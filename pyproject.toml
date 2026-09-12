@@ -1,0 +1,46 @@
+[project]
+name = "fleet-trilogy"
+version = "0.1.0"
+description = "Workspace root for the fleet-trilogy conference talks (1-bit LLMs + Apache Pulsar for connected-fleet telemetry)"
+requires-python = ">=3.11"
+dependencies = [
+    "fleet-telemetry-model",
+    "fleet-simulator",
+    "llm-inference",
+    "talk1-edge-intelligence",
+    "talk2-greenest-token",
+    "talk3-pulsar-speaks-english",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+fleet-telemetry-model = { workspace = true }
+fleet-simulator = { workspace = true }
+llm-inference = { workspace = true }
+talk1-edge-intelligence = { workspace = true }
+talk2-greenest-token = { workspace = true }
+talk3-pulsar-speaks-english = { workspace = true }
+
+[tool.uv.workspace]
+members = [
+    "shared/*",
+    "talks/*",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.6",
+]
+integration = [
+    "testcontainers>=4.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["shared", "talks"]
+markers = [
+    "integration: requires Docker (spins up Pulsar standalone via testcontainers); run with `make test-integration`, never required for `make test`",
+    "model: requires a real llama.cpp-family binary + GGUF model; auto-skips when absent; run with `make test-model`, never required for `make test`",
+]

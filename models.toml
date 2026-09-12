@@ -1,0 +1,34 @@
+# Tier 3 model-comparison manifest — one entry per stage-model candidate.
+#
+# Paths are intentionally NOT committed as real values: every model/binary path is
+# env-overridable and none of these files (GGUF weights, llama.cpp build output) are
+# tracked in this repo (see .gitignore). Defaults below point at where Step 3 of the
+# BitNet-to-Qwen pivot actually downloaded/built things on the dev (M4) machine; override
+# per-host (e.g. on the Pi 4) with the env vars named in each entry.
+#
+# `extra_args` are appended verbatim to the SubprocessLlmBackend command line after the
+# shared `-m -p -n -t --temp` flags — this is where per-model one-shot/template flags
+# (e.g. mainline llama.cpp's `-no-cnv` to disable auto chat-template/conversation mode)
+# live, per docs/CANON.md's runtime-agnostic backend design.
+#
+# `binary_path_env` / `model_path_env` name the env vars `make compare-models` reads for
+# this entry; `default_binary_path` / `default_model_path` are dev-machine fallbacks used
+# only when those env vars are unset.
+
+[[models]]
+id = "qwen2.5-1.5b-instruct-q4km"
+display_name = "Qwen2.5-1.5B-Instruct (Q4_K_M)"
+binary_path_env = "LLM_BINARY_PATH_QWEN15B"
+model_path_env = "LLM_MODEL_PATH_QWEN15B"
+default_binary_path = "~/tools/llama.cpp/build/bin/llama-completion"
+default_model_path = "~/tools/models/Qwen2.5-1.5B-Instruct-GGUF/qwen2.5-1.5b-instruct-q4_k_m.gguf"
+extra_args = ["-no-cnv"]
+
+[[models]]
+id = "qwen2.5-0.5b-instruct-q4km"
+display_name = "Qwen2.5-0.5B-Instruct (Q4_K_M)"
+binary_path_env = "LLM_BINARY_PATH_QWEN05B"
+model_path_env = "LLM_MODEL_PATH_QWEN05B"
+default_binary_path = "~/tools/llama.cpp/build/bin/llama-completion"
+default_model_path = "~/tools/models/Qwen2.5-0.5B-Instruct-GGUF/qwen2.5-0.5b-instruct-q4_k_m.gguf"
+extra_args = ["-no-cnv"]

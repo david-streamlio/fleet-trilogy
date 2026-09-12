@@ -1,0 +1,11 @@
+# Pulsar standalone for LOCAL DEV ONLY, on the laptop — not the Pi.
+# See README.md for why the broker defaults to living off the Pi.
+services:
+  pulsar:
+    image: apachepulsar/pulsar:3.2.2
+    command: bin/pulsar standalone
+    ports:
+      - "6650:6650" # broker (binary protocol) — simulator and edge function connect here
+      - "8080:8080" # admin API/UI — used by `pulsar-admin` and localrun
+    environment:
+      PULSAR_MEM: "-Xms512m -Xmx512m -XX:MaxDirectMemorySize=512m"
