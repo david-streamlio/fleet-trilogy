@@ -31,22 +31,71 @@ pytestmark = pytest.mark.model
 # check_flow_b_severity_calibration judges against) — the single source of truth for
 # what "low"/"medium"/"high" means here.
 #
-# A real run of this fixture (2026-09-26, eval-results/compare-flow-b-*-20260926T131727Z)
-# held stop_go_index=0.8 constant across every tier, so the "low" tier's small
-# eta_slip_min was paired with the SAME "aggressive stop-and-go spikes" traffic_pattern
-# text (see coprocessor.traffic_pattern_from_stop_go_index) as the "high" tier. Every one
-# of 15 models across 5 different families converged on "medium"/"high" for the low tier
-# regardless of size or training — strong evidence the qualitative cues, not eta_slip_min,
-# were driving the model's judgment, and the fixture was internally inconsistent (a real
-# low-severity event wouldn't pair a 4-minute ETA slip with an aggressive stop-go
-# signature in the first place). stop_go_index can't go below
-# detection.STOP_GO_INDEX_THRESHOLD (0.5) without the coprocessor gating the event out
-# entirely (is_probable_slowdown needs all three signals), so "low" sits at that floor
-# rather than in traffic_pattern_from_stop_go_index's lowest ("steady compression") bucket.
+# ROUND 1 (2026-09-26, eval-results/compare-flow-b-*-20260926T131727Z): held
+# stop_go_index=0.8 constant across every tier, so "low"'s small eta_slip_min was
+# paired with the SAME "aggressive stop-and-go spikes" traffic_pattern text as "high".
+# All 15 models across 5 families converged on "medium"/"high" for the low tier
+# regardless of size or training — the qualitative cues, not eta_slip_min, were driving
+# the model's judgment, and the fixture was internally inconsistent.
+#
+# ROUND 2 (2026-09-26, ad-hoc diagnostic against gemma-3-1b-it): fixed round 1's bug but
+# exposed a narrower version of it. traffic_pattern_from_stop_go_index then had only 2
+# text buckets reachable above the detection floor (moderate, aggressive) for 3 tiers, so
+# some pair always shared text — low+medium at first (low called medium 8/10 trials),
+# and shifting the split (medium+high sharing "aggressive" instead) just moved the
+# collision and made the overall picture worse: medium->high confusion rose to 9/10 and
+# high itself regressed to 8/10 correct. The pattern: whichever two tiers share
+# traffic_pattern text, the model defaults to the MORE severe one, not an even split —
+# not fixable by choosing different fixture numbers within a 2-bucket range.
+#
+# ROUND 3 (2026-09-26, production fix): traffic_pattern_from_stop_go_index now has 3
+# distinct descriptions across (0.5, 1.0] — the only range it's ever actually called
+# with in production (is_probable_slowdown already requires stop_go_index >= 0.5) — so
+# low/medium/high each get genuinely different text, not just different numbers. See
+# that function's own docstring in coprocessor.py for the full account. Also observed in
+# round 2's diagnostic, not yet addressed: models leaning "high" fabricated unsupported
+# narrative (event_label "Truck Collision") to justify the call — a grounding failure on
+# the free-text fields, likely rooted in the SEVERITY RULE ENGINE's vocabulary in
+# triage_function.py ("active incident", "peak rush hour") never appearing anywhere in
+# the payload the model actually receives.
+#
+# ROUND 4-6 (2026-09-26, ad-hoc diagnostics against gemma-3-1b-it and lfm2.5-350m):
+# after round 3's fix, medium and high are each cleanly, distinctly identified
+# (medium correct 7/10, was 1/10; high stayed 10/10) — real progress. But low stayed
+# at 0/10 correct (9/10 called medium) despite having its own uniquely distinct
+# "mild" text nothing else shares. Tested and rejected as the cause: removing the
+# fired-signal names entirely (no effect), an explicit qualitative "low-magnitude"
+# assertion (no effect on gemma-3-1b-it; a complete, suspicious 100%-low
+# overcorrection on lfm2.5-350m — closer to keyword latching than judgment), missing
+# mph units (no effect), a mislabeled raw-ISO-timestamp line (no effect), and even an
+# extreme-minimal-magnitude control event with the bare-minimum value on every single
+# signal simultaneously (still never "low" under the default prompt). Also observed
+# in round 4's diagnostic: models leaning "high" fabricated unsupported narrative
+# (event_label "Truck Collision") to justify the call — a grounding failure on the
+# free-text fields, likely rooted in the SEVERITY RULE ENGINE's vocabulary in
+# triage_function.py ("active incident", "peak rush hour") never appearing anywhere
+# in the payload the model actually receives.
+#
+# ROUND 7 (2026-09-26, production fix, partially resolved): round 6 tried giving the
+# model two raw numbers (actual speed + a bare planned-speed baseline) and letting it
+# compute the deviation itself — no effect for either model, and it made gemma-3-1b's
+# medium-tier calibration modestly worse. Precomputing the deviation as cheap math and
+# handing the model the already-computed fact instead — coprocessor.velocity_context,
+# backed by route_plans.py's pre-seeded per-segment plan — did work for lfm2.5-350m:
+# correct "low" calls went from ~0% to 60%, genuinely differentiated (a real mix of
+# low/medium/high, not the round-4 assertion's degenerate 100%-low overcorrection).
+# gemma-3-1b-it was unmoved either way — seven different interventions now, all
+# failed to move it off "medium" for this tier, which is about as strong a case as
+# this investigation can build that its behavior here is an intrinsic property of
+# that model, not an input-engineering problem. Model-dependent, not a universal fix,
+# but a real, no-downside win for at least one model, kept in production
+# (coprocessor.py) rather than reverted, since I-95N-segment-3 (this fixture's
+# route_segment) is now pre-seeded with a real plan and gets a real, non-"unknown"
+# historical_baseline_speed as a result.
 _SEVERITY_SIGNAL_PROFILE = {
-    "low": {"rolling_avg_speed": 39.0, "stop_go_index": 0.50},
-    "medium": {"rolling_avg_speed": 28.0, "stop_go_index": 0.60},
-    "high": {"rolling_avg_speed": 15.0, "stop_go_index": 0.85},
+    "low": {"rolling_avg_speed": 39.0, "stop_go_index": 0.55},
+    "medium": {"rolling_avg_speed": 28.0, "stop_go_index": 0.72},
+    "high": {"rolling_avg_speed": 15.0, "stop_go_index": 0.90},
 }
 
 

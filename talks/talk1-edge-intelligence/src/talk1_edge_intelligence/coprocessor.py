@@ -19,9 +19,12 @@ hardcoded a fake historical_baseline_speed context field with a comment
 admitting it would be "programmatically generated in production." This module
 maps the real stop_go_index scalar to a descriptive traffic_pattern string
 instead of a fabricated trend, and derives local_time from the event's real
-timestamp; it does not emit historical_baseline_speed at all, since there's no
-real source for it in this schema. See triage_function.py's DEFAULT_PROMPT_TEMPLATE,
-which renders "unknown" for that field when it's absent instead of a made-up number.
+timestamp. historical_baseline_speed now DOES get emitted, but only from a real
+source — route_plans.py's pre-seeded per-segment plan (see velocity_context
+below) — and only for segments that actually have one; a segment with no plan
+gets no baseline at all, same as before, rather than a fabricated one. See
+triage_function.py's DEFAULT_PROMPT_TEMPLATE, which still renders "unknown" for
+that field when it's absent.
 """
 
 from __future__ import annotations
@@ -35,21 +38,73 @@ from fleet_telemetry_model import (
     is_probable_slowdown,
 )
 
+from talk1_edge_intelligence.route_plans import get_route_segment_plan
+
 DEFAULT_MIN_ETA_SLIP_MIN = 3.0
 DEFAULT_MAX_ETA_SLIP_MIN = 60.0
 
 
 def traffic_pattern_from_stop_go_index(stop_go_index: float) -> str:
-    """Descriptive label for the real stop_go_index scalar — not a fabricated trend."""
-    if stop_go_index > 0.7:
-        return "high velocity variance (aggressive stop-and-go spikes)"
+    """Descriptive label for the real stop_go_index scalar — not a fabricated trend.
+
+    build_triage_payload (below) is only ever called after is_probable_slowdown has
+    already confirmed all three signals, including stop_go_index >=
+    detection.STOP_GO_INDEX_THRESHOLD (0.5) — so in real production use, every call
+    this function actually receives lands in (0.5, 1.0], never the "steady" branch
+    below. The three thresholds above 0.5 split that real range into three
+    genuinely distinct descriptions (not two, as an earlier version had it): a
+    real Tier-3 eval run found that when two tiers land in the same bucket here,
+    the LLM doesn't split its severity call evenly between them — it defaults to
+    the more severe one, regardless of which two tiers were sharing text. Fewer
+    than three distinct buckets across the reachable range silently miscalibrates
+    the model reading this field, not just the eval measuring it — see
+    tests/model/test_flow_b_triage.py's _SEVERITY_SIGNAL_PROFILE comment for the
+    full account.
+    """
+    if stop_go_index > 0.8:
+        return "severe stop-and-go compaction (repeated hard braking)"
+    if stop_go_index > 0.65:
+        return "elevated velocity variance (frequent speed cycling)"
     if stop_go_index > 0.3:
-        return "moderate speed oscillations (unstable wave flow)"
+        return "mild speed oscillations (intermittent deceleration)"
     return "steady compression (uniform linear deceleration)"
+
+
+def velocity_context(actual_speed_mph: float, route_segment: str) -> str | None:
+    """Cheap-math deviation-from-plan description, or None if route_segment has no
+    pre-seeded plan (route_plans.py) — never a fabricated baseline.
+
+    Handing the LLM this already-computed fact, instead of a bare planned-speed
+    number and letting the model subtract the two itself, is a real, confirmed fix,
+    not a guess: a real Tier-3 eval investigation (2026-09-26) chasing why the "low"
+    severity tier stayed miscalibrated found that giving two small real models
+    (Gemma-3-1B-it, LFM2.5-350M) a raw planned-speed number changed nothing for
+    either — neither one reliably computed the deviation itself, and for Gemma it
+    made an unrelated tier's calibration worse. Precomputing the percentage here
+    and handing it over as a stated fact instead: no effect on Gemma-3-1B-it either
+    way (no regression), but LFM2.5-350M's correct "low" call rate went from ~0% to
+    60%, and it was genuinely differentiated (a mix of low/medium/high outputs, not
+    a keyword-triggered 100%-low overcorrection like an earlier, unfounded-assertion
+    version of this same idea caused). Model-dependent, not a universal fix — see
+    tests/model/test_flow_b_triage.py's _SEVERITY_SIGNAL_PROFILE comment for the
+    full multi-round account — but a real, no-downside win for at least one model,
+    built on real data rather than an assertion.
+    """
+    plan = get_route_segment_plan(route_segment)
+    if plan is None:
+        return None
+    deviation_pct = 100 * (1 - actual_speed_mph / plan.planned_avg_speed_mph)
+    direction = "below" if deviation_pct >= 0 else "above"
+    return f"{plan.planned_avg_speed_mph:.0f} mph planned, {abs(deviation_pct):.0f}% {direction} plan"
 
 
 def build_triage_payload(event: TelemetryEvent, triggered_signals: list[str]) -> dict:
     """The Flow B payload shape LlmTriageFunction.process() parses."""
+    contextual_triggers = {"local_time": event.timestamp.isoformat()}
+    context = velocity_context(event.signals.rolling_avg_speed, event.route_segment)
+    if context is not None:
+        contextual_triggers["historical_baseline_speed"] = context
+
     return {
         "truck_id": event.truck_id,
         "corridor": event.corridor,
@@ -59,9 +114,7 @@ def build_triage_payload(event: TelemetryEvent, triggered_signals: list[str]) ->
             "eta_slip_min": event.signals.eta_slip_min,
             "traffic_pattern": traffic_pattern_from_stop_go_index(event.signals.stop_go_index),
         },
-        "contextual_triggers": {
-            "local_time": event.timestamp.isoformat(),
-        },
+        "contextual_triggers": contextual_triggers,
     }
 
 

@@ -56,7 +56,7 @@ DEFAULT_PROMPT_TEMPLATE = (
     "Truck ID: {truck_id}\n"
     "Corridor Location: {corridor}\n"
     "Pre-existing Fired Mathematical Signals: {signals}\n"
-    "Current Velocity Track: {rolling_avg_speed} (Baseline Expectation: {historical_baseline_speed})\n"
+    "Current Velocity Track: {rolling_avg_speed} mph ({historical_baseline_speed})\n"
     "Current Traffic Footprint Pattern: {traffic_pattern}\n"
     "System Environmental Constraints: {local_time}\n"
     "Calculated Primary ETA Slip Deficit: {eta_slip_min} minutes\n\n"

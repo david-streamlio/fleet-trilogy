@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 920" font-family="Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="1440" height="920" fill="#f6f5f2"/>
+
+  <!-- Title -->
+  <text x="60" y="42" font-size="13" font-weight="700" letter-spacing="2" fill="#d9622b">MODEL EVALUATION METHODOLOGY</text>
+  <text x="60" y="80" font-size="34" font-weight="700" fill="#1c2129">The Model Testing Cycle</text>
+
+  <!-- ============ MAIN FUNNEL ============ -->
+
+  <!-- Start pill -->
+  <rect x="60" y="120" width="780" height="50" rx="25" fill="#1c2129"/>
+  <text x="450" y="151" font-size="16" font-weight="600" fill="#f6f5f2" text-anchor="middle">MODEL SPECTRUM — 16 candidates (models.toml)</text>
+
+  <!-- connector: start -> layer0 -->
+  <line x1="450" y1="171" x2="450" y2="189" stroke="#5b6472" stroke-width="2.5"/>
+  <polygon points="450,196 442,183 458,183" fill="#5b6472"/>
+
+  <!-- Stage 1: Layer 0 -->
+  <rect x="60" y="198" width="780" height="130" rx="14" fill="#ffffff" stroke="#e1ddd3" stroke-width="1.5"/>
+  <rect x="60" y="198" width="8" height="130" rx="4" fill="#5b6472"/>
+  <text x="90" y="228" font-size="19" font-weight="700" fill="#1c2129">LAYER 0 — Can it even run here?</text>
+  <text x="90" y="251" font-size="13" fill="#5b6472" font-style="italic">Zero inference calls — pure filtering, before spending any eval budget</text>
+  <text x="90" y="283" font-size="13" fill="#1c2129">•  Runtime supports the architecture</text>
+  <text x="90" y="303" font-size="13" fill="#1c2129">•  A real, verified quantized artifact exists</text>
+  <text x="470" y="283" font-size="13" fill="#1c2129">•  Static footprint fits the device, with margin</text>
+  <text x="470" y="303" font-size="13" fill="#1c2129">•  Survives sustained load on the real target</text>
+  <text x="90" y="321" font-size="13" fill="#1c2129">•  Integrates with the runtime (chat template / grammar)</text>
+
+  <!-- connector: layer0 -> gate1 -->
+  <line x1="450" y1="328" x2="450" y2="346" stroke="#5b6472" stroke-width="2.5"/>
+  <polygon points="450,353 442,340 458,340" fill="#5b6472"/>
+
+  <!-- Stage 2: Gate 1 -->
+  <rect x="60" y="355" width="780" height="95" rx="14" fill="#ffffff" stroke="#e1ddd3" stroke-width="1.5"/>
+  <rect x="60" y="355" width="8" height="95" rx="4" fill="#b23b3b"/>
+  <text x="90" y="385" font-size="19" font-weight="700" fill="#1c2129">GATE 1 — Format reliability</text>
+  <text x="90" y="408" font-size="13" fill="#5b6472" font-style="italic">~30 calls/model · parse rate ≥ 80% to proceed</text>
+  <text x="90" y="430" font-size="13" fill="#1c2129">Catches structural failures — the 0.5B degenerate-repetition collapse, 350M prompt-echo</text>
+
+  <!-- connector: gate1 -> gate2 -->
+  <line x1="450" y1="450" x2="450" y2="468" stroke="#5b6472" stroke-width="2.5"/>
+  <polygon points="450,475 442,462 458,462" fill="#5b6472"/>
+
+  <!-- Stage 3: Gate 2 -->
+  <rect x="60" y="477" width="780" height="110" rx="14" fill="#ffffff" stroke="#e1ddd3" stroke-width="1.5"/>
+  <rect x="60" y="477" width="8" height="110" rx="4" fill="#b23b3b"/>
+  <text x="90" y="507" font-size="19" font-weight="700" fill="#1c2129">GATE 2 — Severity calibration</text>
+  <text x="90" y="530" font-size="13" fill="#5b6472" font-style="italic">~90 calls/model (3x confirm) · mismatch rate ≤ 50% to proceed</text>
+  <text x="90" y="552" font-size="13" fill="#1c2129">The real judgment test — format and judgment are different capabilities;</text>
+  <text x="90" y="570" font-size="13" fill="#1c2129">a model can parse perfectly and still fail this gate</text>
+
+  <!-- connector: gate2 -> resource gate -->
+  <line x1="450" y1="587" x2="450" y2="605" stroke="#5b6472" stroke-width="2.5"/>
+  <polygon points="450,612 442,599 458,599" fill="#5b6472"/>
+
+  <!-- Stage 4: Resource gate -->
+  <rect x="60" y="614" width="780" height="95" rx="14" fill="#ffffff" stroke="#e1ddd3" stroke-width="1.5"/>
+  <rect x="60" y="614" width="8" height="95" rx="4" fill="#5b6472"/>
+  <text x="90" y="644" font-size="19" font-weight="700" fill="#1c2129">RESOURCE GATE — the real target hardware</text>
+  <text x="90" y="667" font-size="13" fill="#5b6472" font-style="italic">latency · RAM · tokens/sec, measured on the Pi 4 — not the dev machine</text>
+  <text x="90" y="689" font-size="13" fill="#1c2129">M4 numbers are quality-only; only a Pi 4 run is decision-grade</text>
+
+  <!-- connector: resource gate -> ship/iterate -->
+  <line x1="450" y1="709" x2="450" y2="727" stroke="#5b6472" stroke-width="2.5"/>
+  <polygon points="450,734 442,721 458,721" fill="#5b6472"/>
+
+  <!-- Stage 5: Ship / Iterate -->
+  <rect x="60" y="736" width="380" height="100" rx="14" fill="#e3f0e9" stroke="#2f7d5c" stroke-width="1.5"/>
+  <text x="250" y="776" font-size="20" font-weight="700" fill="#2f7d5c" text-anchor="middle">SHIP</text>
+  <text x="250" y="801" font-size="13" fill="#2f7d5c" text-anchor="middle">Cleared every gate on the real target</text>
+
+  <rect x="460" y="736" width="380" height="100" rx="14" fill="#f4e6d6" stroke="#a8631f" stroke-width="1.5"/>
+  <text x="650" y="776" font-size="20" font-weight="700" fill="#a8631f" text-anchor="middle">ITERATE</text>
+  <text x="650" y="801" font-size="13" fill="#a8631f" text-anchor="middle">A gate found a real gap — diagnose it →</text>
+
+  <!-- Arrow from ITERATE into the side diagnostic loop -->
+  <line x1="840" y1="786" x2="893" y2="786" stroke="#a8631f" stroke-width="2.5"/>
+  <polygon points="900,786 887,778 887,794" fill="#a8631f"/>
+
+  <!-- ============ SIDE PANEL: DIAGNOSTIC LOOP ============ -->
+  <rect x="920" y="255" width="460" height="545" rx="16" fill="#fbf6ee" stroke="#a8631f" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <text x="1150" y="290" font-size="16" font-weight="700" fill="#a8631f" text-anchor="middle" letter-spacing="0.5">WHEN A GATE FINDS A GAP</text>
+
+  <!-- step boxes -->
+  <rect x="950" y="315" width="400" height="58" rx="10" fill="#ffffff" stroke="#e1ddd3"/>
+  <text x="970" y="349" font-size="14" fill="#1c2129">1 · Isolate ONE variable at a time</text>
+
+  <line x1="1150" y1="375" x2="1150" y2="389" stroke="#a8631f" stroke-width="2.5"/>
+  <polygon points="1150,396 1142,384 1158,384" fill="#a8631f"/>
+
+  <rect x="950" y="399" width="400" height="58" rx="10" fill="#ffffff" stroke="#e1ddd3"/>
+  <text x="970" y="433" font-size="14" fill="#1c2129">2 · Test cheaply, on a fast small model</text>
+
+  <line x1="1150" y1="459" x2="1150" y2="473" stroke="#a8631f" stroke-width="2.5"/>
+  <polygon points="1150,480 1142,468 1158,468" fill="#a8631f"/>
+
+  <rect x="950" y="483" width="400" height="58" rx="10" fill="#ffffff" stroke="#e1ddd3"/>
+  <text x="970" y="517" font-size="14" fill="#1c2129">3 · Confirm or reject the hypothesis</text>
+
+  <line x1="1150" y1="543" x2="1150" y2="557" stroke="#a8631f" stroke-width="2.5"/>
+  <polygon points="1150,564 1142,552 1158,552" fill="#a8631f"/>
+
+  <rect x="950" y="567" width="400" height="58" rx="10" fill="#ffffff" stroke="#e1ddd3"/>
+  <text x="970" y="601" font-size="14" fill="#1c2129">4 · Fix: prompt wording, or cheap math</text>
+
+  <line x1="1150" y1="627" x2="1150" y2="641" stroke="#a8631f" stroke-width="2.5"/>
+  <polygon points="1150,648 1142,636 1158,636" fill="#a8631f"/>
+
+  <rect x="950" y="651" width="400" height="58" rx="10" fill="#ffffff" stroke="#e1ddd3"/>
+  <text x="970" y="685" font-size="14" fill="#1c2129">5 · Re-validate against real models</text>
+
+  <!-- loop-back path: step 5 -> step 1, rejected hypothesis path -->
+  <path d="M 1350 680 C 1400 680 1400 344 1350 344" stroke="#a8631f" stroke-width="1.75" fill="none"/>
+  <polygon points="1350,344 1362,338 1362,350" fill="#a8631f"/>
+  <text x="1414" y="512" font-size="11" fill="#a8631f" text-anchor="middle" transform="rotate(90 1414 512)">rejected — try the next variable</text>
+
+  <!-- exit path: back into the main funnel to re-run the gate -->
+  <path d="M 950 680 C 890 680 890 590 843 555" stroke="#2f7d5c" stroke-width="2.5" fill="none"/>
+  <polygon points="838,551 852,553 844,566" fill="#2f7d5c"/>
+  <text x="905" y="720" font-size="11" fill="#2f7d5c" text-anchor="middle">confirmed fix —</text>
+  <text x="905" y="734" font-size="11" fill="#2f7d5c" text-anchor="middle">re-run the gate</text>
+
+  <!-- Real example caption -->
+  <rect x="60" y="855" width="1320" height="55" rx="10" fill="#eceae5"/>
+  <text x="80" y="878" font-size="12.5" font-weight="600" fill="#1c2129">Real example, this project:</text>
+  <text x="80" y="897" font-size="12.5" fill="#5b6472">low-severity miscalibration took 7 rounds — 6 negative results (signal framing, units, timestamps) ruled out before a precomputed cheap-math deviation-from-plan fix worked, for one model, with no regression on another.</text>
+</svg>
