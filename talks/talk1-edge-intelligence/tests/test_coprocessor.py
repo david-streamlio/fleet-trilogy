@@ -28,7 +28,13 @@ class _FakeContext:
 
 
 def _event(
-    *, rolling_avg_speed: float, eta_slip_min: float, stop_go_index: float, route_segment: str = "seg-1"
+    *,
+    rolling_avg_speed: float,
+    eta_slip_min: float,
+    stop_go_index: float,
+    route_segment: str = "seg-1",
+    peak_deceleration_g: float = 0.0,
+    abs_engaged: bool = False,
 ) -> TelemetryEvent:
     return TelemetryEvent(
         timestamp=datetime(2026, 9, 12, 17, 15, 0, tzinfo=UTC),
@@ -45,6 +51,8 @@ def _event(
             eta_slip_min=eta_slip_min,
             stop_go_index=stop_go_index,
         ),
+        peak_deceleration_g=peak_deceleration_g,
+        abs_engaged=abs_engaged,
         _ground_truth="slowdown_incident",
     )
 
@@ -167,3 +175,25 @@ def test_process_returns_none_on_unparseable_input():
     function = TelemetryCoprocessorFunction()
     result = function.process("not json", _FakeContext())
     assert result is None
+
+
+def test_build_triage_payload_computes_baseline_severity_deterministically():
+    # abs_engaged=True is an unconditional override to "high" per
+    # severity_classifier.classify_severity, regardless of the other signals.
+    event = _event(
+        rolling_avg_speed=35.0, eta_slip_min=13.8, stop_go_index=0.6, abs_engaged=True
+    )
+    payload = build_triage_payload(event, ["sustained_low_speed", "stop_go_index", "eta_slip"])
+    assert payload["baseline_severity"] == "high"
+    assert payload["metrics"]["abs_engaged"] is True
+    assert payload["metrics"]["peak_deceleration_g"] == 0.0
+
+
+def test_build_triage_payload_includes_trip_context_for_a_known_truck():
+    # _event() hardcodes truck_id="truck-47", which trip_context.py pre-seeds.
+    event = _event(rolling_avg_speed=35.0, eta_slip_min=13.8, stop_go_index=0.6)
+    payload = build_triage_payload(event, ["sustained_low_speed", "stop_go_index", "eta_slip"])
+    triggers = payload["contextual_triggers"]
+    assert triggers["weather_condition"]
+    assert triggers["cargo_type"]
+    assert triggers["dispatch_status"]

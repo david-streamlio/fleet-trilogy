@@ -25,6 +25,10 @@ below) — and only for segments that actually have one; a segment with no plan
 gets no baseline at all, same as before, rather than a fabricated one. See
 triage_function.py's DEFAULT_PROMPT_TEMPLATE, which still renders "unknown" for
 that field when it's absent.
+
+Also computes `baseline_severity` deterministically now (severity_classifier.py)
+rather than leaving it to the LLM — see build_triage_payload's docstring and
+docs/TALK2-DATA-ENGINEERING-IMPACT-TRACK.md for why.
 """
 
 from __future__ import annotations
@@ -39,6 +43,8 @@ from fleet_telemetry_model import (
 )
 
 from talk1_edge_intelligence.route_plans import get_route_segment_plan
+from talk1_edge_intelligence.severity_classifier import classify_severity
+from talk1_edge_intelligence.trip_context import get_trip_context
 
 DEFAULT_MIN_ETA_SLIP_MIN = 3.0
 DEFAULT_MAX_ETA_SLIP_MIN = 60.0
@@ -99,11 +105,34 @@ def velocity_context(actual_speed_mph: float, route_segment: str) -> str | None:
 
 
 def build_triage_payload(event: TelemetryEvent, triggered_signals: list[str]) -> dict:
-    """The Flow B payload shape LlmTriageFunction.process() parses."""
+    """The Flow B payload shape LlmTriageFunction.process() parses.
+
+    `baseline_severity` is computed here, deterministically, by
+    severity_classifier.classify_severity — not left for the LLM to derive. See
+    that module's docstring for why: ten-plus rounds of real-model testing this
+    session found every model asked to classify severity from graduated numeric
+    signals unreliable, while a function does the same classification perfectly.
+    The LLM's job (triage_function.py) is now a bounded escalate/confirm/
+    de-escalate adjustment on top of this baseline, driven by genuinely
+    unstructured operational context (trip_context.py) that a lookup table can't
+    reduce to a threshold — not re-deriving severity from scratch.
+    """
     contextual_triggers = {"local_time": event.timestamp.isoformat()}
     context = velocity_context(event.signals.rolling_avg_speed, event.route_segment)
     if context is not None:
         contextual_triggers["historical_baseline_speed"] = context
+
+    trip_context = get_trip_context(event.truck_id)
+    if trip_context is not None:
+        contextual_triggers["weather_condition"] = trip_context.weather_condition
+        contextual_triggers["cargo_type"] = trip_context.cargo_type
+        contextual_triggers["dispatch_status"] = trip_context.dispatch_status
+
+    baseline_severity = classify_severity(
+        peak_deceleration_g=event.peak_deceleration_g,
+        abs_engaged=event.abs_engaged,
+        stop_go_index=event.signals.stop_go_index,
+    )
 
     return {
         "truck_id": event.truck_id,
@@ -113,7 +142,10 @@ def build_triage_payload(event: TelemetryEvent, triggered_signals: list[str]) ->
             "rolling_avg_speed": event.signals.rolling_avg_speed,
             "eta_slip_min": event.signals.eta_slip_min,
             "traffic_pattern": traffic_pattern_from_stop_go_index(event.signals.stop_go_index),
+            "peak_deceleration_g": event.peak_deceleration_g,
+            "abs_engaged": event.abs_engaged,
         },
+        "baseline_severity": baseline_severity,
         "contextual_triggers": contextual_triggers,
     }
 

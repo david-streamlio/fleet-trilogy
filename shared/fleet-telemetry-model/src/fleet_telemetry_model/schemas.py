@@ -48,6 +48,16 @@ class TelemetryEvent(BaseModel):
     signals: Signals
     brake_events: int = 0
     downshift_events: int = 0
+    # Raw per-event sensor readings, same category as brake_events/downshift_events
+    # above — not derived/computed like Signals' fields. peak_deceleration_g is the
+    # magnitude a real IMU/accelerometer reports for the single hardest braking event
+    # in the window (commercial telematics typically expose a discrete, pre-thresholded
+    # per-event g-force reading, not a raw continuous stream — see
+    # talk1_edge_intelligence.severity_classifier's module docstring). abs_engaged is
+    # the real ABS system flag off the CAN/J1939 bus: an objective, binary signature of
+    # the tires actually losing traction, not an inferred/estimated condition.
+    peak_deceleration_g: float = 0.0
+    abs_engaged: bool = False
     ground_truth: Literal["normal", "slowdown_incident"] = Field(alias="_ground_truth")
 
 
