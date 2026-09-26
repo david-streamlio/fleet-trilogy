@@ -1,4 +1,4 @@
-.PHONY: install test test-integration test-model compare-models sim-dryrun
+.PHONY: install test test-integration test-model compare-models compare-flow-b-models sim-dryrun
 
 # Installs the whole uv workspace into one venv.
 install:
@@ -28,6 +28,14 @@ test-model:
 # cleanly if zero manifest models are available.
 compare-models:
 	uv run pytest tests/model/test_compare_models.py -m model -s $(ARGS)
+
+# Opt-in. Same idea as compare-models but for Flow B (TelemetryCoprocessorFunction ->
+# LlmTriageFunction, see talk1_edge_intelligence/coprocessor.py) instead of Flow A's
+# EnrichmentCard pipeline — grammar-constrained triage cards, not free-text JSON, so
+# it measures format/severity/latency/RAM only (no grounding or directional_accuracy
+# axes). Writes eval-results/compare-flow-b-<host>-<timestamp>.json.
+compare-flow-b-models:
+	uv run pytest tests/model/test_compare_flow_b_models.py -m model -s $(ARGS)
 
 # Sample fleet-simulator output, no Pulsar connection required.
 sim-dryrun:
