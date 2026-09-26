@@ -37,11 +37,21 @@ def _resolve(env_var: str, default_path: str | None) -> Path | None:
     return Path(raw).expanduser() if raw else None
 
 
-def load_models_manifest(manifest_path: Path = DEFAULT_MANIFEST_PATH) -> list[ModelEntry]:
+def load_models_manifest(
+    manifest_path: Path = DEFAULT_MANIFEST_PATH,
+    include_ids: frozenset[str] | None = None,
+) -> list[ModelEntry]:
+    """`include_ids`, when given, re-includes specific `enabled = false` entries by
+    id for one caller/run without touching the manifest file itself — the `enabled`
+    flag is a durable, cross-run historical record (see models.toml's own header
+    comment), and a single comparison run wanting a wider or narrower slice of it
+    shouldn't have to edit that record to get one."""
     with manifest_path.open("rb") as f:
         data = tomllib.load(f)
     entries = []
     for raw in data.get("models", []):
+        if not raw.get("enabled", True) and raw["id"] not in (include_ids or frozenset()):
+            continue
         entries.append(
             ModelEntry(
                 id=raw["id"],

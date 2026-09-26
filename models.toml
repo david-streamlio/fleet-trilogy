@@ -14,10 +14,24 @@
 # `binary_path_env` / `model_path_env` name the env vars `make compare-models` reads for
 # this entry; `default_binary_path` / `default_model_path` are dev-machine fallbacks used
 # only when those env vars are unset.
+#
+# GATE-2 RESULT (2026-09-25, 18:57 UTC) — eval-results/compare-COMP-J2D9D71YNJ-20260925T185711Z.json:
+# 8 of these 9 entries are ELIMINATED (production_candidates: reject). Qwen3-8B is the
+# sole PASS. Entries stay in this manifest for the historical record/re-run capability —
+# see each entry's own comment below for its specific verdict, and
+# docs/TALK2-OUTLINE.md's "Update — gate-2-confirmed result" section for the full table.
+#
+# `enabled` (default true, read by tests/model/models_manifest.py) controls whether an
+# entry is part of `make compare-models` going forward. All 8 gate-2-eliminated entries
+# below are set `enabled = false` — they stay in the file as a historical/re-run record,
+# but no longer run by default. Flip back to `true` (or delete the line) to re-include one.
 
 [[models]]
 id = "qwen2.5-1.5b-instruct-q4km"
 display_name = "Qwen2.5-1.5B-Instruct (Q4_K_M)"
+enabled = false
+# ELIMINATED (gate 1): format_parse_rate=0.767, below the 0.80 production_candidates
+# threshold — never reached gate 2 (severity calibration).
 binary_path_env = "LLM_BINARY_PATH_QWEN15B"
 model_path_env = "LLM_MODEL_PATH_QWEN15B"
 default_binary_path = "~/tools/llama.cpp/build/bin/llama-completion"
@@ -27,8 +41,251 @@ extra_args = ["-no-cnv"]
 [[models]]
 id = "qwen2.5-0.5b-instruct-q4km"
 display_name = "Qwen2.5-0.5B-Instruct (Q4_K_M)"
+enabled = false
+# ELIMINATED (gate 1): format_parse_rate=0.567 — never reached gate 2. Root cause is the
+# 0.5B capability cliff (degenerate repetition, not a formatting nit) —
+# docs/TALK2-0.5B-CAPABILITY-CLIFF.md.
 binary_path_env = "LLM_BINARY_PATH_QWEN05B"
 model_path_env = "LLM_MODEL_PATH_QWEN05B"
 default_binary_path = "~/tools/llama.cpp/build/bin/llama-completion"
 default_model_path = "~/tools/models/Qwen2.5-0.5B-Instruct-GGUF/qwen2.5-0.5b-instruct-q4_k_m.gguf"
+extra_args = ["-no-cnv"]
+
+# Cross-family additions — docs/TALK2-MODEL-SPECTRUM-ACCURACY-PLAN.md's M4
+# accuracy gate ("what I learned broadening beyond Qwen2.5"), not a same-family
+# spectrum. All still SubprocessLlmBackend/CPU llama.cpp, not HttpLlmBackend,
+# to keep the gate's measurement method consistent across models (see that
+# doc's per-family notes for why, and for the GLM-4 llama.cpp-support caveat).
+
+[[models]]
+id = "llama-3.1-8b-instruct-q4km"
+display_name = "Llama-3.1-8B-Instruct (Q4_K_M)"
+enabled = false
+# Verified source: https://huggingface.co/unsloth/Llama-3.1-8B-Instruct-GGUF
+# (Llama-3.1-8B-Instruct-Q4_K_M.gguf, 4.92 GB). The official meta-llama repo
+# has no GGUF files at all — this unsloth mirror is the quantized source.
+# ELIMINATED (gate 2): format_parse_rate=0.967 (cleared gate 1) but
+# severity_mismatch_rate=0.506 (n=89) exceeds the 0.50 production_candidates bar —
+# parses fine, judgment fails.
+binary_path_env = "LLM_BINARY_PATH_LLAMA31_8B"
+model_path_env = "LLM_MODEL_PATH_LLAMA31_8B"
+default_binary_path = "~/tools/llama.cpp/build/bin/llama-completion"
+default_model_path = "~/tools/models/Llama-3.1-8B-Instruct-GGUF/Llama-3.1-8B-Instruct-Q4_K_M.gguf"
+extra_args = ["-no-cnv"]
+
+[[models]]
+id = "qwen3-8b-q4km"
+display_name = "Qwen3-8B (Q4_K_M)"
+# Verified source: https://huggingface.co/Aldaris/Qwen3-8B-Q4_K_M-GGUF
+# (qwen3-8b-q4_k_m.gguf, 5.03 GB).
+# SOLE SURVIVING CANDIDATE (2026-09-25, gate-2 confirmed): the only PASS across all 9
+# entries — severity_mismatch_rate=0.205 (n=88). Not yet a final stage-model pick: the
+# Pi 4 decision-grade run (docs/PI4-RUNBOOK.md) on this model's actual RAM/latency
+# footprint hasn't happened yet.
+binary_path_env = "LLM_BINARY_PATH_QWEN3_8B"
+model_path_env = "LLM_MODEL_PATH_QWEN3_8B"
+default_binary_path = "~/tools/llama.cpp/build/bin/llama-completion"
+default_model_path = "~/tools/models/Qwen3-8B-GGUF/qwen3-8b-q4_k_m.gguf"
+extra_args = ["-no-cnv"]
+
+[[models]]
+id = "glm-4-9b-0414-q4km"
+display_name = "GLM-4-9B-0414 (Q4_K_M)"
+enabled = false
+# Verified source: https://huggingface.co/unsloth/GLM-4-9B-0414-GGUF
+# (GLM-4-9B-0414-Q4_K_M.gguf, 6.17 GB).
+# ELIMINATED (gate 2): format_parse_rate=1.000 (cleared gate 1) but
+# severity_mismatch_rate=0.578 (n=90) exceeds the bar — same "parses perfectly, judgment
+# fails" shape as Llama-3.1-8B above.
+binary_path_env = "LLM_BINARY_PATH_GLM4_9B"
+model_path_env = "LLM_MODEL_PATH_GLM4_9B"
+default_binary_path = "~/tools/llama.cpp/build/bin/llama-completion"
+default_model_path = "~/tools/models/GLM-4-9B-0414-GGUF/GLM-4-9B-0414-Q4_K_M.gguf"
+extra_args = ["-no-cnv"]
+
+# Extreme-low-end additions, sourced from a Raspberry Pi 5 community roundup
+# (not independently verified against HF — confirm real repo IDs before
+# pulling weights; paths below are placeholders same as the three entries
+# above). Qwen3-0.6B: does the next Qwen generation avoid the degenerate-
+# repetition collapse found at Qwen2.5-0.5B? LFM2.5-350M / Granite-4.0-H-350M:
+# purpose-built tiny models claiming high tokens/sec at this size — per
+# docs/TALK2-0.5B-CAPABILITY-CLIFF.md, raw speed alone doesn't mean the output
+# is real; the gate is what actually tells us. Ling-3.0-tiny: sparse MoE
+# (7.9B total / 1.3B active params) — RAM tracks total params, compute/speed
+# tracks active params, a different lever than dense quantization.
+
+[[models]]
+id = "qwen3-0.6b-q8-0"
+display_name = "Qwen3-0.6B (Q8_0)"
+enabled = false
+# Verified source: https://huggingface.co/drmcbride/Qwen3-0.6B-Q8_0-GGUF
+# (qwen3-0.6b-q8_0.gguf, 805 MB).
+# ELIMINATED (gate 1): format_parse_rate=0.767, below threshold — never reached gate 2.
+# Also has the worst grounding_violation_rate of the whole spectrum (0.889) on the
+# trials that did parse.
+binary_path_env = "LLM_BINARY_PATH_QWEN3_06B"
+model_path_env = "LLM_MODEL_PATH_QWEN3_06B"
+default_binary_path = "~/tools/llama.cpp/build/bin/llama-completion"
+default_model_path = "~/tools/models/Qwen3-0.6B-GGUF/qwen3-0.6b-q8_0.gguf"
+extra_args = ["-no-cnv"]
+
+[[models]]
+id = "lfm2.5-350m-q8-0"
+display_name = "LFM2.5-350M (Q8_0)"
+enabled = false
+# Verified source: https://huggingface.co/NANI-Nithin/LFM2.5-350M-RLCD-GGUF
+# (LFM2.5-350M-RLCD-Q8_0.gguf, 379 MB). The notnotsamuel/LFM2.5-350M-RLCD
+# repo (safetensors only, no GGUF) is the base this was quantized from.
+# ELIMINATED (gate 1): format_parse_rate=0.000 — zero parseable cards across 30 trials.
+# Distinct failure shape from the 0.5B cliff (prompt-echo, not degenerate repetition) —
+# docs/TALK2-350M-PROMPT-ECHO.md.
+binary_path_env = "LLM_BINARY_PATH_LFM25_350M"
+model_path_env = "LLM_MODEL_PATH_LFM25_350M"
+default_binary_path = "~/tools/llama.cpp/build/bin/llama-completion"
+default_model_path = "~/tools/models/LFM2.5-350M-GGUF/LFM2.5-350M-RLCD-Q8_0.gguf"
+extra_args = ["-no-cnv"]
+
+[[models]]
+id = "granite-4.0-h-350m-q8-0"
+display_name = "Granite-4.0-H-350M (Q8_0)"
+enabled = false
+# Verified source: https://huggingface.co/unsloth/granite-4.0-h-350m-GGUF
+# (granite-4.0-h-350m-Q8_0.gguf, 366 MB). All 9 entries in this file now have
+# a verified real GGUF source — see each entry's own comment for its link.
+# ELIMINATED (gate 1): format_parse_rate=0.000 — zero parseable cards, same prompt-echo
+# failure shape as LFM2.5-350M above (docs/TALK2-350M-PROMPT-ECHO.md).
+binary_path_env = "LLM_BINARY_PATH_GRANITE40H_350M"
+model_path_env = "LLM_MODEL_PATH_GRANITE40H_350M"
+default_binary_path = "~/tools/llama.cpp/build/bin/llama-completion"
+default_model_path = "~/tools/models/granite-4.0-h-350m-GGUF/granite-4.0-h-350m-Q8_0.gguf"
+extra_args = ["-no-cnv"]
+
+[[models]]
+id = "ling-3.0-tiny-7.9b-a1.3b-q4km"
+display_name = "Ling-3.0-tiny (7.9B-A1.3B, Q4_K_M)"
+enabled = false
+# Verified source: https://huggingface.co/bloomer010/Ling-3.0-tiny-GGUF
+# (Ling-3.0-tiny-Q4_K_M.gguf, 4.82 GB). Neither this repo nor the base
+# inclusionAI/Ling-3.0-tiny repo states total/active param counts in the
+# model card — the 7.9B-total/1.3B-active figure in this entry's id/display
+# name is still community-sourced and not independently confirmed on HF.
+# ELIMINATED (gate 1): format_parse_rate=0.367, below threshold — never reached gate 2.
+binary_path_env = "LLM_BINARY_PATH_LING30_TINY"
+model_path_env = "LLM_MODEL_PATH_LING30_TINY"
+default_binary_path = "~/tools/llama.cpp/build/bin/llama-completion"
+default_model_path = "~/tools/models/Ling-3.0-tiny-GGUF/Ling-3.0-tiny-Q4_K_M.gguf"
+extra_args = ["-no-cnv"]
+
+# Round 2 additions (2026-09-25) — with the field down to one PASS (Qwen3-8B), broadening
+# the spectrum again rather than accepting a sample of one. Gemma-3-1B: another small-model
+# data point after the 0.5B/350M wall, from a different family/training recipe than the
+# Qwen2.5 line that hit the capability cliff. Qwen3.8-27B: an intentionally much heavier
+# candidate than anything tried so far (Q4_K_M alone is ~16.5 GB) — a genuine "does more
+# judgment quality show up if we spend a lot more RAM/compute" data point, almost certainly
+# never a Pi 4 candidate but useful to know where the accuracy ceiling sits. Phi-3.5-mini:
+# a third distinct family (Microsoft) at a dense ~3.8B size, between the two extremes.
+# None of these are independently confirmed against the M4 gate yet — no verdict comment
+# until a run happens.
+
+[[models]]
+id = "gemma-3-1b-it-q4km"
+display_name = "Gemma-3-1B-it (Q4_K_M)"
+# Verified source: https://huggingface.co/ggml-org/gemma-3-1b-it-GGUF
+# (gemma-3-1b-it-Q4_K_M.gguf, 806 MB).
+binary_path_env = "LLM_BINARY_PATH_GEMMA3_1B"
+model_path_env = "LLM_MODEL_PATH_GEMMA3_1B"
+default_binary_path = "~/tools/llama.cpp/build/bin/llama-completion"
+default_model_path = "~/tools/models/gemma-3-1b-it-GGUF/gemma-3-1b-it-Q4_K_M.gguf"
+extra_args = ["-no-cnv"]
+
+[[models]]
+id = "qwen3.8-27b-q4km"
+display_name = "Qwen3.8-27B (Q4_K_M)"
+enabled = false
+# Verified source: https://huggingface.co/unsloth/Qwen3.8-27B-GGUF
+# (Qwen3.8-27B-UD-Q4_K_M.gguf, 16.5 GB — an unsloth "Unsloth Dynamic" quant, the closest
+# match to this manifest's Q4_K_M convention; the repo has no plain, non-UD Q4_K_M file).
+# By far the heaviest entry in this manifest — confirm the M4 host actually has >=20 GB
+# free (weights + KV cache + runtime) before enabling this one.
+# ELIMINATED (Pi 4 target, hardware constraint, not a gate result): confirmed thermal
+# issues on the Pi 4 at this size/weight class — not a viable stage-model candidate
+# regardless of any M4 quality-gate result, so no longer run by default in any
+# comparison (Flow A or Flow B).
+binary_path_env = "LLM_BINARY_PATH_QWEN38_27B"
+model_path_env = "LLM_MODEL_PATH_QWEN38_27B"
+default_binary_path = "~/tools/llama.cpp/build/bin/llama-completion"
+default_model_path = "~/tools/models/Qwen3.8-27B-GGUF/Qwen3.8-27B-UD-Q4_K_M.gguf"
+extra_args = ["-no-cnv"]
+
+[[models]]
+id = "phi-3.5-mini-instruct-q4km"
+display_name = "Phi-3.5-mini-instruct (Q4_K_M)"
+# Verified source: https://huggingface.co/bartowski/Phi-3.5-mini-instruct-GGUF
+# (Phi-3.5-mini-instruct-Q4_K_M.gguf, 2.39 GB).
+binary_path_env = "LLM_BINARY_PATH_PHI35_MINI"
+model_path_env = "LLM_MODEL_PATH_PHI35_MINI"
+default_binary_path = "~/tools/llama.cpp/build/bin/llama-completion"
+default_model_path = "~/tools/models/Phi-3.5-mini-instruct-GGUF/Phi-3.5-mini-instruct-Q4_K_M.gguf"
+extra_args = ["-no-cnv"]
+
+# Round 3 additions (2026-09-25) — two more small Llama-3.2 sizes, run on the M4 first
+# (per user request) before deciding whether either is worth a Pi 4 decision-grade run.
+# Both land in the same small-model territory that hit the capability cliff at Qwen2.5-0.5B
+# and the prompt-echo failures at 350M — useful data points on whether Llama-3.2's training
+# recipe fares better at 1B/3B than Qwen2.5/Qwen3 did at similar or smaller sizes.
+# None of these are independently confirmed against the M4 gate yet — no verdict comment
+# until a run happens.
+
+[[models]]
+id = "llama-3.2-1b-instruct-q4km"
+display_name = "Llama-3.2-1B-Instruct (Q4_K_M)"
+# Verified source: https://huggingface.co/unsloth/Llama-3.2-1B-Instruct-GGUF
+# (Llama-3.2-1B-Instruct-Q4_K_M.gguf, 808 MB).
+binary_path_env = "LLM_BINARY_PATH_LLAMA32_1B"
+model_path_env = "LLM_MODEL_PATH_LLAMA32_1B"
+default_binary_path = "~/tools/llama.cpp/build/bin/llama-completion"
+default_model_path = "~/tools/models/Llama-3.2-1B-Instruct-GGUF/Llama-3.2-1B-Instruct-Q4_K_M.gguf"
+extra_args = ["-no-cnv"]
+
+[[models]]
+id = "llama-3.2-3b-instruct-q4km"
+display_name = "Llama-3.2-3B-Instruct (Q4_K_M)"
+# Verified source: https://huggingface.co/unsloth/Llama-3.2-3B-Instruct-GGUF
+# (Llama-3.2-3B-Instruct-Q4_K_M.gguf, 2.02 GB).
+binary_path_env = "LLM_BINARY_PATH_LLAMA32_3B"
+model_path_env = "LLM_MODEL_PATH_LLAMA32_3B"
+default_binary_path = "~/tools/llama.cpp/build/bin/llama-completion"
+default_model_path = "~/tools/models/Llama-3.2-3B-Instruct-GGUF/Llama-3.2-3B-Instruct-Q4_K_M.gguf"
+extra_args = ["-no-cnv"]
+
+[[models]]
+id = "gemma-3-4b-it-q4km"
+display_name = "Gemma-3-4B-it (Q4_K_M)"
+# Verified source: https://huggingface.co/unsloth/gemma-3-4b-it-GGUF
+# (gemma-3-4b-it-Q4_K_M.gguf, 2.49 GB). A larger sibling of gemma-3-1b-it-q4km above
+# (same family, different repo owner — unsloth mirrors this one, ggml-org owns the 1B).
+binary_path_env = "LLM_BINARY_PATH_GEMMA3_4B"
+model_path_env = "LLM_MODEL_PATH_GEMMA3_4B"
+default_binary_path = "~/tools/llama.cpp/build/bin/llama-completion"
+default_model_path = "~/tools/models/gemma-3-4b-it-GGUF/gemma-3-4b-it-Q4_K_M.gguf"
+extra_args = ["-no-cnv"]
+
+# Round 4 addition (2026-09-25) — Pi-4-targeted candidate, not another M4-only quality
+# data point. Unlike Qwen3-8B (the current Pi decision-grade run), Qwen2.5 is NOT a
+# reasoning/chain-of-thought model by default — no hidden <think> tokens before the JSON
+# — which is the more likely reason Qwen3-8B's single-call latency on the Pi is running
+# several minutes per trial, not raw parameter count alone. At 3B and non-thinking, this
+# is a genuine candidate for actually fitting the Pi 4's RAM/latency budget rather than
+# just a quality-ceiling data point like Qwen3.8-27B. Still needs both an M4 quality gate
+# run AND its own Pi decision-grade run before any verdict.
+
+[[models]]
+id = "qwen2.5-3b-instruct-q4km"
+display_name = "Qwen2.5-3B-Instruct (Q4_K_M)"
+# Verified source: https://huggingface.co/Qwen/Qwen2.5-3B-Instruct-GGUF
+# (qwen2.5-3b-instruct-q4_k_m.gguf, 2.1 GB) — official Qwen repo, single-file Q4_K_M.
+binary_path_env = "LLM_BINARY_PATH_QWEN25_3B"
+model_path_env = "LLM_MODEL_PATH_QWEN25_3B"
+default_binary_path = "~/tools/llama.cpp/build/bin/llama-completion"
+default_model_path = "~/tools/models/Qwen2.5-3B-Instruct-GGUF/qwen2.5-3b-instruct-q4_k_m.gguf"
 extra_args = ["-no-cnv"]

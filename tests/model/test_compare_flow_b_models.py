@@ -353,7 +353,9 @@ def _render_table(report: dict, artifact_path: Path) -> str:
 
 
 def test_compare_flow_b_models(request: pytest.FixtureRequest) -> None:
-    manifest = load_models_manifest()
+    raw_ids = request.config.getoption("--flow-b-model-ids")
+    include_ids = frozenset(x.strip() for x in raw_ids.split(",") if x.strip()) if raw_ids else None
+    manifest = load_models_manifest(include_ids=include_ids)
     available = [e for e in manifest if e.is_available()]
     if not available:
         pytest.skip(

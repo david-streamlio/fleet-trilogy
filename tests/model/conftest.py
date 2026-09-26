@@ -104,6 +104,17 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         ),
     )
     group.addoption("--model-accuracy-seed", type=int, default=1234)
+    group.addoption(
+        "--flow-b-model-ids",
+        default=None,
+        help=(
+            "make compare-flow-b-models only: comma-separated models.toml ids to "
+            "re-include for this run even if their `enabled` flag is false (see "
+            "models_manifest.load_models_manifest's include_ids). Lets one run widen "
+            "or narrow the model set without editing models.toml's durable, "
+            "cross-run elimination record."
+        ),
+    )
 
 
 def _resolve_path(cli_value: str | None, env_var: str) -> str | None:
