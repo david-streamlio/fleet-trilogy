@@ -32,14 +32,15 @@ from talk1_edge_intelligence.triage_function import LlmTriageFunction
 
 from tests.model.conftest import _FlowBEvalContext
 from tests.model.eval_lib import (
+    ESCALATION_SCENARIOS,
     _percentile,
-    check_flow_b_severity_calibration,
+    check_escalation_direction,
     flow_b_format_reliability,
     peak_child_rss_mb,
     run_flow_b_trials,
 )
 from tests.model.models_manifest import ModelEntry, load_models_manifest
-from tests.model.test_flow_b_triage import _event as _flow_b_tier_event
+from tests.model.test_flow_b_triage import _canonical_event
 
 pytestmark = pytest.mark.model
 
@@ -49,14 +50,14 @@ COHERENCE_PROMPT = "The capital of France is"
 
 AXES: list[tuple[str, tuple[str, ...], str]] = [
     ("format_parse_rate", ("format_reliability", "rate"), "higher"),
-    ("severity_mismatch_rate", ("severity_calibration", "mismatch_rate"), "lower"),
+    ("escalation_mismatch_rate", ("escalation_calibration", "mismatch_rate"), "lower"),
     ("latency_p50_seconds", ("latency", "p50_seconds"), "lower"),
     ("latency_p95_seconds", ("latency", "p95_seconds"), "lower"),
     ("tokens_per_sec_approx", ("tokens_per_sec_approx",), "higher"),
     ("load_time_seconds", ("load_time_seconds",), "lower"),
     ("resident_ram_mb_after", ("resident_ram_mb_after",), "lower"),
 ]
-QUALITY_AXES = {"format_parse_rate", "severity_mismatch_rate"}
+QUALITY_AXES = {"format_parse_rate", "escalation_mismatch_rate"}
 
 
 def _decision_grade() -> str:
@@ -121,49 +122,45 @@ def _run_one_model(entry: ModelEntry, request: pytest.FixtureRequest) -> dict:
     coprocessor = TelemetryCoprocessorFunction()
     triage = LlmTriageFunction()
 
-    # 4.0/10.0/20.0 -> low/medium/high per eval_lib's severity thresholds — same
-    # tiers test_flow_b_triage.py's single-model test already exercises, so a
-    # comparison run and a standalone `make test-model` run measure identically.
-    per_tier_n = max(1, n // 3)
-    events_and_trials = []
-    for eta_slip_min in (4.0, 10.0, 20.0):
-        event = _flow_b_tier_event(eta_slip_min)
-        trials = run_flow_b_trials(coprocessor, triage, context, event, per_tier_n)
-        events_and_trials.append((event, trials))
+    # Gate 1: format reliability on one canonical event, full N — see
+    # test_flow_b_triage.py's module docstring for why this is no longer
+    # tier-based (severity is cheap math now, identical for every model).
+    format_event = _canonical_event()
+    format_trials = run_flow_b_trials(coprocessor, triage, context, format_event, n)
+    fr_result = flow_b_format_reliability(format_event, format_trials)
 
-    fr_result = {"total": 0, "parsed": 0, "sample_failures": []}
-    for event, trials in events_and_trials:
-        tier_result = flow_b_format_reliability(event, trials)
-        fr_result["total"] += tier_result["total"]
-        fr_result["parsed"] += tier_result["parsed"]
-        fr_result["sample_failures"].extend(tier_result["sample_failures"])
-    fr_result["rate"] = (fr_result["parsed"] / fr_result["total"]) if fr_result["total"] else 0.0
-    fr_result["sample_failures"] = fr_result["sample_failures"][:5]
-
-    sc_result_gate1 = check_flow_b_severity_calibration(events_and_trials)
-    sc_result_gate1["gate2_confirmed"] = False
-
-    # GATE 2: same rationale as test_compare_models.py — a model that parses
-    # reliably gets its severity check re-run at a much bigger sample,
-    # severity-axis only, so a low parse rate can't starve the severity sample.
+    # GATE 2: same two-stage rationale as test_compare_models.py, retargeted at
+    # escalation direction (see eval_lib.check_escalation_direction) now that
+    # severity itself no longer varies by model. A model that parses reliably
+    # gets the three escalation scenarios re-run at a much bigger per-scenario
+    # sample so a low parse rate can't starve the escalation-direction sample.
+    per_scenario_n = max(1, n // 3)
     gate2_promoted = fr_result["rate"] >= format_threshold
-    gate2_events_and_trials = []
+    gate2_scenario_trials: dict[str, list] = {}
     if gate2_promoted:
-        confirm_per_tier_n = max(per_tier_n, round(per_tier_n * confirm_multiplier))
-        for eta_slip_min in (4.0, 10.0, 20.0):
-            event = _flow_b_tier_event(eta_slip_min)
-            trials = run_flow_b_trials(coprocessor, triage, context, event, confirm_per_tier_n)
-            gate2_events_and_trials.append((event, trials))
-        sc_result = check_flow_b_severity_calibration(gate2_events_and_trials)
-        sc_result["gate2_confirmed"] = True
-        sc_result["gate2_per_tier_n"] = confirm_per_tier_n
-        sc_result["gate2_format_threshold"] = format_threshold
+        confirm_per_scenario_n = max(per_scenario_n, round(per_scenario_n * confirm_multiplier))
+        for scenario_name, scenario in ESCALATION_SCENARIOS.items():
+            scenario_event = _canonical_event()
+            trials = run_flow_b_trials(
+                coprocessor,
+                triage,
+                context,
+                scenario_event,
+                confirm_per_scenario_n,
+                contextual_trigger_overrides=scenario["contextual_triggers"],
+                baseline_severity_override="medium",
+            )
+            gate2_scenario_trials[scenario_name] = trials
+        ec_result = check_escalation_direction(gate2_scenario_trials)
+        ec_result["gate2_confirmed"] = True
+        ec_result["gate2_per_scenario_n"] = confirm_per_scenario_n
+        ec_result["gate2_format_threshold"] = format_threshold
     else:
-        sc_result = sc_result_gate1
+        ec_result = {"total": 0, "matched": 0, "mismatches": 0, "mismatch_rate": None, "gate2_confirmed": False}
 
     ram_after_mb = peak_child_rss_mb()
 
-    all_trials = [t for _event, trials in (events_and_trials + gate2_events_and_trials) for t in trials]
+    all_trials = list(format_trials) + [t for trials in gate2_scenario_trials.values() for t in trials]
     ordered = sorted(t.latency_seconds for t in all_trials)
     latency = {
         "p50_seconds": _percentile(ordered, 0.50) if ordered else None,
@@ -188,8 +185,7 @@ def _run_one_model(entry: ModelEntry, request: pytest.FixtureRequest) -> dict:
         "model_path": str(entry.model_path),
         "extra_args": list(entry.extra_args),
         "format_reliability": fr_result,
-        "severity_calibration": sc_result,
-        "severity_calibration_gate1": sc_result_gate1,
+        "escalation_calibration": ec_result,
         "latency": latency,
         "tokens_per_sec_approx": tokens_per_sec_approx,
         "tokens_per_sec_note": (
@@ -257,35 +253,36 @@ def _build_recommendation(results: dict[str, dict], comparison: dict, decision_g
     return "\n".join(lines)
 
 
-def _production_candidates(results: dict[str, dict], format_threshold: float, severity_threshold: float) -> dict:
+def _production_candidates(results: dict[str, dict], format_threshold: float, escalation_threshold: float) -> dict:
     """Same evidence-backed-case rule as test_compare_models.py's version, scoped
     to Flow B's two quality axes (format_parse_rate, gate-2-confirmed
-    severity_mismatch_rate)."""
+    escalation_mismatch_rate — see eval_lib.check_escalation_direction for why
+    this replaced severity_mismatch_rate post-pivot)."""
     passed = []
     rejected = []
     for mid, r in results.items():
         if not r.get("available"):
             continue
-        sc = r.get("severity_calibration", {})
+        ec = r.get("escalation_calibration", {})
         entry = {
             "id": mid,
             "display_name": r["display_name"],
             "format_parse_rate": r.get("format_reliability", {}).get("rate"),
-            "gate2_confirmed": sc.get("gate2_confirmed", False),
-            "severity_mismatch_rate": sc.get("mismatch_rate"),
-            "severity_sample_n": sc.get("total"),
+            "gate2_confirmed": ec.get("gate2_confirmed", False),
+            "escalation_mismatch_rate": ec.get("mismatch_rate"),
+            "escalation_sample_n": ec.get("total"),
         }
         if (
-            sc.get("gate2_confirmed")
-            and sc.get("mismatch_rate") is not None
-            and sc["mismatch_rate"] <= severity_threshold
+            ec.get("gate2_confirmed")
+            and ec.get("mismatch_rate") is not None
+            and ec["mismatch_rate"] <= escalation_threshold
         ):
             passed.append(entry)
         else:
             rejected.append(entry)
     return {
         "format_threshold": format_threshold,
-        "severity_threshold": severity_threshold,
+        "escalation_threshold": escalation_threshold,
         "passed": passed,
         "rejected": rejected,
     }
@@ -326,13 +323,13 @@ def _render_table(report: dict, artifact_path: Path) -> str:
     lines.append("")
     lines.append(
         f"--- production candidates (format_parse_rate>={pc['format_threshold']:.0%}, "
-        f"gate-2-confirmed severity_mismatch_rate<={pc['severity_threshold']:.0%}) ---"
+        f"gate-2-confirmed escalation_mismatch_rate<={pc['escalation_threshold']:.0%}) ---"
     )
     if pc["passed"]:
         for e in pc["passed"]:
             lines.append(
-                f"  PASS   {e['display_name']}: severity_mismatch={e['severity_mismatch_rate']:.1%} "
-                f"(n={e['severity_sample_n']}, gate-2 confirmed)"
+                f"  PASS   {e['display_name']}: escalation_mismatch={e['escalation_mismatch_rate']:.1%} "
+                f"(n={e['escalation_sample_n']}, gate-2 confirmed)"
             )
     else:
         lines.append(
@@ -343,7 +340,10 @@ def _render_table(report: dict, artifact_path: Path) -> str:
         if not e["gate2_confirmed"]:
             reason = f"format_parse_rate={e['format_parse_rate']:.3f} below threshold — never reached gate 2"
         else:
-            reason = f"severity_mismatch={e['severity_mismatch_rate']:.1%} (n={e['severity_sample_n']}) exceeds bar"
+            reason = (
+                f"escalation_mismatch={e['escalation_mismatch_rate']:.1%} "
+                f"(n={e['escalation_sample_n']}) exceeds bar"
+            )
         lines.append(f"  reject {e['display_name']}: {reason}")
     lines.append(
         "Evidence for/against production use on THIS task — not a final pick. Pi 4 "
@@ -372,7 +372,7 @@ def test_compare_flow_b_models(request: pytest.FixtureRequest) -> None:
     production_candidates = _production_candidates(
         results,
         format_threshold=request.config.getoption("--model-format-threshold"),
-        severity_threshold=request.config.getoption("--model-severity-max-mismatch-rate"),
+        escalation_threshold=request.config.getoption("--model-severity-max-mismatch-rate"),
     )
 
     report = {

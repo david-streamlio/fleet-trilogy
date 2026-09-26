@@ -17,6 +17,7 @@ from fleet_telemetry_model import EnrichmentCard, TelemetryEvent, to_json
 from fleet_telemetry_model.detection import evaluate_signals, is_probable_slowdown
 from llm_inference import LlmBackend, LlmGenerationConfig
 from llm_inference.structured import extract_json_object, render_enrichment_prompt
+from talk1_edge_intelligence.triage_function import recommended_action_for
 
 ETA_IMPACT_ABSOLUTE_TOLERANCE_MIN = 2.0
 ETA_IMPACT_RELATIVE_TOLERANCE = 0.5
@@ -357,16 +358,41 @@ class FlowBTrial:
     error: str | None = None
 
 
-def run_flow_b_trials(coprocessor, triage, context, event: TelemetryEvent, n: int) -> list[FlowBTrial]:
+def run_flow_b_trials(
+    coprocessor,
+    triage,
+    context,
+    event: TelemetryEvent,
+    n: int,
+    contextual_trigger_overrides: dict | None = None,
+    baseline_severity_override: str | None = None,
+) -> list[FlowBTrial]:
     """Runs `event` through the real coprocessor once (its output is deterministic
     per event, same as Flow A renders its prompt once) and the real triage step n
     times. If the coprocessor's own gate (is_probable_slowdown / eta_slip_min
     bounds) filters `event` out, returns an empty list rather than raising —
-    callers should assert len(trials) == n to catch a badly-chosen test event."""
+    callers should assert len(trials) == n to catch a badly-chosen test event.
+
+    contextual_trigger_overrides/baseline_severity_override let a caller exercise
+    a scenario the real coprocessor wouldn't otherwise produce from one TelemetryEvent
+    alone — e.g. check_escalation_direction's three operational-context scenarios,
+    which all hold baseline_severity fixed to isolate the context variable rather than
+    the physics baseline (same mechanism this session's ad-hoc
+    diagnose_operational_risk.py script validated before this became the real harness).
+    Applied by mutating the coprocessor's real JSON payload post-hoc, not by changing
+    what the coprocessor itself computes.
+    """
     payload = coprocessor.process(to_json(event), context)
     trials: list[FlowBTrial] = []
     if payload is None:
         return trials
+    if contextual_trigger_overrides or baseline_severity_override:
+        payload_dict = json.loads(payload)
+        if contextual_trigger_overrides:
+            payload_dict["contextual_triggers"].update(contextual_trigger_overrides)
+        if baseline_severity_override:
+            payload_dict["baseline_severity"] = baseline_severity_override
+        payload = json.dumps(payload_dict)
     for _ in range(n):
         start = time.monotonic()
         try:
@@ -395,11 +421,20 @@ def run_flow_b_trials(coprocessor, triage, context, event: TelemetryEvent, n: in
 
 
 def flow_b_format_reliability(event: TelemetryEvent, trials: list[FlowBTrial]) -> dict:
-    """(a) FORMAT RELIABILITY for Flow B: a trial only counts as valid if severity
-    is one of the three grammar-forced values, event_label/dispatch_action are
-    non-empty strings, and eta_impact/truck_id match the input exactly (hardcoded
-    post-generation, so a mismatch means the pipeline's plumbing broke, not that
-    the model guessed wrong)."""
+    """(a) FORMAT RELIABILITY for Flow B, post-pivot (docs/TALK2-DATA-ENGINEERING-
+    IMPACT-TRACK.md section 5): a trial only counts as valid if baseline_severity/
+    severity are grammar-and-cheap-math-legal values, escalation is one of the three
+    grammar-forced values, recommended_action matches the deterministic template for
+    that escalation (verifies the "always agrees by construction" claim actually
+    holds at runtime, not just in unit tests), risk_synthesis is real free text (the
+    model's only remaining free-text job), and eta_impact/truck_id match the input
+    exactly (hardcoded post-generation, so a mismatch means the pipeline's plumbing
+    broke, not that the model guessed wrong).
+
+    Replaces the pre-pivot version, which checked for event_label/dispatch_action —
+    fields that no longer exist on the card at all now that severity moved to
+    severity_classifier.py and recommended_action to a template keyed on escalation.
+    """
     valid = 0
     sample_failures = []
     for trial in trials:
@@ -408,12 +443,20 @@ def flow_b_format_reliability(event: TelemetryEvent, trials: list[FlowBTrial]) -
             continue
         card = trial.parsed
         problems = []
+        if card.get("baseline_severity") not in ("low", "medium", "high"):
+            problems.append(f"baseline_severity {card.get('baseline_severity')!r} not one of low/medium/high")
         if card.get("severity") not in ("low", "medium", "high"):
             problems.append(f"severity {card.get('severity')!r} not one of low/medium/high")
-        if not isinstance(card.get("event_label"), str) or not card["event_label"].strip():
-            problems.append("event_label missing or empty")
-        if not isinstance(card.get("dispatch_action"), str) or not card["dispatch_action"].strip():
-            problems.append("dispatch_action missing or empty")
+        escalation = card.get("escalation")
+        if escalation not in ("raise", "hold", "lower"):
+            problems.append(f"escalation {escalation!r} not one of raise/hold/lower")
+        elif card.get("recommended_action") != recommended_action_for(escalation):
+            problems.append(
+                f"recommended_action {card.get('recommended_action')!r} does not match "
+                f"the deterministic template for escalation {escalation!r}"
+            )
+        if not isinstance(card.get("risk_synthesis"), str) or not card["risk_synthesis"].strip():
+            problems.append("risk_synthesis missing or empty")
         if card.get("eta_impact") != event.signals.eta_slip_min:
             problems.append(f"eta_impact {card.get('eta_impact')!r} != input {event.signals.eta_slip_min}")
         if card.get("truck_id") != event.truck_id:
@@ -430,35 +473,94 @@ def flow_b_format_reliability(event: TelemetryEvent, trials: list[FlowBTrial]) -
     }
 
 
-def check_flow_b_severity_calibration(events_and_trials: list[tuple[TelemetryEvent, list[FlowBTrial]]]) -> dict:
-    """(e) SEVERITY CALIBRATION for Flow B — same tiers/thresholds as Flow A's
-    check_severity_calibration above. Only checks trials whose severity parsed as
-    one of the three grammar-legal values; a trial that failed format entirely is
-    already counted by flow_b_format_reliability, not double-counted here."""
+# (f) ESCALATION DIRECTION for Flow B, post-pivot: severity is no longer a model
+# output (severity_classifier.py computes baseline_severity identically for every
+# model given the same event), so "did the model classify severity right" no longer
+# discriminates between models at all. What the model actually controls now is
+# escalation, given a fixed baseline plus genuinely unstructured operational context
+# (weather/cargo/dispatch status). These three scenarios are the same ones this
+# session's ad-hoc diagnose_operational_risk.py script validated before this became
+# the real harness — ground truth here is this eval's own documented hypothesis
+# about reasonable behavior, not an independently-verified fact, same epistemic
+# status as expected_severity's tier boundaries above, and reported with the same
+# caution.
+ESCALATION_SCENARIOS: dict[str, dict] = {
+    "escalate-worthy": {
+        "contextual_triggers": {
+            "weather_condition": "Heavy rain, wet asphalt",
+            "cargo_type": "Liquids / Chemical Tanker",
+            "dispatch_status": "Running 20 minutes behind schedule",
+        },
+        "expected_direction": "raise",
+    },
+    "benign": {
+        "contextual_triggers": {
+            "weather_condition": "Clear skies, dry pavement",
+            "cargo_type": "Dry goods / General freight",
+            "dispatch_status": "On schedule",
+        },
+        "expected_direction": "hold",
+    },
+    "de-escalate-worthy": {
+        "contextual_triggers": {
+            "weather_condition": "Clear conditions, light traffic",
+            "cargo_type": "Empty trailer, non-hazardous",
+            "dispatch_status": (
+                "Ahead of schedule; driver executed a documented defensive maneuver for a merging vehicle"
+            ),
+        },
+        "expected_direction": "lower_or_hold",
+    },
+}
+
+
+def check_escalation_direction(scenario_trials: dict[str, list[FlowBTrial]]) -> dict:
+    """Does each scenario's escalation decision match ESCALATION_SCENARIOS'
+    expected_direction? "lower_or_hold" accepts either value — this session's real
+    diagnostics never cleanly separated "lower" from "hold" for a model that's
+    merely not over-reacting, and conflating them here is more honest than picking
+    one arbitrarily. Only checks trials whose escalation parsed as one of the three
+    grammar-legal values; a trial that failed format entirely is already counted by
+    flow_b_format_reliability, not double-counted here."""
+    per_scenario: dict[str, dict] = {}
     mismatches = []
     checked = 0
-    for event, trials in events_and_trials:
-        expected = expected_severity(event.signals.eta_slip_min)
+    matched = 0
+    for scenario_name, trials in scenario_trials.items():
+        expected = ESCALATION_SCENARIOS[scenario_name]["expected_direction"]
+        tally: dict[str, int] = {}
+        scenario_checked = 0
+        scenario_matched = 0
         for trial in trials:
             if trial.parsed is None:
                 continue
-            actual = trial.parsed.get("severity")
-            if actual not in ("low", "medium", "high"):
+            escalation = trial.parsed.get("escalation")
+            if escalation not in ("raise", "hold", "lower"):
                 continue
+            tally[escalation] = tally.get(escalation, 0) + 1
+            scenario_checked += 1
             checked += 1
-            if actual != expected:
+            is_match = escalation == expected or (expected == "lower_or_hold" and escalation in ("lower", "hold"))
+            if is_match:
+                scenario_matched += 1
+                matched += 1
+            else:
                 mismatches.append(
-                    {
-                        "input_eta_slip_min": event.signals.eta_slip_min,
-                        "expected_severity": expected,
-                        "actual_severity": actual,
-                        "output": trial.parsed,
-                    }
+                    {"scenario": scenario_name, "expected_direction": expected, "escalation": escalation}
                 )
+        per_scenario[scenario_name] = {
+            "expected_direction": expected,
+            "escalation_tally": tally,
+            "total": scenario_checked,
+            "matched": scenario_matched,
+            "match_rate": (scenario_matched / scenario_checked) if scenario_checked else 0.0,
+        }
     return {
+        "per_scenario": per_scenario,
         "total": checked,
-        "mismatches": len(mismatches),
-        "mismatch_rate": (len(mismatches) / checked) if checked else 0.0,
+        "matched": matched,
+        "mismatches": checked - matched,
+        "mismatch_rate": (1 - matched / checked) if checked else 0.0,
         "sample_mismatches": mismatches[:5],
     }
 
@@ -472,7 +574,7 @@ class FlowBReport:
 
     config: dict
     format_reliability: dict = field(default_factory=dict)
-    severity_calibration: dict = field(default_factory=dict)
+    escalation_calibration: dict = field(default_factory=dict)
     latency_samples_seconds: list[float] = field(default_factory=list)
 
     def add_latencies(self, samples: list[float]) -> None:
@@ -492,7 +594,7 @@ class FlowBReport:
         return {
             "config": self.config,
             "format_reliability": self.format_reliability,
-            "severity_calibration": self.severity_calibration,
+            "escalation_calibration": self.escalation_calibration,
             "latency": self.latency_percentiles(),
         }
 
@@ -507,11 +609,11 @@ class FlowBReport:
         if self.format_reliability:
             fr = self.format_reliability
             lines.append(f"format reliability: {fr['rate']:.1%} ({fr['parsed']}/{fr['total']} parsed)")
-        if self.severity_calibration:
-            sc = self.severity_calibration
+        if self.escalation_calibration:
+            ec = self.escalation_calibration
             lines.append(
-                f"severity calibration mismatches: {sc['mismatch_rate']:.1%} "
-                f"({sc['mismatches']}/{sc['total']})"
+                f"escalation-direction mismatches: {ec['mismatch_rate']:.1%} "
+                f"({ec['mismatches']}/{ec['total']})"
             )
         if lat["n"]:
             lines.append(f"latency: p50={lat['p50_seconds']:.2f}s p95={lat['p95_seconds']:.2f}s (n={lat['n']})")
