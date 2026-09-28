@@ -143,3 +143,56 @@ def test_still_parses_a_clean_unwrapped_json_completion():
 def test_raises_when_no_json_object_is_present_at_all():
     with pytest.raises(ValueError, match="did not contain a JSON object"):
         extract_json_object("[mock llm completion] Truck 47 has slowed down.")
+
+
+# Captured from Qwen2.5-1.5B-Instruct during the 2026-09-25 Pi 4 decision-grade run
+# (eval-results/compare-edge-node00-20260925T030826Z.json): the model copies the
+# prompt's own "Signals detected by cheap math: [...]" line verbatim into its real
+# fenced answer, single-quoted Python-repr list syntax and all — otherwise-valid
+# JSON that plain json.loads rejects outright. See docs/TALK2-0.5B-CAPABILITY-CLIFF.md.
+FENCED_ANSWER_WITH_SINGLE_QUOTED_SIGNALS_LIST = (
+    'You are generating a structured enrichment card for fleet dispatch. Cheap math '
+    'has already detected the signals below — do not re-derive detection, just '
+    'classify severity and describe the ETA impact.\n\n'
+    'Respond with ONLY a single JSON object with exactly these keys: "event", '
+    '"severity", "signals", "eta_impact", "corridor", "truck_id". No prose, no '
+    'markdown fences.\n\nTruck: truck-47\nCorridor: I-95N\n'
+    "Signals detected by cheap math: ['sustained_low_speed', 'stop_go_index', 'eta_slip']\n"
+    'Rolling average speed: 35.0 mph\nETA slip: 6.0 minutes\n\n'
+    '"eta_impact" MUST be the ETA slip value given above (6.0) — copy it exactly, do '
+    'not invent or estimate a different number. "truck_id" and "corridor" MUST be '
+    'copied exactly from above. Do not reuse any value from the shape below —\n'
+    'it is a structure template, not a real answer.\n\n'
+    'Shape (placeholders only, not real values): {"event": "<event_name>", '
+    '"severity": "<low|medium|high>", "signals": '
+    "['sustained_low_speed', 'stop_go_index', 'eta_slip'], "
+    '"eta_impact": <copy the ETA slip value above>, "corridor": "<copy the corridor '
+    'above>", "truck_id": "<copy the truck id above>"} '
+    "Here is the JSON object:\n\n"
+    '```json\n{\n  "event": "ETA slip",\n  "severity": "high",\n'
+    "  \"signals\": ['sustained_low_speed', 'stop_go_index', 'eta_slip'],\n"
+    '  "eta_impact": 6.0,\n  "corridor": "I-95N",\n  "truck_id": "truck-47"\n}\n``` \n\n'
+    'This object is now ready for use in generating the structured enrichment card.'
+)
+
+
+def test_extracts_fenced_answer_with_single_quoted_signals_list():
+    card = extract_json_object(FENCED_ANSWER_WITH_SINGLE_QUOTED_SIGNALS_LIST)
+    assert card == {
+        "event": "ETA slip",
+        "severity": "high",
+        "signals": ["sustained_low_speed", "stop_go_index", "eta_slip"],
+        "eta_impact": 6.0,
+        "corridor": "I-95N",
+        "truck_id": "truck-47",
+    }
+
+
+def test_normalization_does_not_touch_prose_apostrophes():
+    raw = (
+        "The truck's ETA has slipped. "
+        '{"event": "traffic_incident_suspected", "severity": "high", '
+        '"signals": ["sustained_low_speed"], "eta_impact": 4.0, "corridor": "I-95N", '
+        '"truck_id": "truck-47"}'
+    )
+    assert extract_json_object(raw)["truck_id"] == "truck-47"
