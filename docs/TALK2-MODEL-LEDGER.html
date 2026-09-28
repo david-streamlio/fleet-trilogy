@@ -1,0 +1,562 @@
+<title>Fleet Model Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#f6f5f2;
+    --surface:#ffffff;
+    --surface-2:#efece4;
+    --ink:#1c2129;
+    --ink-muted:#5b6472;
+    --accent:#d9622b;
+    --accent-ink:#ffffff;
+    --pass:#2f7d5c;
+    --pass-bg:#e3f0e9;
+    --fail:#b23b3b;
+    --fail-bg:#f5e6e6;
+    --disq:#a8631f;
+    --disq-bg:#f4e6d6;
+    --pending:#8a8f98;
+    --pending-bg:#eceae5;
+    --border:#e1ddd3;
+    --grid:#e6e2d8;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#14161b;
+      --surface:#1b1e25;
+      --surface-2:#20232b;
+      --ink:#ecebe7;
+      --ink-muted:#a3a9b3;
+      --accent:#ec8e51;
+      --accent-ink:#1c1108;
+      --pass:#5cbf95;
+      --pass-bg:#1c2f27;
+      --fail:#e58080;
+      --fail-bg:#332020;
+      --disq:#e0a352;
+      --disq-bg:#332815;
+      --pending:#8d939d;
+      --pending-bg:#242730;
+      --border:#2c303a;
+      --grid:#2a2e37;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14161b;
+    --surface:#1b1e25;
+    --surface-2:#20232b;
+    --ink:#ecebe7;
+    --ink-muted:#a3a9b3;
+    --accent:#ec8e51;
+    --accent-ink:#1c1108;
+    --pass:#5cbf95;
+    --pass-bg:#1c2f27;
+    --fail:#e58080;
+    --fail-bg:#332020;
+    --disq:#e0a352;
+    --disq-bg:#332815;
+    --pending:#8d939d;
+    --pending-bg:#242730;
+    --border:#2c303a;
+    --grid:#2a2e37;
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans',system-ui,sans-serif;
+    padding-inline:16px;
+    padding-block:28px;
+    display:flex;
+    justify-content:center;
+  }
+  main{width:100%; max-width:1180px; display:flex; flex-direction:column; gap:36px;}
+
+  h1,h2,h3{font-family:'Barlow Condensed',system-ui,sans-serif; text-wrap:balance; margin:0; letter-spacing:0.01em;}
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--accent);
+    font-weight:600;
+  }
+  .num{font-family:'IBM Plex Mono',monospace; font-variant-numeric:tabular-nums;}
+
+  header.page{
+    display:flex; flex-direction:column; gap:10px;
+    border-bottom:1px solid var(--border);
+    padding-block-end:22px;
+  }
+  header.page h1{font-size:clamp(30px,5vw,44px); font-weight:700;}
+  header.page p{margin:0; color:var(--ink-muted); font-size:15px; max-width:none; line-height:1.55;}
+
+  .stat-row{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:12px;
+  }
+  .stat{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:14px 16px;
+    display:flex; flex-direction:column; gap:4px;
+  }
+  .stat .v{font-family:'Barlow Condensed',sans-serif; font-size:30px; font-weight:700; line-height:1;}
+  .stat .l{font-size:12px; color:var(--ink-muted); line-height:1.3;}
+  .stat.pass .v{color:var(--pass);}
+  .stat.fail .v{color:var(--fail);}
+  .stat.disq .v{color:var(--disq);}
+
+  section{display:flex; flex-direction:column; gap:14px;}
+  section > .section-head{display:flex; flex-direction:column; gap:6px;}
+  section h2{font-size:24px; font-weight:600;}
+  section .dek{color:var(--ink-muted); font-size:14.5px; max-width:none; line-height:1.55;}
+
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:20px;
+  }
+
+  .chart-wrap{position:relative; height:440px;}
+  .chart-wrap.short{height:280px;}
+
+  .legend-row{display:flex; gap:16px; flex-wrap:wrap; font-size:12.5px; color:var(--ink-muted); margin-top:10px;}
+  .legend-row span{display:inline-flex; align-items:center; gap:6px;}
+  .swatch{width:10px; height:10px; border-radius:3px; display:inline-block; flex:none;}
+
+  .table-scroll{overflow-x:auto; border-radius:10px; border:1px solid var(--border);}
+  table{width:100%; border-collapse:collapse; min-width:920px; font-size:13.5px;}
+  thead th{
+    text-align:left;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--ink-muted);
+    background:var(--surface-2);
+    padding:10px 12px;
+    border-bottom:1px solid var(--border);
+    white-space:nowrap;
+  }
+  tbody td{
+    padding:9px 12px;
+    border-bottom:1px solid var(--border);
+    white-space:nowrap;
+    vertical-align:middle;
+  }
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:var(--surface-2);}
+  tr.group-row td{
+    background:var(--surface-2);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--accent);
+    font-weight:600;
+    padding:7px 12px;
+    border-bottom:1px solid var(--border);
+    white-space:nowrap;
+  }
+  tr.group-row:hover td{background:var(--surface-2);}
+  tr.group-row .group-count{color:var(--ink-muted); text-transform:none; letter-spacing:0; font-weight:400;}
+  td.model{white-space:normal; min-width:190px;}
+  td.model .name{font-weight:600;}
+  td.model .fam{display:block; font-size:11.5px; color:var(--ink-muted);}
+  td.reason{white-space:normal; min-width:240px; color:var(--ink-muted); font-size:12.8px; line-height:1.4;}
+  td.num, th.num{text-align:right; font-family:'IBM Plex Mono',monospace;}
+
+  .pill{
+    display:inline-flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px; font-weight:600; letter-spacing:0.03em;
+    padding:3px 9px; border-radius:100px; white-space:nowrap;
+  }
+  .pill.pass{color:var(--pass); background:var(--pass-bg);}
+  .pill.reject{color:var(--fail); background:var(--fail-bg);}
+  .pill.disq{color:var(--disq); background:var(--disq-bg);}
+  .pill.pending{color:var(--pending); background:var(--pending-bg);}
+
+  .gate-tag{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-muted);}
+
+  .callout-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:14px;
+  }
+  .callout{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-left:3px solid var(--accent);
+    border-radius:10px;
+    padding:16px 18px;
+    display:flex; flex-direction:column; gap:6px;
+  }
+  .callout h3{font-size:16px; font-weight:600;}
+  .callout p{margin:0; font-size:13.5px; color:var(--ink-muted); line-height:1.55;}
+  .callout .ev{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink); background:var(--surface-2); padding:6px 8px; border-radius:6px; margin-top:2px;}
+
+  .divergence-panel{display:grid; grid-template-columns:1.1fr 1fr; gap:26px; align-items:center;}
+  .divergence-copy p{margin:0 0 10px; font-size:14px; color:var(--ink-muted); line-height:1.6;}
+  .divergence-copy p:last-child{margin-bottom:0;}
+  .divergence-copy strong{color:var(--ink); font-weight:600;}
+  .segue{
+    background:var(--surface-2);
+    border-radius:10px;
+    padding:16px 18px;
+    font-size:14px;
+    line-height:1.6;
+    color:var(--ink);
+  }
+  .segue .eyebrow{display:block; margin-bottom:6px;}
+
+  footer.foot{
+    color:var(--ink-muted);
+    font-size:12px;
+    border-top:1px solid var(--border);
+    padding-block-start:16px;
+    line-height:1.6;
+  }
+
+  @media (max-width:640px){
+    .divergence-panel{grid-template-columns:1fr;}
+    .chart-wrap{height:360px;}
+  }
+</style>
+
+<main>
+  <header class="page">
+    <span class="eyebrow">Model selection · fleet-telemetry triage</span>
+    <h1>Fleet Model Ledger</h1>
+    <p>Every model tested against the Flow A enrichment task on the M4 dev machine, plus real Pi&nbsp;4 target-hardware numbers where we have them. This is the evidence behind "what to consider when you pick a model" — accuracy and speed are on the chart, but three of sixteen models were eliminated for reasons the chart alone won't show you.</p>
+  </header>
+
+  <div class="stat-row">
+    <div class="stat"><span class="v num">16</span><span class="l">models in the manifest, 0.34&ndash;15.33&nbsp;GB</span></div>
+    <div class="stat pass"><span class="v num">3</span><span class="l">cleared gate&nbsp;2 (format + judgment)</span></div>
+    <div class="stat fail"><span class="v num">2</span><span class="l">produced zero parseable output at all</span></div>
+    <div class="stat disq"><span class="v num">1</span><span class="l">disqualified on hardware, independent of score</span></div>
+  </div>
+
+  <section>
+    <div class="section-head">
+      <h2>Accuracy vs. speed, at a glance</h2>
+      <p class="dek">Bubble size is model weight size on disk (GB) &mdash; a real, always-available proxy for footprint; the harness's own RAM reading is a cumulative session high-water mark, not a clean per-model number (see callouts below). Lower-left is the goal: fast <em>and</em> judgment you can trust. The 50% severity-mismatch line is the production bar this harness gates on.</p>
+    </div>
+    <div class="panel">
+      <div class="chart-wrap"><canvas id="scatter"></canvas></div>
+      <div class="legend-row" id="scatter-legend"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>The full ledger</h2>
+      <p class="dek">Gate 1 is format reliability; gate 2 re-confirms severity calibration at a bigger sample once gate 1 clears &mdash; a model with a small gate&#8209;1&#8209;only sample (low <span class="num">n</span>) hasn't earned a severity verdict yet, whatever its raw percentage says.</p>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th class="num">Size</th>
+            <th class="num">Format parse</th>
+            <th class="num">Severity mismatch</th>
+            <th class="num">Gate</th>
+            <th class="num">Latency p50</th>
+            <th class="num">Latency p95</th>
+            <th class="num">Tok/s</th>
+            <th>Verdict</th>
+            <th>Why</th>
+          </tr>
+        </thead>
+        <tbody id="ledger-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>What the chart alone won't tell you</h2>
+      <p class="dek">Four things the numbers above hide, each one a real finding from this evaluation round &mdash; the case for "consider more than accuracy and speed."</p>
+    </div>
+    <div class="callout-grid">
+      <div class="callout">
+        <h3>Parsing fine isn't judging well</h3>
+        <p>Llama-3.1-8B and GLM-4-9B-0414 parse at 96.7% and 100% &mdash; better than the models that passed. Both still fail on judgment: severity mismatch of 50.6% and 57.8%. Format and calibration are different capabilities; a model can ace one and fail the other.</p>
+        <div class="ev">llama-3.1-8b-instruct-q4km · glm-4-9b-0414-q4km</div>
+      </div>
+      <div class="callout">
+        <h3>Hardware can disqualify a model the benchmark never touches</h3>
+        <p>Qwen3.8-27B is disqualified for confirmed thermal issues on the Pi&nbsp;4 &mdash; a fact no accuracy or M4 latency number captures, and true regardless of how it scores.</p>
+        <div class="ev">qwen3.8-27b-q4km · models.toml: enabled = false</div>
+      </div>
+      <div class="callout">
+        <h3>The median hides the worst case</h3>
+        <p>Qwen3.8-27B's own p50/p95 split makes the point on its own: 4.2s median, 25.2s 95th percentile &mdash; a single call almost 6x its typical time. A dashboard showing only p50 would call this model stable.</p>
+        <div class="ev">latency_p50 4.21s → latency_p95 25.16s</div>
+      </div>
+      <div class="callout">
+        <h3>Reasoning tokens spend time before the JSON starts</h3>
+        <p>Qwen3-8B is the only gate-2 PASS with real latency headroom to spare &mdash; its reasoning-model architecture emits hidden `&lt;think&gt;` tokens before the actual answer, a cost invisible to format/severity checks but very visible on constrained target hardware.</p>
+        <div class="ev">qwen3-8b-q4km · latency_p50 6.83s for a 4.68 GB model</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Dev-machine numbers are quality signal only</h2>
+      <p class="dek">The only two models with a real Pi&nbsp;4 decision-grade run so far show why the M4 latency column above can't be read as a deployment estimate.</p>
+    </div>
+    <div class="panel divergence-panel">
+      <div class="chart-wrap short"><canvas id="divergence"></canvas></div>
+      <div class="divergence-copy">
+        <p><strong>Qwen2.5-1.5B-Instruct:</strong> 0.98s median on the M4 → <strong>111.5s</strong> on the real Pi&nbsp;4. <span class="num">114x</span> slower on target hardware.</p>
+        <p><strong>Qwen2.5-0.5B-Instruct:</strong> 1.22s median on the M4 → <strong>70.7s</strong> on the real Pi&nbsp;4. <span class="num">58x</span> slower on target hardware.</p>
+        <p>Every other row in the ledger above is "quality&#8209;only" &mdash; a real accuracy signal, but a hardware footprint number from the wrong hardware.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="segue">
+    <span class="eyebrow">Which sets up the next question</span>
+    Running this ledger once, on CPU, already costs real wall time: the 15-model Flow B pass alone ran <strong>54 minutes</strong>, and individual calls on the heaviest model reached <strong>25 seconds each</strong>. That's the cost of evaluating models &mdash; not deploying them &mdash; and it's the argument for putting the harness itself on GPU-backed infrastructure, even though every model above still has to run on constrained CPU hardware once it ships.
+  </div>
+
+  <footer class="foot">
+    Sources: <span class="num">eval-results/compare-COMP-J2D9D71YNJ-20260925T185711Z.json</span> (gate-2 run, original 9-model spectrum), <span class="num">…-20260926T000238Z.json</span> (round 2&ndash;4 additions), <span class="num">compare-edge-node00-20260925T030826Z.json</span> (real Pi&nbsp;4 run). Gemma-3-4B-it and Qwen2.5-3B-Instruct have weights on the M4 as of this session but no Flow A run yet &mdash; shown as pending, not scored. RAM is omitted from the chart: the harness's <span class="num">peak_child_rss_mb()</span> reading is a cumulative session high-water mark on this host, not an isolated per-model reading &mdash; a measurement-methodology caveat worth its own line on stage.
+  </footer>
+</main>
+
+<script>
+(function(){
+  // Grouped by model family (largest family first), ascending by weight size
+  // within each family — a deliberate order, not the models.toml addition order
+  // this used to follow.
+  const data = [
+    // Qwen — 6 models, 0.5B to 27B, three generations (2.5 / 3 / 3.8)
+    {id:'qwen2.5-0.5b-instruct-q4km', name:'Qwen2.5-0.5B-Instruct', fam:'Qwen2.5 · Q4_K_M', family:'Qwen', size:0.46, parse:0.567, mismatch:0.538, gate:1, n:13, p50:1.219, p95:1.555, tps:221.52, verdict:'reject', why:'0.5B capability cliff — degenerate repetition. Never reached gate 2.'},
+    {id:'qwen3-0.6b-q8-0', name:'Qwen3-0.6B', fam:'Qwen3 · Q8_0', family:'Qwen', size:0.75, parse:0.767, mismatch:0.519, gate:1, n:27, p50:1.646, p95:1.854, tps:169.82, verdict:'reject', why:'Format parse rate 76.7% — never reached gate 2. Worst grounding rate of the field.'},
+    {id:'qwen2.5-1.5b-instruct-q4km', name:'Qwen2.5-1.5B-Instruct', fam:'Qwen2.5 · Q4_K_M', family:'Qwen', size:1.04, parse:0.767, mismatch:0.625, gate:1, n:24, p50:0.980, p95:1.588, tps:257.96, verdict:'reject', why:'Format parse rate 76.7% — never reached gate 2.'},
+    {id:'qwen2.5-3b-instruct-q4km', name:'Qwen2.5-3B-Instruct', fam:'Qwen2.5 · Q4_K_M', family:'Qwen', size:1.96, parse:null, mismatch:null, gate:null, n:null, p50:null, p95:null, tps:null, verdict:'pending', why:'Weights pulled onto the M4 this session — Flow A run not yet performed.'},
+    {id:'qwen3-8b-q4km', name:'Qwen3-8B', fam:'Qwen3 · Q4_K_M', family:'Qwen', size:4.68, parse:1.000, mismatch:0.200, gate:2, n:85, p50:6.831, p95:7.367, tps:54.06, verdict:'pass', why:'Gate-2 PASS. Reasoning-model architecture — hidden <think> tokens inflate latency for its size.'},
+    {id:'qwen3.8-27b-q4km', name:'Qwen3.8-27B', fam:'Qwen3.8 · Q4_K_M', family:'Qwen', size:15.33, parse:0.167, mismatch:null, gate:1, n:5, p50:4.211, p95:25.159, tps:26.22, verdict:'disq', why:'Format parse rate 16.7% AND independently disqualified: confirmed Pi 4 thermal issues at this weight class.'},
+    // Llama — 3 models, two generations (3.1 / 3.2)
+    {id:'llama-3.2-1b-instruct-q4km', name:'Llama-3.2-1B-Instruct', fam:'Llama-3.2 · Q4_K_M', family:'Llama', size:0.75, parse:0.300, mismatch:null, gate:1, n:6, p50:0.643, p95:1.375, tps:235.03, verdict:'reject', why:'Format parse rate 30% — never reached gate 2. Only 6 cards parsed — too small a sample to score severity on.'},
+    {id:'llama-3.2-3b-instruct-q4km', name:'Llama-3.2-3B-Instruct', fam:'Llama-3.2 · Q4_K_M', family:'Llama', size:1.88, parse:0.800, mismatch:0.494, gate:2, n:79, p50:3.873, p95:4.108, tps:84.37, verdict:'pass', why:'Gate-2 PASS, right at the 80% format-parse line.'},
+    {id:'llama-3.1-8b-instruct-q4km', name:'Llama-3.1-8B-Instruct', fam:'Llama-3.1 · Q4_K_M', family:'Llama', size:4.58, parse:0.967, mismatch:0.506, gate:2, n:89, p50:7.208, p95:7.538, tps:43.26, verdict:'reject', why:'Parses fine (96.7%) — judgment fails, severity mismatch 50.6%.'},
+    // Gemma — 2 models
+    {id:'gemma-3-1b-it-q4km', name:'Gemma-3-1B-it', fam:'Gemma-3 · Q4_K_M', family:'Gemma', size:0.75, parse:1.000, mismatch:0.644, gate:2, n:90, p50:1.756, p95:1.836, tps:155.91, verdict:'reject', why:'Parses perfectly — judgment fails, severity mismatch 64.4%.'},
+    {id:'gemma-3-4b-it-q4km', name:'Gemma-3-4B-it', fam:'Gemma-3 · Q4_K_M', family:'Gemma', size:2.32, parse:null, mismatch:null, gate:null, n:null, p50:null, p95:null, tps:null, verdict:'pending', why:'Weights pulled onto the M4 this session — Flow A run not yet performed.'},
+    // Single-entry families, alphabetical
+    {id:'glm-4-9b-0414-q4km', name:'GLM-4-9B-0414', fam:'GLM-4 · Q4_K_M', family:'GLM', size:5.74, parse:1.000, mismatch:0.578, gate:2, n:90, p50:3.561, p95:5.577, tps:60.74, verdict:'reject', why:'Parses perfectly (100%) — judgment fails, severity mismatch 57.8%.'},
+    {id:'granite-4.0-h-350m-q8-0', name:'Granite-4.0-H-350M', fam:'Granite-4.0 · Q8_0', family:'Granite', size:0.34, parse:0.000, mismatch:null, gate:1, n:0, p50:0.570, p95:0.601, tps:null, verdict:'reject', why:'Zero parseable output — same prompt-echo failure shape as LFM2.5-350M.'},
+    {id:'lfm2.5-350m-q8-0', name:'LFM2.5-350M', fam:'LFM2.5 · Q8_0', family:'LFM', size:0.35, parse:0.000, mismatch:null, gate:1, n:0, p50:0.283, p95:0.303, tps:null, verdict:'reject', why:'Zero parseable output across every trial — prompt-echo failure, distinct from the 0.5B collapse.'},
+    {id:'ling-3.0-tiny-7.9b-a1.3b-q4km', name:'Ling-3.0-tiny', fam:'7.9B-A1.3B MoE · Q4_K_M', family:'Ling', size:4.49, parse:0.367, mismatch:null, gate:1, n:5, p50:2.760, p95:3.292, tps:135.87, verdict:'reject', why:'Format parse rate 36.7% — never reached gate 2. Only 5 cards parsed at all — too small a sample to score severity on.'},
+    {id:'phi-3.5-mini-instruct-q4km', name:'Phi-3.5-mini-instruct', fam:'Phi-3.5 · Q4_K_M', family:'Phi', size:2.23, parse:1.000, mismatch:0.200, gate:2, n:90, p50:5.628, p95:6.244, tps:48.52, verdict:'pass', why:'Gate-2 PASS.'},
+  ];
+
+  const verdictMeta = {
+    pass:    {label:'PASS',         color:'#2f7d5c'},
+    reject:  {label:'REJECT',       color:'#b23b3b'},
+    disq:    {label:'DISQUALIFIED', color:'#a8631f'},
+    pending: {label:'PENDING',      color:'#8a8f98'},
+  };
+
+  const root = document.documentElement;
+  function isDark(){
+    const t = root.getAttribute('data-theme');
+    if (t === 'dark') return true;
+    if (t === 'light') return false;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function cssVar(name){ return getComputedStyle(root).getPropertyValue(name).trim(); }
+
+  // ---- table ----
+  const pct = v => v === null || v === undefined ? '—' : (v*100).toFixed(1) + '%';
+  const sec = v => v === null || v === undefined ? '—' : v.toFixed(2) + 's';
+  const tps = v => v === null || v === undefined ? '—' : v.toFixed(1);
+  const tbody = document.getElementById('ledger-body');
+  let lastFamily = null;
+  data.forEach(d => {
+    if (d.family !== lastFamily) {
+      const groupTr = document.createElement('tr');
+      groupTr.className = 'group-row';
+      const count = data.filter(x => x.family === d.family).length;
+      groupTr.innerHTML = `<td colspan="10">${d.family} <span class="group-count">(${count} model${count > 1 ? 's' : ''})</span></td>`;
+      tbody.appendChild(groupTr);
+      lastFamily = d.family;
+    }
+    const tr = document.createElement('tr');
+    const vm = verdictMeta[d.verdict];
+    tr.innerHTML = `
+      <td class="model"><span class="name">${d.name}</span><span class="fam">${d.fam}</span></td>
+      <td class="num">${d.size.toFixed(2)} GB</td>
+      <td class="num">${pct(d.parse)}</td>
+      <td class="num">${pct(d.mismatch)}${d.n !== null ? ` <span class="gate-tag">(n=${d.n})</span>` : ''}</td>
+      <td class="num">${d.gate === null ? '—' : d.gate}</td>
+      <td class="num">${sec(d.p50)}</td>
+      <td class="num">${sec(d.p95)}</td>
+      <td class="num">${tps(d.tps)}</td>
+      <td><span class="pill ${d.verdict}">${vm.label}</span></td>
+      <td class="reason">${d.why}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // ---- scatter/bubble chart ----
+  const scored = data.filter(d => d.p50 !== null && d.mismatch !== null);
+  const noSample = data.filter(d => d.p50 !== null && d.mismatch === null && d.verdict !== 'pending');
+
+  function pointColor(d){ return verdictMeta[d.verdict].color; }
+
+  const scatterCanvas = document.getElementById('scatter');
+  let scatterChart;
+
+  function buildScatter(){
+    if (scatterChart) scatterChart.destroy();
+    const dark = isDark();
+    const gridColor = dark ? '#2a2e37' : '#e6e2d8';
+    const inkMuted = dark ? '#a3a9b3' : '#5b6472';
+    const ink = dark ? '#ecebe7' : '#1c2129';
+
+    const datasets = [
+      {
+        label: 'Scored (severity known)',
+        data: scored.map(d => ({x:d.p50, y:d.mismatch*100, r: 6 + Math.sqrt(d.size)*7, meta:d})),
+        backgroundColor: scored.map(d => pointColor(d) + 'cc'),
+        borderColor: scored.map(d => pointColor(d)),
+        borderWidth: 1.5,
+      },
+      {
+        label: 'Sample too small to trust',
+        data: noSample.map(d => ({x:d.p50, y: 8, r: 6 + Math.sqrt(d.size)*7, meta:d})),
+        backgroundColor: noSample.map(d => pointColor(d) + '55'),
+        borderColor: noSample.map(d => pointColor(d)),
+        borderWidth: 1.5,
+        borderDash: [3,2],
+      },
+    ];
+
+    scatterChart = new Chart(scatterCanvas, {
+      type: 'bubble',
+      data: { datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 400 },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => {
+                const m = ctx.raw.meta;
+                const sev = m.mismatch === null ? 'sample too small (n=' + m.n + ')' : (m.mismatch*100).toFixed(1) + '% mismatch';
+                return `${m.name} — p50 ${m.p50.toFixed(2)}s, ${sev}, ${m.size.toFixed(2)} GB`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            type: 'logarithmic',
+            title: { display: true, text: 'Latency, p50 (seconds, log scale) — faster is left', color: inkMuted, font:{family:"'IBM Plex Sans'", size:12} },
+            grid: { color: gridColor },
+            ticks: { color: inkMuted, font:{family:"'IBM Plex Mono'", size:11}, callback: v => v + 's' },
+            min: 0.2, max: 30,
+          },
+          y: {
+            title: { display: true, text: 'Severity mismatch rate (%) — lower is better', color: inkMuted, font:{family:"'IBM Plex Sans'", size:12} },
+            grid: { color: gridColor },
+            ticks: { color: inkMuted, font:{family:"'IBM Plex Mono'", size:11}, callback: v => v + '%' },
+            min: 0, max: 75,
+          }
+        }
+      },
+      plugins: [{
+        id: 'thresholdLine',
+        afterDraw(chart){
+          const yScale = chart.scales.y;
+          const xScale = chart.scales.x;
+          const ctx = chart.ctx;
+          const y = yScale.getPixelForValue(50);
+          ctx.save();
+          ctx.strokeStyle = dark ? '#e0a352' : '#a8631f';
+          ctx.setLineDash([5,4]);
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(xScale.left, y);
+          ctx.lineTo(xScale.right, y);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillStyle = dark ? '#e0a352' : '#a8631f';
+          ctx.font = "600 11px 'IBM Plex Mono', monospace";
+          ctx.fillText('50% production bar', xScale.left + 6, y - 6);
+          ctx.restore();
+        }
+      }]
+    });
+  }
+  buildScatter();
+
+  const legend = document.getElementById('scatter-legend');
+  legend.innerHTML = Object.entries(verdictMeta).map(([k,v]) =>
+    `<span><span class="swatch" style="background:${v.color}"></span>${v.label}</span>`
+  ).join('') + `<span><span class="swatch" style="background:transparent;border:1.5px dashed var(--ink-muted)"></span>Bubble size = weight file size (GB)</span>`;
+
+  // ---- Pi vs M4 divergence chart ----
+  const divCanvas = document.getElementById('divergence');
+  let divChart;
+  function buildDivergence(){
+    if (divChart) divChart.destroy();
+    const dark = isDark();
+    const gridColor = dark ? '#2a2e37' : '#e6e2d8';
+    const inkMuted = dark ? '#a3a9b3' : '#5b6472';
+    const accent = dark ? '#ec8e51' : '#d9622b';
+    const muted2 = dark ? '#4a5568' : '#c9c3b4';
+
+    divChart = new Chart(divCanvas, {
+      type: 'bar',
+      data: {
+        labels: ['Qwen2.5-1.5B-Instruct', 'Qwen2.5-0.5B-Instruct'],
+        datasets: [
+          { label: 'M4 (dev, quality-only)', data: [0.980, 1.219], backgroundColor: muted2, borderRadius: 4 },
+          { label: 'Pi 4 (real target)', data: [111.506, 70.663], backgroundColor: accent, borderRadius: 4 },
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 400 },
+        plugins: {
+          legend: { position: 'top', labels: { color: inkMuted, font:{family:"'IBM Plex Sans'", size:12} } },
+          tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.raw.toFixed(2)}s` } }
+        },
+        scales: {
+          x: { grid: { display:false }, ticks: { color: inkMuted, font:{family:"'IBM Plex Sans'", size:11.5} } },
+          y: {
+            type: 'logarithmic',
+            title: { display:true, text:'Latency p50 (seconds, log scale)', color: inkMuted, font:{family:"'IBM Plex Sans'", size:12} },
+            grid: { color: gridColor },
+            ticks: { color: inkMuted, font:{family:"'IBM Plex Mono'", size:11} },
+          }
+        }
+      }
+    });
+  }
+  buildDivergence();
+
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { buildScatter(); buildDivergence(); });
+})();
+</script>

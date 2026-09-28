@@ -553,6 +553,494 @@ roughly-3B-and-up scale, and unreliable below it — Qwen2.5-3B-Instruct
 landing exactly on the 50% line (not comfortably under it) is itself a data
 point that "3B" isn't a clean cutoff, just a rough one.
 
+## Infrastructure fix: the M4 harness was reloading the model on every trial
+
+Widening the Flow B run to all 14 candidate models (M4 gate) surfaced a
+problem that had nothing to do with model quality: it was running far slower
+than the model spectrum alone predicted. Root-caused, not guessed at:
+
+- `SubprocessLlmBackend.generate()` shells out to `llama-completion` (a
+  one-shot CLI binary) fresh on **every single call** — `lsof` on a live
+  process confirmed the Metal shader library gets re-mapped from disk on
+  every subprocess launch. For a workload calling `generate()` ~120 times per
+  model, that means reloading the full model weights and reinitializing the
+  GPU backend 120 times per model.
+- The file-based prompt cache (`--prompt-cache-ro /tmp/telemetry_base.cache`)
+  had silently never worked at all: `-ro` never writes the cache file, and
+  nothing in this pipeline ever ran a non-`-ro` pass to create it. `ls`
+  confirmed the file didn't exist.
+- `DEFAULT_THREADS=4` on a 16-core M4 (12 performance + 4 efficiency,
+  confirmed via `sysctl`) left two-thirds of the performance cores idle.
+
+Fix: added `LlmServerBackend` to `shared/llm-inference` — starts
+`llama-server` (built fresh; the existing build had `LLAMA_BUILD_SERVER=OFF`)
+once and keeps it running across every call, using its raw `/completion`
+endpoint (not the OpenAI-compatible chat endpoint, which would silently
+chat-template the prompt — verified live that `/completion` sends it
+untouched, matching `-no-cnv`'s existing behavior byte-for-byte). This also
+fixes the prompt cache for free: llama-server's internal slot cache reuses a
+shared prompt prefix across HTTP requests automatically — verified live, a
+second call sharing an 86/90-token prefix with the first dropped
+prompt-processing time from 44ms to 3.6ms with zero extra code. Threads
+raised to 12. `triage_function.py` switched from `SubprocessLlmBackend` to
+`LlmServerBackend`; the eval harness now closes each model's server before
+the manifest loop moves to the next one (skipping this would leave two
+servers competing for the GPU at once — the exact contention this project
+already hit and corrupted two earlier diagnostic runs).
+
+**One real regression this surfaced and fixed along the way**: llama-server's
+`stop` field excludes the matched text from the returned content (unlike
+whatever `--reverse-prompt` did under the old CLI path) — passing
+`stop=("}",)` alongside the grammar silently truncated the required closing
+brace off every completion, a 0%-format-reliability failure, not a subtle
+one. Fixed by dropping `stop` entirely: the grammar's root rule already ends
+with a required `"}"` literal, and grammar-constrained decoding terminates
+on its own once that's satisfied — no separate stop sequence was ever
+necessary.
+
+**Measured, validated speedup**: an 8-model run (including two 8B models,
+Llama-3.1-8B-Instruct and Qwen3-8B) completed in 232.79s. The earlier
+7-model run under the old architecture took 1471s (24.5 min) for a similar
+model set — roughly a 6x speedup, with identical result shape (same models
+landing at 0% escalation mismatch as before) confirming the backend swap
+didn't change what's being measured, only how fast.
+
+## Full M4 gate result: all 14 candidates (2026-09-26 21:52 UTC)
+
+`eval-results/compare-flow-b-COMP-J2D9D71YNJ-20260926T215201Z.json` — the
+complete M4 sweep, all 14 non-thermally-excluded `models.toml` entries
+(everything except Gemma-3-1B-it, already rejected in the fixed-harness run
+above, and Qwen3.8-27B, excluded for confirmed Pi 4 thermal issues at its
+weight class). 1492.70s wall time (~24.9 min) for all 14, on the fixed
+`LlmServerBackend` architecture — for comparison, the *old* architecture took
+24.5 min for 7 models; this run covered exactly double the model count in
+about the same wall time.
+
+| Model | format_parse_rate | escalation_mismatch_rate (n) | Verdict |
+|---|---|---|---|
+| **Qwen3-8B** | 1.000 | **0.0%** (90) | Clean PASS |
+| **Phi-3.5-mini-instruct** | 1.000 | **0.0%** (90) | Clean PASS |
+| **Gemma-3-4B-it** | 1.000 | **0.0%** (90) | Clean PASS |
+| Llama-3.1-8B-Instruct | 1.000 | 5.6% (90) | Strong PASS |
+| GLM-4-9B-0414 | 1.000 | 6.7% (90) | Strong PASS |
+| Qwen2.5-0.5B-Instruct | 1.000 | 33.3% (90) | Weak PASS |
+| Qwen2.5-1.5B-Instruct | 0.967 | 36.6% (82) | Weak PASS |
+| Llama-3.2-1B-Instruct | 1.000 | 38.9% (90) | Weak PASS |
+| Ling-3.0-tiny (7.9B-A1.3B) | 1.000 | 42.2% (90) | Weak PASS |
+| Llama-3.2-3B-Instruct | 1.000 | 42.2% (90) | Weak PASS |
+| Qwen2.5-3B-Instruct | 1.000 | 46.7% (90) | Weak PASS, right at the line |
+| LFM2.5-350M | 1.000 | 64.4% (90) | **REJECT** |
+| Qwen3-0.6B | 1.000 | 66.7% (90) | **REJECT** |
+| Granite-4.0-H-350M | 1.000 | 66.7% (90) | **REJECT** |
+
+**Headline findings for the talk:**
+
+1. **Format reliability is a solved problem across the whole spectrum now** —
+   13 of 14 models hit exactly 1.000, the one exception (Qwen2.5-1.5B,
+   0.967) barely dented. This is a genuinely different picture from the old
+   free-text Flow A results (`docs/TALK2-OUTLINE.md`'s gate-1 table, where
+   five of nine models never even reached gate 2) — grammar-constrained
+   decoding under the current schema is structurally reliable everywhere
+   tested, model size and family stopped mattering for this axis entirely.
+2. **A real, five-model top tier exists at ≤6.7% mismatch**: Qwen3-8B,
+   Phi-3.5-mini-instruct, and Gemma-3-4B-it at an exact 0%, plus
+   Llama-3.1-8B-Instruct (5.6%) and GLM-4-9B-0414 (6.7%). This is the richest
+   "clean" candidate pool anywhere in this document — every earlier round
+   found at most one or two genuine wins.
+3. **11 of 14 clear the 50% bar; only the three smallest fail it** —
+   Qwen3-0.6B, LFM2.5-350M, and Granite-4.0-H-350M (all ≤0.6B-class) are the
+   only rejects, at 64-67% mismatch. The cutoff isn't clean by size alone
+   though: Qwen2.5-0.5B-Instruct (also sub-1B) passes at 33.3%, better than
+   several 1-3B models — size correlates with success on this task but
+   doesn't determine it model-by-model.
+4. **The RAM column in this artifact is not usable for comparison** — it's a
+   cumulative session-wide high-water mark (documented in the harness's own
+   `resident_ram_mb_note`), not per-model footprint. Actual RAM/latency
+   comparison has to come from the Pi 4 decision-grade run, not this M4
+   quality gate — exactly the two-stage funnel this whole project has been
+   built around.
+
+**What this changes about the stage-model pick**: before this session,
+exactly one model (Qwen3-8B, Flow A) had ever cleared a gate-2-equivalent bar
+in this entire project. There are now five real M4-cleared candidates for
+Flow B specifically, spanning very different resource footprints (Phi-3.5-mini
+~2.4GB weights vs. GLM-4-9B ~6.2GB) — the actual pick depends entirely on
+which of these fit the Pi 4's real constraints, decided next.
+
+## Pi 4 decision-grade run: two real findings before a single model passed
+
+Kicked off the M4-cleared top tier (Qwen3-8B, Phi-3.5-mini-instruct,
+Gemma-3-4B-it, Llama-3.1-8B-Instruct, GLM-4-9B-0414) sequentially on the real
+Pi 4 target (8GB RAM, 4 cores, `edge-node00`), one model at a time. The first
+model in the queue (Qwen3-8B) surfaced two real problems before producing a
+usable result — one about the model, one about the eval code.
+
+**1. Qwen3-8B failed gate 1 on the Pi — and thermal throttling is very
+likely why.** 5 of 15 format-check trials hit the 300s timeout
+("llama-server did not respond within 300.0s"), landing `format_parse_rate`
+at 0.667 — below the 80% gate-1 bar, so gate 2 never ran. Checked the Pi's
+actual thermal state mid-run (on the *next* queued model, Phi-3.5-mini,
+since Qwen3-8B had already moved on): `vcgencmd measure_temp` read **83.7°C**,
+`vcgencmd get_throttled` returned `0xe0006` — decoded, bits for "ARM
+frequency capped" and "currently throttled" were both set **live, at read
+time**, not just "has occurred since boot." `vcgencmd measure_clock arm`
+confirmed it: **600MHz**, against the Pi 4's stock 1.5GHz — a 60% clock
+reduction. This reframes something the project already believed: `models.toml`
+attributes confirmed Pi 4 thermal issues specifically to Qwen3.8-27B's weight
+class, as if smaller models were thermally fine. This reading says the Pi may
+throttle under *any* sustained real-inference load on its current cooling
+setup, not just the heaviest model — which means every Pi latency number
+gathered anywhere in this project without also checking throttle state is a
+number of unknown provenance: it might describe the Pi 4's real capability,
+or a throttled fraction of it. Worth checking `get_throttled` on every future
+Pi run, not just when something already looks slow.
+
+**2. A real bug in the comparison harness, hit by this exact failure mode.**
+`_build_recommendation` (in all three comparison harnesses —
+`test_compare_models.py`, `test_compare_flow_b_models.py`, and the new
+`test_compare_tier2_models.py`) checked `if not axis["values"]:` to decide
+whether an axis had any data. That's wrong when a single-model run's only
+model fails to reach gate 2: `axis["values"]` is `{"model-id": None}` — a
+non-empty dict, so the check passes through — and the code then does
+`results[axis["best"]]` where `best` is `None` (since `_build_comparison`
+only sets `best` when at least one *non-None* value exists), crashing with
+`KeyError: None`. This is a real, pre-existing latent bug (not something this
+session's changes introduced), just never triggered before because every
+earlier run had at least one model clear gate 2. It crashed *before* the
+JSON artifact gets written, so Qwen3-8B's Pi run produced no usable artifact
+at all — the format_parse_rate/latency numbers above are recovered from the
+pytest failure traceback's captured local variables, not a clean report.
+Fixed (`if axis["best"] is None:` instead) and synced to the Pi before the
+next queued model (Phi-3.5-mini) could hit the same crash.
+
+**A live intervention, mid-session**: after the throttling reading above, a
+fan was added directly to the Pi while Phi-3.5-mini's run was still actively
+in progress (same sustained load, no pause — `llama-server`'s CPU time was
+still climbing between readings, ruling out "it just went idle" as the
+explanation).
+
+| | Before fan | After fan |
+|---|---|---|
+| Temp | 83.7°C | 76.4°C |
+| `get_throttled` live bits | Set (freq-capped + throttled, at read time) | Clear |
+| ARM clock | 600MHz | 1800MHz (full boost) |
+
+Two readings isn't a controlled study — temperature fluctuates on its own,
+and this doesn't isolate the fan from other factors yet — but the clock
+recovering from a 60%-reduced 600MHz to a full 1800MHz boost, on the
+identical sustained workload, is a strong signal in the expected direction.
+Worth tracking a real before/after series (several more readings on both
+sides, same workload) rather than resting on two points, but this already
+suggests the earlier throttling finding is a genuinely fixable cooling
+problem, not an inherent Pi 4 ceiling.
+
+**First complete Pi 4 decision-grade result: Phi-3.5-mini-instruct (2026-09-26
+23:25 UTC, `eval-results/compare-flow-b-edge-node00-20260926T232520Z.json`,
+53min run, post-fan/post-bugfix).** This clears the actual first gate for
+this talk track: does ANY LLM produce accurate results on the Pi 4, at all,
+period. It does — 0.0% escalation mismatch, gate-2 confirmed, on the real
+target hardware, identical to its M4 result.
+
+| Axis | Value |
+|---|---|
+| format_parse_rate | 86.7% (clears gate 1) |
+| escalation_mismatch_rate | **0.0%** (n=45, gate-2 confirmed — identical to its M4 result) |
+| latency p50 | 35.7s |
+| latency p95 | 157.8s |
+| tokens/sec (approx) | 0.467 |
+| resident RAM | 7.1GB of the Pi's 7.6GB total (93%) |
+
+Latency/RAM are recorded for the talk's data set, not evaluated here —
+resource-fit and optimization are a later pass, separate from this session's
+actual bar (accuracy on the real target, period).
+
+**Second Pi 4 decision-grade result: Gemma-3-4B-it (2026-09-27 00:47 UTC,
+`eval-results/compare-flow-b-edge-node00-20260927T004712Z.json`, 82min
+run) — a second model clears the same bar.**
+
+| Axis | Phi-3.5-mini-instruct | Gemma-3-4B-it |
+|---|---|---|
+| format_parse_rate | 86.7% | **100%** |
+| escalation_mismatch_rate | 0.0% (n=45) | 2.2% (n=45) — both effectively clean |
+| latency p50 | 35.7s | 77.1s |
+| latency p95 | 157.8s | 101.4s |
+| tokens/sec (approx) | 0.467 | 0.867 |
+| resident RAM | 7.11GB (93%) | 7.26GB (96%) |
+
+Two models now have real, accurate, gate-2-confirmed output running on the
+actual Pi 4 target — the first-gate objective for this talk track, met
+twice. Latency/RAM numbers are captured above for the talk's data set;
+performance optimization is explicitly out of scope for this pass.
+
+**Third Pi 4 decision-grade result: Llama-3.1-8B-Instruct (2026-09-27 02:18
+UTC, `eval-results/compare-flow-b-edge-node00-20260927T021819Z.json`, 91min
+run) — a third model clears the same bar.**
+
+| Axis | Value |
+|---|---|
+| format_parse_rate | 86.7% |
+| escalation_mismatch_rate | **0.0%** (n=45, gate-2 confirmed) |
+| latency p50 | 74.7s |
+| latency p95 | 232.3s |
+| tokens/sec (approx) | 0.499 |
+| resident RAM | 6.92GB (91%) |
+
+Three models now have real, accurate, gate-2-confirmed output on the actual
+Pi 4 target: Phi-3.5-mini-instruct, Gemma-3-4B-it, Llama-3.1-8B-Instruct.
+Latency/RAM captured for the data set, not evaluated here.
+
+**Also decided mid-run**: Qwen3-8B's Pi failure (gate-1 timeout, likely
+thermal per the finding above) gets a clean re-run, queued to fire
+automatically after the remaining models (GLM-4-9B-0414, currently running)
+finish — now that the fan is in and thermal is stable, it deserves a fair
+result before being counted as a real rejection
+rather than a measurement artifact.
+
+**Decision-tree data point: for this stack, hardware changes speed, not
+accuracy.** Same software (llama.cpp, GGUF Q4_K_M), same model, two
+different machines (M4 Max MacBook vs. Pi 4) — three models now have both
+readings:
+
+| Model | M4 → Pi p50 latency ratio | M4 → Pi p95 latency ratio | Accuracy delta (Pi − M4) |
+|---|---|---|---|
+| Phi-3.5-mini-instruct | 47.5x slower | 199.0x slower | +0.0pp |
+| Gemma-3-4B-it | 37.6x slower | 42.7x slower | +2.2pp |
+| Llama-3.1-8B-Instruct | 59.9x slower | 109.5x slower | −5.6pp |
+
+Latency dropped by 38-200x depending on model/percentile; accuracy moved by
+at most 5.6 percentage points, in *both* directions, on `n=45-90` samples
+small enough that this is plausibly sampling noise around a stable true
+rate rather than a real hardware-driven effect. For the "when to use an LLM
+on the edge" decision tree: moving the same model/quantization from a
+Mac Studio-class M4 Max to a Pi 4 is a speed and resource-footprint decision,
+not an accuracy one — at least for this stack, on the models tested so far.
+Whether a *different* quantization scheme (e.g. MLX) would change the
+accuracy side independently of hardware is a real, separate question, not
+pursued further this round.
+
+**Fourth Pi 4 decision-grade result: GLM-4-9B-0414 (2026-09-27 04:18 UTC,
+`eval-results/compare-flow-b-edge-node00-20260927T041805Z.json`, 120min
+run).**
+
+| Axis | Value |
+|---|---|
+| format_parse_rate | 86.7% |
+| escalation_mismatch_rate | 14.6% (6/41) — concentrated entirely in the "benign" scenario (6/13 false-escalations: expected "hold", got "lower"/"raise") |
+| latency p50 | 94.3s |
+| latency p95 | 300.1s (pinned at the timeout ceiling) |
+| resident RAM | 6.81GB |
+
+Roughly double its M4 reading (6.7% mismatch there) on a modest sample
+(n=41) — plausibly noise, but this is the first of the top-5 to show a real
+gap between M4 and Pi quality rather than a near-identical number, so it's
+flagged rather than assumed to be sampling variance.
+
+**Fifth Pi 4 decision-grade result: Qwen3-8B — post-fan re-run closes out
+the thermal question (2026-09-27 06:43 UTC,
+`eval-results/compare-flow-b-edge-node00-20260927T064341Z.json`, 145min
+run).** This is the model that failed gate 1 on its first Pi attempt (rows 9/10
+above) with the Pi running hot and throttled. Re-queued to run last, after
+the fan fix had time to prove itself on every other model in the queue.
+Result: format_parse_rate recovered from 66.7% to **86.7%**, and
+escalation_mismatch_rate came back at a clean **0.0% (43/43)** — a full
+pass, on the real target hardware. The original failure was thermal, not
+the model, confirmed by a real re-run rather than inferred from the
+temperature reading alone.
+
+**Top-5 Pi 4 decision-grade summary — every M4-cleared Flow B candidate now
+has a real Pi 4 number:**
+
+| Model | Format | Escalation mismatch | p50 | p95 | RAM after |
+|---|---|---|---|---|---|
+| Phi-3.5-mini-instruct | 86.7% | 0.0% | 35.7s | 157.8s | 7.11GB |
+| Gemma-3-4B-it | 100.0% | 2.2% | 77.1s | 101.4s | 7.26GB |
+| Llama-3.1-8B-Instruct | 86.7% | 0.0% | 74.7s | 232.3s | 6.92GB |
+| GLM-4-9B-0414 | 86.7% | 14.6% | 94.3s | 300.1s | 6.81GB |
+| Qwen3-8B (post-fan re-run) | 86.7% | 0.0% | 127.0s | 300.0s | 7.02GB |
+
+RAM readings past the first model in a queued run are a floor, not a true
+peak (`ru_maxrss` is cumulative for the whole process session — see the
+harness's own `resident_ram_mb_note`). Four of five hold 0-2.2% mismatch on
+the real target hardware; GLM-4-9B is the one outlier at 14.6%. This is the
+complete Tier 1 (Flow B) Pi dataset for this project so far — the M4 gate
+found a clean cliff at exactly these five models (0-6.7% mismatch there vs.
+33%+ for every other candidate), so there is no larger list still waiting
+on a Pi run.
+
+---
+
+## Tier 2 (talk3) corridor-omission prompt fix, validated at scale (n=30)
+
+**The fix**: one line added to `SYNTHESIS_WARNING_PROMPT`
+(`talks/talk3-pulsar-speaks-english/src/talk3_pulsar_speaks_english/prompting.py`):
+"Always name the corridor explicitly in your warning ... — never omit it,
+even when the situation seems minor." Deliberately framed as a narrow,
+mechanical "always include this literal fact" instruction — contrast with
+Flow B's escalation-task prompt tuning (row 3), which repeatedly asked
+models to weigh multiple risk factors, not just state one fact, and kept
+overcorrecting as a result.
+
+**Full 15-model re-test, n=30 per model,
+`eval-results/compare-tier2-COMP-J2D9D71YNJ-20260927T050845Z.json`, 826s run
+— grounding-violation rate, pre-fix vs. post-fix:**
+
+| Model | Pre-fix | Post-fix | Change |
+|---|---|---|---|
+| Llama-3.1-8B-Instruct | 20.0% | **0.0%** | improved |
+| Qwen3-8B | 10.0% | 10.0% | unchanged |
+| GLM-4-9B-0414 | 0.0% | 0.0% | unchanged |
+| Gemma-3-1B-it | 70.0% | **10.0%** | improved — newly passes |
+| Phi-3.5-mini-instruct | 0.0% | 10.0% | regressed |
+| Gemma-3-4B-it | 0.0% | 0.0% | unchanged |
+| Qwen2.5-1.5B-Instruct | 10.0% | **50.0%** | regressed sharply — newly rejects |
+| Qwen2.5-3B-Instruct | 100.0% | 30.0% | improved substantially, still rejects |
+| Llama-3.2-3B-Instruct | 70.0% | 30.0% | improved, still rejects on other axes |
+| Qwen2.5-0.5B-Instruct | 70.0% | 70.0% | unchanged |
+| Qwen3-0.6B | 70.0% | 70.0% | unchanged |
+| Ling-3.0-tiny | 80.0% | 100.0% | regressed (already a clear reject on every axis) |
+| Llama-3.2-1B-Instruct | 100.0% | 100.0% | unchanged |
+| LFM2.5-350M | n/a (0% nonempty) | n/a (0% nonempty) | unchanged |
+| Granite-4.0-H-350M | n/a (0% nonempty) | n/a (0% nonempty) | unchanged |
+
+**Two regressions, both diagnosed by reading the actual flagged sample
+text, not just trusting the percentage:**
+
+1. **Phi-3.5-mini-instruct (0%→10%)**: hallucinates a specific *wrong*
+   corridor ("I-10W" instead of the real "I-95N") in roughly 1 in 10 trials,
+   rather than omitting it — arguably worse than omission (actively
+   misleading vs. merely incomplete), though small enough the model still
+   passes overall.
+2. **Qwen2.5-1.5B-Instruct (10%→50%), a new finding**: not corridor
+   omission — the model starts echoing prompt-template fragments verbatim
+   instead of writing a warning (`"Reroute detail (already decided): none"`,
+   `"Enrichment cards:"`, `"Affected trucks: 2"`), and in one trial parrots
+   the new instruction sentence itself back as if it were the answer. This
+   flips the model from PASS to REJECT. It's the same prompt-echo collapse
+   pattern seen three times already in Flow B's escalation-task prompt
+   tuning (row 3 and others) — except the trigger here was a purely
+   mechanical "state this one literal fact" instruction, not a nuanced
+   multi-factor judgment call, on a smaller model (1.5B) than any prior
+   instance. Confirms the collapse pattern isn't specific to reasoning-heavy
+   prompts — sharpening *any* instruction can tip a small enough model over.
+
+**One genuine new pass**: Gemma-3-1B-it (70%→10%), verified against real
+sample text — its two remaining violations are honest partial omissions
+("The corridor is experiencing a slowdown..." never naming it), not echo
+artifacts. Notably, this model *failed* Flow B's escalation gate (51.1%
+mismatch — see its `models.toml` elimination note) but *passes* Tier 2's
+simpler paraphrase task. The clearest evidence yet in this project that
+task-appropriate model sizing is real: the same model is unusable for one
+task and production-viable for another.
+
+**Final validated Tier 2 (talk3) PASS list, n=30, post-fix**:
+Llama-3.1-8B-Instruct (0%), Qwen3-8B (10%), GLM-4-9B-0414 (0%),
+Gemma-3-1B-it (10%), Phi-3.5-mini-instruct (10%), Gemma-3-4B-it (0%) — six
+models, now queued for their own Pi 4 decision-grade run. **Superseded
+below**: the Pi run's own token-budget fix later exposed Qwen3-8B's PASS
+here as an artifact of an overly generous max_tokens default (see "Pi 4
+decision-grade run: Tier 2" and row 22) — corrected list is 5 models, not 6.
+
+---
+
+## Flow B escalation failures split into two distinct archetypes, not one spectrum
+
+Reading the full 15-model M4 Flow B per-scenario breakdown (not just the
+aggregate mismatch rate) side by side shows two genuinely different failure
+shapes, not just "worse vs. better":
+
+| Model | Mismatch | escalate-worthy | benign | de-escalate-worthy |
+|---|---|---|---|---|
+| Qwen3-8B / Phi-3.5-mini / Gemma-3-4B | 0.0% | 100% | 100% | 100% |
+| Llama-3.1-8B-Instruct | 5.6% | 93.3% | 90.0% | 100% |
+| GLM-4-9B-0414 | 6.7% | 100% | 80.0% | 100% |
+| Qwen2.5-0.5B-Instruct | 33.3% | **0.0%** | 100% | 100% |
+| Qwen2.5-1.5B-Instruct | 36.6% | 28.6% | 77.8% | 85.2% |
+| Llama-3.2-1B-Instruct | 38.9% | **0.0%** | 83.3% | 100% |
+| Ling-3.0-tiny | 42.2% | 16.7% | 56.7% | 100% |
+| Llama-3.2-3B-Instruct | 42.2% | 73.3% | **0.0%** | 100% |
+| Qwen2.5-3B-Instruct | 46.7% | 3.3% | 56.7% | 100% |
+| Gemma-3-1B-it | 51.1% | 100% | **10.0%** | 36.7% |
+| LFM2.5-350M | 64.4% | 100% | **0.0%** | 6.7% |
+| Qwen3-0.6B | 66.7% | 100% | **0.0%** | **0.0%** |
+| Granite-4.0-H-350M | 66.7% | 3.3% | **0.0%** | 96.7% |
+
+**"Never raises" (Qwen2.5-0.5B, Llama-3.2-1B, Qwen2.5-3B, Granite-4.0-H, weakly
+Ling-3.0-tiny)**: near-0% specifically on escalate-worthy, fine or good on the
+calmer scenarios. **"Can't calm down" (Gemma-3-1B-it, LFM2.5-350M,
+Qwen3-0.6B)**: perfect on escalate-worthy, collapse on benign and/or
+de-escalate-worthy — they over-trigger. Llama-3.2-3B-Instruct is a third,
+narrower shape (decent escalate-worthy, 0% benign specifically). This
+distinction directly shaped which model got which intervention below.
+
+## Two prompt-side accuracy interventions, round 2 — one archetype each, both real negative-or-mixed results
+
+**RAG (query-dependent retrieval), targeting the "can't calm down" archetype
+— Gemma-3-1B-it** (full raw result:
+`eval-results/rag-flow-b-gemma-3-1b-it-COMP-J2D9D71YNJ-20260927T201646Z.json`).
+Built a held-out pool of 24 synthetic escalation
+precedents (`tests/model/escalation_precedents.py`), embedded with
+`sentence-transformers` (`all-MiniLM-L6-v2`, in-memory cosine similarity —
+no vector DB, unnecessary at this corpus size), retrieved top-2 per query,
+injected as a "similar past cases" block before the existing rule-based
+prompt's `Decision:` section. Single variable isolated: same model, same 3
+canonical scenarios, RAG on vs. off, n=90 each.
+
+| | Baseline | RAG |
+|---|---|---|
+| Overall mismatch | 58.9% | 57.8% |
+| Latency p50/p95 | 0.54s / 0.66s | 0.51s / 0.63s |
+
+No detectable accuracy effect (1.1pp on n=90 is noise) and no detectable
+latency effect on M4 (fast enough that the ~20% longer prompt doesn't
+register). The one unambiguous, real cost: the embedder itself —
+**4.91s one-time load, 531.9MB RSS** on a warm cache — paid for zero measured
+benefit. Converges with row 3's earlier finding that Gemma-3-1B-it is
+unmoved by rule-tightening too: two different intervention types, same
+non-result, on the same model — real evidence it's capacity-gated for this
+task, not technique-gated. (Latency conclusion is M4-specific; the Pi's much
+lower CPU throughput could still show a real prefill tax from the longer
+prompt that M4's headroom hides — not tested on the Pi.)
+
+**Static (non-retrieved) few-shot, targeting the "never raises" archetype —
+Qwen2.5-3B-Instruct and Qwen2.5-1.5B-Instruct** (full raw result:
+`eval-results/static-fewshot-qwen2.5-COMP-J2D9D71YNJ-20260927T203806Z.json`).
+Two fixed, moderate (not
+cartoonishly extreme) worked examples baked into every prompt regardless of
+scenario — isolates "do worked examples help at all" from RAG's retrieval
+overhead. n=90 per condition per model, all three per-scenario rates
+checked, not just the aggregate (row 3's own lesson: an aggregate
+improvement can hide a benign/de-escalate collapse).
+
+| Model | Scenario | Baseline | Few-shot |
+|---|---|---|---|
+| Qwen2.5-3B-Instruct | escalate-worthy | 3.3% | **100.0%** |
+| Qwen2.5-3B-Instruct | benign | 46.7% | **3.3%** |
+| Qwen2.5-3B-Instruct | de-escalate-worthy | 100.0% | **6.7%** |
+| Qwen2.5-3B-Instruct | **overall mismatch** | 50.0% | **63.3% (worse)** |
+| Qwen2.5-1.5B-Instruct | escalate-worthy | 20.7% | 86.2% |
+| Qwen2.5-1.5B-Instruct | benign | 69.2% | 65.5% |
+| Qwen2.5-1.5B-Instruct | de-escalate-worthy | 77.8% | 66.7% |
+| Qwen2.5-1.5B-Instruct | **overall mismatch** | 45.1% | **27.3% (better)** |
+
+Qwen2.5-3B-Instruct is a clean, textbook overcorrection: the two
+"raise"-labeled examples didn't teach risk-trigger recognition, they pushed
+the decision boundary toward raise across every scenario, moving it from the
+"never raises" archetype into the "can't calm down" one — the aggregate
+mismatch rate got *worse* despite the targeted scenario "fixing," which is
+exactly why the per-scenario breakdown matters more than the headline number.
+Qwen2.5-1.5B-Instruct shows a genuine net improvement, but a real portion of
+it comes from trading away de-escalate-worthy accuracy (77.8%→66.7%), not
+from getting more discriminating — the same mechanism at a smaller dose, not
+a clean win.
+
+**The generalized finding**: overcorrection isn't specific to explicit
+rule-tightening (row 3) or to models that already over-trigger (Group 2). A
+different intervention (biased worked examples) on a different failure
+archetype (Group 1, "never raises") produced the same shape of failure. Any
+prompt-side push toward one decision direction risks the same trade-off,
+almost regardless of technique — a stronger, more general version of row 3's
+original finding.
+
 ---
 
 ## Running total (update as rounds land)
@@ -565,3 +1053,120 @@ point that "3B" isn't a clean cutoff, just a rough one.
 | 5 | Architectural pivot: severity + recommended_action to cheap math, LLM narrowed to bounded escalation | Severity, recommended_action: universal (both fully deterministic, zero model dependency, contradiction eliminated by construction). Real harness, full 7-model run: **Qwen3-8B, Phi-3.5-mini-instruct, Gemma-3-4B-it** at a clean 0% escalation-direction mismatch (gate 2, n=90) | Gemma-3-1B-it: 51.1% mismatch, the only one of 7 to fail gate 2; Llama-3.2-1B (37.8%) and Llama-3.2-3B (43.3%) pass but weakly | Severity + recommended_action: solved. Escalation quality: reliable at ~3B-and-up (three clean PASSes), unreliable below it — first genuinely clean pass for this task anywhere in this document |
 | 4 | Brake intensity (v2, 3 separated bands) | **Gemma-3-1B-it** (net 47%→57%, no regressions — first win for this model in 10 rounds) | LFM2.5-350M (net regression, medium collapsed to "low"); Qwen2.5-0.5B-Instruct (net wash) | Mixed, model-specific — not universal, but the first real signal that reaches Gemma at all |
 | 6 | Fixed the stale Flow B eval harness (event_label/dispatch_action/eta_slip_min-severity checks replaced with the current card shape + escalation-direction scenarios), then ran it for real | See row 5 — this is the harness that produced row 5's numbers | — | Confirmed the harness fix works: full 7-model run completed cleanly, 24.5 min, no errors |
+| 7 | Infrastructure: SubprocessLlmBackend → LlmServerBackend (persistent server, 12 threads, working prompt cache) | All models — pure speedup, not an accuracy change | — | ~6x faster (232.79s for 8 models incl. two 8B, vs. 1471s for a similar 7-model set), identical result shape confirmed |
+| 8 | Full M4 gate, all 14 candidates | **Qwen3-8B, Phi-3.5-mini-instruct, Gemma-3-4B-it** (0.0%); Llama-3.1-8B-Instruct (5.6%), GLM-4-9B-0414 (6.7%) — 5-model clean tier | Qwen3-0.6B, LFM2.5-350M, Granite-4.0-H-350M (64-67%, all ≤0.6B) | 11/14 pass the 50% bar; format reliability solved everywhere (13/14 at exactly 1.000); richest candidate pool in this whole project — next step is the Pi 4 decision-grade run |
+| 9 | Pi 4 decision-grade run, Qwen3-8B (first of the top-5 queue) | — | Qwen3-8B: failed gate 1 on the Pi (0.667 format_parse_rate, 5/15 timeouts at 300s) | Not a model-quality finding — thermal throttling (see row 10) is the far more likely cause than the model itself |
+| 10 | Pi 4 thermal throttling, discovered live mid-run | — | Confirmed: 83.7°C, `get_throttled` live bits set, ARM clock reduced to 600MHz (40% of stock) during sustained inference | Reframes `models.toml`'s "only Qwen3.8-27B has thermal issues" note — may be a property of sustained load on this Pi's cooling generally, not one model's weight class. A fan added mid-session (same sustained workload) brought it to 76.4°C, live throttle bits clear, clock back to full 1800MHz boost — encouraging but only 2 data points so far |
+| 11 | Pi 4 decision-grade run, Phi-3.5-mini-instruct | **First gate cleared: accurate LLM output on the real Pi 4** (0.0% mismatch, identical to M4) | — | Latency (35.7s p50/157.8s p95) and RAM (93%) captured for the talk's data set; optimization out of scope for this pass |
+| 12 | Pi 4 decision-grade run, Gemma-3-4B-it | Second model clears the same bar (2.2% mismatch, ~identical to M4's 0%) | — | Latency (77.1s p50/101.4s p95) and RAM (96%) captured; optimization out of scope for this pass |
+| 13 | Pi 4 decision-grade run, Llama-3.1-8B-Instruct | Third model clears the same bar (0.0% mismatch, n=45, gate-2 confirmed) | — | Latency (74.7s p50/232.3s p95) and RAM (91%) captured; optimization out of scope for this pass |
+| 14 | Tier 2 (talk3) harness bug: negation-blind grounding checks | Fixed both, verified against real output before trusting the numbers | — | Gemma-3-4B-it's "I-95 North" (natural paraphrase of "I-95N") and Qwen3-8B's "No reroute is recommended" (correct hold, contains the keyword "reroute") were both scored as violations by naive exact-string/keyword checks — same lesson as this whole project's "verify against real ground truth" discipline, applied to the eval harness's own code this time |
+| 15 | Decision-tree data point: M4→Pi hardware swap, same stack | Accuracy stable across all 3 models tested (delta ≤5.6pp, plausibly noise) | — | Latency dropped 38-200x for the same models/quantization; hardware changes speed, not accuracy, for this stack — a real input to "when to use an LLM on the edge" |
+| 16 | Full Tier 2 (talk3) comparison, all 15 candidates, post-grounding-fix | **GLM-4-9B-0414, Phi-3.5-mini-instruct, Gemma-3-4B-it** (0.0% grounding violation); Qwen3-8B, Qwen2.5-1.5B (10%); Llama-3.1-8B (20%) — 6-model pass tier, independent of Flow B's model selection per explicit instruction | LFM2.5-350M, Granite-4.0-H-350M (0% nonempty — same prompt-echo failure as earlier Flow A/B findings); Qwen2.5-0.5B, Qwen3-0.6B, Ling-3.0-tiny, Gemma-3-1B-it, Llama-3.2-1B/3B (all fail on real grounding, not the fixed bug); **Qwen2.5-3B-Instruct still 100% grounding-violation post-fix** | The grounding fix (row 14) is validated by scale: Gemma-3-4B-it went from 100%→0.0% violation between the 6-model pre-fix run and this 15-model post-fix run, confirming it was a harness bug. Tier 2's own pass list only partially overlaps Flow B's (Qwen2.5-1.5B-Instruct passes Tier 2 despite never reaching Flow B's gate 2) — confirms the two tasks genuinely test different skills, as intended |
+| 17 | Qwen2.5-3B-Instruct's grounding failure, diagnosed | Confirmed real, not a harness artifact — read the actual flagged text | — | Systematically omits the corridor entirely in lower-stakes scenarios: 100% violation on single-truck, 50% on corridor-wide-no-reroute, **0% on corridor-wide-with-reroute**. Consistent pattern, not noise — the model trades completeness for brevity specifically when it judges the situation less severe, dropping "I-95N" from otherwise well-formed, speakable warnings. A real deployment concern if the spoken warning is meant to stand alone rather than supplement an already-corridor-scoped channel |
+| 18 | Pi 4 decision-grade run, GLM-4-9B-0414 + Qwen3-8B post-fan re-run — completes the top-5 Flow B Pi queue | All five M4-cleared candidates now have real Pi numbers; Qwen3-8B recovered from a 66.7% format_parse_rate (thermal, row 9/10) to 86.7% with a clean 0.0% mismatch (43/43) once the fan fix had time to prove out | GLM-4-9B: 14.6% mismatch on the Pi (vs. 6.7% on M4), concentrated entirely in the "benign" scenario (6/13 false-escalations) | Four of five hold 0-2.2% mismatch on real target hardware; GLM-4-9B is the one outlier, on a modest n=41 sample. Qwen3-8B's clean re-run confirms the thermal diagnosis was correct, not just plausible. This is the complete Tier 1 (Flow B) Pi dataset — the M4 gate's clean cliff at exactly these 5 models means there's no larger list still owed a Pi run |
+| 19 | Tier 2 (talk3) corridor-omission prompt fix ("always name the corridor" instruction), validated n=30 across all 15 candidates | Llama-3.1-8B-Instruct (20%→0%), Gemma-3-1B-it (70%→10%, newly passes), Qwen2.5-3B-Instruct (100%→30%, still rejects), Llama-3.2-3B-Instruct (70%→30%) | Phi-3.5-mini-instruct (0%→10%: new wrong-corridor hallucination, "I-10W" instead of "I-95N"); **Qwen2.5-1.5B-Instruct (10%→50%, newly rejects)**: not omission — a prompt-echo collapse, the model outputs copied template fragments ("Reroute detail (already decided): none", "Enrichment cards:") instead of a paraphrase | Net effect on the 6-model pass list is a lateral swap (Gemma-3-1B-it in, Qwen2.5-1.5B-Instruct out), not a net gain or loss. Confirms the prompt-echo overcorrection pattern (row 3) isn't specific to reasoning-heavy prompts — it also hit a purely mechanical "state this one fact" instruction, on a smaller model (1.5B) than any prior instance. Also the clearest task-appropriate-sizing evidence in this project: Gemma-3-1B-it fails Flow B's escalation gate (51.1% mismatch) but passes Tier 2's simpler paraphrase task outright |
+| 20 | RAG (query-dependent precedent retrieval), targeting the "can't calm down" archetype — Gemma-3-1B-it | — | No detectable accuracy effect (58.9%→57.8% mismatch, n=90, within noise) or M4 latency effect (0.54s→0.51s p50) | Real, unambiguous cost with zero measured benefit: embedder load 4.91s + 531.9MB RSS. Converges with row 3: two different intervention types (rule-tightening, retrieval) both unmoved this model — real evidence it's capacity-gated for this task, not technique-gated. Latency conclusion is M4-only; not tested on the Pi, where lower CPU throughput could still show a real prefill tax |
+| 21 | Static (non-retrieved) few-shot, targeting the "never raises" archetype — Qwen2.5-3B-Instruct and Qwen2.5-1.5B-Instruct | Qwen2.5-1.5B-Instruct: net improvement, 45.1%→27.3% mismatch (escalate-worthy 20.7%→86.2%) | **Qwen2.5-3B-Instruct got worse overall (50.0%→63.3% mismatch)**: escalate-worthy fixed (3.3%→100%) but benign (46.7%→3.3%) and de-escalate-worthy (100%→6.7%) collapsed — moved from "never raises" into "can't calm down." Qwen2.5-1.5B's improvement partly bought by trading away de-escalate-worthy (77.8%→66.7%) | Generalizes row 3's overcorrection finding beyond rule-tightening and beyond over-triggering models: biased worked examples produced the same failure shape on a different archetype. Checking all three per-scenario rates (not just the aggregate) is what caught this — the aggregate alone would have looked like a win for Qwen2.5-3B on the one scenario it targeted |
+| 22 | Pi 4 decision-grade run, Tier 2 (talk3), all 6 M4-passing models | Gemma-3-1B-it, Phi-3.5-mini-instruct, Gemma-3-4B-it, GLM-4-9B-0414, and (after the max_tokens fix below) Llama-3.1-8B-Instruct all transfer cleanly from M4 to Pi | **Qwen3-8B**: initially collapsed to 10.0% nonempty on the Pi (256-token default, no stop sequence, ~555-560s needed at its measured throughput vs. the 300s budget). Fixed the timeout-wiring bug and the token budget (capped at 110, sized off `MAX_SPEAKABLE_WORDS`) — nonempty recovered to 100%, but structured_rate/speakability then revealed a genuine, hardware-independent problem: Qwen3-8B reasons out loud in raw-completion mode, and 110 tokens sometimes runs out before it reaches the JSON. Confirmed by re-running on M4 under the identical config (structured 90%→73.3%, speak_viol 10%→26.7%) — same direction on both hosts, so this is a real model/config interaction, not a Pi artifact | Two real bugs found and fixed en route: `--model-timeout-seconds` never wired into `run_tier2_trials` (hardcoded 180s default, invisible on M4, corrupted Phi-3.5-mini's first Pi attempt); then no grammar/stop-sequence on a task that only needs a short answer. Fixing the second bug's overly generous token budget is what *exposed* Qwen3-8B's real weakness — the original PASS was an artifact of budget slack, not evidence of quality. **Qwen3-8B removed from the Tier 2 PASS list** (now 5 models, not 6) |
+
+---
+
+## Pi 4 decision-grade run: Tier 2 (talk3), all 6 M4-passing models
+
+Ran the validated 6-model Tier 2 PASS list on the real Pi 4 target, one
+model at a time, n=30 (`pi_tier2_queue.sh` then `pi_tier2_queue_resume.sh` —
+see the timeout bugfix below).
+
+| Model | M4 nonempty/speak/ground | Pi nonempty/speak/ground | Pi p50/p95 | Pi tok/s | Pi RAM |
+|---|---|---|---|---|---|
+| Gemma-3-1B-it | 100%/3.3%/10.0% | 100%/3.3%/10.0% | 60.1s/82.4s | 1.865 | 1533MB |
+| Phi-3.5-mini-instruct | 100%/0.0%/10.0% | 100%/0.0%/0.0% | 186.0s/251.6s | 0.450 | 7171MB |
+| Gemma-3-4B-it | 100%/0.0%/0.0% | 100%/0.0%/0.0% | 43.7s/119.3s | 0.690 | 7049MB |
+| GLM-4-9B-0414 | 100%/0.0%/0.0% | 100%/0.0%/0.0% | 57.6s/179.5s | 0.304 | 6808MB |
+| **Qwen3-8B** | 100%/10.0%/10.0% | **10.0%**/0.0%/0.0% | 300.1s/300.1s | 0.461 | 6994MB |
+| **Llama-3.1-8B-Instruct** | 100%/3.3%/0.0% | **6.7%**/0.0%/0.0% | 300.1s/300.1s | 0.455 | 6815MB |
+
+(This table is the pre-fix snapshot, kept for the narrative below. Corrected
+final numbers for the bottom two rows, after the max_tokens fix: see
+"Fixed" further down — Llama-3.1-8B-Instruct→100%/100%/0.0%/0.0% on Pi,
+clean; Qwen3-8B→100%/63.3%/36.7%/10.0% on Pi and a matching regression on
+M4 under the identical config, now REJECTED from the PASS list.)
+
+4 of 6 (Gemma-3-1B-it, Phi-3.5-mini, Gemma-3-4B-it, GLM-4-9B) transfer
+cleanly from M4 to Pi — Gemma-3-1B-it's numbers are essentially identical on
+both hosts.
+
+**A real timeout-wiring bug, found and fixed mid-run**:
+`test_compare_tier2_models.py::_run_one_model` read
+`--model-timeout-seconds` from the CLI only to log it into the report's
+`seed_config` — it never actually passed it to `run_tier2_trials`, which
+silently used `tier2_eval_lib.py`'s hardcoded `DEFAULT_EVAL_TIMEOUT_SECONDS
+= 180.0` regardless. Invisible on M4 (real latencies never approached 180s
+there) but it corrupted Phi-3.5-mini-instruct's first Pi attempt (27/30
+trials hit "did not respond within 180.0s", nonempty_rate=10.0%). Fixed
+(wired the CLI option through), killed the corrupted run, and re-ran
+everything after Gemma-3-1B-it (whose result stayed valid — its real
+latencies never got near 180s either).
+
+**A second real gap, found after the fix, not a bug in the fix**:
+Qwen3-8B and Llama-3.1-8B-Instruct still collapsed to 10.0%/6.7% nonempty
+on the Pi even with the timeout correctly set to 300s. Every error reads
+exactly `"llama-server did not respond within 300.0s"` — real, not an
+artifact. Root cause: unlike Flow B, **Tier 2's harness has no grammar and
+no stop sequence** (`run_tier2_trials` builds a bare
+`LlmGenerationConfig(timeout_seconds=...)`), so generation only ends when
+the model naturally emits a stop token or hits the 256-token default cap.
+At these two models' measured Pi throughput (~0.455-0.461 tok/s), reaching
+256 tokens takes ~555-560s — almost double the 300s budget. GLM-4-9B is
+*slower* per-token (0.304 tok/s) but finishes fine, meaning it reliably
+stops itself well short of 256 tokens for this prompt; these two apparently
+don't. This is a harness gap on a task that only ever needs a short answer,
+not evidence the models can't do the task — both show 100% nonempty on M4.
+
+**Fixed**: adding an actual `stop` sequence was considered and rejected —
+llama-server excludes matched stop text from the returned content (the same
+lesson `triage_function.py`'s grammar/stop interaction bug already taught
+this project), and Tier 2 has no grammar to fall back on, so a stop match
+would strip the JSON's closing brace and break parsing for every model, not
+just these two. Capped `max_tokens=110` instead (`tier2_eval_lib.py`),
+sized off `MAX_SPEAKABLE_WORDS`' own documented "generous ceiling" (70
+words ≈ 100-101 tokens) plus JSON overhead. Re-ran both models on the Pi
+under the fix, n=30 each:
+
+| Model | Pi nonempty | Pi structured | Pi speak_viol | Pi ground_viol | Pi p50/p95 |
+|---|---|---|---|---|---|
+| Llama-3.1-8B-Instruct | **100.0%** | 100.0% | 0.0% | 0.0% | 147.9s/238.8s |
+| Qwen3-8B | **100.0%** | 63.3% | 36.7% | 10.0% | 151.2s/244.6s |
+
+The timeout collapse is gone for both — comfortably under the 300s budget
+now. Llama-3.1-8B-Instruct is a clean win, matching its M4 quality exactly.
+
+**Qwen3-8B surfaced a third, genuinely different finding — and it isn't a
+Pi problem.** Its structured_rate dropped and speakability violations rose
+even though nonempty is 100%. Reading the actual flagged text: Qwen3-8B
+reasons out loud before answering ("Alright, let's see. The user wants a
+proactive traffic warning...") — unsurprising in raw-completion mode with
+no chat template to separate thinking from the final answer, but it means
+a 110-token cap sized for the *answer* sometimes runs out before the model
+ever reaches the JSON. Before trusting this as a Pi-specific artifact, this
+project's own single-variable-isolation discipline required checking
+whether it reproduces on M4 under the identical (new) config — it does:
+
+| Model | Host | max_tokens | structured | speak_viol | ground_viol |
+|---|---|---|---|---|---|
+| Qwen3-8B | M4 | 256 (old) | 90.0% | 10.0% | 10.0% (PASS) |
+| Qwen3-8B | M4 | 110 (new) | 73.3% | 26.7% | 0.0% (**REJECT**) |
+| Qwen3-8B | Pi | 110 (new) | 63.3% | 36.7% | 10.0% (**REJECT**) |
+
+(`eval-results/compare-tier2-COMP-J2D9D71YNJ-20260928T151529Z.json` for the
+M4 110-token re-baseline.) Same direction, same magnitude, on both hosts —
+this is a real model/config interaction, not hardware. The original PASS
+for Qwen3-8B was itself an artifact of a token budget generous enough to
+let it finish thinking out loud before running out of room; a budget sized
+for what the Pi can actually afford exposes that it doesn't handle this
+task as cleanly as the original number suggested. **Qwen3-8B is removed
+from the Tier 2 PASS list** — the corrected list is Llama-3.1-8B-Instruct,
+GLM-4-9B-0414, Gemma-3-1B-it, Phi-3.5-mini-instruct, Gemma-3-4B-it (5
+models, not 6).
+

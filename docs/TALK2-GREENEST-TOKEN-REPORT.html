@@ -1,0 +1,726 @@
+<title>Greenest Token</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+  :root{
+    --bg:#eef0ee; --surface:#ffffff; --surface-2:#f5f6f4;
+    --ink:#161a19; --ink-dim:#565f5c; --ink-faint:#8a9390;
+    --border:#d8ddda; --border-soft:#e6eae7;
+    --accent:#2c6a85; --accent-ink:#1c4c62; --accent-soft:#e2edf1;
+    --good:#2e7a4f; --good-soft:#e2f0e6; --good-ink:#1f5d3b;
+    --warn:#a97418; --warn-soft:#f5ecd9; --warn-ink:#8a5d10;
+    --bad:#a13d2c; --bad-soft:#f6e3dd; --bad-ink:#832f21;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#121514; --surface:#1a1e1c; --surface-2:#20241f;
+      --ink:#eef1ee; --ink-dim:#a7b0ac; --ink-faint:#717a76;
+      --border:#333a35; --border-soft:#282e2a;
+      --accent:#7fb3cc; --accent-ink:#aed3e5; --accent-soft:#1e3038;
+      --good:#6cbf8a; --good-soft:#1c3226; --good-ink:#9adcb3;
+      --warn:#d9a94b; --warn-soft:#3a2f18; --warn-ink:#eec583;
+      --bad:#e08872; --bad-soft:#3a231d; --bad-ink:#f0aa96;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121514; --surface:#1a1e1c; --surface-2:#20241f;
+    --ink:#eef1ee; --ink-dim:#a7b0ac; --ink-faint:#717a76;
+    --border:#333a35; --border-soft:#282e2a;
+    --accent:#7fb3cc; --accent-ink:#aed3e5; --accent-soft:#1e3038;
+    --good:#6cbf8a; --good-soft:#1c3226; --good-ink:#9adcb3;
+    --warn:#d9a94b; --warn-soft:#3a2f18; --warn-ink:#eec583;
+    --bad:#e08872; --bad-soft:#3a231d; --bad-ink:#f0aa96;
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,sans-serif;
+    line-height:1.55; font-size:16px;
+  }
+  .mono{font-family:"IBM Plex Mono",ui-monospace,monospace;}
+  h1,h2,h3,h4{font-family:"IBM Plex Sans",sans-serif; text-wrap:balance; margin:0; font-weight:600;}
+  p{margin:0 0 1em 0; max-width:38em;}
+  table{font-variant-numeric:tabular-nums;}
+
+  a{color:var(--accent); text-decoration-color:var(--border);}
+
+  .shell{display:flex; max-width:1180px; margin:0 auto;}
+
+  /* ---------- Nav ---------- */
+  nav.toc{
+    width:220px; flex:0 0 220px; position:sticky; top:24px; align-self:flex-start;
+    padding:32px 16px 32px 24px; display:none;
+  }
+  nav.toc .tocTitle{font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:12px; font-weight:600;}
+  nav.toc ol{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; border-left:2px solid var(--border-soft); padding-left:14px;}
+  nav.toc a{display:block; font-size:.86rem; color:var(--ink-dim); text-decoration:none; line-height:1.4;}
+  nav.toc a:hover{color:var(--accent);}
+  @media (min-width:900px){ nav.toc{display:block;} }
+
+  main{flex:1 1 auto; min-width:0; padding:0 20px 80px; padding-block-start:32px;}
+  @media (min-width:900px){ main{padding-left:8px; padding-right:40px;} }
+
+  .wrap{max-width:760px;}
+
+  /* ---------- Header ---------- */
+  header.hero{margin-bottom:40px;}
+  .eyebrow{
+    font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; color:var(--accent);
+    font-weight:600; margin-bottom:14px; display:flex; align-items:center; gap:8px;
+  }
+  .eyebrow::before{content:""; width:8px; height:8px; border-radius:50%; background:var(--accent); display:inline-block;}
+  h1.title{font-size:2.6rem; letter-spacing:-0.01em; margin-bottom:14px;}
+  .dek{font-size:1.12rem; color:var(--ink-dim); max-width:42em; margin-bottom:22px;}
+  .metaRow{display:flex; flex-wrap:wrap; gap:10px;}
+  .chip{
+    font-size:.78rem; font-family:"IBM Plex Mono",monospace; padding:5px 10px; border-radius:5px;
+    background:var(--surface-2); border:1px solid var(--border-soft); color:var(--ink-dim);
+  }
+
+  /* ---------- Stat strip ---------- */
+  .statGrid{
+    display:grid; grid-template-columns:repeat(2,1fr); gap:1px;
+    background:var(--border); border:1px solid var(--border); border-radius:10px; overflow:hidden;
+    margin:28px 0 44px;
+  }
+  @media (min-width:640px){ .statGrid{grid-template-columns:repeat(3,1fr);} }
+  .stat{background:var(--surface); padding:20px 18px;}
+  .stat .num{font-family:"IBM Plex Mono",monospace; font-size:1.66rem; font-weight:600; color:var(--accent-ink); line-height:1.1;}
+  .stat .lbl{font-size:.8rem; color:var(--ink-dim); margin-top:6px; line-height:1.35;}
+
+  /* ---------- Section structure ---------- */
+  section{margin:56px 0; scroll-margin-top:24px;}
+  .secHead{display:flex; align-items:baseline; gap:12px; margin-bottom:6px; border-bottom:1px solid var(--border); padding-bottom:14px;}
+  .secNum{font-family:"IBM Plex Mono",monospace; color:var(--ink-faint); font-size:1rem;}
+  h2{font-size:1.5rem;}
+  .secDek{color:var(--ink-dim); margin:14px 0 26px; max-width:44em;}
+  h3{font-size:1.12rem; margin:30px 0 10px;}
+  h3 .subnum{color:var(--ink-faint); font-family:"IBM Plex Mono",monospace; font-weight:400; margin-right:6px;}
+
+  /* ---------- Callouts ---------- */
+  .callout{
+    border-radius:8px; padding:16px 18px; margin:18px 0; border:1px solid var(--border-soft);
+    background:var(--surface-2);
+  }
+  .callout.accent{border-color:var(--accent-soft); background:var(--accent-soft);}
+  .callout .ctitle{font-weight:600; font-size:.92rem; margin-bottom:6px; color:var(--ink);}
+  .callout p{margin:0; font-size:.94rem; color:var(--ink-dim); max-width:none;}
+  .callout p + p{margin-top:8px;}
+
+  /* ---------- Tables ---------- */
+  .tblwrap{overflow-x:auto; margin:16px 0 8px; border:1px solid var(--border); border-radius:8px;}
+  table.data{width:100%; border-collapse:collapse; font-size:.87rem; min-width:560px;}
+  table.data th{
+    text-align:left; font-weight:600; font-size:.72rem; letter-spacing:.04em; text-transform:uppercase;
+    color:var(--ink-dim); background:var(--surface-2); padding:10px 12px; border-bottom:1px solid var(--border);
+    white-space:nowrap;
+  }
+  table.data td{padding:9px 12px; border-bottom:1px solid var(--border-soft); font-family:"IBM Plex Mono",monospace; white-space:nowrap;}
+  table.data td.label{font-family:"IBM Plex Sans",sans-serif; white-space:normal; font-weight:500;}
+  table.data tr:last-child td{border-bottom:none;}
+  table.data tr:hover td{background:var(--surface-2);}
+  .figcap{font-size:.8rem; color:var(--ink-faint); margin-top:8px; max-width:none;}
+
+  .tag{display:inline-block; font-size:.72rem; font-weight:600; padding:2px 8px; border-radius:20px; font-family:"IBM Plex Mono",monospace;}
+  .tag.good{background:var(--good-soft); color:var(--good-ink);}
+  .tag.warn{background:var(--warn-soft); color:var(--warn-ink);}
+  .tag.bad{background:var(--bad-soft); color:var(--bad-ink);}
+
+  .num-good{color:var(--good); font-weight:600;}
+  .num-warn{color:var(--warn); font-weight:600;}
+  .num-bad{color:var(--bad); font-weight:600;}
+
+  /* ---------- Bar chart ---------- */
+  .barchart{margin:20px 0;}
+  .barchart .axis{position:relative; height:20px; margin-bottom:10px; border-bottom:1px solid var(--border);}
+  .barchart .axis .tick{position:absolute; top:0; bottom:-6px; border-left:1px solid var(--border-soft); font-size:.7rem; color:var(--ink-faint); padding-left:4px; font-family:"IBM Plex Mono",monospace;}
+  .barRow{display:flex; align-items:center; gap:14px; margin:14px 0;}
+  .barRow .rlabel{width:150px; flex:0 0 150px; font-size:.82rem; color:var(--ink-dim);}
+  .barRow .rtrack{flex:1; position:relative; height:34px;}
+  .barRow .rtrack .gridline{position:absolute; top:0; bottom:0; width:1px; background:var(--border-soft);}
+  .barRow .bar{position:absolute; top:4px; height:12px; border-radius:3px 6px 6px 3px; display:flex; align-items:center;}
+  .barRow .bar.p50{background:var(--accent); top:2px;}
+  .barRow .bar.p95{background:var(--ink-faint); top:19px; opacity:.55;}
+  .barRow .bar .val{position:absolute; left:calc(100% + 8px); top:50%; transform:translateY(-50%); font-family:"IBM Plex Mono",monospace; font-size:.74rem; white-space:nowrap; color:var(--ink-dim);}
+  .legendRow{display:flex; gap:18px; font-size:.78rem; color:var(--ink-dim); margin-top:4px;}
+  .legendRow .sw{display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:6px; vertical-align:middle;}
+
+  /* ---------- Archetype grid ---------- */
+  .agrid{margin:18px 0; border:1px solid var(--border); border-radius:8px; overflow:hidden;}
+  .agridRow{display:grid; grid-template-columns:1.5fr 0.6fr .8fr .8fr .8fr; align-items:center;}
+  .agridRow.head{background:var(--surface-2);}
+  .agridRow > div{padding:9px 12px; font-size:.82rem; border-bottom:1px solid var(--border-soft); border-right:1px solid var(--border-soft);}
+  .agridRow > div:last-child{border-right:none;}
+  .agridRow:last-child > div{border-bottom:none;}
+  .agridRow.head > div{font-weight:600; font-size:.7rem; text-transform:uppercase; letter-spacing:.03em; color:var(--ink-dim);}
+  .agridRow .cell{font-family:"IBM Plex Mono",monospace; text-align:center; font-weight:600;}
+  .agridRow .modelname{font-weight:500;}
+  .cell.good{background:var(--good-soft); color:var(--good-ink);}
+  .cell.warn{background:var(--warn-soft); color:var(--warn-ink);}
+  .cell.bad{background:var(--bad-soft); color:var(--bad-ink);}
+
+  /* ---------- Pitfall list ---------- */
+  .pitfall{display:flex; gap:16px; padding:20px 0; border-bottom:1px solid var(--border-soft);}
+  .pitfall:last-child{border-bottom:none;}
+  .pitfall .pnum{font-family:"IBM Plex Mono",monospace; font-size:1.3rem; color:var(--ink-faint); flex:0 0 34px; font-weight:600;}
+  .pitfall h4{font-size:1.02rem; margin-bottom:6px;}
+  .pitfall p{font-size:.92rem; color:var(--ink-dim); margin-bottom:6px;}
+  .pitfall .evidence{font-size:.82rem; color:var(--ink-faint); font-family:"IBM Plex Mono",monospace; background:var(--surface-2); padding:8px 10px; border-radius:6px; margin-top:8px; display:inline-block;}
+
+  /* ---------- Stat pair (thermal) ---------- */
+  .pairGrid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:16px 0;}
+  .pairCard{border:1px solid var(--border); border-radius:8px; padding:16px;}
+  .pairCard .ptitle{font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-faint); margin-bottom:10px; font-weight:600;}
+  .pairCard .prow{display:flex; justify-content:space-between; font-size:.9rem; padding:5px 0;}
+  .pairCard .prow .pval{font-family:"IBM Plex Mono",monospace; font-weight:600;}
+  .pairCard.before .pval{color:var(--bad);}
+  .pairCard.after .pval{color:var(--good);}
+
+  hr.rule{border:none; border-top:1px solid var(--border); margin:0;}
+
+  footer{margin-top:70px; padding-top:24px; border-top:1px solid var(--border); font-size:.82rem; color:var(--ink-faint);}
+  footer p{max-width:none;}
+
+  @media (max-width:640px){
+    h1.title{font-size:1.9rem;}
+    .barRow .rlabel{width:96px; flex:0 0 96px; font-size:.74rem;}
+    .agridRow{grid-template-columns:1.2fr .5fr .6fr .6fr .6fr; font-size:.72rem;}
+    .pairGrid{grid-template-columns:1fr;}
+  }
+</style>
+
+<div class="shell">
+  <nav class="toc">
+    <div class="tocTitle">Contents</div>
+    <ol>
+      <li><a href="#methodology">Methodology</a></li>
+      <li><a href="#hardware">Resource-constrained vs. larger hardware</a></li>
+      <li><a href="#prompt">Prompt engineering, quantified</a></li>
+      <li><a href="#data">Data engineering, quantified</a></li>
+      <li><a href="#pitfalls">Pitfalls for practitioners</a></li>
+      <li><a href="#recommendations">Recommendations</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <div class="wrap">
+
+      <header class="hero">
+        <div class="eyebrow">Field report — edge LLM deployment</div>
+        <h1 class="title">Greenest Token</h1>
+        <p class="dek">
+          What actually changes when a small language model moves from a development workstation
+          to resource-constrained edge hardware, and what fails in between. Fifteen models, two
+          structurally different tasks, real measurements on a Raspberry Pi 4 — no projections.
+        </p>
+        <div class="metaRow">
+          <span class="chip">15 models, 0.35B–9B params</span>
+          <span class="chip">M4 Max → Raspberry Pi 4</span>
+          <span class="chip">llama.cpp / GGUF, Q4_K_M &amp; Q8_0</span>
+          <span class="chip">2 task shapes: judgment vs. paraphrase</span>
+        </div>
+      </header>
+
+      <div class="statGrid">
+        <div class="stat"><div class="num">38–200×</div><div class="lbl">latency slowdown, M4 → Pi 4, same software/quantization</div></div>
+        <div class="stat"><div class="num">≤5.6pp</div><div class="lbl">accuracy delta across that same slowdown — hardware moved speed, not accuracy</div></div>
+        <div class="stat"><div class="num">5 of 5</div><div class="lbl">real infrastructure/measurement bugs found — none were model bugs</div></div>
+        <div class="stat"><div class="num">5×</div><div class="lbl">independent overcorrection collapses from prompt-side accuracy fixes</div></div>
+        <div class="stat"><div class="num">33–73%</div><div class="lbl">error rate ceiling across 10+ rounds of prompt tuning for one task — solved in one move by deleting the task</div></div>
+        <div class="stat"><div class="num">1 model</div><div class="lbl">failed one task at 51% error and cleanly passed a different task at 10% — same weights, same day</div></div>
+      </div>
+
+      <!-- ============ METHODOLOGY ============ -->
+      <section id="methodology">
+        <div class="secHead"><span class="secNum">01</span><h2>Methodology</h2></div>
+        <p class="secDek">
+          Two structurally different jobs were asked of small models in this deployment, and they
+          needed different evaluation designs and produced different failure shapes. Conflating them
+          is the first mistake practitioners tend to make.
+        </p>
+
+        <h3><span class="subnum">1.1</span>Two task shapes, not one</h3>
+        <p>
+          <strong>Judgment task</strong> (referred to below as Flow B): a deterministic pipeline
+          computes a baseline severity and hands the model three free-text operational fields
+          (weather, cargo, dispatch status). The model's only job is a bounded three-way decision —
+          raise, hold, or lower that baseline — which requires weighing several soft signals against
+          each other. This is reasoning, not lookup.
+        </p>
+        <p>
+          <strong>Paraphrase task</strong> (Tier 2): scope and any reroute decision are already fully
+          decided by plain code before the model is ever invoked. The model's only job is to phrase
+          those already-settled facts as two or three natural, speakable sentences. It never decides
+          anything — its failure modes are fidelity failures (omitting a fact, inventing one, or
+          failing to paraphrase at all), not judgment errors.
+        </p>
+        <p>
+          The same model can fail one of these tasks and pass the other outright — see §5.3. Treating
+          "how good is this model" as one number, independent of task shape, is the single most
+          common way this kind of evaluation goes wrong.
+        </p>
+
+        <h3><span class="subnum">1.2</span>A two-stage funnel</h3>
+        <p>
+          Every model passed through a quality gate on fast hardware (an M4 Max workstation) before
+          ever touching the real deployment target (a Raspberry Pi 4, 8GB RAM, 4 cores). The M4 gate
+          is fast and cheap to iterate on, but its latency and RAM numbers are meaningless for the
+          actual deployment — only the target hardware's own numbers are decision-grade. Skipping the
+          second stage and shipping on M4-only numbers would have shipped at least one model
+          (Qwen3-8B, Tier 2) whose passing grade turned out to be an artifact of a config choice never
+          exercised on the real target — see §2.5.
+        </p>
+      </section>
+
+      <!-- ============ HARDWARE ============ -->
+      <section id="hardware">
+        <div class="secHead"><span class="secNum">02</span><h2>Resource-constrained vs. larger hardware</h2></div>
+        <p class="secDek">
+          Same software stack, same weights, same quantization, two machines. The clearest single
+          result in this report: hardware changed how fast the answer arrived, not whether it was
+          right.
+        </p>
+
+        <h3><span class="subnum">2.1</span>Latency multiplies; accuracy barely moves</h3>
+        <p>Three models with clean readings on both hosts, same GGUF weights, same Q4_K_M quantization:</p>
+
+        <div class="barchart">
+          <div class="legendRow">
+            <span><span class="sw" style="background:var(--accent)"></span>p50 slowdown (×)</span>
+            <span><span class="sw" style="background:var(--ink-faint); opacity:.55"></span>p95 slowdown (×)</span>
+          </div>
+          <div class="axis">
+            <div class="tick" style="left:0%">1×</div>
+            <div class="tick" style="left:42.7%">10×</div>
+            <div class="tick" style="left:72.5%">50×</div>
+            <div class="tick" style="left:85.4%">100×</div>
+            <div class="tick" style="left:98.3%">200×</div>
+          </div>
+          <div class="barRow">
+            <div class="rlabel">Gemma-3-4B-it<br><span class="mono" style="font-size:.72rem; color:var(--ink-faint)">+2.2pp accuracy</span></div>
+            <div class="rtrack">
+              <div class="gridline" style="left:42.7%"></div><div class="gridline" style="left:72.5%"></div><div class="gridline" style="left:85.4%"></div><div class="gridline" style="left:98.3%"></div>
+              <div class="bar p50" style="width:67.3%"><span class="val">37.6×</span></div>
+              <div class="bar p95" style="width:69.6%"></div>
+            </div>
+          </div>
+          <div class="barRow">
+            <div class="rlabel">Phi-3.5-mini-instruct<br><span class="mono" style="font-size:.72rem; color:var(--ink-faint)">+0.0pp accuracy</span></div>
+            <div class="rtrack">
+              <div class="gridline" style="left:42.7%"></div><div class="gridline" style="left:72.5%"></div><div class="gridline" style="left:85.4%"></div><div class="gridline" style="left:98.3%"></div>
+              <div class="bar p50" style="width:71.6%"><span class="val">47.5×</span></div>
+              <div class="bar p95" style="width:98.1%"><span class="val">199.0×</span></div>
+            </div>
+          </div>
+          <div class="barRow">
+            <div class="rlabel">Llama-3.1-8B-Instruct<br><span class="mono" style="font-size:.72rem; color:var(--ink-faint)">−5.6pp accuracy</span></div>
+            <div class="rtrack">
+              <div class="gridline" style="left:42.7%"></div><div class="gridline" style="left:72.5%"></div><div class="gridline" style="left:85.4%"></div><div class="gridline" style="left:98.3%"></div>
+              <div class="bar p50" style="width:75.9%"><span class="val">59.9×</span></div>
+              <div class="bar p95" style="width:87.1%"><span class="val">109.5×</span></div>
+            </div>
+          </div>
+        </div>
+        <p class="figcap">Log scale. p50/p95 latency ratio, Pi 4 ÷ M4 Max, same model/quantization. Accuracy deltas are escalation-mismatch-rate differences, n=45–90 per host — small enough that this is plausibly sampling noise around a stable true rate, not a real hardware-driven accuracy effect.</p>
+
+        <div class="callout accent">
+          <div class="ctitle">Takeaway</div>
+          <p>For "when to put an LLM on the edge": moving the same model/quantization from a
+          workstation-class machine to a Raspberry Pi 4 is a speed and resource-footprint decision,
+          not an accuracy one, for this stack. Budget for 40–200× latency, not for a different pass/fail line.</p>
+        </div>
+
+        <h3><span class="subnum">2.2</span>Judgment task — full M4-to-Pi comparison</h3>
+        <p>The five models that cleared the M4 quality gate cleanly (≤6.7% mismatch), confirmed on the real Pi 4 target:</p>
+        <div class="tblwrap">
+          <table class="data">
+            <tr><th>Model</th><th>M4 mismatch</th><th>Pi mismatch</th><th>Pi p50</th><th>Pi p95</th><th>Pi RAM</th></tr>
+            <tr><td class="label">Phi-3.5-mini-instruct</td><td class="num-good">0.0%</td><td class="num-good">0.0%</td><td>35.7s</td><td>157.8s</td><td>7.11GB</td></tr>
+            <tr><td class="label">Gemma-3-4B-it</td><td class="num-good">0.0%</td><td class="num-good">2.2%</td><td>77.1s</td><td>101.4s</td><td>7.26GB</td></tr>
+            <tr><td class="label">Llama-3.1-8B-Instruct</td><td class="num-good">5.6%</td><td class="num-good">0.0%</td><td>74.7s</td><td>232.3s</td><td>6.92GB</td></tr>
+            <tr><td class="label">GLM-4-9B-0414</td><td class="num-good">6.7%</td><td class="num-warn">14.6%</td><td>94.3s</td><td>300.1s</td><td>6.81GB</td></tr>
+            <tr><td class="label">Qwen3-8B</td><td class="num-good">0.0%</td><td class="num-good">0.0%</td><td>127.0s</td><td>300.0s</td><td>7.02GB</td></tr>
+          </table>
+        </div>
+        <p class="figcap">Escalation-mismatch rate, n=90 per host except GLM-4-9B-0414 on Pi (n=41). RAM figures past the first model in a queued run are a floor, not a true peak (session-cumulative high-water mark). GLM-4-9B's Pi regression concentrated entirely in one scenario (false-escalating a calm case 6/13 times) — on a modest sample, flagged rather than dismissed.</p>
+
+        <h3><span class="subnum">2.3</span>Paraphrase task — full M4-to-Pi comparison, corrected</h3>
+        <p>The final, corrected set after two measurement bugs were found and fixed (§2.5, §5.6):</p>
+        <div class="tblwrap">
+          <table class="data">
+            <tr><th>Model</th><th>M4 nonempty/speak/ground</th><th>Pi nonempty/speak/ground</th><th>Pi p50 / p95</th></tr>
+            <tr><td class="label">Gemma-3-1B-it</td><td>100/3.3/10.0%</td><td>100/3.3/10.0%</td><td>60.1s / 82.4s</td></tr>
+            <tr><td class="label">Phi-3.5-mini-instruct</td><td>100/0.0/10.0%</td><td>100/0.0/0.0%</td><td>186.0s / 251.6s</td></tr>
+            <tr><td class="label">Gemma-3-4B-it</td><td>100/0.0/0.0%</td><td>100/0.0/0.0%</td><td>43.7s / 119.3s</td></tr>
+            <tr><td class="label">GLM-4-9B-0414</td><td>100/0.0/0.0%</td><td>100/0.0/0.0%</td><td>57.6s / 179.5s</td></tr>
+            <tr><td class="label">Llama-3.1-8B-Instruct</td><td>100/0.0/0.0%</td><td>100/0.0/0.0%</td><td>147.9s / 238.8s</td></tr>
+          </table>
+        </div>
+        <p class="figcap">nonempty / speakability-violation / grounding-violation rates, n=30. Qwen3-8B is not in this table — see §2.5, it was removed from the pass list after correction.</p>
+
+        <h3><span class="subnum">2.4</span>Case study: thermal throttling silently caps edge performance</h3>
+        <p>
+          Mid-run, the Pi's own thermal state was checked directly rather than assumed. Under
+          sustained inference load it was measurably throttling — and this had been true the whole
+          time, undetected.
+        </p>
+        <div class="pairGrid">
+          <div class="pairCard before">
+            <div class="ptitle">Before intervention</div>
+            <div class="prow"><span>Temperature</span><span class="pval">83.7°C</span></div>
+            <div class="prow"><span>Throttle bits (live)</span><span class="pval">SET</span></div>
+            <div class="prow"><span>ARM clock</span><span class="pval">600MHz</span></div>
+          </div>
+          <div class="pairCard after">
+            <div class="ptitle">After adding a fan, same workload</div>
+            <div class="prow"><span>Temperature</span><span class="pval">76.4°C</span></div>
+            <div class="prow"><span>Throttle bits (live)</span><span class="pval">CLEAR</span></div>
+            <div class="prow"><span>ARM clock</span><span class="pval">1800MHz</span></div>
+          </div>
+        </div>
+        <p>
+          600MHz is one-third of the confirmed 1800MHz stock boost clock — a real ~67% reduction,
+          not a rounding artifact. This had been quietly attributed to one specific, unusually large
+          model's weight class; the reading above was taken on a completely different, much smaller
+          model, under ordinary sustained load. A single physical fan restored full clock speed.
+        </p>
+        <div class="callout">
+          <div class="ctitle">Takeaway</div>
+          <p>Any edge latency number gathered without checking throttle state at the same time is a
+          number of unknown provenance — it may describe the hardware's real capability, or an
+          arbitrarily throttled fraction of it. Check <span class="mono">vcgencmd get_throttled</span>
+          (or the equivalent on your target) on every run, not only when something already looks slow.</p>
+        </div>
+
+        <h3><span class="subnum">2.5</span>Case study: a generous token budget can hide a real defect</h3>
+        <p>
+          One model's Pi run initially collapsed to 10% successful completions — every failure timing
+          out at exactly the configured limit. The fix (correctly wiring the timeout, then capping the
+          token budget to what the task actually needs) recovered successful completions to 100% — but
+          then exposed a second, unrelated, genuine defect that a looser budget had been masking on
+          <em>both</em> hosts all along.
+        </p>
+        <div class="tblwrap">
+          <table class="data">
+            <tr><th>Model</th><th>Host</th><th>Token budget</th><th>Structured rate</th><th>Speakability violation</th><th>Verdict</th></tr>
+            <tr><td class="label">Qwen3-8B</td><td>M4</td><td>256 (original)</td><td>90.0%</td><td>10.0%</td><td><span class="tag good">PASS</span></td></tr>
+            <tr><td class="label">Qwen3-8B</td><td>M4</td><td>110 (corrected)</td><td>73.3%</td><td>26.7%</td><td><span class="tag bad">REJECT</span></td></tr>
+            <tr><td class="label">Qwen3-8B</td><td>Pi</td><td>110 (corrected)</td><td>63.3%</td><td>36.7%</td><td><span class="tag bad">REJECT</span></td></tr>
+          </table>
+        </div>
+        <p>
+          Reading the actual output explained why: this model reasons out loud before answering
+          ("Alright, let's see. The user wants a proactive traffic warning…") in a raw-completion
+          setup with no chat template to separate thinking from the final answer. A budget generous
+          enough to let it finish thinking looked like a clean pass; a budget sized for what the
+          target hardware can actually afford exposed that it doesn't reliably reach the answer at
+          all. The same regression on <em>both</em> hosts under the identical corrected config is what
+          proves this is a real model/configuration interaction, not a hardware artifact — see §5.5.
+        </p>
+      </section>
+
+      <!-- ============ PROMPT ENGINEERING ============ -->
+      <section id="prompt">
+        <div class="secHead"><span class="secNum">03</span><h2>Prompt engineering, quantified</h2></div>
+        <p class="secDek">
+          Five independent prompt-side attempts to move accuracy, across two different tasks and two
+          different kinds of intervention (rewriting rules, and adding worked examples). Every one of
+          them produced the same underlying failure shape at least once: a change that measurably
+          fixes one weakness collapses a different scenario or a different model into a constant,
+          degenerate answer.
+        </p>
+
+        <h3><span class="subnum">3.1</span>The diagnostic that made this visible: break the aggregate open</h3>
+        <p>
+          A single mismatch-rate number looks like one axis of quality. Splitting it into its three
+          underlying scenarios on the judgment task revealed two genuinely different failure shapes —
+          not degrees of the same problem — which is exactly why one intervention (retrieved
+          precedents) was aimed at one group and a different intervention (worked examples) was aimed
+          at the other.
+        </p>
+        <div class="agrid">
+          <div class="agridRow head">
+            <div>Model</div><div>Mismatch</div><div>Escalate-worthy</div><div>Benign</div><div>De-escalate-worthy</div>
+          </div>
+          <div class="agridRow"><div class="modelname">Qwen3-8B / Phi-3.5-mini / Gemma-3-4B</div><div class="cell good">0.0%</div><div class="cell good">100</div><div class="cell good">100</div><div class="cell good">100</div></div>
+          <div class="agridRow"><div class="modelname">Llama-3.1-8B-Instruct</div><div class="cell good">5.6%</div><div class="cell good">93.3</div><div class="cell good">90.0</div><div class="cell good">100</div></div>
+          <div class="agridRow"><div class="modelname">GLM-4-9B-0414</div><div class="cell good">6.7%</div><div class="cell good">100</div><div class="cell warn">80.0</div><div class="cell good">100</div></div>
+          <div class="agridRow"><div class="modelname">Qwen2.5-0.5B-Instruct</div><div class="cell warn">33.3%</div><div class="cell bad">0.0</div><div class="cell good">100</div><div class="cell good">100</div></div>
+          <div class="agridRow"><div class="modelname">Llama-3.2-1B-Instruct</div><div class="cell warn">38.9%</div><div class="cell bad">0.0</div><div class="cell warn">83.3</div><div class="cell good">100</div></div>
+          <div class="agridRow"><div class="modelname">Qwen2.5-3B-Instruct</div><div class="cell warn">46.7%</div><div class="cell bad">3.3</div><div class="cell warn">56.7</div><div class="cell good">100</div></div>
+          <div class="agridRow"><div class="modelname">Gemma-3-1B-it</div><div class="cell bad">51.1%</div><div class="cell good">100</div><div class="cell bad">10.0</div><div class="cell bad">36.7</div></div>
+          <div class="agridRow"><div class="modelname">LFM2.5-350M</div><div class="cell bad">64.4%</div><div class="cell good">100</div><div class="cell bad">0.0</div><div class="cell bad">6.7</div></div>
+          <div class="agridRow"><div class="modelname">Qwen3-0.6B</div><div class="cell bad">66.7%</div><div class="cell good">100</div><div class="cell bad">0.0</div><div class="cell bad">0.0</div></div>
+        </div>
+        <p class="figcap">Per-scenario match rate (%), judgment task, n=90 (n=82 for one omitted mid-table model). Green ≥90%, amber 40–89%, red &lt;40%.</p>
+        <p>
+          Two archetypes fall out cleanly: a <strong>"never raises"</strong> group (Qwen2.5-0.5B,
+          Llama-3.2-1B, Qwen2.5-3B) that is fine on calm scenarios but almost never detects the one
+          built to require escalation, and a <strong>"can't calm down"</strong> group (Gemma-3-1B-it,
+          LFM2.5-350M, Qwen3-0.6B) that is perfect at escalating but collapses on the scenarios that
+          should hold or de-escalate. A single aggregate number would have called all six of these
+          models simply "worse" than the top tier, with no hint that they need opposite kinds of help.
+        </p>
+
+        <h3><span class="subnum">3.2</span>Five interventions, one recurring failure shape</h3>
+        <div class="tblwrap">
+          <table class="data">
+            <tr><th>Intervention</th><th>Model</th><th>What improved</th><th>What broke</th></tr>
+            <tr><td class="label">Bare qualitative assertion</td><td>LFM2.5-350M</td><td>—</td><td class="num-bad">100% constant "low" output</td></tr>
+            <tr><td class="label">Rule-engine rewrite</td><td>Llama-3.1-8B</td><td class="num-good">100/40/95% across 3 tiers (real)</td><td>—</td></tr>
+            <tr><td class="label">Rule-engine rewrite</td><td>Phi-3.5-mini, Qwen3-8B, LFM2.5-350M</td><td>—</td><td class="num-bad">collapsed to constant "low" on every severity, incl. the most extreme case</td></tr>
+            <tr><td class="label">Per-field risk rules</td><td>Gemma-3-1B-it</td><td class="num-good">escalate-worthy 20%→100%</td><td class="num-bad">benign scenario 93%→0% correct</td></tr>
+            <tr><td class="label">Per-field risk rules</td><td>LFM2.5-350M</td><td>—</td><td class="num-bad">constant "raise", 43/45 trials; echoed the instruction template verbatim</td></tr>
+            <tr><td class="label">"Always name the corridor"</td><td>Qwen2.5-1.5B</td><td>—</td><td class="num-bad">grounding violation 10%→50%: echoed prompt fragments instead of answering</td></tr>
+            <tr><td class="label">RAG (retrieved precedents)</td><td>Gemma-3-1B-it</td><td>no effect (58.9%→57.8%, noise)</td><td class="num-warn">real cost (4.91s load, 532MB) for zero benefit</td></tr>
+            <tr><td class="label">Static few-shot examples</td><td>Qwen2.5-3B</td><td>escalate-worthy 3%→100%</td><td class="num-bad">overall mismatch 50.0%→63.3%: benign and de-escalate scenarios collapsed</td></tr>
+            <tr><td class="label">Static few-shot examples</td><td>Qwen2.5-1.5B</td><td class="num-good">overall mismatch 45.1%→27.3%</td><td>partly bought by trading away de-escalate accuracy (77.8%→66.7%)</td></tr>
+          </table>
+        </div>
+        <p class="figcap">n=45–90 per cell. "Rule-engine rewrite" and "per-field risk rules" are two separate rounds of the judgment task; "always name the corridor" is the paraphrase task; RAG and static few-shot both targeted the judgment task, on two different failure archetypes (see §5.2).</p>
+
+        <div class="callout accent">
+          <div class="ctitle">Net verdict</div>
+          <p>Out of five independent prompt-side accuracy interventions tested across two tasks, exactly
+          one (the rule-engine rewrite, on Llama-3.1-8B only) produced an unambiguous win with no
+          matching cost. Every other one either produced a mixed result with a real hidden cost, or
+          made the aggregate number worse while looking like a win on the one dimension it targeted.
+          This is not a story about picking the wrong wording — it recurred across rule-tightening
+          <em>and</em> worked examples, across two unrelated tasks, on five different models. Treat
+          it as a structural property of pushing more instruction-following load onto a small model,
+          not a bug to word your way out of. Full detail in §5.2.</p>
+        </div>
+      </section>
+
+      <!-- ============ DATA ENGINEERING ============ -->
+      <section id="data">
+        <div class="secHead"><span class="secNum">04</span><h2>Data engineering, quantified</h2></div>
+        <p class="secDek">
+          What you feed a model changed outcomes more reliably than how you word the instruction
+          asking for them — but the effect was real, conditional, and had to be measured per model,
+          per signal. It was never a universal lever.
+        </p>
+
+        <h3><span class="subnum">4.1</span>Grammar constraints — a structural unlock, not a judgment fix</h3>
+        <div class="tblwrap">
+          <table class="data">
+            <tr><th>Model</th><th>Free-text format-parse rate</th><th>Grammar-constrained</th></tr>
+            <tr><td class="label">LFM2.5-350M</td><td class="num-bad">0.000 (0/30)</td><td class="num-good">1.000</td></tr>
+            <tr><td class="label">Granite-4.0-H-350M</td><td class="num-bad">0.000</td><td class="num-good">0.833–1.000</td></tr>
+          </table>
+        </div>
+        <p>Two models went from completely non-functional to fully functional, structurally, not incrementally. But structure isn't judgment — both models still needed everything below to make any real accuracy progress.</p>
+
+        <h3><span class="subnum">4.2</span>Real grounding facts — narrow, model-specific, sometimes negative</h3>
+        <div class="tblwrap">
+          <table class="data">
+            <tr><th>Signal added</th><th>Model</th><th>Before</th><th>After</th><th>Verdict</th></tr>
+            <tr><td class="label">Velocity deviation-from-plan</td><td>LFM2.5-350M</td><td>~0%</td><td class="num-good">50–60%</td><td>real, narrow win</td></tr>
+            <tr><td class="label">Velocity deviation-from-plan</td><td>Qwen2.5-0.5B</td><td>67.8% mismatch</td><td class="num-good">50%</td><td>real, narrow win</td></tr>
+            <tr><td class="label">Velocity deviation-from-plan</td><td>13 other models, 0.6B–9B</td><td>0%</td><td class="num-bad">0% — unmoved</td><td>completely capacity-gated</td></tr>
+            <tr><td class="label">Brake-intensity magnitude</td><td>Gemma-3-1B-it</td><td>47% net</td><td class="num-good">57% net</td><td>first win in 10 rounds, zero regression</td></tr>
+            <tr><td class="label">Brake-intensity magnitude</td><td>LFM2.5-350M</td><td>70% net</td><td class="num-bad">65% net</td><td>net regression, medium tier collapsed to "low"</td></tr>
+            <tr><td class="label">Brake-intensity magnitude</td><td>Qwen2.5-0.5B</td><td>37% net</td><td>40% net</td><td>a wash</td></tr>
+          </table>
+        </div>
+        <p>
+          Average improvement across the full 15-model spectrum from the velocity fix: 7%. Two
+          real, physically-grounded signals, tested against the same three small models, produced a
+          win, a regression, and a wash — for the <em>same</em> model on the <em>same</em> task,
+          depending only on which real signal was handed to it.
+        </p>
+        <div class="callout">
+          <div class="ctitle">Takeaway</div>
+          <p>"Feed the model real data" is necessary but not sufficient. <em>Which</em> real signal
+          helps <em>which</em> specific model is not reliably predictable in advance — it has to be
+          measured per model, per signal, not assumed from one success.</p>
+        </div>
+
+        <h3><span class="subnum">4.3</span>The architectural pivot — the single largest win in this report</h3>
+        <p>
+          Ten-plus rounds of prompt tuning tried to make small models classify event severity
+          directly from raw signals. Every round hit the same ceiling: mismatch rates from 33% to
+          73%, with degenerate constant-output collapse as the norm, not the exception. The fix
+          was not a better prompt — it was removing the job from the model entirely. A deterministic,
+          hand-verified classification function now computes severity instantly, for free, with
+          zero model dependency.
+        </p>
+        <div class="tblwrap">
+          <table class="data">
+            <tr><th></th><th>10+ rounds of prompt tuning</th><th>Deterministic classification</th></tr>
+            <tr><td class="label">Severity mismatch rate</td><td class="num-bad">33–73%, never solved</td><td class="num-good">0% — by construction</td></tr>
+            <tr><td class="label">Model dependency</td><td>Yes — every model behaved differently</td><td class="num-good">None</td></tr>
+            <tr><td class="label">recommended_action / escalation contradiction</td><td class="num-bad">Recurred under 3 separate wording fixes</td><td class="num-good">Eliminated by construction</td></tr>
+          </table>
+        </div>
+        <p>
+          The model's job narrowed to the one genuinely unstructured decision left — a bounded
+          escalate/hold/lower call over free-text operational context — and <em>that</em> narrower
+          task is where the five-model clean tier in §2.2 comes from. The lesson generalizes past this
+          one pipeline: before spending another round tuning a prompt, ask whether the sub-task is
+          actually reducible to code. If it is, that beats every prompt-side fix tried on it.
+        </p>
+      </section>
+
+      <!-- ============ PITFALLS ============ -->
+      <section id="pitfalls">
+        <div class="secHead"><span class="secNum">05</span><h2>Pitfalls for practitioners</h2></div>
+        <p class="secDek">
+          The concrete, recurring failure modes worth planning for before deploying small LLMs on
+          resource-constrained hardware — each one cost real time to diagnose in this project.
+        </p>
+
+        <div class="pitfall">
+          <div class="pnum">1</div>
+          <div>
+            <h4>An aggregate accuracy number can hide a 100% failure on one dimension</h4>
+            <p>One model's overall mismatch rate looked fine while it scored 0% correct on an entire
+            severity tier, invisible in the rolled-up number because it compensated elsewhere. Always
+            check the full per-scenario or per-tier breakdown, never just the headline rate.</p>
+            <span class="evidence">Gemma-3-1B-it: 47.8% aggregate mismatch (a pass) alongside 0% correct on its "low" tier, every round tested</span>
+          </div>
+        </div>
+
+        <div class="pitfall">
+          <div class="pnum">2</div>
+          <div>
+            <h4>Overcorrection is systemic, not a wording bug</h4>
+            <p>Sharpening an instruction to fix one model's specific failure — whether by tightening
+            rules or by adding worked examples — repeatedly collapsed a different scenario, or a
+            smaller model, into a constant, degenerate answer. This happened five separate times
+            across two unrelated tasks and two different intervention types. Budget for this risk on
+            every prompt change; don't treat any single fix as safe until checked per-scenario.</p>
+            <span class="evidence">See §3 — five distinct instances, same underlying shape each time</span>
+          </div>
+        </div>
+
+        <div class="pitfall">
+          <div class="pnum">3</div>
+          <div>
+            <h4>Task-appropriate sizing beats "use the biggest model"</h4>
+            <p>The same model, same weights, same day: unusable for one task and cleanly
+            production-viable for a different one. Model choice has to be made per task, not once for
+            a whole pipeline.</p>
+            <span class="evidence">Gemma-3-1B-it: 51.1% mismatch on the judgment task (rejected) vs. 10.0% grounding violation on the paraphrase task (passed cleanly)</span>
+          </div>
+        </div>
+
+        <div class="pitfall">
+          <div class="pnum">4</div>
+          <div>
+            <h4>Thermal throttling silently corrupts edge latency measurements</h4>
+            <p>Sustained inference load throttled the target device's clock to a third of its rated
+            speed, with no visible symptom besides "it's slow." Any latency number collected without
+            checking throttle state at the same time is a number of unknown provenance.</p>
+            <span class="evidence">83.7°C, throttle bits live-set, clock at 600MHz of a confirmed 1800MHz stock boost — recovered fully with a single added fan</span>
+          </div>
+        </div>
+
+        <div class="pitfall">
+          <div class="pnum">5</div>
+          <div>
+            <h4>A generous token budget can mask a real quality defect</h4>
+            <p>A model's clean pass turned out to be an artifact of unused headroom in its output
+            length limit, not evidence it actually completes the task reliably. Size generation
+            limits to what the target hardware can afford, not to whatever the fast dev machine can
+            tolerate — a tighter, realistic budget is itself part of the test.</p>
+            <span class="evidence">Qwen3-8B: PASS at a 256-token budget, REJECT at a 110-token budget sized for the actual answer — on both the dev machine and the target device</span>
+          </div>
+        </div>
+
+        <div class="pitfall">
+          <div class="pnum">6</div>
+          <div>
+            <h4>Measurement infrastructure fails about as often as the models do</h4>
+            <p>Five distinct, real bugs in the evaluation harness itself — not the models — produced
+            or would have produced wrong conclusions if not caught: a stop-sequence/grammar
+            interaction that silently truncated every completion, a crash that discarded an entire
+            run's results before they were written to disk, a stale schema check that would have
+            reported 0% reliability for every model, a CLI timeout flag that was read but never
+            actually applied, and two grounding checks that scored genuinely correct answers as
+            failures. Treat "the model failed" and "the harness has a bug" as equally likely
+            hypotheses until the raw output is actually read.</p>
+          </div>
+        </div>
+
+        <div class="pitfall">
+          <div class="pnum">7</div>
+          <div>
+            <h4>Retrieval and few-shot examples are not free, and are not guaranteed wins</h4>
+            <p>Retrieval-augmented prompting added a measurable, real memory and load-time cost with
+            no measurable accuracy benefit on the model it was tested against. Static few-shot
+            examples, its cheaper cousin, produced one real net win and one outright regression on
+            the two models tested. Neither technique should be assumed to pay for itself — measure the
+            specific model and specific failure mode before adopting either.</p>
+            <span class="evidence">RAG: 4.91s embedder load + 532MB RSS for a 1.1-percentage-point accuracy change (noise). Static few-shot: one model improved 45.1%→27.3%, a different model worsened 50.0%→63.3%</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ RECOMMENDATIONS ============ -->
+      <section id="recommendations">
+        <div class="secHead"><span class="secNum">06</span><h2>Recommendations</h2></div>
+
+        <h3><span class="subnum">6.1</span>Corrected, decision-grade pass lists</h3>
+        <p>Both lists below reflect the real Pi 4 target measurement, after every correction found in this report.</p>
+
+        <div class="tblwrap">
+          <table class="data">
+            <tr><th>Task</th><th>Model</th><th>Pi accuracy</th><th>Weights</th></tr>
+            <tr><td class="label">Judgment</td><td>Phi-3.5-mini-instruct</td><td class="num-good">0.0% mismatch</td><td>2.39GB</td></tr>
+            <tr><td class="label">Judgment</td><td>Llama-3.1-8B-Instruct</td><td class="num-good">0.0% mismatch</td><td>4.92GB</td></tr>
+            <tr><td class="label">Judgment</td><td>Qwen3-8B</td><td class="num-good">0.0% mismatch</td><td>5.03GB</td></tr>
+            <tr><td class="label">Judgment</td><td>Gemma-3-4B-it</td><td class="num-good">2.2% mismatch</td><td>2.49GB</td></tr>
+            <tr><td class="label">Judgment</td><td>GLM-4-9B-0414</td><td class="num-warn">14.6% mismatch</td><td>6.17GB</td></tr>
+            <tr><td class="label">Paraphrase</td><td>Gemma-3-4B-it</td><td class="num-good">0.0% violation</td><td>2.49GB</td></tr>
+            <tr><td class="label">Paraphrase</td><td>GLM-4-9B-0414</td><td class="num-good">0.0% violation</td><td>6.17GB</td></tr>
+            <tr><td class="label">Paraphrase</td><td>Llama-3.1-8B-Instruct</td><td class="num-good">0.0% violation</td><td>4.92GB</td></tr>
+            <tr><td class="label">Paraphrase</td><td>Phi-3.5-mini-instruct</td><td class="num-good">0.0% violation</td><td>2.39GB</td></tr>
+            <tr><td class="label">Paraphrase</td><td>Gemma-3-1B-it</td><td class="num-warn">10.0% violation</td><td>806MB</td></tr>
+          </table>
+        </div>
+        <p class="figcap">Note the two lists only partly overlap — Gemma-3-1B-it fails the judgment task outright but is the smallest passer of the paraphrase task. Qwen3-8B passes judgment cleanly but was removed from paraphrase after §2.5's correction.</p>
+
+        <h3><span class="subnum">6.2</span>A decision framework</h3>
+        <p>
+          <strong>Never ship on the quality-gate host's numbers alone.</strong> Run the quality gate
+          on whatever hardware is fast to iterate on, then confirm every candidate on the actual
+          target device before calling anything decision-grade — speed, RAM, thermal behavior, and
+          even some accuracy regressions only show up there.
+        </p>
+        <p>
+          <strong>Split judgment from paraphrasing wherever a pipeline does both.</strong> A model
+          that reasons about ambiguous context and a model that faithfully restates already-decided
+          facts are different jobs with different minimum capability bars — evaluate and select for
+          each separately.
+        </p>
+        <p>
+          <strong>Before tuning a prompt again, ask whether the sub-task is really a judgment call.</strong>
+          If it reduces to a deterministic function of the inputs, moving it to code outperforms every
+          prompt-side fix tried on it in this report, with zero model dependency and zero recurring
+          latency cost.
+        </p>
+        <p>
+          <strong>Treat every prompt change as a regression test across every scenario, not a
+          targeted patch.</strong> The one axis you're trying to fix is the one axis least likely to
+          reveal a new collapse; check the others every time.
+        </p>
+      </section>
+
+      <footer>
+        <p>
+          Every number in this report is a real measurement against real models on real hardware —
+          M4 Max workstation and Raspberry Pi 4, llama.cpp/GGUF, Q4_K_M and Q8_0 quantization — not a
+          projection. Sample sizes and artifact provenance are noted inline; several results are
+          explicitly flagged as small-sample and plausibly noisy rather than presented as more certain
+          than they are.
+        </p>
+      </footer>
+
+    </div>
+  </main>
+</div>
