@@ -1,0 +1,889 @@
+{
+  "host": "COMP-J2D9D71YNJ",
+  "arch": "arm64",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "decision_grade": "quality-only (non-target hardware)",
+  "timestamp": "2026-09-28T15:15:29Z",
+  "seed_config": {
+    "model_eval_runs": 30,
+    "model_timeout_seconds": 180.0
+  },
+  "models": {
+    "llama-3.1-8b-instruct-q4km": {
+      "id": "llama-3.1-8b-instruct-q4km",
+      "display_name": "Llama-3.1-8B-Instruct (Q4_K_M)",
+      "available": true,
+      "binary_path": "/Users/david.kjerrumgaard/tools/llama.cpp/build/bin/llama-completion",
+      "model_path": "/Users/david.kjerrumgaard/tools/models/Llama-3.1-8B-Instruct-GGUF/Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+      "format_reliability": {
+        "total": 30,
+        "structured": 30,
+        "structured_rate": 1.0,
+        "nonempty": 30,
+        "nonempty_rate": 1.0,
+        "errors": 0,
+        "sample_errors": []
+      },
+      "speakability": {
+        "total": 30,
+        "violations": 0,
+        "violation_rate": 0.0,
+        "sample_violations": []
+      },
+      "grounding": {
+        "by_scenario": {
+          "single-truck": {
+            "total": 10,
+            "violations": 0,
+            "violation_rate": 0.0,
+            "sample_violations": [],
+            "reroute_mentioned_when_recommended": null
+          },
+          "corridor-wide-no-reroute": {
+            "total": 10,
+            "violations": 0,
+            "violation_rate": 0.0,
+            "sample_violations": [],
+            "reroute_mentioned_when_recommended": null
+          },
+          "corridor-wide-with-reroute": {
+            "total": 10,
+            "violations": 0,
+            "violation_rate": 0.0,
+            "sample_violations": [],
+            "reroute_mentioned_when_recommended": 8
+          }
+        },
+        "max_violation_rate": 0.0
+      },
+      "latency": {
+        "p50_seconds": 1.6344946669996716,
+        "p95_seconds": 1.8009917500021402,
+        "n": 30
+      },
+      "tokens_per_sec_approx": 42.803261675827756,
+      "tokens_per_sec_note": "approximate \u2014 whitespace word count / latency over trials with no error, not an exact tokenizer count",
+      "load_time_seconds": 3.21766112500336,
+      "resident_ram_mb_before": 0.0,
+      "resident_ram_mb_after": 21318.90625,
+      "resident_ram_mb_note": "RUSAGE_CHILDREN ru_maxrss is a cumulative max for the whole test session and isn't resettable per model; this is exact for the first model in a run (or when a model is run alone) and otherwise a floor \u2014 not a true peak \u2014 for models measured later in the same run.",
+      "_format_threshold_for_pass": 0.8
+    },
+    "qwen3-8b-q4km": {
+      "id": "qwen3-8b-q4km",
+      "display_name": "Qwen3-8B (Q4_K_M)",
+      "available": true,
+      "binary_path": "/Users/david.kjerrumgaard/tools/llama.cpp/build/bin/llama-completion",
+      "model_path": "/Users/david.kjerrumgaard/tools/models/Qwen3-8B-GGUF/qwen3-8b-q4_k_m.gguf",
+      "format_reliability": {
+        "total": 30,
+        "structured": 22,
+        "structured_rate": 0.7333333333333333,
+        "nonempty": 30,
+        "nonempty_rate": 1.0,
+        "errors": 0,
+        "sample_errors": []
+      },
+      "speakability": {
+        "total": 30,
+        "violations": 8,
+        "violation_rate": 0.26666666666666666,
+        "sample_violations": [
+          {
+            "spoken_warning": "The spoken warning should be a short, calm, spoken-style text for text-to-speech, with 2-3 sentences. It should be natural language, not a list. It must name the corridor explicitly. It should include the number of affected trucks, the severity, and the expected impact on ETA. It should not include reroute details or recommendations. It should not mention any other corridors or incidents. It should not use any markdown.\n\n{\"spoken_warning\": \"There is a sustained slowdown on I-95N due to 1 truck",
+            "problems": [
+              "contains non-speakable artifact '{'",
+              "contains non-speakable artifact '\"spoken_warning\"'",
+              "80 words exceeds the 70-word spoken-length ceiling"
+            ]
+          },
+          {
+            "spoken_warning": "The spoken warning should be a natural, calm, spoken-style message for text-to-speech, with 2-3 sentences. It should include the corridor name, mention the affected trucks, and the nature of the issue (sustained slowdown, stop-and-go). It should not include reroute recommendations or other details not in the scope. It should be concise and clear.\n\n{\"spoken_warning\": \"There is a sustained slowdown on I-95N due to a single truck causing stop-and-go traffic. Drivers should expect delays of approximately",
+            "problems": [
+              "contains non-speakable artifact '{'",
+              "contains non-speakable artifact '\"spoken_warning\"'",
+              "75 words exceeds the 70-word spoken-length ceiling"
+            ]
+          },
+          {
+            "spoken_warning": "The spoken warning should be in natural, spoken language, not a list.  It should be a single sentence or two, calm and proactive, with the corridor name, the number of trucks, and the impact on ETA.  It should not include any markdown, special characters, or extra keys.  It should be phrased as a warning, not a list of facts.\n\n{\"spoken_warning\": \"On I-95N, there are two trucks causing sustained slowdowns with a medium severity impact, which may add up to 8",
+            "problems": [
+              "contains non-speakable artifact '{'",
+              "contains non-speakable artifact '\"spoken_warning\"'",
+              "80 words exceeds the 70-word spoken-length ceiling"
+            ]
+          },
+          {
+            "spoken_warning": "I-95N is experiencing moderate slowdowns due to two trucks causing sustained low speeds and stop-go conditions. Travelers should expect delays of approximately 8 minutes ahead. Proceed with caution and maintain a safe following distance. I-95N is experiencing moderate slowdowns due to two trucks causing sustained low speeds and stop-go conditions. Travelers should expect delays of approximately 8 minutes ahead. Proceed with caution and maintain a safe following distance.\n\n{\"spoken_warning\": \"On I-95N, there are two trucks causing sustained low speeds",
+            "problems": [
+              "contains non-speakable artifact '{'",
+              "contains non-speakable artifact '\"spoken_warning\"'",
+              "79 words exceeds the 70-word spoken-length ceiling"
+            ]
+          },
+          {
+            "spoken_warning": "I-95N is experiencing moderate delays due to two trucks causing sustained slowdowns. Drivers should expect reduced speeds and frequent stop-and-go conditions ahead, with an estimated impact of 8 minutes on travel time. Proceed with caution and maintain a safe following distance. I-95N is experiencing moderate delays due to two trucks causing sustained slowdowns. Drivers should expect reduced speeds and frequent stop-and-go conditions ahead, with an estimated impact of 8 minutes on travel time. Proceed with caution and maintain a safe following distance.\n\n{\"spoken_warning\":",
+            "problems": [
+              "contains non-speakable artifact '{'",
+              "contains non-speakable artifact '\"spoken_warning\"'",
+              "83 words exceeds the 70-word spoken-length ceiling"
+            ]
+          }
+        ]
+      },
+      "grounding": {
+        "by_scenario": {
+          "single-truck": {
+            "total": 10,
+            "violations": 0,
+            "violation_rate": 0.0,
+            "sample_violations": [],
+            "reroute_mentioned_when_recommended": null
+          },
+          "corridor-wide-no-reroute": {
+            "total": 10,
+            "violations": 0,
+            "violation_rate": 0.0,
+            "sample_violations": [],
+            "reroute_mentioned_when_recommended": null
+          },
+          "corridor-wide-with-reroute": {
+            "total": 10,
+            "violations": 0,
+            "violation_rate": 0.0,
+            "sample_violations": [],
+            "reroute_mentioned_when_recommended": 9
+          }
+        },
+        "max_violation_rate": 0.0
+      },
+      "latency": {
+        "p50_seconds": 1.3861472910211887,
+        "p95_seconds": 2.1007735829916783,
+        "n": 30
+      },
+      "tokens_per_sec_approx": 40.36479376842977,
+      "tokens_per_sec_note": "approximate \u2014 whitespace word count / latency over trials with no error, not an exact tokenizer count",
+      "load_time_seconds": 2.741364916000748,
+      "resident_ram_mb_before": 21318.90625,
+      "resident_ram_mb_after": 21318.90625,
+      "resident_ram_mb_note": "RUSAGE_CHILDREN ru_maxrss is a cumulative max for the whole test session and isn't resettable per model; this is exact for the first model in a run (or when a model is run alone) and otherwise a floor \u2014 not a true peak \u2014 for models measured later in the same run.",
+      "_format_threshold_for_pass": 0.8
+    },
+    "phi-3.5-mini-instruct-q4km": {
+      "id": "phi-3.5-mini-instruct-q4km",
+      "display_name": "Phi-3.5-mini-instruct (Q4_K_M)",
+      "available": true,
+      "binary_path": "/Users/david.kjerrumgaard/tools/llama.cpp/build/bin/llama-completion",
+      "model_path": "/Users/david.kjerrumgaard/tools/models/Phi-3.5-mini-instruct-GGUF/Phi-3.5-mini-instruct-Q4_K_M.gguf",
+      "format_reliability": {
+        "total": 30,
+        "structured": 30,
+        "structured_rate": 1.0,
+        "nonempty": 30,
+        "nonempty_rate": 1.0,
+        "errors": 0,
+        "sample_errors": []
+      },
+      "speakability": {
+        "total": 30,
+        "violations": 0,
+        "violation_rate": 0.0,
+        "sample_violations": []
+      },
+      "grounding": {
+        "by_scenario": {
+          "single-truck": {
+            "total": 10,
+            "violations": 0,
+            "violation_rate": 0.0,
+            "sample_violations": [],
+            "reroute_mentioned_when_recommended": null
+          },
+          "corridor-wide-no-reroute": {
+            "total": 10,
+            "violations": 0,
+            "violation_rate": 0.0,
+            "sample_violations": [],
+            "reroute_mentioned_when_recommended": null
+          },
+          "corridor-wide-with-reroute": {
+            "total": 10,
+            "violations": 0,
+            "violation_rate": 0.0,
+            "sample_violations": [],
+            "reroute_mentioned_when_recommended": 5
+          }
+        },
+        "max_violation_rate": 0.0
+      },
+      "latency": {
+        "p50_seconds": 0.9196349580015521,
+        "p95_seconds": 1.122558625007514,
+        "n": 30
+      },
+      "tokens_per_sec_approx": 51.77581352817708,
+      "tokens_per_sec_note": "approximate \u2014 whitespace word count / latency over trials with no error, not an exact tokenizer count",
+      "load_time_seconds": 5.8406599999871105,
+      "resident_ram_mb_before": 21318.90625,
+      "resident_ram_mb_after": 50752.203125,
+      "resident_ram_mb_note": "RUSAGE_CHILDREN ru_maxrss is a cumulative max for the whole test session and isn't resettable per model; this is exact for the first model in a run (or when a model is run alone) and otherwise a floor \u2014 not a true peak \u2014 for models measured later in the same run.",
+      "_format_threshold_for_pass": 0.8
+    },
+    "llama-3.2-1b-instruct-q4km": {
+      "id": "llama-3.2-1b-instruct-q4km",
+      "display_name": "Llama-3.2-1B-Instruct (Q4_K_M)",
+      "available": true,
+      "binary_path": "/Users/david.kjerrumgaard/tools/llama.cpp/build/bin/llama-completion",
+      "model_path": "/Users/david.kjerrumgaard/tools/models/Llama-3.2-1B-Instruct-GGUF/Llama-3.2-1B-Instruct-Q4_K_M.gguf",
+      "format_reliability": {
+        "total": 30,
+        "structured": 6,
+        "structured_rate": 0.2,
+        "nonempty": 17,
+        "nonempty_rate": 0.5666666666666667,
+        "errors": 0,
+        "sample_errors": []
+      },
+      "speakability": {
+        "total": 30,
+        "violations": 24,
+        "violation_rate": 0.8,
+        "sample_violations": [
+          {
+            "spoken_warning": "",
+            "problems": [
+              "empty"
+            ]
+          },
+          {
+            "spoken_warning": "",
+            "problems": [
+              "empty"
+            ]
+          },
+          {
+            "spoken_warning": "- \"Always name the corridor explicitly in your warning (e.g. 'On I-95N...')\"\n- \"Corridor: I-95N\"\n- \"Affected trucks: 1\"\n- \"Scope (already decided): single_truck\"\n- \"Reroute recommended (already decided): False\"\n- \"Reroute detail (already decided): none\"\n- \"Enrichment cards:\"\n- \"  - (truck-01) sustained_slowdown, severity=medium, signals=['sustained_low_speed', '",
+            "problems": [
+              "contains non-speakable artifact '- '"
+            ]
+          },
+          {
+            "spoken_warning": ", {\"name\": \"I-95N\", \"affected_trucks\": \"1\", \"scope\": \"single_truck\", \"reroute\": \"False\", \"reroute_details\": \"none\", \"enrichment_cards\": [{\"truck_id\": \"truck-01\", \"sustained_slowdown_severity\": \"medium\", \"signals\": [\"sustained_low_speed\", \"stop_go_index\"], \"eta_impact\": \"8.0min\"}]}",
+            "problems": [
+              "contains non-speakable artifact '{'",
+              "contains non-speakable artifact '}'"
+            ]
+          },
+          {
+            "spoken_warning": "",
+            "problems": [
+              "empty"
+            ]
+          }
+        ]
+      },
+      "grounding": {
+        "by_scenario": {
+          "single-truck": {
+            "total": 10,
+            "violations": 10,
+            "violation_rate": 1.0,
+            "sample_violations": [
+              {
+                "spoken_warning": "",
+                "problems": [
+                  "corridor 'I-95N' not mentioned (checked for ('95',))"
+                ]
+              },
+              {
+                "spoken_warning": "",
+                "problems": [
+                  "corridor 'I-95N' not mentioned (checked for ('95',))"
+                ]
+              },
+              {
+                "spoken_warning": "Your safety is at risk...",
+                "problems": [
+                  "corridor 'I-95N' not mentioned (checked for ('95',))"
+                ]
+              },
+              {
+                "spoken_warning": "- \"Always name the corridor explicitly in your warning (e.g. 'On I-95N...')\"\n- \"Corridor: I-95N\"\n- \"Affected trucks: 1\"\n- \"Scope (already decided): single_truck\"\n- \"Reroute recommended (already decided): False\"\n- \"Reroute detail (already decided): none\"\n- \"Enrichment cards:\"\n- \"  - (truck-01) sustained_slowdown, severity=medium, signals=['sustained_low_speed', '",
+                "problems": [
+                  "mentions reroute/detour language despite reroute_recommended=False"
+                ]
+              },
+              {
+                "spoken_warning": ", {\"name\": \"I-95N\", \"affected_trucks\": \"1\", \"scope\": \"single_truck\", \"reroute\": \"False\", \"reroute_details\": \"none\", \"enrichment_cards\": [{\"truck_id\": \"truck-01\", \"sustained_slowdown_severity\": \"medium\", \"signals\": [\"sustained_low_speed\", \"stop_go_index\"], \"eta_impact\": \"8.0min\"}]}",
+                "problems": [
+                  "mentions reroute/detour language despite reroute_recommended=False"
+                ]
+              }
+            ],
+            "reroute_mentioned_when_recommended": null
+          },
+          "corridor-wide-no-reroute": {
+            "total": 10,
+            "violations": 10,
+            "violation_rate": 1.0,
+            "sample_violations": [
+              {
+                "spoken_warning": "<your warning text here>",
+                "problems": [
+                  "corridor 'I-95N' not mentioned (checked for ('95',))"
+                ]
+              },
+              {
+                "spoken_warning": "{\"corridor\": \"I-95N\", \"affected_trucks\": \"2\", \"scope\": \"corridor_wide\", \"reroute\": false, \"reroute_detail\": \"none\", \"enrichment_cards\": [{\"truck-02\": {\"severity\": \"medium\", \"signals\": [\"sustained_low_speed\", \"stop_go_index\"], \"eta_impact\": 8.0}]}\"}",
+                "problems": [
+                  "mentions reroute/detour language despite reroute_recommended=False"
+                ]
+              },
+              {
+                "spoken_warning": "- (truck-02) sustained_slowdown, severity=medium, signals=['sustained_low_speed', 'stop_go_index'], eta_impact=8.0min\n- (truck-03) sustained_slowdown, severity=medium, signals=['sustained_low_speed', 'stop_go_index'], eta_impact=8.0min",
+                "problems": [
+                  "corridor 'I-95N' not mentioned (checked for ('95',))"
+                ]
+              },
+              {
+                "spoken_warning": "",
+                "problems": [
+                  "corridor 'I-95N' not mentioned (checked for ('95',))"
+                ]
+              },
+              {
+                "spoken_warning": "",
+                "problems": [
+                  "corridor 'I-95N' not mentioned (checked for ('95',))"
+                ]
+              }
+            ],
+            "reroute_mentioned_when_recommended": null
+          },
+          "corridor-wide-with-reroute": {
+            "total": 10,
+            "violations": 7,
+            "violation_rate": 0.7,
+            "sample_violations": [
+              {
+                "spoken_warning": "<your warning text here>",
+                "problems": [
+                  "corridor 'I-95N' not mentioned (checked for ('95',))"
+                ]
+              },
+              {
+                "spoken_warning": "",
+                "problems": [
+                  "corridor 'I-95N' not mentioned (checked for ('95',))"
+                ]
+              },
+              {
+                "spoken_warning": "",
+                "problems": [
+                  "corridor 'I-95N' not mentioned (checked for ('95',))"
+                ]
+              },
+              {
+                "spoken_warning": "",
+                "problems": [
+                  "corridor 'I-95N' not mentioned (checked for ('95',))"
+                ]
+              },
+              {
+                "spoken_warning": "",
+                "problems": [
+                  "corridor 'I-95N' not mentioned (checked for ('95',))"
+                ]
+              }
+            ],
+            "reroute_mentioned_when_recommended": 3
+          }
+        },
+        "max_violation_rate": 1.0
+      },
+      "latency": {
+        "p50_seconds": 0.224091625015717,
+        "p95_seconds": 0.3446255419985391,
+        "n": 30
+      },
+      "tokens_per_sec_approx": 72.76643420653426,
+      "tokens_per_sec_note": "approximate \u2014 whitespace word count / latency over trials with no error, not an exact tokenizer count",
+      "load_time_seconds": 1.1040406670072116,
+      "resident_ram_mb_before": 50752.203125,
+      "resident_ram_mb_after": 50752.203125,
+      "resident_ram_mb_note": "RUSAGE_CHILDREN ru_maxrss is a cumulative max for the whole test session and isn't resettable per model; this is exact for the first model in a run (or when a model is run alone) and otherwise a floor \u2014 not a true peak \u2014 for models measured later in the same run.",
+      "_format_threshold_for_pass": 0.8
+    },
+    "llama-3.2-3b-instruct-q4km": {
+      "id": "llama-3.2-3b-instruct-q4km",
+      "display_name": "Llama-3.2-3B-Instruct (Q4_K_M)",
+      "available": true,
+      "binary_path": "/Users/david.kjerrumgaard/tools/llama.cpp/build/bin/llama-completion",
+      "model_path": "/Users/david.kjerrumgaard/tools/models/Llama-3.2-3B-Instruct-GGUF/Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+      "format_reliability": {
+        "total": 30,
+        "structured": 20,
+        "structured_rate": 0.6666666666666666,
+        "nonempty": 26,
+        "nonempty_rate": 0.8666666666666667,
+        "errors": 0,
+        "sample_errors": []
+      },
+      "speakability": {
+        "total": 30,
+        "violations": 10,
+        "violation_rate": 0.3333333333333333,
+        "sample_violations": [
+          {
+            "spoken_warning": "",
+            "problems": [
+              "empty"
+            ]
+          },
+          {
+            "spoken_warning": "(Note: this is the expected output format. I'll provide the actual answer once you're ready.) \n\nLet you know if the text is correct, and if so, I'll provide the answer. Go ahead! \n\n```\n{\n  \"spoken_warning\": \"\",\n  \"corridor\": \"I-95N\",\n  \"affected_trucks\": \"1\",\n  \"scope\": \"single_truck\",\n  \"reroute\": \"False\",\n  \"enrichment_cards\": [\n    {\n      \"truck-01\": {\n        \"",
+            "problems": [
+              "contains non-speakable artifact '```'",
+              "contains non-speakable artifact '{'",
+              "contains non-speakable artifact '\"spoken_warning\"'"
+            ]
+          },
+          {
+            "spoken_warning": "```\n{\n  \"spoken_warning\": \"\"\n}\n``` \n\nNote: The warning should be a natural-sounding phrase that conveys the necessary information to drivers, and does not imply any level of urgency. \nNote: The words \"slow down\" or \"slow down caution\" are not allowed. \nNote: The words \"lane closure\" or \"lane closure ahead\" are not allowed. \nNote: The word \"exit\" is not allowed. \n\nPlease fill in the warning text. \n\n```\n{\n  \"spoken_warning\": \"\"",
+            "problems": [
+              "contains non-speakable artifact '```'",
+              "contains non-speakable artifact '{'",
+              "contains non-speakable artifact '}'",
+              "contains non-speakable artifact '\"spoken_warning\"'"
+            ]
+          },
+          {
+            "spoken_warning": "",
+            "problems": [
+              "empty"
+            ]
+          },
+          {
+            "spoken_warning": "",
+            "problems": [
+              "empty"
+            ]
+          }
+        ]
+      },
+      "grounding": {
+        "by_scenario": {
+          "single-truck": {
+            "total": 10,
+            "violations": 2,
+            "violation_rate": 0.2,
+            "sample_violations": [
+              {
+                "spoken_warning": "",
+                "problems": [
+                  "corridor 'I-95N' not mentioned (checked for ('95',))"
+                ]
+              },
+              {
+                "spoken_warning": "(Note: this is the expected output format. I'll provide the actual answer once you're ready.) \n\nLet you know if the text is correct, and if so, I'll provide the answer. Go ahead! \n\n```\n{\n  \"spoken_warning\": \"\",\n  \"corridor\": \"I-95N\",\n  \"affected_trucks\": \"1\",\n  \"scope\": \"single_truck\",\n  \"reroute\": \"False\",\n  \"enrichment_cards\": [\n    {\n      \"truck-01\": {\n        \"",
+                "problems": [
+                  "mentions reroute/detour language despite reroute_recommended=False"
+                ]
+              }
+            ],
+            "reroute_mentioned_when_recommended": null
+          },
+          "corridor-wide-no-reroute": {
+            "total": 10,
+            "violations": 5,
+            "violation_rate": 0.5,
+            "sample_violations": [
+              {
+                "spoken_warning": "```\n{\n  \"spoken_warning\": \"\"\n}\n``` \n\nNote: The warning should be a natural-sounding phrase that conveys the necessary information to drivers, and does not imply any level of urgency. \nNote: The words \"slow down\" or \"slow down caution\" are not allowed. \nNote: The words \"lane closure\" or \"lane closure ahead\" are not allowed. \nNote: The word \"exit\" is not allowed. \n\nPlease fill in the warning text. \n\n```\n{\n  \"spoken_warning\": \"\"",
+                "problems": [
+                  "corridor 'I-95N' not mentioned (checked for ('95',))"
+                ]
+              },
+              {
+                "spoken_warning": "<your warning text here>",
+                "problems": [
+                  "corridor 'I-95N' not mentioned (checked for ('95',))"
+                ]
+              },
+              {
+                "spoken_warning": "",
+                "problems": [
+                  "corridor 'I-95N' not mentioned (checked for ('95',))"
+                ]
+              },
+              {
+                "spoken_warning": "",
+                "problems": [
+                  "corridor 'I-95N' not mentioned (checked for ('95',))"
+                ]
+              },
+              {
+                "spoken_warning": "",
+                "problems": [
+                  "corridor 'I-95N' not mentioned (checked for ('95',))"
+                ]
+              }
+            ],
+            "reroute_mentioned_when_recommended": null
+          },
+          "corridor-wide-with-reroute": {
+            "total": 10,
+            "violations": 2,
+            "violation_rate": 0.2,
+            "sample_violations": [
+              {
+                "spoken_warning": "Do not change the \"spoken_warning\" text. Use the \"enrichment_cards\" input. \nUse only the text from the enrichment cards to inform the warning, but do not invent new facts. \nUse only the text from the enrichment cards to inform the warning; do not use any external sources. \n\nHere is the \"enrichment_cards\" input:\n\n\n{\"truck-04\": \"2 trucks reporting a sustained slowdown\", \"truck-05\": \"2 trucks reporting a sustained slowdown\"}\n\n\nHere is the \"spoken_warning\" template",
+                "problems": [
+                  "corridor 'I-95N' not mentioned (checked for ('95',))"
+                ]
+              },
+              {
+                "spoken_warning": "Let's go! \n---\n\n```json\n{\n  \"spoken_warning\": \"\"\n}\n```\n\n---\n\n```json\n{\n  \"spoken_warning\": \"\"\n}\n```\n\n---\n\n```json\n{\n  \"spoken_warning\": \"\"\n}\n```\n\n---\n\n```json\n{\n  \"spoken_warning\": \"\"\n}\n```\n\n---\n\n```json\n{\n  \"spoken_warning\": \"\"\n}\n```\n\n---\n\n```json\n{\n  \"spoken_warning\": \"\"\n}\n```\n\n---\n\n```json\n{\n  \"spoken_warning\": \"\"\n}\n```\n\n---\n\n```json\n{",
+                "problems": [
+                  "corridor 'I-95N' not mentioned (checked for ('95',))"
+                ]
+              }
+            ],
+            "reroute_mentioned_when_recommended": 3
+          }
+        },
+        "max_violation_rate": 0.5
+      },
+      "latency": {
+        "p50_seconds": 0.7762957910017576,
+        "p95_seconds": 0.9309181669959798,
+        "n": 30
+      },
+      "tokens_per_sec_approx": 78.22554112583076,
+      "tokens_per_sec_note": "approximate \u2014 whitespace word count / latency over trials with no error, not an exact tokenizer count",
+      "load_time_seconds": 2.1718905000016093,
+      "resident_ram_mb_before": 50752.203125,
+      "resident_ram_mb_after": 50752.203125,
+      "resident_ram_mb_note": "RUSAGE_CHILDREN ru_maxrss is a cumulative max for the whole test session and isn't resettable per model; this is exact for the first model in a run (or when a model is run alone) and otherwise a floor \u2014 not a true peak \u2014 for models measured later in the same run.",
+      "_format_threshold_for_pass": 0.8
+    },
+    "gemma-3-4b-it-q4km": {
+      "id": "gemma-3-4b-it-q4km",
+      "display_name": "Gemma-3-4B-it (Q4_K_M)",
+      "available": true,
+      "binary_path": "/Users/david.kjerrumgaard/tools/llama.cpp/build/bin/llama-completion",
+      "model_path": "/Users/david.kjerrumgaard/tools/models/gemma-3-4b-it-GGUF/gemma-3-4b-it-Q4_K_M.gguf",
+      "format_reliability": {
+        "total": 30,
+        "structured": 30,
+        "structured_rate": 1.0,
+        "nonempty": 30,
+        "nonempty_rate": 1.0,
+        "errors": 0,
+        "sample_errors": []
+      },
+      "speakability": {
+        "total": 30,
+        "violations": 0,
+        "violation_rate": 0.0,
+        "sample_violations": []
+      },
+      "grounding": {
+        "by_scenario": {
+          "single-truck": {
+            "total": 10,
+            "violations": 0,
+            "violation_rate": 0.0,
+            "sample_violations": [],
+            "reroute_mentioned_when_recommended": null
+          },
+          "corridor-wide-no-reroute": {
+            "total": 10,
+            "violations": 0,
+            "violation_rate": 0.0,
+            "sample_violations": [],
+            "reroute_mentioned_when_recommended": null
+          },
+          "corridor-wide-with-reroute": {
+            "total": 10,
+            "violations": 0,
+            "violation_rate": 0.0,
+            "sample_violations": [],
+            "reroute_mentioned_when_recommended": 8
+          }
+        },
+        "max_violation_rate": 0.0
+      },
+      "latency": {
+        "p50_seconds": 0.6277628329989966,
+        "p95_seconds": 0.8363866249856073,
+        "n": 30
+      },
+      "tokens_per_sec_approx": 52.53615247475225,
+      "tokens_per_sec_note": "approximate \u2014 whitespace word count / latency over trials with no error, not an exact tokenizer count",
+      "load_time_seconds": 1.9287479170016013,
+      "resident_ram_mb_before": 50752.203125,
+      "resident_ram_mb_after": 50752.203125,
+      "resident_ram_mb_note": "RUSAGE_CHILDREN ru_maxrss is a cumulative max for the whole test session and isn't resettable per model; this is exact for the first model in a run (or when a model is run alone) and otherwise a floor \u2014 not a true peak \u2014 for models measured later in the same run.",
+      "_format_threshold_for_pass": 0.8
+    },
+    "qwen2.5-3b-instruct-q4km": {
+      "id": "qwen2.5-3b-instruct-q4km",
+      "display_name": "Qwen2.5-3B-Instruct (Q4_K_M)",
+      "available": true,
+      "binary_path": "/Users/david.kjerrumgaard/tools/llama.cpp/build/bin/llama-completion",
+      "model_path": "/Users/david.kjerrumgaard/tools/models/Qwen2.5-3B-Instruct-GGUF/qwen2.5-3b-instruct-q4_k_m.gguf",
+      "format_reliability": {
+        "total": 30,
+        "structured": 30,
+        "structured_rate": 1.0,
+        "nonempty": 30,
+        "nonempty_rate": 1.0,
+        "errors": 0,
+        "sample_errors": []
+      },
+      "speakability": {
+        "total": 30,
+        "violations": 0,
+        "violation_rate": 0.0,
+        "sample_violations": []
+      },
+      "grounding": {
+        "by_scenario": {
+          "single-truck": {
+            "total": 10,
+            "violations": 2,
+            "violation_rate": 0.2,
+            "sample_violations": [
+              {
+                "spoken_warning": "A truck ahead of you is experiencing a sustained slowdown, which could affect your journey, estimated to take 8 minutes. Drive cautiously and be prepared for potential delays.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned (checked for ('95',))"
+                ]
+              },
+              {
+                "spoken_warning": "A truck ahead is experiencing a sustained slowdown, causing a medium severity issue. Be prepared to slow down and maintain a safe distance.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned (checked for ('95',))"
+                ]
+              }
+            ],
+            "reroute_mentioned_when_recommended": null
+          },
+          "corridor-wide-no-reroute": {
+            "total": 10,
+            "violations": 0,
+            "violation_rate": 0.0,
+            "sample_violations": [],
+            "reroute_mentioned_when_recommended": null
+          },
+          "corridor-wide-with-reroute": {
+            "total": 10,
+            "violations": 0,
+            "violation_rate": 0.0,
+            "sample_violations": [],
+            "reroute_mentioned_when_recommended": 9
+          }
+        },
+        "max_violation_rate": 0.2
+      },
+      "latency": {
+        "p50_seconds": 0.3270686249888968,
+        "p95_seconds": 0.5058118749875575,
+        "n": 30
+      },
+      "tokens_per_sec_approx": 82.07003473738884,
+      "tokens_per_sec_note": "approximate \u2014 whitespace word count / latency over trials with no error, not an exact tokenizer count",
+      "load_time_seconds": 1.4815242500044405,
+      "resident_ram_mb_before": 50752.203125,
+      "resident_ram_mb_after": 50752.203125,
+      "resident_ram_mb_note": "RUSAGE_CHILDREN ru_maxrss is a cumulative max for the whole test session and isn't resettable per model; this is exact for the first model in a run (or when a model is run alone) and otherwise a floor \u2014 not a true peak \u2014 for models measured later in the same run.",
+      "_format_threshold_for_pass": 0.8
+    }
+  },
+  "comparison": {
+    "nonempty_rate": {
+      "direction": "higher",
+      "values": {
+        "llama-3.1-8b-instruct-q4km": 1.0,
+        "qwen3-8b-q4km": 1.0,
+        "phi-3.5-mini-instruct-q4km": 1.0,
+        "llama-3.2-1b-instruct-q4km": 0.5666666666666667,
+        "llama-3.2-3b-instruct-q4km": 0.8666666666666667,
+        "gemma-3-4b-it-q4km": 1.0,
+        "qwen2.5-3b-instruct-q4km": 1.0
+      },
+      "best": "llama-3.1-8b-instruct-q4km"
+    },
+    "structured_rate": {
+      "direction": "higher",
+      "values": {
+        "llama-3.1-8b-instruct-q4km": 1.0,
+        "qwen3-8b-q4km": 0.7333333333333333,
+        "phi-3.5-mini-instruct-q4km": 1.0,
+        "llama-3.2-1b-instruct-q4km": 0.2,
+        "llama-3.2-3b-instruct-q4km": 0.6666666666666666,
+        "gemma-3-4b-it-q4km": 1.0,
+        "qwen2.5-3b-instruct-q4km": 1.0
+      },
+      "best": "llama-3.1-8b-instruct-q4km"
+    },
+    "speakability_violation_rate": {
+      "direction": "lower",
+      "values": {
+        "llama-3.1-8b-instruct-q4km": 0.0,
+        "qwen3-8b-q4km": 0.26666666666666666,
+        "phi-3.5-mini-instruct-q4km": 0.0,
+        "llama-3.2-1b-instruct-q4km": 0.8,
+        "llama-3.2-3b-instruct-q4km": 0.3333333333333333,
+        "gemma-3-4b-it-q4km": 0.0,
+        "qwen2.5-3b-instruct-q4km": 0.0
+      },
+      "best": "llama-3.1-8b-instruct-q4km"
+    },
+    "max_grounding_violation_rate": {
+      "direction": "lower",
+      "values": {
+        "llama-3.1-8b-instruct-q4km": 0.0,
+        "qwen3-8b-q4km": 0.0,
+        "phi-3.5-mini-instruct-q4km": 0.0,
+        "llama-3.2-1b-instruct-q4km": 1.0,
+        "llama-3.2-3b-instruct-q4km": 0.5,
+        "gemma-3-4b-it-q4km": 0.0,
+        "qwen2.5-3b-instruct-q4km": 0.2
+      },
+      "best": "llama-3.1-8b-instruct-q4km"
+    },
+    "latency_p50_seconds": {
+      "direction": "lower",
+      "values": {
+        "llama-3.1-8b-instruct-q4km": 1.6344946669996716,
+        "qwen3-8b-q4km": 1.3861472910211887,
+        "phi-3.5-mini-instruct-q4km": 0.9196349580015521,
+        "llama-3.2-1b-instruct-q4km": 0.224091625015717,
+        "llama-3.2-3b-instruct-q4km": 0.7762957910017576,
+        "gemma-3-4b-it-q4km": 0.6277628329989966,
+        "qwen2.5-3b-instruct-q4km": 0.3270686249888968
+      },
+      "best": "llama-3.2-1b-instruct-q4km"
+    },
+    "latency_p95_seconds": {
+      "direction": "lower",
+      "values": {
+        "llama-3.1-8b-instruct-q4km": 1.8009917500021402,
+        "qwen3-8b-q4km": 2.1007735829916783,
+        "phi-3.5-mini-instruct-q4km": 1.122558625007514,
+        "llama-3.2-1b-instruct-q4km": 0.3446255419985391,
+        "llama-3.2-3b-instruct-q4km": 0.9309181669959798,
+        "gemma-3-4b-it-q4km": 0.8363866249856073,
+        "qwen2.5-3b-instruct-q4km": 0.5058118749875575
+      },
+      "best": "llama-3.2-1b-instruct-q4km"
+    },
+    "tokens_per_sec_approx": {
+      "direction": "higher",
+      "values": {
+        "llama-3.1-8b-instruct-q4km": 42.803261675827756,
+        "qwen3-8b-q4km": 40.36479376842977,
+        "phi-3.5-mini-instruct-q4km": 51.77581352817708,
+        "llama-3.2-1b-instruct-q4km": 72.76643420653426,
+        "llama-3.2-3b-instruct-q4km": 78.22554112583076,
+        "gemma-3-4b-it-q4km": 52.53615247475225,
+        "qwen2.5-3b-instruct-q4km": 82.07003473738884
+      },
+      "best": "qwen2.5-3b-instruct-q4km"
+    },
+    "load_time_seconds": {
+      "direction": "lower",
+      "values": {
+        "llama-3.1-8b-instruct-q4km": 3.21766112500336,
+        "qwen3-8b-q4km": 2.741364916000748,
+        "phi-3.5-mini-instruct-q4km": 5.8406599999871105,
+        "llama-3.2-1b-instruct-q4km": 1.1040406670072116,
+        "llama-3.2-3b-instruct-q4km": 2.1718905000016093,
+        "gemma-3-4b-it-q4km": 1.9287479170016013,
+        "qwen2.5-3b-instruct-q4km": 1.4815242500044405
+      },
+      "best": "llama-3.2-1b-instruct-q4km"
+    },
+    "resident_ram_mb_after": {
+      "direction": "lower",
+      "values": {
+        "llama-3.1-8b-instruct-q4km": 21318.90625,
+        "qwen3-8b-q4km": 21318.90625,
+        "phi-3.5-mini-instruct-q4km": 50752.203125,
+        "llama-3.2-1b-instruct-q4km": 50752.203125,
+        "llama-3.2-3b-instruct-q4km": 50752.203125,
+        "gemma-3-4b-it-q4km": 50752.203125,
+        "qwen2.5-3b-instruct-q4km": 50752.203125
+      },
+      "best": "llama-3.1-8b-instruct-q4km"
+    }
+  },
+  "recommendation": "nonempty_rate: Llama-3.1-8B-Instruct (Q4_K_M) leads (1.000) vs Qwen3-8B (Q4_K_M)=1.000, Phi-3.5-mini-instruct (Q4_K_M)=1.000, Llama-3.2-1B-Instruct (Q4_K_M)=0.567, Llama-3.2-3B-Instruct (Q4_K_M)=0.867, Gemma-3-4B-it (Q4_K_M)=1.000, Qwen2.5-3B-Instruct (Q4_K_M)=1.000\nstructured_rate: Llama-3.1-8B-Instruct (Q4_K_M) leads (1.000) vs Qwen3-8B (Q4_K_M)=0.733, Phi-3.5-mini-instruct (Q4_K_M)=1.000, Llama-3.2-1B-Instruct (Q4_K_M)=0.200, Llama-3.2-3B-Instruct (Q4_K_M)=0.667, Gemma-3-4B-it (Q4_K_M)=1.000, Qwen2.5-3B-Instruct (Q4_K_M)=1.000\nspeakability_violation_rate: Llama-3.1-8B-Instruct (Q4_K_M) leads (0.000) vs Qwen3-8B (Q4_K_M)=0.267, Phi-3.5-mini-instruct (Q4_K_M)=0.000, Llama-3.2-1B-Instruct (Q4_K_M)=0.800, Llama-3.2-3B-Instruct (Q4_K_M)=0.333, Gemma-3-4B-it (Q4_K_M)=0.000, Qwen2.5-3B-Instruct (Q4_K_M)=0.000\nmax_grounding_violation_rate: Llama-3.1-8B-Instruct (Q4_K_M) leads (0.000) vs Qwen3-8B (Q4_K_M)=0.000, Phi-3.5-mini-instruct (Q4_K_M)=0.000, Llama-3.2-1B-Instruct (Q4_K_M)=1.000, Llama-3.2-3B-Instruct (Q4_K_M)=0.500, Gemma-3-4B-it (Q4_K_M)=0.000, Qwen2.5-3B-Instruct (Q4_K_M)=0.200\n[informational \u2014 non-target hardware] latency_p50_seconds: Llama-3.2-1B-Instruct (Q4_K_M) leads (0.224) vs Llama-3.1-8B-Instruct (Q4_K_M)=1.634, Qwen3-8B (Q4_K_M)=1.386, Phi-3.5-mini-instruct (Q4_K_M)=0.920, Llama-3.2-3B-Instruct (Q4_K_M)=0.776, Gemma-3-4B-it (Q4_K_M)=0.628, Qwen2.5-3B-Instruct (Q4_K_M)=0.327\n[informational \u2014 non-target hardware] latency_p95_seconds: Llama-3.2-1B-Instruct (Q4_K_M) leads (0.345) vs Llama-3.1-8B-Instruct (Q4_K_M)=1.801, Qwen3-8B (Q4_K_M)=2.101, Phi-3.5-mini-instruct (Q4_K_M)=1.123, Llama-3.2-3B-Instruct (Q4_K_M)=0.931, Gemma-3-4B-it (Q4_K_M)=0.836, Qwen2.5-3B-Instruct (Q4_K_M)=0.506\n[informational \u2014 non-target hardware] tokens_per_sec_approx: Qwen2.5-3B-Instruct (Q4_K_M) leads (82.070) vs Llama-3.1-8B-Instruct (Q4_K_M)=42.803, Qwen3-8B (Q4_K_M)=40.365, Phi-3.5-mini-instruct (Q4_K_M)=51.776, Llama-3.2-1B-Instruct (Q4_K_M)=72.766, Llama-3.2-3B-Instruct (Q4_K_M)=78.226, Gemma-3-4B-it (Q4_K_M)=52.536\n[informational \u2014 non-target hardware] load_time_seconds: Llama-3.2-1B-Instruct (Q4_K_M) leads (1.104) vs Llama-3.1-8B-Instruct (Q4_K_M)=3.218, Qwen3-8B (Q4_K_M)=2.741, Phi-3.5-mini-instruct (Q4_K_M)=5.841, Llama-3.2-3B-Instruct (Q4_K_M)=2.172, Gemma-3-4B-it (Q4_K_M)=1.929, Qwen2.5-3B-Instruct (Q4_K_M)=1.482\n[informational \u2014 non-target hardware] resident_ram_mb_after: Llama-3.1-8B-Instruct (Q4_K_M) leads (21318.906) vs Qwen3-8B (Q4_K_M)=21318.906, Phi-3.5-mini-instruct (Q4_K_M)=50752.203, Llama-3.2-1B-Instruct (Q4_K_M)=50752.203, Llama-3.2-3B-Instruct (Q4_K_M)=50752.203, Gemma-3-4B-it (Q4_K_M)=50752.203, Qwen2.5-3B-Instruct (Q4_K_M)=50752.203\nThis note does not pick a stage model. Quality axes above are decision-relevant on any host; speed/RAM axes only count when measured on the Pi 4 target.",
+  "production_candidates": {
+    "format_threshold": 0.8,
+    "grounding_threshold": 0.2,
+    "passed": [
+      {
+        "id": "llama-3.1-8b-instruct-q4km",
+        "display_name": "Llama-3.1-8B-Instruct (Q4_K_M)",
+        "nonempty_rate": 1.0,
+        "speakability_violation_rate": 0.0,
+        "max_grounding_violation_rate": 0.0,
+        "sample_n": 30
+      },
+      {
+        "id": "phi-3.5-mini-instruct-q4km",
+        "display_name": "Phi-3.5-mini-instruct (Q4_K_M)",
+        "nonempty_rate": 1.0,
+        "speakability_violation_rate": 0.0,
+        "max_grounding_violation_rate": 0.0,
+        "sample_n": 30
+      },
+      {
+        "id": "gemma-3-4b-it-q4km",
+        "display_name": "Gemma-3-4B-it (Q4_K_M)",
+        "nonempty_rate": 1.0,
+        "speakability_violation_rate": 0.0,
+        "max_grounding_violation_rate": 0.0,
+        "sample_n": 30
+      },
+      {
+        "id": "qwen2.5-3b-instruct-q4km",
+        "display_name": "Qwen2.5-3B-Instruct (Q4_K_M)",
+        "nonempty_rate": 1.0,
+        "speakability_violation_rate": 0.0,
+        "max_grounding_violation_rate": 0.2,
+        "sample_n": 30
+      }
+    ],
+    "rejected": [
+      {
+        "id": "qwen3-8b-q4km",
+        "display_name": "Qwen3-8B (Q4_K_M)",
+        "nonempty_rate": 1.0,
+        "speakability_violation_rate": 0.26666666666666666,
+        "max_grounding_violation_rate": 0.0,
+        "sample_n": 30
+      },
+      {
+        "id": "llama-3.2-1b-instruct-q4km",
+        "display_name": "Llama-3.2-1B-Instruct (Q4_K_M)",
+        "nonempty_rate": 0.5666666666666667,
+        "speakability_violation_rate": 0.8,
+        "max_grounding_violation_rate": 1.0,
+        "sample_n": 30
+      },
+      {
+        "id": "llama-3.2-3b-instruct-q4km",
+        "display_name": "Llama-3.2-3B-Instruct (Q4_K_M)",
+        "nonempty_rate": 0.8666666666666667,
+        "speakability_violation_rate": 0.3333333333333333,
+        "max_grounding_violation_rate": 0.5,
+        "sample_n": 30
+      }
+    ]
+  }
+}

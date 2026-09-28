@@ -1,0 +1,101 @@
+{
+  "model_id": "gemma-3-1b-it-q4km",
+  "n_per_scenario": 30,
+  "embedder_load_seconds": 4.90953362500295,
+  "embedder_rss_delta_mb": 531.859375,
+  "baseline": {
+    "per_scenario": {
+      "escalate-worthy": {
+        "expected": "raise",
+        "tally": {
+          "raise": 30
+        },
+        "checked": 30,
+        "matched": 30,
+        "errors": 0,
+        "match_rate": 1.0,
+        "prompt_chars": 2050,
+        "retrieval_ms": null
+      },
+      "benign": {
+        "expected": "hold",
+        "tally": {
+          "raise": 14,
+          "lower": 15,
+          "hold": 1
+        },
+        "checked": 30,
+        "matched": 1,
+        "errors": 0,
+        "match_rate": 0.03333333333333333,
+        "prompt_chars": 2031,
+        "retrieval_ms": null
+      },
+      "de-escalate-worthy": {
+        "expected": "lower_or_hold",
+        "tally": {
+          "raise": 24,
+          "lower": 4,
+          "hold": 2
+        },
+        "checked": 30,
+        "matched": 6,
+        "errors": 0,
+        "match_rate": 0.2,
+        "prompt_chars": 2115,
+        "retrieval_ms": null
+      }
+    },
+    "overall_mismatch_rate": 0.5888888888888889,
+    "latency_p50_seconds": 0.5415797920140903,
+    "latency_p95_seconds": 0.655677167000249,
+    "n_calls": 90
+  },
+  "rag": {
+    "per_scenario": {
+      "escalate-worthy": {
+        "expected": "raise",
+        "tally": {
+          "raise": 30
+        },
+        "checked": 30,
+        "matched": 30,
+        "errors": 0,
+        "match_rate": 1.0,
+        "prompt_chars": 2490,
+        "retrieval_ms": 8.346375019755214
+      },
+      "benign": {
+        "expected": "hold",
+        "tally": {
+          "raise": 29,
+          "hold": 1
+        },
+        "checked": 30,
+        "matched": 1,
+        "errors": 0,
+        "match_rate": 0.03333333333333333,
+        "prompt_chars": 2451,
+        "retrieval_ms": 16.35983301093802
+      },
+      "de-escalate-worthy": {
+        "expected": "lower_or_hold",
+        "tally": {
+          "lower": 3,
+          "hold": 4,
+          "raise": 23
+        },
+        "checked": 30,
+        "matched": 7,
+        "errors": 0,
+        "match_rate": 0.23333333333333334,
+        "prompt_chars": 2623,
+        "retrieval_ms": 16.099125001346692
+      }
+    },
+    "overall_mismatch_rate": 0.5777777777777777,
+    "latency_p50_seconds": 0.5122222079953644,
+    "latency_p95_seconds": 0.6313277079898398,
+    "n_calls": 90
+  }
+}

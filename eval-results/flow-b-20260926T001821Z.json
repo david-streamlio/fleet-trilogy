@@ -1,0 +1,63 @@
+{
+  "config": {
+    "binary_path": "/Users/david.kjerrumgaard/tools/llama.cpp/build/bin/llama-completion",
+    "model_path": "/Users/david.kjerrumgaard/tools/models/gemma-3-1b-it-GGUF/gemma-3-1b-it-Q4_K_M.gguf",
+    "host": "COMP-J2D9D71YNJ",
+    "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+    "eval_runs": 6
+  },
+  "format_reliability": {
+    "total": 6,
+    "parsed": 6,
+    "sample_failures": [],
+    "rate": 1.0
+  },
+  "severity_calibration": {
+    "total": 6,
+    "mismatches": 3,
+    "mismatch_rate": 0.5,
+    "sample_mismatches": [
+      {
+        "input_eta_slip_min": 4.0,
+        "expected_severity": "low",
+        "actual_severity": "medium",
+        "output": {
+          "severity": "medium",
+          "event_label": "Traffic Congestion",
+          "dispatch_action": "Adjust Speed",
+          "eta_impact": 4.0,
+          "truck_id": "truck-47"
+        }
+      },
+      {
+        "input_eta_slip_min": 4.0,
+        "expected_severity": "low",
+        "actual_severity": "high",
+        "output": {
+          "severity": "high",
+          "event_label": "Traffic Incident",
+          "dispatch_action": "Initiate Structural Route Adjustment",
+          "eta_impact": 4.0,
+          "truck_id": "truck-47"
+        }
+      },
+      {
+        "input_eta_slip_min": 10.0,
+        "expected_severity": "medium",
+        "actual_severity": "high",
+        "output": {
+          "severity": "high",
+          "event_label": "Traffic Incident",
+          "dispatch_action": "Re-route",
+          "eta_impact": 10.0,
+          "truck_id": "truck-47"
+        }
+      }
+    ]
+  },
+  "latency": {
+    "p50_seconds": 0.8608329790149583,
+    "p95_seconds": 0.897804479500337,
+    "n": 6
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "config": {
+    "binary_path": "/Users/david.kjerrumgaard/tools/llama.cpp/build/bin/llama-server",
+    "model_path": "/Users/david.kjerrumgaard/tools/models/gemma-3-1b-it-GGUF/gemma-3-1b-it-Q4_K_M.gguf",
+    "host": "COMP-J2D9D71YNJ",
+    "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+    "eval_runs": 12
+  },
+  "format_reliability": {
+    "total": 12,
+    "parsed": 12,
+    "rate": 1.0,
+    "sample_failures": []
+  },
+  "escalation_calibration": {
+    "per_scenario": {
+      "escalate-worthy": {
+        "expected_direction": "raise",
+        "escalation_tally": {
+          "raise": 4
+        },
+        "total": 4,
+        "matched": 4,
+        "match_rate": 1.0
+      },
+      "benign": {
+        "expected_direction": "hold",
+        "escalation_tally": {
+          "hold": 1,
+          "lower": 1,
+          "raise": 2
+        },
+        "total": 4,
+        "matched": 1,
+        "match_rate": 0.25
+      },
+      "de-escalate-worthy": {
+        "expected_direction": "lower_or_hold",
+        "escalation_tally": {
+          "lower": 2,
+          "raise": 2
+        },
+        "total": 4,
+        "matched": 2,
+        "match_rate": 0.5
+      }
+    },
+    "total": 12,
+    "matched": 7,
+    "mismatches": 5,
+    "mismatch_rate": 0.41666666666666663,
+    "sample_mismatches": [
+      {
+        "scenario": "benign",
+        "expected_direction": "hold",
+        "escalation": "lower"
+      },
+      {
+        "scenario": "benign",
+        "expected_direction": "hold",
+        "escalation": "raise"
+      },
+      {
+        "scenario": "benign",
+        "expected_direction": "hold",
+        "escalation": "raise"
+      },
+      {
+        "scenario": "de-escalate-worthy",
+        "expected_direction": "lower_or_hold",
+        "escalation": "raise"
+      },
+      {
+        "scenario": "de-escalate-worthy",
+        "expected_direction": "lower_or_hold",
+        "escalation": "raise"
+      }
+    ]
+  },
+  "latency": {
+    "p50_seconds": 0.5115784379886463,
+    "p95_seconds": 0.6902880392837687,
+    "n": 24
+  }
+}

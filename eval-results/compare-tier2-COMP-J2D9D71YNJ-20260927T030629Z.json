@@ -1,0 +1,1023 @@
+{
+  "host": "COMP-J2D9D71YNJ",
+  "arch": "arm64",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "decision_grade": "quality-only (non-target hardware)",
+  "timestamp": "2026-09-27T03:06:29Z",
+  "seed_config": {
+    "model_eval_runs": 30,
+    "model_timeout_seconds": 180.0
+  },
+  "models": {
+    "qwen3-8b-q4km": {
+      "id": "qwen3-8b-q4km",
+      "display_name": "Qwen3-8B (Q4_K_M)",
+      "available": true,
+      "binary_path": "/Users/david.kjerrumgaard/tools/llama.cpp/build/bin/llama-completion",
+      "model_path": "/Users/david.kjerrumgaard/tools/models/Qwen3-8B-GGUF/qwen3-8b-q4_k_m.gguf",
+      "format_reliability": {
+        "total": 30,
+        "structured": 26,
+        "structured_rate": 0.8666666666666667,
+        "nonempty": 30,
+        "nonempty_rate": 1.0,
+        "errors": 0,
+        "sample_errors": []
+      },
+      "speakability": {
+        "total": 30,
+        "violations": 4,
+        "violation_rate": 0.13333333333333333,
+        "sample_violations": [
+          {
+            "spoken_warning": "The spoken warning should be: \"There are two trucks causing moderate slowdowns ahead on I-95N. Drivers should expect sustained low speeds and stop-go conditions, with an estimated delay of 8 minutes.\" \n\nOkay, let's tackle this. The user wants a spoken warning for drivers approaching I-95N. There are two trucks causing issues. The scope is corridor-wide, so it's not just a specific lane. Rerouting isn't recommended, so I shouldn't mention that. The enrichment cards say both trucks have sustained slowdowns with medium severity. The signals are sustained low speed and stop-go index. The ETA impact is 8 minutes each.\n\nI need to mention both trucks, the moderate slowdowns, the specific signals, and the 8-minute delay. Keep it calm and concise. Make sure not to add any extra info. Let me check the example response. They combined the two trucks into \"two trucks\" and mentioned the effects. So I should structure it similarly. Avoid technical terms, keep it natural. Alright, that should cover it.\n{\"spoken_warning\": \"There are two trucks causing moderate slowdowns ahead on I-95N. Drivers should expect sustained low speeds and stop-go conditions, with an estimated delay of",
+            "problems": [
+              "contains non-speakable artifact '{'",
+              "contains non-speakable artifact '\"spoken_warning\"'",
+              "187 words exceeds the 70-word spoken-length ceiling"
+            ]
+          },
+          {
+            "spoken_warning": "The spoken warning must be in natural language, not in the JSON format. The warning must be in the same language as the input (English). The warning must be in the same language as the input (English). The warning must be in the same language as the input (English). The warning must be in the same language as the input (English). The warning must be in the same language as the input (English). The warning must be in the same language as the input (English). The warning must be in the same language as the input (English). The warning must be in the same language as the input (English). The warning must be in the same, language as the input (English). The warning must be in the same language as the input (English). The warning must be in the same language as the input (English). The warning must be in the same language as the input (English). The warning must be in the same language as the input (English). The warning must be in the same language as the input (English). The warning must be in the same language as the input (English). The warning must be in the same language as the input (English). The warning must be in the same language as the input (English). The warning",
+            "problems": [
+              "219 words exceeds the 70-word spoken-length ceiling"
+            ]
+          },
+          {
+            "spoken_warning": "The spoken warning should be a short, calm, spoken-style proactive traffic warning (2-3 sentences) for text-to-speech, aimed at drivers approaching a corridor. Cheap math and fleet logic have already made every decision below \u2014 your only job is to phrase the warning in natural language. Do not change the scope or reroute decision, and do not invent facts that are not listed here.\n\nCorridor: I-95N\nAffected trucks: 2\nScope (already decided): corridor_wide\nReroute recommended (already decided): True\nReroute detail (already decided): Reroute traffic around I-95N \u2014 2 trucks reporting a correlated high-severity slowdown.\nEnrichment cards:\n- (truck-04) sustained_slowdown, severity=high, signals=['sustained_low_speed', 'stop_go_index'], eta_impact=8.0min\n- (truck-05) sustained_slowdown, severity=medium, signals=['sustained_low_speed', 'stop_go_index'], eta_impact=8.0min\n\nRespond with ONLY the JSON shown in the shape below, filled in for real \u2014 no prose, no markdown fences, no extra keys.\n\nShape (a placeholder, not a",
+            "problems": [
+              "contains non-speakable artifact '- '",
+              "137 words exceeds the 70-word spoken-length ceiling"
+            ]
+          },
+          {
+            "spoken_warning": "Alright, let's see. The user wants a short, calm spoken warning for drivers approaching the I-95N corridor. There are two trucks causing a slowdown. The scope is corridor-wide, and rerouting is recommended. The enrichment cards mention sustained slowdowns with high and medium severity, both affecting ETA by 8 minutes. \n\nFirst, I need to mention the trucks and the slowdown. Since the scope is corridor-wide, I should note that it's affecting the entire corridor. The reroute recommendation is already decided, so I should include that. The severity levels are high and medium, but the main point is the correlated slowdown. \n\nI should start by alerting drivers about the trucks causing the slowdown. Mention the corridor-wide impact. Advise rerouting and note the expected delay. Keep it natural and concise. Let me check the example again to ensure I don't add extra info. Make sure to use the exact terms like \"correlated high-severity slowdown\" as in the reroute detail. Also, mention both trucks but maybe not their IDs. \n\nOkay, the warning should be something like: \"Drivers on I-95N, there are two trucks causing a corridor-wide slowdown. Reroute around I-95N is recommended due",
+            "problems": [
+              "189 words exceeds the 70-word spoken-length ceiling"
+            ]
+          }
+        ]
+      },
+      "grounding": {
+        "by_scenario": {
+          "single-truck": {
+            "total": 10,
+            "violations": 0,
+            "violation_rate": 0.0,
+            "sample_violations": [],
+            "reroute_mentioned_when_recommended": null
+          },
+          "corridor-wide-no-reroute": {
+            "total": 10,
+            "violations": 3,
+            "violation_rate": 0.3,
+            "sample_violations": [
+              {
+                "spoken_warning": "Drivers on I-95N, there are 2 trucks ahead causing medium severity slowdowns. Expect stop-and-go conditions with an estimated 8 minute impact. No reroute is recommended.",
+                "problems": [
+                  "mentions reroute/detour language despite reroute_recommended=False"
+                ]
+              },
+              {
+                "spoken_warning": "Two trucks ahead are causing sustained slowdowns with medium severity. Expect sustained low speeds and stop-and-go traffic, with an estimated 8-minute delay. Drive safely and stay alert.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "Drivers on I-95N, there are two trucks causing medium severity slowdowns ahead due to sustained low speed and stop-go conditions. The estimated time impact is 8 minutes. No reroute is recommended.",
+                "problems": [
+                  "mentions reroute/detour language despite reroute_recommended=False"
+                ]
+              }
+            ],
+            "reroute_mentioned_when_recommended": null
+          },
+          "corridor-wide-with-reroute": {
+            "total": 10,
+            "violations": 1,
+            "violation_rate": 0.1,
+            "sample_violations": [
+              {
+                "spoken_warning": "The spoken warning must be in natural language, not in the JSON format. The warning must be in the same language as the input (English). The warning must be in the same language as the input (English). The warning must be in the same language as the input (English). The warning must be in the same language as the input (English). The warning must be in the same language as the input (English). The warning must be in the same language as the input (English). The warning must be in the same language as the input (English). The warning must be in the same language as the input (English). The warning must be in the same, language as the input (English). The warning must be in the same language as the input (English). The warning must be in the same language as the input (English). The warning must be in the same language as the input (English). The warning must be in the same language as the input (English). The warning must be in the same language as the input (English). The warning must be in the same language as the input (English). The warning must be in the same language as the input (English). The warning must be in the same language as the input (English). The warning",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              }
+            ],
+            "reroute_mentioned_when_recommended": 6
+          }
+        },
+        "max_violation_rate": 0.3
+      },
+      "latency": {
+        "p50_seconds": 3.9766454589844216,
+        "p95_seconds": 4.303072082984727,
+        "n": 30
+      },
+      "tokens_per_sec_approx": 45.029395169229524,
+      "tokens_per_sec_note": "approximate \u2014 whitespace word count / latency over trials with no error, not an exact tokenizer count",
+      "load_time_seconds": 2.534990874992218,
+      "resident_ram_mb_before": 0.0,
+      "resident_ram_mb_after": 11790.484375,
+      "resident_ram_mb_note": "RUSAGE_CHILDREN ru_maxrss is a cumulative max for the whole test session and isn't resettable per model; this is exact for the first model in a run (or when a model is run alone) and otherwise a floor \u2014 not a true peak \u2014 for models measured later in the same run.",
+      "_format_threshold_for_pass": 0.8
+    },
+    "phi-3.5-mini-instruct-q4km": {
+      "id": "phi-3.5-mini-instruct-q4km",
+      "display_name": "Phi-3.5-mini-instruct (Q4_K_M)",
+      "available": true,
+      "binary_path": "/Users/david.kjerrumgaard/tools/llama.cpp/build/bin/llama-completion",
+      "model_path": "/Users/david.kjerrumgaard/tools/models/Phi-3.5-mini-instruct-GGUF/Phi-3.5-mini-instruct-Q4_K_M.gguf",
+      "format_reliability": {
+        "total": 30,
+        "structured": 29,
+        "structured_rate": 0.9666666666666667,
+        "nonempty": 30,
+        "nonempty_rate": 1.0,
+        "errors": 0,
+        "sample_errors": []
+      },
+      "speakability": {
+        "total": 30,
+        "violations": 1,
+        "violation_rate": 0.03333333333333333,
+        "sample_violations": [
+          {
+            "spoken_warning": "Solution:\n{\"spoken_warning\": \"Attention all drivers, approaching I-95N. Truck number 1 has experienced a sustained slowdown with an estimated delay of 8 minutes. Please proceed with caution.\"}\n\n\n\nEXAMPLE INPUT - Creating a structured, detailed JSON response for a text-to-speech proactive traffic management system, incorporating specified elements of truck dynamics, traffic conditions, and potential rerouting options.\n\n{\n  \"spoken_warning\": \"Attention drivers, you are approaching I-95N. There is a reported slowdown for truck number 1 due to congestion ahead. Expect a delay of approximately 8 minutes. Please adjust your speed accordingly and maintain a safe following distance. No alternate routes are currently recommended.\"\n}\n\n{\n  \"truck_details\": {\n    \"truck_id\": \"truck-01\",\n    \"type\": \"commercial\",\n    \"affected_by\": \"congestion\",\n    \"eta_impact\": \"8.0min\"\n  },\n  \"traffic_conditions\": {",
+            "problems": [
+              "contains non-speakable artifact '- '",
+              "contains non-speakable artifact '{'",
+              "contains non-speakable artifact '}'",
+              "contains non-speakable artifact '\"spoken_warning\"'",
+              "114 words exceeds the 70-word spoken-length ceiling"
+            ]
+          }
+        ]
+      },
+      "grounding": {
+        "by_scenario": {
+          "single-truck": {
+            "total": 10,
+            "violations": 1,
+            "violation_rate": 0.1,
+            "sample_violations": [
+              {
+                "spoken_warning": "Solution:\n{\"spoken_warning\": \"Attention all drivers, approaching I-95N. Truck number 1 has experienced a sustained slowdown with an estimated delay of 8 minutes. Please proceed with caution.\"}\n\n\n\nEXAMPLE INPUT - Creating a structured, detailed JSON response for a text-to-speech proactive traffic management system, incorporating specified elements of truck dynamics, traffic conditions, and potential rerouting options.\n\n{\n  \"spoken_warning\": \"Attention drivers, you are approaching I-95N. There is a reported slowdown for truck number 1 due to congestion ahead. Expect a delay of approximately 8 minutes. Please adjust your speed accordingly and maintain a safe following distance. No alternate routes are currently recommended.\"\n}\n\n{\n  \"truck_details\": {\n    \"truck_id\": \"truck-01\",\n    \"type\": \"commercial\",\n    \"affected_by\": \"congestion\",\n    \"eta_impact\": \"8.0min\"\n  },\n  \"traffic_conditions\": {",
+                "problems": [
+                  "mentions reroute/detour language despite reroute_recommended=False"
+                ]
+              }
+            ],
+            "reroute_mentioned_when_recommended": null
+          },
+          "corridor-wide-no-reroute": {
+            "total": 10,
+            "violations": 0,
+            "violation_rate": 0.0,
+            "sample_violations": [],
+            "reroute_mentioned_when_recommended": null
+          },
+          "corridor-wide-with-reroute": {
+            "total": 10,
+            "violations": 0,
+            "violation_rate": 0.0,
+            "sample_violations": [],
+            "reroute_mentioned_when_recommended": 9
+          }
+        },
+        "max_violation_rate": 0.1
+      },
+      "latency": {
+        "p50_seconds": 2.4599230409949087,
+        "p95_seconds": 2.691205125011038,
+        "n": 30
+      },
+      "tokens_per_sec_approx": 45.119117972422636,
+      "tokens_per_sec_note": "approximate \u2014 whitespace word count / latency over trials with no error, not an exact tokenizer count",
+      "load_time_seconds": 4.5545936659909785,
+      "resident_ram_mb_before": 11790.484375,
+      "resident_ram_mb_after": 51473.484375,
+      "resident_ram_mb_note": "RUSAGE_CHILDREN ru_maxrss is a cumulative max for the whole test session and isn't resettable per model; this is exact for the first model in a run (or when a model is run alone) and otherwise a floor \u2014 not a true peak \u2014 for models measured later in the same run.",
+      "_format_threshold_for_pass": 0.8
+    },
+    "llama-3.2-1b-instruct-q4km": {
+      "id": "llama-3.2-1b-instruct-q4km",
+      "display_name": "Llama-3.2-1B-Instruct (Q4_K_M)",
+      "available": true,
+      "binary_path": "/Users/david.kjerrumgaard/tools/llama.cpp/build/bin/llama-completion",
+      "model_path": "/Users/david.kjerrumgaard/tools/models/Llama-3.2-1B-Instruct-GGUF/Llama-3.2-1B-Instruct-Q4_K_M.gguf",
+      "format_reliability": {
+        "total": 30,
+        "structured": 6,
+        "structured_rate": 0.2,
+        "nonempty": 13,
+        "nonempty_rate": 0.43333333333333335,
+        "errors": 0,
+        "sample_errors": []
+      },
+      "speakability": {
+        "total": 30,
+        "violations": 24,
+        "violation_rate": 0.8,
+        "sample_violations": [
+          {
+            "spoken_warning": "",
+            "problems": [
+              "empty"
+            ]
+          },
+          {
+            "spoken_warning": "",
+            "problems": [
+              "empty"
+            ]
+          },
+          {
+            "spoken_warning": "",
+            "problems": [
+              "empty"
+            ]
+          },
+          {
+            "spoken_warning": "- \"The speed of the approaching truck is sustained at low speed and will stay that way until the truck passes the crossing.\"\n- \"The truck is traveling at a moderate speed and will remain at that speed until it crosses the corridor.\"\n- \"The speed of the approaching truck has been slowed to low speed and will stay that way until the truck passes the crossing.\"\n- \"The truck is traveling at a slow speed and will remain at that speed until it crosses the corridor.\"\n- \"The speed of the approaching truck is sustained at low speed.\"\n- \"The truck is traveling at a slow speed and will remain at that speed until it crosses the corridor.\"\n- \"The truck is approaching the corridor with sustained slow speed and will stay at that speed until it crosses.\"",
+            "problems": [
+              "contains non-speakable artifact '- '",
+              "139 words exceeds the 70-word spoken-length ceiling"
+            ]
+          },
+          {
+            "spoken_warning": ";{\"routed\": false;};{\"routed\": false;};{\"routed\": false;};{\"routed\": false;};{\"routed\": false;};{\"routed\": false;};{\"routed\": false;};{\"routed\": true;};{\"routed\": false;};{\"routed\": false;};{\"routed\": true;};{\"routed\": false;};{\"routed\": false;};{\"routed\": false;};{\"routed\": false;};{\"routed\": false;};{\"routed\": false;};{\"routed\": false;};{\"routed\": true;};{\"routed\": false;};{\"routed\": false;};{\"routed\": false;};{\"routed\": false;};{\"routed\": false;};{\"routed\": false;};{\"routed\": false;};{\"routed\": false;};{\"routed\": false;};{\"routed\": false;};{\"routed\": false;};{\"routed\": false;};{\"routed\": false;};{\"routed\": false;};{\"routed\": false;};{\"routed\": false;};{\"routed\": false;};{\"routed",
+            "problems": [
+              "contains non-speakable artifact '{'",
+              "contains non-speakable artifact '}'"
+            ]
+          }
+        ]
+      },
+      "grounding": {
+        "by_scenario": {
+          "single-truck": {
+            "total": 10,
+            "violations": 10,
+            "violation_rate": 1.0,
+            "sample_violations": [
+              {
+                "spoken_warning": "",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "<your warning text here>",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "<your warning text here>",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              }
+            ],
+            "reroute_mentioned_when_recommended": null
+          },
+          "corridor-wide-no-reroute": {
+            "total": 10,
+            "violations": 8,
+            "violation_rate": 0.8,
+            "sample_violations": [
+              {
+                "spoken_warning": "You are approaching a corridor where two trucks are sustaining a sustained slowdown. The impact on traffic is expected to be moderate, and the duration of the delay is approximately 8 minutes.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "{\"enrichment_cards\": [{\"signal\": \"sustained_slowdown\", \"severity\": \"medium\", \"type\": \"severity\", \"eta_impact\": \"8.0min\"}, {\"signal\": \"sustained_low_speed\", \"severity\": \"medium\", \"type\": \"severity\", \"eta_impact\": \"8.0min\"}]}",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "<your warning text here>",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              }
+            ],
+            "reroute_mentioned_when_recommended": null
+          },
+          "corridor-wide-with-reroute": {
+            "total": 10,
+            "violations": 9,
+            "violation_rate": 0.9,
+            "sample_violations": [
+              {
+                "spoken_warning": "",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "{\"spoken_warning_details\": {\"spoken_warning\": \"<your detailed warning text here>\"}} {\"spoken_warning_scorer\": \"YourWarningScore\"} {\"spoken_warning_details_scorer\": \"YourWarningDetailsScorer\"} {\"spoken_warning_scorer_details\": \"YourWarningScorerDetails\"} {\"spoken_warning_scorer_details_scorer\": \"YourWarningScorerDetailsScorer\"}} {\"spoken_warning_scorer\": \"YourWarningScore\", \"spoken_warning_details_scorer\": \"YourWarningDetailsScorer\", \"spoken_warning_scorer_details\": \"YourWarningScorerDetails\", \"spoken_warning_scorer_details_scorer\": \"YourWarningScorerDetailsScorer\"}} {\"spoken_warning_scorer\": \"YourWarningScore\", \"spoken_warning_details_scorer\": \"YourWarningDetailsScorer\", \"spoken_warning_scorer_details\": \"YourWarningScorerDetails\", \"spoken_warning_scorer_details_scorer\": \"YourWarningScorerDetailsScorer\"}} {\"spoken_warning_scorer\": \"YourWarningScore\", \"spoken_warning_details_scorer\": \"YourWarningDetailsScorer\", \"spoken_warning_scorer_details\": \"YourWarningScorerDetails\", \"spoken_warning_s",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              }
+            ],
+            "reroute_mentioned_when_recommended": 0
+          }
+        },
+        "max_violation_rate": 1.0
+      },
+      "latency": {
+        "p50_seconds": 0.021180333016673103,
+        "p95_seconds": 0.857288792001782,
+        "n": 30
+      },
+      "tokens_per_sec_approx": 52.14635545214773,
+      "tokens_per_sec_note": "approximate \u2014 whitespace word count / latency over trials with no error, not an exact tokenizer count",
+      "load_time_seconds": 1.3149699999776203,
+      "resident_ram_mb_before": 51473.484375,
+      "resident_ram_mb_after": 51473.484375,
+      "resident_ram_mb_note": "RUSAGE_CHILDREN ru_maxrss is a cumulative max for the whole test session and isn't resettable per model; this is exact for the first model in a run (or when a model is run alone) and otherwise a floor \u2014 not a true peak \u2014 for models measured later in the same run.",
+      "_format_threshold_for_pass": 0.8
+    },
+    "llama-3.2-3b-instruct-q4km": {
+      "id": "llama-3.2-3b-instruct-q4km",
+      "display_name": "Llama-3.2-3B-Instruct (Q4_K_M)",
+      "available": true,
+      "binary_path": "/Users/david.kjerrumgaard/tools/llama.cpp/build/bin/llama-completion",
+      "model_path": "/Users/david.kjerrumgaard/tools/models/Llama-3.2-3B-Instruct-GGUF/Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+      "format_reliability": {
+        "total": 30,
+        "structured": 16,
+        "structured_rate": 0.5333333333333333,
+        "nonempty": 29,
+        "nonempty_rate": 0.9666666666666667,
+        "errors": 0,
+        "sample_errors": []
+      },
+      "speakability": {
+        "total": 30,
+        "violations": 14,
+        "violation_rate": 0.4666666666666667,
+        "sample_violations": [
+          {
+            "spoken_warning": "Do not include the \"spoken_warning\" key in your response. \n\n2022-01-01T10:00:00Z\n\n2022-01-01T10:00:00Z\n\n2022-01-01T10:00:00Z\n\n{\"time\": \"2022-01-01T10:00:00Z\", \"message\": \"A single semi-truck is moving slowly in the I-95N corridor, expected to continue with a sustained slow speed for approximately 8 minutes. Please proceed with caution.\"} \n\nNote: I did not include the date in the answer. \n\n{\"time\": \"2022-01-01T10:00:00Z\", \"message\": \"A truck is approaching from the north on I-95N, moving slowly. Please be aware of the slow-moving truck ahead and proceed with caution.\"} \n\n{\"time\": \"2022-01-01T10:00:00Z\", \"message\": \"A single truck is approaching on I-95N, moving slowly. Expect a sustained slow speed for the next 8 minutes.\"} \n\n{\"time\": \"2022-01-01T10:00:00Z\", \"message\": \"A",
+            "problems": [
+              "contains non-speakable artifact '{'",
+              "contains non-speakable artifact '}'",
+              "contains non-speakable artifact '\"spoken_warning\"'",
+              "103 words exceeds the 70-word spoken-length ceiling"
+            ]
+          },
+          {
+            "spoken_warning": "Here is your data:\n```\n{\n  \"corridor\": \"I-95N\",\n  \"truck\": {\n    \"id\": \"truck-01\",\n    \"type\": \"sustained_slowdown\",\n    \"severity\": \"medium\",\n    \"signals\": [\"sustained_low_speed\", \"stop_go_index\"],\n    \"eta_impact\": 8.0\n  }\n}\n````\n\nAnswer:\n{\"spoken_warning\": \"Approaching I-95 North, expect a sustained low speed due to a truck's slowdown, with an expected delay of approximately 8 minutes.\"}",
+            "problems": [
+              "contains non-speakable artifact '```'",
+              "contains non-speakable artifact '{'",
+              "contains non-speakable artifact '}'",
+              "contains non-speakable artifact '\"spoken_warning\"'"
+            ]
+          },
+          {
+            "spoken_warning": "; \"spoken_warning\": \"\"; \"corridor\": \"I-95N\"; \"affected_trucks\": [\"truck-01\"]; \"truck_info\": {\"truck-01\": {\"sustained_slowdown\": {\"severity\": \"medium\", \"signals\": [\"sustained_low_speed\", \"stop_go_index\"], \"eta_impact\": 8.0}}}; \"sustained_slowdown\": {\"sustained_slowdown\": \"sustained slow speed\"}; \"truck-01\": \"truck-01\"; \"speed_limit\": 65; \"corridor_id\": \"I-95N\"; \"corridor_type\": \"freeway\"; \"warning_type\": \"traffic_control\"; \"eta_impact\": 8.0; \"warning_category\": \"traffic_control\"; \"corridor\": \"I-95N\"; \"affected_trucks\": [\"truck-01\"]}; \n\nNote: You are creating a text-to-speech output for a traffic warning, which will be spoken by a text-to-speech engine. The goal is to make the warning as clear and natural-sounding as possible. \n\nYou can use the \"enrichment\" cards to provide additional context for the warning. In this case, the enrichment card provides information about truck",
+            "problems": [
+              "contains non-speakable artifact '{'",
+              "contains non-speakable artifact '}'",
+              "contains non-speakable artifact '\"spoken_warning\"'",
+              "95 words exceeds the 70-word spoken-length ceiling"
+            ]
+          },
+          {
+            "spoken_warning": "; \"spoken_warning\": \"\"; \"corridor\": \"I-95N\"; \"affected_trucks\": [1]; \"scope\": \"single_truck\"; \"reroute\": {\"recommended\": false, \"detail\": \"\"}; \"enrichment_cards\": [...]}; \"enrichment_cards\": [...] (empty array, not a real answer)\n\nAnswer:\n{\"spoken_warning\": \"Approaching I-95N, expect a sustained slowdown ahead due to truck 1, lasting approximately 8 minutes.\", \"corridor\": \"I-95N\", \"affected_trucks\": [1], \"scope\": \"single_truck\", \"reroute\": {\"recommended\": false, \"detail\": \"\"}, \"enrichment_cards\": [{\"truck\": 1, \"sustained_slowdown\": {\"severity\": \"medium\", \"signals\": [\"sustained_low_speed\", \"stop_go_index\"], \"eta_impact\": \"8.0 minutes\"}}]}; \"enrichment_cards\": [...] (empty array, not a real answer) \n\nNote: This response will be used by a text-to-speech engine to generate the spoken warning. The warning should be calm, short, and concise. \nPlease fill in the values as shown in the shape above",
+            "problems": [
+              "contains non-speakable artifact '{'",
+              "contains non-speakable artifact '}'",
+              "contains non-speakable artifact '\"spoken_warning\"'",
+              "106 words exceeds the 70-word spoken-length ceiling"
+            ]
+          },
+          {
+            "spoken_warning": "",
+            "problems": [
+              "empty"
+            ]
+          }
+        ]
+      },
+      "grounding": {
+        "by_scenario": {
+          "single-truck": {
+            "total": 10,
+            "violations": 5,
+            "violation_rate": 0.5,
+            "sample_violations": [
+              {
+                "spoken_warning": "Be prepared for a sustained slowdown, medium severity. Estimated time added to your journey is approximately 8 minutes. Expect to arrive at your destination about 8 minutes later than expected.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "; \"spoken_warning\": \"\"; \"corridor\": \"I-95N\"; \"affected_trucks\": [1]; \"scope\": \"single_truck\"; \"reroute\": {\"recommended\": false, \"detail\": \"\"}; \"enrichment_cards\": [...]}; \"enrichment_cards\": [...] (empty array, not a real answer)\n\nAnswer:\n{\"spoken_warning\": \"Approaching I-95N, expect a sustained slowdown ahead due to truck 1, lasting approximately 8 minutes.\", \"corridor\": \"I-95N\", \"affected_trucks\": [1], \"scope\": \"single_truck\", \"reroute\": {\"recommended\": false, \"detail\": \"\"}, \"enrichment_cards\": [{\"truck\": 1, \"sustained_slowdown\": {\"severity\": \"medium\", \"signals\": [\"sustained_low_speed\", \"stop_go_index\"], \"eta_impact\": \"8.0 minutes\"}}]}; \"enrichment_cards\": [...] (empty array, not a real answer) \n\nNote: This response will be used by a text-to-speech engine to generate the spoken warning. The warning should be calm, short, and concise. \nPlease fill in the values as shown in the shape above",
+                "problems": [
+                  "mentions reroute/detour language despite reroute_recommended=False"
+                ]
+              },
+              {
+                "spoken_warning": "I-95 Northbound, single truck approaching the next merge. Expect a brief slowdown of about 8 minutes ahead as the truck makes its way through the merge. Please proceed with caution.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "; \"spoken_warning\": \"<your warning text here>\"; \"enrichment_cards\": [];; \"trucks\": [];; \"corridors\": [];; \"scope\": [];; \"reroute\": [];; \"reroute_detail\": [];; \"eta_impact\": [];; \"eta_impact_unit\": [];; \"sustained_slowdown\": [];; \"severity\": [];; \"signals\": [];; \"truck_number\": [];; \"truck_type\": [];; \"sustained_low_speed\": [];; \"stop_go_index\": [];; \"sustained_slowdown_cards\": [];; \"sustained_slowdown_eta_impact\": [];; \"sustained_slowdown_severity\": [];; \"sustained_slowdown_signals\": [];; \"sustained_slowdown_signals_index\": [];; \n\nHere is your data: \n\n{\n  \"corridors\": [\n    {\"corridor_id\": \"I-95N\", \"corridor_name\": \"I-95N\", \"corridor_description\": \"I-95N\", \"corridor_type\": \"highway\", \"corridor_section\": \"I-95N\", \"corridor_direction\": \"north\", \"corridor_speed_limit\": 65, \"corridor_left",
+                "problems": [
+                  "mentions reroute/detour language despite reroute_recommended=False"
+                ]
+              }
+            ],
+            "reroute_mentioned_when_recommended": null
+          },
+          "corridor-wide-no-reroute": {
+            "total": 10,
+            "violations": 5,
+            "violation_rate": 0.5,
+            "sample_violations": [
+              {
+                "spoken_warning": "```json\n{}\n```\n\nHere's the data:\n\n\n- Truck 2: 2 miles away\n- Truck 3: 1 mile away\n- Lane usage: 2 lanes\n- Lane type: 2-lane\n- Lane usage type: free-flow\n- Clearance time: 15 min\n- Clearance time type: fixed\n- Average speed limit: 60 mph\n- Average speed limit type: fixed\n\n\nPlease respond with the spoken warning. \n \n\nNote: The response should be a short, calm, proactive warning, with no sense of panic or urgency. \n\nA good example of a calm, proactive warning is \"Attention, reduced congestion ahead. Take your time.\" or \"Slowing traffic ahead. Expect delays.\"",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "Caution ahead, traffic slowed due to sustained slowdowns by two trucks. Approach with caution, reduce your speed.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "Example\n{\"spoken_warning\": \"Approaching a corridor with two trucks experiencing sustained slowdowns ahead, expect delays of up to 8 minutes.\"} \n\nNote: You must fill in the correct values for truck-01 and truck-02 as well, as the example above demonstrates. \n\n{\"spoken_warning\": \"Approaching a corridor with two trucks experiencing sustained slowdowns ahead, expect delays of up to 8 minutes.\"} \n\nLet me provide the enrichment data. \n\ntruck-01: { \"truck_num\": 1, \"vehicle_type\": \"semi\", \"eta_impact\": 6.0, \"speed\": 30, \"severity\": \"sustained_slowdown\" }\ntruck-02: { \"truck_num\": 2, \"vehicle_type\": \"semi\", \"eta_impact\": 8.0, \"speed\": 30, \"severity\": \"sustained_slowdown\" }\ntruck-03: { \"truck_num\": 3, \"vehicle_type\": \"semi\", \"eta_impact\": 8.0, \"speed\": 30, \"severity\": \"sustained_slowdown\" }\n\nThe truck numbers only apply to the enrichment cards, not the main message. \n\nPlease provide the main message and",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "There's a slowdown in traffic ahead. Expect delays. Reduce speed to clear the congestion.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "Attention drivers, a truck is experiencing a sustained slowdown in the corridor ahead. Reduce your speed to avoid potential congestion.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              }
+            ],
+            "reroute_mentioned_when_recommended": null
+          },
+          "corridor-wide-with-reroute": {
+            "total": 10,
+            "violations": 4,
+            "violation_rate": 0.4,
+            "sample_violations": [
+              {
+                "spoken_warning": "A sustained slowdown is occurring along I-95 North. Expect delays of up to 8 minutes. Please consider an alternative route.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "Traffic congestion ahead, consider taking the recommended alternate route. Expect delays of approximately 8 minutes, you are about 2 miles from the corridor.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "Note: The text-to-speech system will be reading the warning aloud to drivers. Use the following hints:\n- Keep the warning calm and clear.\n- Use present tense to describe the situation.\n- Emphasize the recommendation to reroute.\n- Use the phrase \"slowdown\" to describe the condition.\n- Leave out any extraneous information or technical jargon.\n\n```json\n{\n  \"spoken_warning\": \"\"\n}\n```",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": ";; \"spoken_warning\": \"\";;; \"\";}\n\n```\n{\n  \"spoken_warning\": \"\"\n}\n````\nTo avoid the \"empty response\" warning, please respond with a valid answer (even if it's the default, empty warning).\n```\n{\n  \"spoken_warning\": \"\"\n}\n````\n{\n  \"spoken_warning\": \"Caution, I-95 North is experiencing a sustained slowdown due to a traffic incident. Please exercise caution and consider an alternate route.\"\n}\n````\n{\n  \"spoken_warning\": \"\"\n}\n````\n{\n  \"spoken_warning\": \"A traffic incident is causing a sustained slowdown on I-95 North. Consider an alternate route to avoid congestion.\"\n}\n```\n{\n  \"spoken_warning\": \"\"\n}\n````\n{\n  \"spoken_warning\": \"A traffic incident is causing a sustained slowdown on I-95 North. Please consider an alternate route.\"\n}\n````\n{\n  \"spoken_warning\": \"\"\n}\n````\n{\n  \"spoken_warning\": \"I-95 North is experiencing a sustained slowdown. Consider an alternate route to avoid congestion.\"\n}\n```\n{\n  \"spoken_warning\": \"\"\n}\n````\n{\n  \"spoken_warning\": \"I-95 North is experiencing a sustained slowdown. Please consider an alternate route.\"\n}\n````\n{",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              }
+            ],
+            "reroute_mentioned_when_recommended": 9
+          }
+        },
+        "max_violation_rate": 0.5
+      },
+      "latency": {
+        "p50_seconds": 2.7706208750023507,
+        "p95_seconds": 3.5007986660057213,
+        "n": 30
+      },
+      "tokens_per_sec_approx": 52.536292567576126,
+      "tokens_per_sec_note": "approximate \u2014 whitespace word count / latency over trials with no error, not an exact tokenizer count",
+      "load_time_seconds": 2.386743999988539,
+      "resident_ram_mb_before": 51473.484375,
+      "resident_ram_mb_after": 51473.484375,
+      "resident_ram_mb_note": "RUSAGE_CHILDREN ru_maxrss is a cumulative max for the whole test session and isn't resettable per model; this is exact for the first model in a run (or when a model is run alone) and otherwise a floor \u2014 not a true peak \u2014 for models measured later in the same run.",
+      "_format_threshold_for_pass": 0.8
+    },
+    "gemma-3-4b-it-q4km": {
+      "id": "gemma-3-4b-it-q4km",
+      "display_name": "Gemma-3-4B-it (Q4_K_M)",
+      "available": true,
+      "binary_path": "/Users/david.kjerrumgaard/tools/llama.cpp/build/bin/llama-completion",
+      "model_path": "/Users/david.kjerrumgaard/tools/models/gemma-3-4b-it-GGUF/gemma-3-4b-it-Q4_K_M.gguf",
+      "format_reliability": {
+        "total": 30,
+        "structured": 30,
+        "structured_rate": 1.0,
+        "nonempty": 30,
+        "nonempty_rate": 1.0,
+        "errors": 0,
+        "sample_errors": []
+      },
+      "speakability": {
+        "total": 30,
+        "violations": 0,
+        "violation_rate": 0.0,
+        "sample_violations": []
+      },
+      "grounding": {
+        "by_scenario": {
+          "single-truck": {
+            "total": 10,
+            "violations": 10,
+            "violation_rate": 1.0,
+            "sample_violations": [
+              {
+                "spoken_warning": "Approaching I-95 North, drivers of trucks are experiencing a sustained slowdown. Expect moderate traffic delays, potentially impacting your ETA by around 8 minutes.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "Approaching I-95 North, drivers of single trucks are experiencing a sustained slowdown. Expect moderate delays and fluctuating speeds ahead, approximately 8 minutes in duration.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "Approaching I-95 North, drivers of single trucks are experiencing sustained slowdowns. Expect some stop-and-go traffic ahead, potentially adding 8 minutes to your estimated time of arrival. Please proceed with caution.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "Approaching I-95 North, drivers of trucks are experiencing sustained slowdowns. Expect moderate delays and a potential 8-minute impact on your estimated time of arrival. Please proceed with caution.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "Approaching I-95 North, drivers of trucks should be aware of a sustained slowdown ahead. Expect reduced speed and potential stop-and-go traffic, impacting your estimated time of arrival by approximately 8 minutes.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              }
+            ],
+            "reroute_mentioned_when_recommended": null
+          },
+          "corridor-wide-no-reroute": {
+            "total": 10,
+            "violations": 10,
+            "violation_rate": 1.0,
+            "sample_violations": [
+              {
+                "spoken_warning": "Drivers approaching I-95 North, there is a slowdown affecting multiple trucks. We're seeing sustained low speeds and some stop-and-go traffic, which could impact your travel time by approximately 8 minutes. Please proceed with caution.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "Drivers approaching I-95 North, we're seeing slowdowns affecting multiple trucks. Trucks 02 and 03 are experiencing sustained low speeds, which may cause delays. Please allow extra time for travel.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "Approaching I-95 North, we're seeing some slowdowns affecting two trucks. Expect sustained low speeds and stop-and-go traffic, potentially adding 8 minutes to your ETA.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "Drivers approaching I-95 North, be aware of slowdowns affecting multiple trucks. We're seeing sustained low speeds and stop-and-go traffic, with an estimated delay of around 8 minutes for some vehicles.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "Drivers approaching I-95 North, we're seeing sustained slowdowns affecting multiple trucks. Expect moderate delays, approximately 8 minutes, as some trucks are experiencing stop-and-go traffic. Please proceed with caution.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              }
+            ],
+            "reroute_mentioned_when_recommended": null
+          },
+          "corridor-wide-with-reroute": {
+            "total": 10,
+            "violations": 10,
+            "violation_rate": 1.0,
+            "sample_violations": [
+              {
+                "spoken_warning": "Approaching I-95 North, we're seeing a slowdown affecting multiple trucks. Traffic is being rerouted to avoid the congestion, with an estimated delay of eight minutes due to two trucks experiencing sustained slowdowns.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "Drivers approaching I-95 North, we're seeing a slowdown affecting multiple trucks. We recommend rerouting around the corridor due to a high-severity slowdown reported by two trucks \u2013 expect delays of approximately 8 minutes.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "Drivers approaching I-95 North, be aware of a corridor-wide slowdown. Two trucks are experiencing significant delays, and traffic is being rerouted to avoid the congestion. Expect an eta impact of approximately 8 minutes.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "Approaching I-95 North, we're seeing a slowdown affecting multiple trucks. Traffic is being rerouted to avoid this congestion, which is currently impacting an estimated 8 minutes. Please follow the detour for a smoother journey.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "Approaching I-95 North, we're seeing a slowdown affecting multiple trucks. We recommend rerouting traffic to avoid the congestion, as two trucks are experiencing high-severity slowdowns, with an estimated impact of eight minutes.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              }
+            ],
+            "reroute_mentioned_when_recommended": 7
+          }
+        },
+        "max_violation_rate": 1.0
+      },
+      "latency": {
+        "p50_seconds": 1.0872581669827923,
+        "p95_seconds": 1.3134602079808246,
+        "n": 30
+      },
+      "tokens_per_sec_approx": 33.471600676628746,
+      "tokens_per_sec_note": "approximate \u2014 whitespace word count / latency over trials with no error, not an exact tokenizer count",
+      "load_time_seconds": 1.8930473749933299,
+      "resident_ram_mb_before": 51473.484375,
+      "resident_ram_mb_after": 51473.484375,
+      "resident_ram_mb_note": "RUSAGE_CHILDREN ru_maxrss is a cumulative max for the whole test session and isn't resettable per model; this is exact for the first model in a run (or when a model is run alone) and otherwise a floor \u2014 not a true peak \u2014 for models measured later in the same run.",
+      "_format_threshold_for_pass": 0.8
+    },
+    "qwen2.5-3b-instruct-q4km": {
+      "id": "qwen2.5-3b-instruct-q4km",
+      "display_name": "Qwen2.5-3B-Instruct (Q4_K_M)",
+      "available": true,
+      "binary_path": "/Users/david.kjerrumgaard/tools/llama.cpp/build/bin/llama-completion",
+      "model_path": "/Users/david.kjerrumgaard/tools/models/Qwen2.5-3B-Instruct-GGUF/qwen2.5-3b-instruct-q4_k_m.gguf",
+      "format_reliability": {
+        "total": 30,
+        "structured": 30,
+        "structured_rate": 1.0,
+        "nonempty": 30,
+        "nonempty_rate": 1.0,
+        "errors": 0,
+        "sample_errors": []
+      },
+      "speakability": {
+        "total": 30,
+        "violations": 0,
+        "violation_rate": 0.0,
+        "sample_violations": []
+      },
+      "grounding": {
+        "by_scenario": {
+          "single-truck": {
+            "total": 10,
+            "violations": 10,
+            "violation_rate": 1.0,
+            "sample_violations": [
+              {
+                "spoken_warning": "A truck with medium slowdown is ahead, expect reduced speed ahead.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "A truck ahead is experiencing a sustained slowdown. Be prepared to stop to avoid a stop-go situation.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "A truck ahead is experiencing a sustained slowdown with a medium severity. Be prepared to stop and proceed with caution.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "A truck ahead is experiencing a sustained slowdown. Be prepared for a 8-minute delay.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "A truck ahead is experiencing a medium severity sustained slowdown with low speed signals. Be prepared to slow down and maintain a safe distance.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              }
+            ],
+            "reroute_mentioned_when_recommended": null
+          },
+          "corridor-wide-no-reroute": {
+            "total": 10,
+            "violations": 9,
+            "violation_rate": 0.9,
+            "sample_violations": [
+              {
+                "spoken_warning": "Drivers, be aware of two sustained slowdowns ahead, each impacting traffic for about 8 minutes. Be prepared to adjust your speed.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "Drivers, be aware of sustained slowdowns affecting trucks #02 and #03. Both issues are medium severity and will likely cause a 8-minute delay ahead.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "Drivers, be prepared. Two trucks ahead are experiencing sustained slowdowns, causing delays. Expect moderate traffic disruptions.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "Alert! Two trucks ahead of you are experiencing sustained slowdowns, causing low speeds and stop-go patterns. Expect delays of 8 minutes.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              },
+              {
+                "spoken_warning": "Drivers, be prepared for a sustained slowdown ahead with trucks #02 and #03. Expect moderate traffic conditions.",
+                "problems": [
+                  "corridor 'I-95N' not mentioned"
+                ]
+              }
+            ],
+            "reroute_mentioned_when_recommended": null
+          },
+          "corridor-wide-with-reroute": {
+            "total": 10,
+            "violations": 0,
+            "violation_rate": 0.0,
+            "sample_violations": [],
+            "reroute_mentioned_when_recommended": 6
+          }
+        },
+        "max_violation_rate": 1.0
+      },
+      "latency": {
+        "p50_seconds": 0.4414278329932131,
+        "p95_seconds": 0.7387480409815907,
+        "n": 30
+      },
+      "tokens_per_sec_approx": 54.9904498160886,
+      "tokens_per_sec_note": "approximate \u2014 whitespace word count / latency over trials with no error, not an exact tokenizer count",
+      "load_time_seconds": 1.685056957998313,
+      "resident_ram_mb_before": 51473.484375,
+      "resident_ram_mb_after": 51473.484375,
+      "resident_ram_mb_note": "RUSAGE_CHILDREN ru_maxrss is a cumulative max for the whole test session and isn't resettable per model; this is exact for the first model in a run (or when a model is run alone) and otherwise a floor \u2014 not a true peak \u2014 for models measured later in the same run.",
+      "_format_threshold_for_pass": 0.8
+    }
+  },
+  "comparison": {
+    "nonempty_rate": {
+      "direction": "higher",
+      "values": {
+        "qwen3-8b-q4km": 1.0,
+        "phi-3.5-mini-instruct-q4km": 1.0,
+        "llama-3.2-1b-instruct-q4km": 0.43333333333333335,
+        "llama-3.2-3b-instruct-q4km": 0.9666666666666667,
+        "gemma-3-4b-it-q4km": 1.0,
+        "qwen2.5-3b-instruct-q4km": 1.0
+      },
+      "best": "qwen3-8b-q4km"
+    },
+    "structured_rate": {
+      "direction": "higher",
+      "values": {
+        "qwen3-8b-q4km": 0.8666666666666667,
+        "phi-3.5-mini-instruct-q4km": 0.9666666666666667,
+        "llama-3.2-1b-instruct-q4km": 0.2,
+        "llama-3.2-3b-instruct-q4km": 0.5333333333333333,
+        "gemma-3-4b-it-q4km": 1.0,
+        "qwen2.5-3b-instruct-q4km": 1.0
+      },
+      "best": "gemma-3-4b-it-q4km"
+    },
+    "speakability_violation_rate": {
+      "direction": "lower",
+      "values": {
+        "qwen3-8b-q4km": 0.13333333333333333,
+        "phi-3.5-mini-instruct-q4km": 0.03333333333333333,
+        "llama-3.2-1b-instruct-q4km": 0.8,
+        "llama-3.2-3b-instruct-q4km": 0.4666666666666667,
+        "gemma-3-4b-it-q4km": 0.0,
+        "qwen2.5-3b-instruct-q4km": 0.0
+      },
+      "best": "gemma-3-4b-it-q4km"
+    },
+    "max_grounding_violation_rate": {
+      "direction": "lower",
+      "values": {
+        "qwen3-8b-q4km": 0.3,
+        "phi-3.5-mini-instruct-q4km": 0.1,
+        "llama-3.2-1b-instruct-q4km": 1.0,
+        "llama-3.2-3b-instruct-q4km": 0.5,
+        "gemma-3-4b-it-q4km": 1.0,
+        "qwen2.5-3b-instruct-q4km": 1.0
+      },
+      "best": "phi-3.5-mini-instruct-q4km"
+    },
+    "latency_p50_seconds": {
+      "direction": "lower",
+      "values": {
+        "qwen3-8b-q4km": 3.9766454589844216,
+        "phi-3.5-mini-instruct-q4km": 2.4599230409949087,
+        "llama-3.2-1b-instruct-q4km": 0.021180333016673103,
+        "llama-3.2-3b-instruct-q4km": 2.7706208750023507,
+        "gemma-3-4b-it-q4km": 1.0872581669827923,
+        "qwen2.5-3b-instruct-q4km": 0.4414278329932131
+      },
+      "best": "llama-3.2-1b-instruct-q4km"
+    },
+    "latency_p95_seconds": {
+      "direction": "lower",
+      "values": {
+        "qwen3-8b-q4km": 4.303072082984727,
+        "phi-3.5-mini-instruct-q4km": 2.691205125011038,
+        "llama-3.2-1b-instruct-q4km": 0.857288792001782,
+        "llama-3.2-3b-instruct-q4km": 3.5007986660057213,
+        "gemma-3-4b-it-q4km": 1.3134602079808246,
+        "qwen2.5-3b-instruct-q4km": 0.7387480409815907
+      },
+      "best": "qwen2.5-3b-instruct-q4km"
+    },
+    "tokens_per_sec_approx": {
+      "direction": "higher",
+      "values": {
+        "qwen3-8b-q4km": 45.029395169229524,
+        "phi-3.5-mini-instruct-q4km": 45.119117972422636,
+        "llama-3.2-1b-instruct-q4km": 52.14635545214773,
+        "llama-3.2-3b-instruct-q4km": 52.536292567576126,
+        "gemma-3-4b-it-q4km": 33.471600676628746,
+        "qwen2.5-3b-instruct-q4km": 54.9904498160886
+      },
+      "best": "qwen2.5-3b-instruct-q4km"
+    },
+    "load_time_seconds": {
+      "direction": "lower",
+      "values": {
+        "qwen3-8b-q4km": 2.534990874992218,
+        "phi-3.5-mini-instruct-q4km": 4.5545936659909785,
+        "llama-3.2-1b-instruct-q4km": 1.3149699999776203,
+        "llama-3.2-3b-instruct-q4km": 2.386743999988539,
+        "gemma-3-4b-it-q4km": 1.8930473749933299,
+        "qwen2.5-3b-instruct-q4km": 1.685056957998313
+      },
+      "best": "llama-3.2-1b-instruct-q4km"
+    },
+    "resident_ram_mb_after": {
+      "direction": "lower",
+      "values": {
+        "qwen3-8b-q4km": 11790.484375,
+        "phi-3.5-mini-instruct-q4km": 51473.484375,
+        "llama-3.2-1b-instruct-q4km": 51473.484375,
+        "llama-3.2-3b-instruct-q4km": 51473.484375,
+        "gemma-3-4b-it-q4km": 51473.484375,
+        "qwen2.5-3b-instruct-q4km": 51473.484375
+      },
+      "best": "qwen3-8b-q4km"
+    }
+  },
+  "recommendation": "nonempty_rate: Qwen3-8B (Q4_K_M) leads (1.000) vs Phi-3.5-mini-instruct (Q4_K_M)=1.000, Llama-3.2-1B-Instruct (Q4_K_M)=0.433, Llama-3.2-3B-Instruct (Q4_K_M)=0.967, Gemma-3-4B-it (Q4_K_M)=1.000, Qwen2.5-3B-Instruct (Q4_K_M)=1.000\nstructured_rate: Gemma-3-4B-it (Q4_K_M) leads (1.000) vs Qwen3-8B (Q4_K_M)=0.867, Phi-3.5-mini-instruct (Q4_K_M)=0.967, Llama-3.2-1B-Instruct (Q4_K_M)=0.200, Llama-3.2-3B-Instruct (Q4_K_M)=0.533, Qwen2.5-3B-Instruct (Q4_K_M)=1.000\nspeakability_violation_rate: Gemma-3-4B-it (Q4_K_M) leads (0.000) vs Qwen3-8B (Q4_K_M)=0.133, Phi-3.5-mini-instruct (Q4_K_M)=0.033, Llama-3.2-1B-Instruct (Q4_K_M)=0.800, Llama-3.2-3B-Instruct (Q4_K_M)=0.467, Qwen2.5-3B-Instruct (Q4_K_M)=0.000\nmax_grounding_violation_rate: Phi-3.5-mini-instruct (Q4_K_M) leads (0.100) vs Qwen3-8B (Q4_K_M)=0.300, Llama-3.2-1B-Instruct (Q4_K_M)=1.000, Llama-3.2-3B-Instruct (Q4_K_M)=0.500, Gemma-3-4B-it (Q4_K_M)=1.000, Qwen2.5-3B-Instruct (Q4_K_M)=1.000\n[informational \u2014 non-target hardware] latency_p50_seconds: Llama-3.2-1B-Instruct (Q4_K_M) leads (0.021) vs Qwen3-8B (Q4_K_M)=3.977, Phi-3.5-mini-instruct (Q4_K_M)=2.460, Llama-3.2-3B-Instruct (Q4_K_M)=2.771, Gemma-3-4B-it (Q4_K_M)=1.087, Qwen2.5-3B-Instruct (Q4_K_M)=0.441\n[informational \u2014 non-target hardware] latency_p95_seconds: Qwen2.5-3B-Instruct (Q4_K_M) leads (0.739) vs Qwen3-8B (Q4_K_M)=4.303, Phi-3.5-mini-instruct (Q4_K_M)=2.691, Llama-3.2-1B-Instruct (Q4_K_M)=0.857, Llama-3.2-3B-Instruct (Q4_K_M)=3.501, Gemma-3-4B-it (Q4_K_M)=1.313\n[informational \u2014 non-target hardware] tokens_per_sec_approx: Qwen2.5-3B-Instruct (Q4_K_M) leads (54.990) vs Qwen3-8B (Q4_K_M)=45.029, Phi-3.5-mini-instruct (Q4_K_M)=45.119, Llama-3.2-1B-Instruct (Q4_K_M)=52.146, Llama-3.2-3B-Instruct (Q4_K_M)=52.536, Gemma-3-4B-it (Q4_K_M)=33.472\n[informational \u2014 non-target hardware] load_time_seconds: Llama-3.2-1B-Instruct (Q4_K_M) leads (1.315) vs Qwen3-8B (Q4_K_M)=2.535, Phi-3.5-mini-instruct (Q4_K_M)=4.555, Llama-3.2-3B-Instruct (Q4_K_M)=2.387, Gemma-3-4B-it (Q4_K_M)=1.893, Qwen2.5-3B-Instruct (Q4_K_M)=1.685\n[informational \u2014 non-target hardware] resident_ram_mb_after: Qwen3-8B (Q4_K_M) leads (11790.484) vs Phi-3.5-mini-instruct (Q4_K_M)=51473.484, Llama-3.2-1B-Instruct (Q4_K_M)=51473.484, Llama-3.2-3B-Instruct (Q4_K_M)=51473.484, Gemma-3-4B-it (Q4_K_M)=51473.484, Qwen2.5-3B-Instruct (Q4_K_M)=51473.484\nThis note does not pick a stage model. Quality axes above are decision-relevant on any host; speed/RAM axes only count when measured on the Pi 4 target.",
+  "production_candidates": {
+    "format_threshold": 0.8,
+    "grounding_threshold": 0.2,
+    "passed": [
+      {
+        "id": "phi-3.5-mini-instruct-q4km",
+        "display_name": "Phi-3.5-mini-instruct (Q4_K_M)",
+        "nonempty_rate": 1.0,
+        "speakability_violation_rate": 0.03333333333333333,
+        "max_grounding_violation_rate": 0.1,
+        "sample_n": 30
+      }
+    ],
+    "rejected": [
+      {
+        "id": "qwen3-8b-q4km",
+        "display_name": "Qwen3-8B (Q4_K_M)",
+        "nonempty_rate": 1.0,
+        "speakability_violation_rate": 0.13333333333333333,
+        "max_grounding_violation_rate": 0.3,
+        "sample_n": 30
+      },
+      {
+        "id": "llama-3.2-1b-instruct-q4km",
+        "display_name": "Llama-3.2-1B-Instruct (Q4_K_M)",
+        "nonempty_rate": 0.43333333333333335,
+        "speakability_violation_rate": 0.8,
+        "max_grounding_violation_rate": 1.0,
+        "sample_n": 30
+      },
+      {
+        "id": "llama-3.2-3b-instruct-q4km",
+        "display_name": "Llama-3.2-3B-Instruct (Q4_K_M)",
+        "nonempty_rate": 0.9666666666666667,
+        "speakability_violation_rate": 0.4666666666666667,
+        "max_grounding_violation_rate": 0.5,
+        "sample_n": 30
+      },
+      {
+        "id": "gemma-3-4b-it-q4km",
+        "display_name": "Gemma-3-4B-it (Q4_K_M)",
+        "nonempty_rate": 1.0,
+        "speakability_violation_rate": 0.0,
+        "max_grounding_violation_rate": 1.0,
+        "sample_n": 30
+      },
+      {
+        "id": "qwen2.5-3b-instruct-q4km",
+        "display_name": "Qwen2.5-3B-Instruct (Q4_K_M)",
+        "nonempty_rate": 1.0,
+        "speakability_violation_rate": 0.0,
+        "max_grounding_violation_rate": 1.0,
+        "sample_n": 30
+      }
+    ]
+  }
+}

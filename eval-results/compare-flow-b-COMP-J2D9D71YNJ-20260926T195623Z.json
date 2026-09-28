@@ -1,0 +1,753 @@
+{
+  "host": "COMP-J2D9D71YNJ",
+  "arch": "arm64",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "decision_grade": "quality-only (non-target hardware)",
+  "timestamp": "2026-09-26T19:56:23Z",
+  "seed_config": {
+    "model_eval_runs": 30,
+    "model_timeout_seconds": 180.0
+  },
+  "models": {
+    "qwen3-8b-q4km": {
+      "id": "qwen3-8b-q4km",
+      "display_name": "Qwen3-8B (Q4_K_M)",
+      "available": true,
+      "binary_path": "/Users/david.kjerrumgaard/tools/llama.cpp/build/bin/llama-completion",
+      "model_path": "/Users/david.kjerrumgaard/tools/models/Qwen3-8B-GGUF/qwen3-8b-q4_k_m.gguf",
+      "extra_args": [
+        "-no-cnv"
+      ],
+      "format_reliability": {
+        "total": 30,
+        "parsed": 30,
+        "rate": 1.0,
+        "sample_failures": []
+      },
+      "escalation_calibration": {
+        "per_scenario": {
+          "escalate-worthy": {
+            "expected_direction": "raise",
+            "escalation_tally": {
+              "raise": 30
+            },
+            "total": 30,
+            "matched": 30,
+            "match_rate": 1.0
+          },
+          "benign": {
+            "expected_direction": "hold",
+            "escalation_tally": {
+              "hold": 30
+            },
+            "total": 30,
+            "matched": 30,
+            "match_rate": 1.0
+          },
+          "de-escalate-worthy": {
+            "expected_direction": "lower_or_hold",
+            "escalation_tally": {
+              "lower": 11,
+              "hold": 19
+            },
+            "total": 30,
+            "matched": 30,
+            "match_rate": 1.0
+          }
+        },
+        "total": 90,
+        "matched": 90,
+        "mismatches": 0,
+        "mismatch_rate": 0.0,
+        "sample_mismatches": [],
+        "gate2_confirmed": true,
+        "gate2_per_scenario_n": 30,
+        "gate2_format_threshold": 0.8
+      },
+      "latency": {
+        "p50_seconds": 2.5687226044974523,
+        "p95_seconds": 3.148335197889537,
+        "n": 120
+      },
+      "tokens_per_sec_approx": 24.68015564110472,
+      "tokens_per_sec_note": "approximate \u2014 whitespace word count / latency over parsed trials, not an exact tokenizer count",
+      "load_time_seconds": 0.7454447089985479,
+      "resident_ram_mb_before": 0.0,
+      "resident_ram_mb_after": 10718.265625,
+      "resident_ram_mb_note": "RUSAGE_CHILDREN ru_maxrss is a cumulative max for the whole test session and isn't resettable per model; this is exact for the first model in a run (or when a model is run alone) and otherwise a floor \u2014 not a true peak \u2014 for models measured later in the same run."
+    },
+    "gemma-3-1b-it-q4km": {
+      "id": "gemma-3-1b-it-q4km",
+      "display_name": "Gemma-3-1B-it (Q4_K_M)",
+      "available": true,
+      "binary_path": "/Users/david.kjerrumgaard/tools/llama.cpp/build/bin/llama-completion",
+      "model_path": "/Users/david.kjerrumgaard/tools/models/gemma-3-1b-it-GGUF/gemma-3-1b-it-Q4_K_M.gguf",
+      "extra_args": [
+        "-no-cnv"
+      ],
+      "format_reliability": {
+        "total": 30,
+        "parsed": 30,
+        "rate": 1.0,
+        "sample_failures": []
+      },
+      "escalation_calibration": {
+        "per_scenario": {
+          "escalate-worthy": {
+            "expected_direction": "raise",
+            "escalation_tally": {
+              "raise": 30
+            },
+            "total": 30,
+            "matched": 30,
+            "match_rate": 1.0
+          },
+          "benign": {
+            "expected_direction": "hold",
+            "escalation_tally": {
+              "lower": 19,
+              "raise": 8,
+              "hold": 3
+            },
+            "total": 30,
+            "matched": 3,
+            "match_rate": 0.1
+          },
+          "de-escalate-worthy": {
+            "expected_direction": "lower_or_hold",
+            "escalation_tally": {
+              "lower": 7,
+              "raise": 19,
+              "hold": 4
+            },
+            "total": 30,
+            "matched": 11,
+            "match_rate": 0.36666666666666664
+          }
+        },
+        "total": 90,
+        "matched": 44,
+        "mismatches": 46,
+        "mismatch_rate": 0.5111111111111111,
+        "sample_mismatches": [
+          {
+            "scenario": "benign",
+            "expected_direction": "hold",
+            "escalation": "lower"
+          },
+          {
+            "scenario": "benign",
+            "expected_direction": "hold",
+            "escalation": "lower"
+          },
+          {
+            "scenario": "benign",
+            "expected_direction": "hold",
+            "escalation": "lower"
+          },
+          {
+            "scenario": "benign",
+            "expected_direction": "hold",
+            "escalation": "lower"
+          },
+          {
+            "scenario": "benign",
+            "expected_direction": "hold",
+            "escalation": "lower"
+          }
+        ],
+        "gate2_confirmed": true,
+        "gate2_per_scenario_n": 30,
+        "gate2_format_threshold": 0.8
+      },
+      "latency": {
+        "p50_seconds": 0.9692098959931172,
+        "p95_seconds": 1.0609493288662633,
+        "n": 120
+      },
+      "tokens_per_sec_approx": 70.77867717151905,
+      "tokens_per_sec_note": "approximate \u2014 whitespace word count / latency over parsed trials, not an exact tokenizer count",
+      "load_time_seconds": 0.398579458007589,
+      "resident_ram_mb_before": 10718.265625,
+      "resident_ram_mb_after": 10718.265625,
+      "resident_ram_mb_note": "RUSAGE_CHILDREN ru_maxrss is a cumulative max for the whole test session and isn't resettable per model; this is exact for the first model in a run (or when a model is run alone) and otherwise a floor \u2014 not a true peak \u2014 for models measured later in the same run."
+    },
+    "phi-3.5-mini-instruct-q4km": {
+      "id": "phi-3.5-mini-instruct-q4km",
+      "display_name": "Phi-3.5-mini-instruct (Q4_K_M)",
+      "available": true,
+      "binary_path": "/Users/david.kjerrumgaard/tools/llama.cpp/build/bin/llama-completion",
+      "model_path": "/Users/david.kjerrumgaard/tools/models/Phi-3.5-mini-instruct-GGUF/Phi-3.5-mini-instruct-Q4_K_M.gguf",
+      "extra_args": [
+        "-no-cnv"
+      ],
+      "format_reliability": {
+        "total": 30,
+        "parsed": 30,
+        "rate": 1.0,
+        "sample_failures": []
+      },
+      "escalation_calibration": {
+        "per_scenario": {
+          "escalate-worthy": {
+            "expected_direction": "raise",
+            "escalation_tally": {
+              "raise": 30
+            },
+            "total": 30,
+            "matched": 30,
+            "match_rate": 1.0
+          },
+          "benign": {
+            "expected_direction": "hold",
+            "escalation_tally": {
+              "hold": 30
+            },
+            "total": 30,
+            "matched": 30,
+            "match_rate": 1.0
+          },
+          "de-escalate-worthy": {
+            "expected_direction": "lower_or_hold",
+            "escalation_tally": {
+              "hold": 29,
+              "lower": 1
+            },
+            "total": 30,
+            "matched": 30,
+            "match_rate": 1.0
+          }
+        },
+        "total": 90,
+        "matched": 90,
+        "mismatches": 0,
+        "mismatch_rate": 0.0,
+        "sample_mismatches": [],
+        "gate2_confirmed": true,
+        "gate2_per_scenario_n": 30,
+        "gate2_format_threshold": 0.8
+      },
+      "latency": {
+        "p50_seconds": 3.255635749999783,
+        "p95_seconds": 3.335090652400686,
+        "n": 120
+      },
+      "tokens_per_sec_approx": 5.374672541392765,
+      "tokens_per_sec_note": "approximate \u2014 whitespace word count / latency over parsed trials, not an exact tokenizer count",
+      "load_time_seconds": 3.549416875001043,
+      "resident_ram_mb_before": 10718.265625,
+      "resident_ram_mb_after": 50493.859375,
+      "resident_ram_mb_note": "RUSAGE_CHILDREN ru_maxrss is a cumulative max for the whole test session and isn't resettable per model; this is exact for the first model in a run (or when a model is run alone) and otherwise a floor \u2014 not a true peak \u2014 for models measured later in the same run."
+    },
+    "llama-3.2-1b-instruct-q4km": {
+      "id": "llama-3.2-1b-instruct-q4km",
+      "display_name": "Llama-3.2-1B-Instruct (Q4_K_M)",
+      "available": true,
+      "binary_path": "/Users/david.kjerrumgaard/tools/llama.cpp/build/bin/llama-completion",
+      "model_path": "/Users/david.kjerrumgaard/tools/models/Llama-3.2-1B-Instruct-GGUF/Llama-3.2-1B-Instruct-Q4_K_M.gguf",
+      "extra_args": [
+        "-no-cnv"
+      ],
+      "format_reliability": {
+        "total": 30,
+        "parsed": 30,
+        "rate": 1.0,
+        "sample_failures": []
+      },
+      "escalation_calibration": {
+        "per_scenario": {
+          "escalate-worthy": {
+            "expected_direction": "raise",
+            "escalation_tally": {
+              "lower": 6,
+              "hold": 23,
+              "raise": 1
+            },
+            "total": 30,
+            "matched": 1,
+            "match_rate": 0.03333333333333333
+          },
+          "benign": {
+            "expected_direction": "hold",
+            "escalation_tally": {
+              "hold": 25,
+              "lower": 5
+            },
+            "total": 30,
+            "matched": 25,
+            "match_rate": 0.8333333333333334
+          },
+          "de-escalate-worthy": {
+            "expected_direction": "lower_or_hold",
+            "escalation_tally": {
+              "lower": 3,
+              "hold": 27
+            },
+            "total": 30,
+            "matched": 30,
+            "match_rate": 1.0
+          }
+        },
+        "total": 90,
+        "matched": 56,
+        "mismatches": 34,
+        "mismatch_rate": 0.37777777777777777,
+        "sample_mismatches": [
+          {
+            "scenario": "escalate-worthy",
+            "expected_direction": "raise",
+            "escalation": "lower"
+          },
+          {
+            "scenario": "escalate-worthy",
+            "expected_direction": "raise",
+            "escalation": "hold"
+          },
+          {
+            "scenario": "escalate-worthy",
+            "expected_direction": "raise",
+            "escalation": "lower"
+          },
+          {
+            "scenario": "escalate-worthy",
+            "expected_direction": "raise",
+            "escalation": "hold"
+          },
+          {
+            "scenario": "escalate-worthy",
+            "expected_direction": "raise",
+            "escalation": "hold"
+          }
+        ],
+        "gate2_confirmed": true,
+        "gate2_per_scenario_n": 30,
+        "gate2_format_threshold": 0.8
+      },
+      "latency": {
+        "p50_seconds": 0.7636384164943593,
+        "p95_seconds": 0.7849899076754809,
+        "n": 120
+      },
+      "tokens_per_sec_approx": 23.99613429696234,
+      "tokens_per_sec_note": "approximate \u2014 whitespace word count / latency over parsed trials, not an exact tokenizer count",
+      "load_time_seconds": 0.8138877500023227,
+      "resident_ram_mb_before": 50493.859375,
+      "resident_ram_mb_after": 50493.859375,
+      "resident_ram_mb_note": "RUSAGE_CHILDREN ru_maxrss is a cumulative max for the whole test session and isn't resettable per model; this is exact for the first model in a run (or when a model is run alone) and otherwise a floor \u2014 not a true peak \u2014 for models measured later in the same run."
+    },
+    "llama-3.2-3b-instruct-q4km": {
+      "id": "llama-3.2-3b-instruct-q4km",
+      "display_name": "Llama-3.2-3B-Instruct (Q4_K_M)",
+      "available": true,
+      "binary_path": "/Users/david.kjerrumgaard/tools/llama.cpp/build/bin/llama-completion",
+      "model_path": "/Users/david.kjerrumgaard/tools/models/Llama-3.2-3B-Instruct-GGUF/Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+      "extra_args": [
+        "-no-cnv"
+      ],
+      "format_reliability": {
+        "total": 30,
+        "parsed": 30,
+        "rate": 1.0,
+        "sample_failures": []
+      },
+      "escalation_calibration": {
+        "per_scenario": {
+          "escalate-worthy": {
+            "expected_direction": "raise",
+            "escalation_tally": {
+              "raise": 21,
+              "lower": 9
+            },
+            "total": 30,
+            "matched": 21,
+            "match_rate": 0.7
+          },
+          "benign": {
+            "expected_direction": "hold",
+            "escalation_tally": {
+              "lower": 30
+            },
+            "total": 30,
+            "matched": 0,
+            "match_rate": 0.0
+          },
+          "de-escalate-worthy": {
+            "expected_direction": "lower_or_hold",
+            "escalation_tally": {
+              "lower": 30
+            },
+            "total": 30,
+            "matched": 30,
+            "match_rate": 1.0
+          }
+        },
+        "total": 90,
+        "matched": 51,
+        "mismatches": 39,
+        "mismatch_rate": 0.43333333333333335,
+        "sample_mismatches": [
+          {
+            "scenario": "escalate-worthy",
+            "expected_direction": "raise",
+            "escalation": "lower"
+          },
+          {
+            "scenario": "escalate-worthy",
+            "expected_direction": "raise",
+            "escalation": "lower"
+          },
+          {
+            "scenario": "escalate-worthy",
+            "expected_direction": "raise",
+            "escalation": "lower"
+          },
+          {
+            "scenario": "escalate-worthy",
+            "expected_direction": "raise",
+            "escalation": "lower"
+          },
+          {
+            "scenario": "escalate-worthy",
+            "expected_direction": "raise",
+            "escalation": "lower"
+          }
+        ],
+        "gate2_confirmed": true,
+        "gate2_per_scenario_n": 30,
+        "gate2_format_threshold": 0.8
+      },
+      "latency": {
+        "p50_seconds": 1.5447555000137072,
+        "p95_seconds": 1.5772089027057519,
+        "n": 120
+      },
+      "tokens_per_sec_approx": 13.299545439667197,
+      "tokens_per_sec_note": "approximate \u2014 whitespace word count / latency over parsed trials, not an exact tokenizer count",
+      "load_time_seconds": 1.730049332982162,
+      "resident_ram_mb_before": 50493.859375,
+      "resident_ram_mb_after": 50493.859375,
+      "resident_ram_mb_note": "RUSAGE_CHILDREN ru_maxrss is a cumulative max for the whole test session and isn't resettable per model; this is exact for the first model in a run (or when a model is run alone) and otherwise a floor \u2014 not a true peak \u2014 for models measured later in the same run."
+    },
+    "gemma-3-4b-it-q4km": {
+      "id": "gemma-3-4b-it-q4km",
+      "display_name": "Gemma-3-4B-it (Q4_K_M)",
+      "available": true,
+      "binary_path": "/Users/david.kjerrumgaard/tools/llama.cpp/build/bin/llama-completion",
+      "model_path": "/Users/david.kjerrumgaard/tools/models/gemma-3-4b-it-GGUF/gemma-3-4b-it-Q4_K_M.gguf",
+      "extra_args": [
+        "-no-cnv"
+      ],
+      "format_reliability": {
+        "total": 30,
+        "parsed": 30,
+        "rate": 1.0,
+        "sample_failures": []
+      },
+      "escalation_calibration": {
+        "per_scenario": {
+          "escalate-worthy": {
+            "expected_direction": "raise",
+            "escalation_tally": {
+              "raise": 30
+            },
+            "total": 30,
+            "matched": 30,
+            "match_rate": 1.0
+          },
+          "benign": {
+            "expected_direction": "hold",
+            "escalation_tally": {
+              "hold": 30
+            },
+            "total": 30,
+            "matched": 30,
+            "match_rate": 1.0
+          },
+          "de-escalate-worthy": {
+            "expected_direction": "lower_or_hold",
+            "escalation_tally": {
+              "lower": 26,
+              "hold": 4
+            },
+            "total": 30,
+            "matched": 30,
+            "match_rate": 1.0
+          }
+        },
+        "total": 90,
+        "matched": 90,
+        "mismatches": 0,
+        "mismatch_rate": 0.0,
+        "sample_mismatches": [],
+        "gate2_confirmed": true,
+        "gate2_per_scenario_n": 30,
+        "gate2_format_threshold": 0.8
+      },
+      "latency": {
+        "p50_seconds": 1.9235323125030845,
+        "p95_seconds": 2.35247448332957,
+        "n": 120
+      },
+      "tokens_per_sec_approx": 34.901304860230574,
+      "tokens_per_sec_note": "approximate \u2014 whitespace word count / latency over parsed trials, not an exact tokenizer count",
+      "load_time_seconds": 1.3817637079919223,
+      "resident_ram_mb_before": 50493.859375,
+      "resident_ram_mb_after": 50493.859375,
+      "resident_ram_mb_note": "RUSAGE_CHILDREN ru_maxrss is a cumulative max for the whole test session and isn't resettable per model; this is exact for the first model in a run (or when a model is run alone) and otherwise a floor \u2014 not a true peak \u2014 for models measured later in the same run."
+    },
+    "qwen2.5-3b-instruct-q4km": {
+      "id": "qwen2.5-3b-instruct-q4km",
+      "display_name": "Qwen2.5-3B-Instruct (Q4_K_M)",
+      "available": true,
+      "binary_path": "/Users/david.kjerrumgaard/tools/llama.cpp/build/bin/llama-completion",
+      "model_path": "/Users/david.kjerrumgaard/tools/models/Qwen2.5-3B-Instruct-GGUF/qwen2.5-3b-instruct-q4_k_m.gguf",
+      "extra_args": [
+        "-no-cnv"
+      ],
+      "format_reliability": {
+        "total": 30,
+        "parsed": 30,
+        "rate": 1.0,
+        "sample_failures": []
+      },
+      "escalation_calibration": {
+        "per_scenario": {
+          "escalate-worthy": {
+            "expected_direction": "raise",
+            "escalation_tally": {
+              "raise": 3,
+              "lower": 5,
+              "hold": 22
+            },
+            "total": 30,
+            "matched": 3,
+            "match_rate": 0.1
+          },
+          "benign": {
+            "expected_direction": "hold",
+            "escalation_tally": {
+              "hold": 12,
+              "lower": 18
+            },
+            "total": 30,
+            "matched": 12,
+            "match_rate": 0.4
+          },
+          "de-escalate-worthy": {
+            "expected_direction": "lower_or_hold",
+            "escalation_tally": {
+              "hold": 23,
+              "lower": 7
+            },
+            "total": 30,
+            "matched": 30,
+            "match_rate": 1.0
+          }
+        },
+        "total": 90,
+        "matched": 45,
+        "mismatches": 45,
+        "mismatch_rate": 0.5,
+        "sample_mismatches": [
+          {
+            "scenario": "escalate-worthy",
+            "expected_direction": "raise",
+            "escalation": "lower"
+          },
+          {
+            "scenario": "escalate-worthy",
+            "expected_direction": "raise",
+            "escalation": "lower"
+          },
+          {
+            "scenario": "escalate-worthy",
+            "expected_direction": "raise",
+            "escalation": "lower"
+          },
+          {
+            "scenario": "escalate-worthy",
+            "expected_direction": "raise",
+            "escalation": "hold"
+          },
+          {
+            "scenario": "escalate-worthy",
+            "expected_direction": "raise",
+            "escalation": "hold"
+          }
+        ],
+        "gate2_confirmed": true,
+        "gate2_per_scenario_n": 30,
+        "gate2_format_threshold": 0.8
+      },
+      "latency": {
+        "p50_seconds": 0.9505126040021423,
+        "p95_seconds": 1.2229587892390552,
+        "n": 120
+      },
+      "tokens_per_sec_approx": 22.255661456107532,
+      "tokens_per_sec_note": "approximate \u2014 whitespace word count / latency over parsed trials, not an exact tokenizer count",
+      "load_time_seconds": 1.1825105839816388,
+      "resident_ram_mb_before": 50493.859375,
+      "resident_ram_mb_after": 50493.859375,
+      "resident_ram_mb_note": "RUSAGE_CHILDREN ru_maxrss is a cumulative max for the whole test session and isn't resettable per model; this is exact for the first model in a run (or when a model is run alone) and otherwise a floor \u2014 not a true peak \u2014 for models measured later in the same run."
+    }
+  },
+  "comparison": {
+    "format_parse_rate": {
+      "direction": "higher",
+      "values": {
+        "qwen3-8b-q4km": 1.0,
+        "gemma-3-1b-it-q4km": 1.0,
+        "phi-3.5-mini-instruct-q4km": 1.0,
+        "llama-3.2-1b-instruct-q4km": 1.0,
+        "llama-3.2-3b-instruct-q4km": 1.0,
+        "gemma-3-4b-it-q4km": 1.0,
+        "qwen2.5-3b-instruct-q4km": 1.0
+      },
+      "best": "qwen3-8b-q4km"
+    },
+    "escalation_mismatch_rate": {
+      "direction": "lower",
+      "values": {
+        "qwen3-8b-q4km": 0.0,
+        "gemma-3-1b-it-q4km": 0.5111111111111111,
+        "phi-3.5-mini-instruct-q4km": 0.0,
+        "llama-3.2-1b-instruct-q4km": 0.37777777777777777,
+        "llama-3.2-3b-instruct-q4km": 0.43333333333333335,
+        "gemma-3-4b-it-q4km": 0.0,
+        "qwen2.5-3b-instruct-q4km": 0.5
+      },
+      "best": "qwen3-8b-q4km"
+    },
+    "latency_p50_seconds": {
+      "direction": "lower",
+      "values": {
+        "qwen3-8b-q4km": 2.5687226044974523,
+        "gemma-3-1b-it-q4km": 0.9692098959931172,
+        "phi-3.5-mini-instruct-q4km": 3.255635749999783,
+        "llama-3.2-1b-instruct-q4km": 0.7636384164943593,
+        "llama-3.2-3b-instruct-q4km": 1.5447555000137072,
+        "gemma-3-4b-it-q4km": 1.9235323125030845,
+        "qwen2.5-3b-instruct-q4km": 0.9505126040021423
+      },
+      "best": "llama-3.2-1b-instruct-q4km"
+    },
+    "latency_p95_seconds": {
+      "direction": "lower",
+      "values": {
+        "qwen3-8b-q4km": 3.148335197889537,
+        "gemma-3-1b-it-q4km": 1.0609493288662633,
+        "phi-3.5-mini-instruct-q4km": 3.335090652400686,
+        "llama-3.2-1b-instruct-q4km": 0.7849899076754809,
+        "llama-3.2-3b-instruct-q4km": 1.5772089027057519,
+        "gemma-3-4b-it-q4km": 2.35247448332957,
+        "qwen2.5-3b-instruct-q4km": 1.2229587892390552
+      },
+      "best": "llama-3.2-1b-instruct-q4km"
+    },
+    "tokens_per_sec_approx": {
+      "direction": "higher",
+      "values": {
+        "qwen3-8b-q4km": 24.68015564110472,
+        "gemma-3-1b-it-q4km": 70.77867717151905,
+        "phi-3.5-mini-instruct-q4km": 5.374672541392765,
+        "llama-3.2-1b-instruct-q4km": 23.99613429696234,
+        "llama-3.2-3b-instruct-q4km": 13.299545439667197,
+        "gemma-3-4b-it-q4km": 34.901304860230574,
+        "qwen2.5-3b-instruct-q4km": 22.255661456107532
+      },
+      "best": "gemma-3-1b-it-q4km"
+    },
+    "load_time_seconds": {
+      "direction": "lower",
+      "values": {
+        "qwen3-8b-q4km": 0.7454447089985479,
+        "gemma-3-1b-it-q4km": 0.398579458007589,
+        "phi-3.5-mini-instruct-q4km": 3.549416875001043,
+        "llama-3.2-1b-instruct-q4km": 0.8138877500023227,
+        "llama-3.2-3b-instruct-q4km": 1.730049332982162,
+        "gemma-3-4b-it-q4km": 1.3817637079919223,
+        "qwen2.5-3b-instruct-q4km": 1.1825105839816388
+      },
+      "best": "gemma-3-1b-it-q4km"
+    },
+    "resident_ram_mb_after": {
+      "direction": "lower",
+      "values": {
+        "qwen3-8b-q4km": 10718.265625,
+        "gemma-3-1b-it-q4km": 10718.265625,
+        "phi-3.5-mini-instruct-q4km": 50493.859375,
+        "llama-3.2-1b-instruct-q4km": 50493.859375,
+        "llama-3.2-3b-instruct-q4km": 50493.859375,
+        "gemma-3-4b-it-q4km": 50493.859375,
+        "qwen2.5-3b-instruct-q4km": 50493.859375
+      },
+      "best": "qwen3-8b-q4km"
+    }
+  },
+  "recommendation": "format_parse_rate: Qwen3-8B (Q4_K_M) leads (1.000) vs Gemma-3-1B-it (Q4_K_M)=1.000, Phi-3.5-mini-instruct (Q4_K_M)=1.000, Llama-3.2-1B-Instruct (Q4_K_M)=1.000, Llama-3.2-3B-Instruct (Q4_K_M)=1.000, Gemma-3-4B-it (Q4_K_M)=1.000, Qwen2.5-3B-Instruct (Q4_K_M)=1.000\nescalation_mismatch_rate: Qwen3-8B (Q4_K_M) leads (0.000) vs Gemma-3-1B-it (Q4_K_M)=0.511, Phi-3.5-mini-instruct (Q4_K_M)=0.000, Llama-3.2-1B-Instruct (Q4_K_M)=0.378, Llama-3.2-3B-Instruct (Q4_K_M)=0.433, Gemma-3-4B-it (Q4_K_M)=0.000, Qwen2.5-3B-Instruct (Q4_K_M)=0.500\n[informational \u2014 non-target hardware] latency_p50_seconds: Llama-3.2-1B-Instruct (Q4_K_M) leads (0.764) vs Qwen3-8B (Q4_K_M)=2.569, Gemma-3-1B-it (Q4_K_M)=0.969, Phi-3.5-mini-instruct (Q4_K_M)=3.256, Llama-3.2-3B-Instruct (Q4_K_M)=1.545, Gemma-3-4B-it (Q4_K_M)=1.924, Qwen2.5-3B-Instruct (Q4_K_M)=0.951\n[informational \u2014 non-target hardware] latency_p95_seconds: Llama-3.2-1B-Instruct (Q4_K_M) leads (0.785) vs Qwen3-8B (Q4_K_M)=3.148, Gemma-3-1B-it (Q4_K_M)=1.061, Phi-3.5-mini-instruct (Q4_K_M)=3.335, Llama-3.2-3B-Instruct (Q4_K_M)=1.577, Gemma-3-4B-it (Q4_K_M)=2.352, Qwen2.5-3B-Instruct (Q4_K_M)=1.223\n[informational \u2014 non-target hardware] tokens_per_sec_approx: Gemma-3-1B-it (Q4_K_M) leads (70.779) vs Qwen3-8B (Q4_K_M)=24.680, Phi-3.5-mini-instruct (Q4_K_M)=5.375, Llama-3.2-1B-Instruct (Q4_K_M)=23.996, Llama-3.2-3B-Instruct (Q4_K_M)=13.300, Gemma-3-4B-it (Q4_K_M)=34.901, Qwen2.5-3B-Instruct (Q4_K_M)=22.256\n[informational \u2014 non-target hardware] load_time_seconds: Gemma-3-1B-it (Q4_K_M) leads (0.399) vs Qwen3-8B (Q4_K_M)=0.745, Phi-3.5-mini-instruct (Q4_K_M)=3.549, Llama-3.2-1B-Instruct (Q4_K_M)=0.814, Llama-3.2-3B-Instruct (Q4_K_M)=1.730, Gemma-3-4B-it (Q4_K_M)=1.382, Qwen2.5-3B-Instruct (Q4_K_M)=1.183\n[informational \u2014 non-target hardware] resident_ram_mb_after: Qwen3-8B (Q4_K_M) leads (10718.266) vs Gemma-3-1B-it (Q4_K_M)=10718.266, Phi-3.5-mini-instruct (Q4_K_M)=50493.859, Llama-3.2-1B-Instruct (Q4_K_M)=50493.859, Llama-3.2-3B-Instruct (Q4_K_M)=50493.859, Gemma-3-4B-it (Q4_K_M)=50493.859, Qwen2.5-3B-Instruct (Q4_K_M)=50493.859\nThis note does not pick a stage model. Quality axes above are decision-relevant on any host; speed/RAM axes only count when measured on the Pi 4 target.",
+  "production_candidates": {
+    "format_threshold": 0.8,
+    "escalation_threshold": 0.5,
+    "passed": [
+      {
+        "id": "qwen3-8b-q4km",
+        "display_name": "Qwen3-8B (Q4_K_M)",
+        "format_parse_rate": 1.0,
+        "gate2_confirmed": true,
+        "escalation_mismatch_rate": 0.0,
+        "escalation_sample_n": 90
+      },
+      {
+        "id": "phi-3.5-mini-instruct-q4km",
+        "display_name": "Phi-3.5-mini-instruct (Q4_K_M)",
+        "format_parse_rate": 1.0,
+        "gate2_confirmed": true,
+        "escalation_mismatch_rate": 0.0,
+        "escalation_sample_n": 90
+      },
+      {
+        "id": "llama-3.2-1b-instruct-q4km",
+        "display_name": "Llama-3.2-1B-Instruct (Q4_K_M)",
+        "format_parse_rate": 1.0,
+        "gate2_confirmed": true,
+        "escalation_mismatch_rate": 0.37777777777777777,
+        "escalation_sample_n": 90
+      },
+      {
+        "id": "llama-3.2-3b-instruct-q4km",
+        "display_name": "Llama-3.2-3B-Instruct (Q4_K_M)",
+        "format_parse_rate": 1.0,
+        "gate2_confirmed": true,
+        "escalation_mismatch_rate": 0.43333333333333335,
+        "escalation_sample_n": 90
+      },
+      {
+        "id": "gemma-3-4b-it-q4km",
+        "display_name": "Gemma-3-4B-it (Q4_K_M)",
+        "format_parse_rate": 1.0,
+        "gate2_confirmed": true,
+        "escalation_mismatch_rate": 0.0,
+        "escalation_sample_n": 90
+      },
+      {
+        "id": "qwen2.5-3b-instruct-q4km",
+        "display_name": "Qwen2.5-3B-Instruct (Q4_K_M)",
+        "format_parse_rate": 1.0,
+        "gate2_confirmed": true,
+        "escalation_mismatch_rate": 0.5,
+        "escalation_sample_n": 90
+      }
+    ],
+    "rejected": [
+      {
+        "id": "gemma-3-1b-it-q4km",
+        "display_name": "Gemma-3-1B-it (Q4_K_M)",
+        "format_parse_rate": 1.0,
+        "gate2_confirmed": true,
+        "escalation_mismatch_rate": 0.5111111111111111,
+        "escalation_sample_n": 90
+      }
+    ]
+  }
+}

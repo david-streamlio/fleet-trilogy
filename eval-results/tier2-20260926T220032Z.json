@@ -1,0 +1,79 @@
+{
+  "config": {
+    "binary_path": "/Users/david.kjerrumgaard/tools/llama.cpp/build/bin/llama-server",
+    "model_path": "/Users/david.kjerrumgaard/tools/models/gemma-3-1b-it-GGUF/gemma-3-1b-it-Q4_K_M.gguf",
+    "host": "COMP-J2D9D71YNJ",
+    "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+    "eval_runs": 9
+  },
+  "format_reliability": {
+    "total": 9,
+    "structured": 9,
+    "structured_rate": 1.0,
+    "nonempty": 9,
+    "nonempty_rate": 1.0,
+    "errors": 0,
+    "sample_errors": []
+  },
+  "speakability": {
+    "total": 9,
+    "violations": 0,
+    "violation_rate": 0.0,
+    "sample_violations": []
+  },
+  "grounding_by_scenario": {
+    "single-truck": {
+      "total": 3,
+      "violations": 1,
+      "violation_rate": 0.3333333333333333,
+      "sample_violations": [
+        {
+          "spoken_warning": "Slow traffic ahead. One truck is slowing down.",
+          "problems": [
+            "corridor 'I-95N' not mentioned"
+          ]
+        }
+      ],
+      "reroute_mentioned_when_recommended": null
+    },
+    "corridor-wide-no-reroute": {
+      "total": 3,
+      "violations": 2,
+      "violation_rate": 0.6666666666666666,
+      "sample_violations": [
+        {
+          "spoken_warning": "Two trucks are slowing down.  Maintain safe distance.",
+          "problems": [
+            "corridor 'I-95N' not mentioned"
+          ]
+        },
+        {
+          "spoken_warning": "Slowdown expected in the corridor. Two trucks are experiencing reduced speed.  Stay alert.",
+          "problems": [
+            "corridor 'I-95N' not mentioned"
+          ]
+        }
+      ],
+      "reroute_mentioned_when_recommended": null
+    },
+    "corridor-wide-with-reroute": {
+      "total": 3,
+      "violations": 1,
+      "violation_rate": 0.3333333333333333,
+      "sample_violations": [
+        {
+          "spoken_warning": "Rerouting required.  Avoid the corridor due to high-speed traffic.",
+          "problems": [
+            "corridor 'I-95N' not mentioned"
+          ]
+        }
+      ],
+      "reroute_mentioned_when_recommended": 1
+    }
+  },
+  "latency": {
+    "p50_seconds": 1.0524670829763636,
+    "p95_seconds": 1.100705791002838,
+    "n": 9
+  }
+}

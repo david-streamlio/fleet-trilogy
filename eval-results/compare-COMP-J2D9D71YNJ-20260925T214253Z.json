@@ -1,0 +1,1043 @@
+{
+  "host": "COMP-J2D9D71YNJ",
+  "arch": "arm64",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "decision_grade": "quality-only (non-target hardware)",
+  "timestamp": "2026-09-25T21:42:53Z",
+  "seed_config": {
+    "model_eval_runs": 30,
+    "model_timeout_seconds": 180.0,
+    "accuracy_fleet_size": 6,
+    "accuracy_incident_trucks": 3,
+    "accuracy_ticks": 30,
+    "accuracy_seed": 1234
+  },
+  "models": {
+    "qwen3-8b-q4km": {
+      "id": "qwen3-8b-q4km",
+      "display_name": "Qwen3-8B (Q4_K_M)",
+      "available": true,
+      "binary_path": "/Users/david.kjerrumgaard/tools/llama.cpp/build/bin/llama-completion",
+      "model_path": "/Users/david.kjerrumgaard/tools/models/Qwen3-8B-GGUF/qwen3-8b-q4_k_m.gguf",
+      "extra_args": [
+        "-no-cnv"
+      ],
+      "format_reliability": {
+        "total": 30,
+        "parsed": 29,
+        "rate": 0.9666666666666667,
+        "sample_failures": [
+          {
+            "raw_output": "You are generating a structured enrichment card for fleet dispatch. Cheap math has already detected the signals below \u2014 do not re-derive detection, just classify severity and describe the ETA impact.\n\nRespond with ONLY a single JSON object with exactly these keys: \"event\", \"severity\", \"signals\", \"eta_impact\", \"corridor\", \"truck_id\". No prose, no markdown fences.\n\nTruck: truck-47\nCorridor: I-95N\nSignals detected by cheap math: ['sustained_low_speed', 'stop_go_index', 'eta_slip']\nRolling average speed: 35.0 mph\nETA slip: 6.0 minutes\n\n\"severity\" MUST be exactly one of \"low\", \"medium\", or \"high\", using these exact ETA slip thresholds \u2014 no other rule: \"low\" means ETA slip under 5.0 minutes, \"medium\" means ETA slip from 5.0 up to (but not including) 15.0 minutes, \"high\" means ETA slip 15.0 minutes or more.\n\n\"eta_impact\" MUST be the ETA slip value given above (6.0) \u2014 copy it exactly, do not invent or estimate a different number. \"truck_id\" and \"corridor\" MUST be copied exactly from above. Do not reuse any value from the shape below \u2014\nit is a structure template, not a real answer.\n\nShape (placeholders only, not real values): {\"event\": \"<event_name>\", \"severity\": \"<low|medium|high>\", \"signals\": ['sustained_low_speed', 'stop_go_index', 'eta_slip'], \"eta_impact\": <copy the ETA slip value above>, \"corridor\": \"<copy the corridor above>\", \"truck_id\": \"<copy the truck id above>\"} \n\n{\n  \"event\": \"traffic_congestion\",\n  \"severity\": \"medium\",\n  \"signals\": [\"sustained_low_speed\", \"stop_go_index\", \"eta_slip\"],\n  \"eta_impact\": 6.0,\n  \"corridor\": \"I-95N\",\n  \"truck_id\": \"truck-47\"\n}\n{\n  \"event\": \"traffic_congestion\",\n  \"severity\": \"medium\",\n  \"signals\": [\"sustained_low_speed\", \"stop_go_index\", \"eta_slip\"],\n  \"eta_impact\": 6.0,\n  \"corridor\": \"I-95N\",\n  \"truck_id\": \"truck-47\"\n}\n{\n  \"event\": \"traffic_congestion\",\n  \"severity\": \"medium\",\n  \"signals\": [\"sustained_low_speed\", \"stop_go_index\", \"eta_slip\"],\n  \"eta_impact\": 6.0,\n  \"cor38\": \"I-95N\",\n  \"truck_id\": \"truck-47\"\n}\n{\n  \"event\": \"traffic_congestion\",\n  \"severity\": \"medium\",\n  \"signals\": [\"sustained_low_speed\", \"stop_go",
+            "error": "1 validation error for EnrichmentCard\ncorridor\n  Field required [type=missing, input_value={'event': 'traffic_conges... 'truck_id': 'truck-47'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/missing"
+          }
+        ]
+      },
+      "grounding": {
+        "total": 30,
+        "violations": 0,
+        "violation_rate": 0.0,
+        "sample_violations": []
+      },
+      "severity_calibration": {
+        "total": 87,
+        "mismatches": 19,
+        "mismatch_rate": 0.21839080459770116,
+        "sample_mismatches": [
+          {
+            "input_eta_slip_min": 3.0,
+            "expected_severity": "low",
+            "actual_severity": "medium",
+            "output": {
+              "event": "traffic_congestion",
+              "severity": "medium",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": 3.0,
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            }
+          },
+          {
+            "input_eta_slip_min": 3.0,
+            "expected_severity": "low",
+            "actual_severity": "medium",
+            "output": {
+              "event": "traffic_congestion",
+              "severity": "medium",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": 3.0,
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            }
+          },
+          {
+            "input_eta_slip_min": 3.0,
+            "expected_severity": "low",
+            "actual_severity": "medium",
+            "output": {
+              "event": "traffic_congestion",
+              "severity": "medium",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": 3.0,
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            }
+          },
+          {
+            "input_eta_slip_min": 3.0,
+            "expected_severity": "low",
+            "actual_severity": "medium",
+            "output": {
+              "event": "traffic_congestion",
+              "severity": "medium",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": 3.0,
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            }
+          },
+          {
+            "input_eta_slip_min": 3.0,
+            "expected_severity": "low",
+            "actual_severity": "medium",
+            "output": {
+              "event": "traffic_congestion",
+              "severity": "medium",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": 3.0,
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            }
+          }
+        ],
+        "gate2_confirmed": true,
+        "gate2_per_tier_n": 30,
+        "gate2_format_threshold": 0.8
+      },
+      "severity_calibration_gate1": {
+        "total": 30,
+        "mismatches": 8,
+        "mismatch_rate": 0.26666666666666666,
+        "sample_mismatches": [
+          {
+            "input_eta_slip_min": 3.0,
+            "expected_severity": "low",
+            "actual_severity": "medium",
+            "output": {
+              "event": "traffic_congestion",
+              "severity": "medium",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": 3.0,
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            }
+          },
+          {
+            "input_eta_slip_min": 3.0,
+            "expected_severity": "low",
+            "actual_severity": "medium",
+            "output": {
+              "event": "traffic_congestion",
+              "severity": "medium",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": 3.0,
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            }
+          },
+          {
+            "input_eta_slip_min": 3.0,
+            "expected_severity": "low",
+            "actual_severity": "medium",
+            "output": {
+              "event": "traffic_congestion",
+              "severity": "medium",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": 3.0,
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            }
+          },
+          {
+            "input_eta_slip_min": 3.0,
+            "expected_severity": "low",
+            "actual_severity": "medium",
+            "output": {
+              "event": "traffic_congestion",
+              "severity": "medium",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": 3.0,
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            }
+          },
+          {
+            "input_eta_slip_min": 3.0,
+            "expected_severity": "low",
+            "actual_severity": "medium",
+            "output": {
+              "event": "traffic_congestion",
+              "severity": "medium",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": 3.0,
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            }
+          }
+        ],
+        "gate2_confirmed": false
+      },
+      "directional_accuracy": {
+        "total": 180,
+        "confusion_matrix": {
+          "tp": 49,
+          "fp": 1,
+          "fn": 33,
+          "tn": 97
+        },
+        "precision": 0.98,
+        "recall": 0.5975609756097561,
+        "f1": 0.7424242424242423
+      },
+      "latency": {
+        "p50_seconds": 6.263663020989043,
+        "p95_seconds": 7.258592901747033,
+        "n": 230
+      },
+      "tokens_per_sec_approx": 62.05699056994364,
+      "tokens_per_sec_note": "approximate \u2014 whitespace word count / latency over parsed trials, not an exact tokenizer count",
+      "load_time_seconds": 1.9587574589822907,
+      "resident_ram_mb_before": 0.0,
+      "resident_ram_mb_after": 10701.828125,
+      "resident_ram_mb_note": "RUSAGE_CHILDREN ru_maxrss is a cumulative max for the whole test session and isn't resettable per model; this is exact for the first model in a run (or when a model is run alone) and otherwise a floor \u2014 not a true peak \u2014 for models measured later in the same run."
+    },
+    "gemma-3-1b-it-q4km": {
+      "id": "gemma-3-1b-it-q4km",
+      "display_name": "Gemma-3-1B-it (Q4_K_M)",
+      "available": true,
+      "binary_path": "/Users/david.kjerrumgaard/tools/llama.cpp/build/bin/llama-completion",
+      "model_path": "/Users/david.kjerrumgaard/tools/models/gemma-3-1b-it-GGUF/gemma-3-1b-it-Q4_K_M.gguf",
+      "extra_args": [
+        "-no-cnv"
+      ],
+      "format_reliability": {
+        "total": 30,
+        "parsed": 30,
+        "rate": 1.0,
+        "sample_failures": []
+      },
+      "grounding": {
+        "total": 30,
+        "violations": 0,
+        "violation_rate": 0.0,
+        "sample_violations": []
+      },
+      "severity_calibration": {
+        "total": 90,
+        "mismatches": 58,
+        "mismatch_rate": 0.6444444444444445,
+        "sample_mismatches": [
+          {
+            "input_eta_slip_min": 3.0,
+            "expected_severity": "low",
+            "actual_severity": "high",
+            "output": {
+              "event": "Truck Slowdown",
+              "severity": "high",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": 3.0,
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            }
+          },
+          {
+            "input_eta_slip_min": 3.0,
+            "expected_severity": "low",
+            "actual_severity": "medium",
+            "output": {
+              "event": "truck_stop",
+              "severity": "medium",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": 3.0,
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            }
+          },
+          {
+            "input_eta_slip_min": 3.0,
+            "expected_severity": "low",
+            "actual_severity": "high",
+            "output": {
+              "event": "truck_stop",
+              "severity": "high",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": 15.0,
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            }
+          },
+          {
+            "input_eta_slip_min": 3.0,
+            "expected_severity": "low",
+            "actual_severity": "high",
+            "output": {
+              "event": "truck_stop",
+              "severity": "high",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": 3.0,
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            }
+          },
+          {
+            "input_eta_slip_min": 3.0,
+            "expected_severity": "low",
+            "actual_severity": "high",
+            "output": {
+              "event": "Truck Slowdown",
+              "severity": "high",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": 3.0,
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            }
+          }
+        ],
+        "gate2_confirmed": true,
+        "gate2_per_tier_n": 30,
+        "gate2_format_threshold": 0.8
+      },
+      "severity_calibration_gate1": {
+        "total": 30,
+        "mismatches": 19,
+        "mismatch_rate": 0.6333333333333333,
+        "sample_mismatches": [
+          {
+            "input_eta_slip_min": 3.0,
+            "expected_severity": "low",
+            "actual_severity": "high",
+            "output": {
+              "event": "truck_stop",
+              "severity": "high",
+              "signals": [
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": 3.0,
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            }
+          },
+          {
+            "input_eta_slip_min": 3.0,
+            "expected_severity": "low",
+            "actual_severity": "high",
+            "output": {
+              "event": "truck_stop",
+              "severity": "high",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": 3.0,
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            }
+          },
+          {
+            "input_eta_slip_min": 3.0,
+            "expected_severity": "low",
+            "actual_severity": "high",
+            "output": {
+              "event": "truck_stop",
+              "severity": "high",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": 15.0,
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            }
+          },
+          {
+            "input_eta_slip_min": 3.0,
+            "expected_severity": "low",
+            "actual_severity": "high",
+            "output": {
+              "event": "truck_departure",
+              "severity": "high",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": 3.0,
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            }
+          },
+          {
+            "input_eta_slip_min": 3.0,
+            "expected_severity": "low",
+            "actual_severity": "high",
+            "output": {
+              "event": "truck_stop",
+              "severity": "high",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": 15.0,
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            }
+          }
+        ],
+        "gate2_confirmed": false
+      },
+      "directional_accuracy": {
+        "total": 180,
+        "confusion_matrix": {
+          "tp": 49,
+          "fp": 1,
+          "fn": 33,
+          "tn": 97
+        },
+        "precision": 0.98,
+        "recall": 0.5975609756097561,
+        "f1": 0.7424242424242423
+      },
+      "latency": {
+        "p50_seconds": 1.757762229492073,
+        "p95_seconds": 1.8165986127991345,
+        "n": 230
+      },
+      "tokens_per_sec_approx": 152.97838945394312,
+      "tokens_per_sec_note": "approximate \u2014 whitespace word count / latency over parsed trials, not an exact tokenizer count",
+      "load_time_seconds": 0.8252204169984907,
+      "resident_ram_mb_before": 10701.828125,
+      "resident_ram_mb_after": 10701.828125,
+      "resident_ram_mb_note": "RUSAGE_CHILDREN ru_maxrss is a cumulative max for the whole test session and isn't resettable per model; this is exact for the first model in a run (or when a model is run alone) and otherwise a floor \u2014 not a true peak \u2014 for models measured later in the same run."
+    },
+    "qwen3.8-27b-q4km": {
+      "id": "qwen3.8-27b-q4km",
+      "display_name": "Qwen3.8-27B (Q4_K_M)",
+      "available": true,
+      "binary_path": "/Users/david.kjerrumgaard/tools/llama.cpp/build/bin/llama-completion",
+      "model_path": "/Users/david.kjerrumgaard/tools/models/Qwen3.8-27B-GGUF/Qwen3.8-27B-UD-Q4_K_M.gguf",
+      "extra_args": [
+        "-no-cnv"
+      ],
+      "format_reliability": {
+        "total": 30,
+        "parsed": 2,
+        "rate": 0.06666666666666667,
+        "sample_failures": [
+          {
+            "raw_output": "You are generating a structured enrichment card for fleet dispatch. Cheap math has already detected the signals below \u2014 do not re-derive detection, just classify severity and describe the ETA impact.\n\nRespond with ONLY a single JSON object with exactly these keys: \"event\", \"severity\", \"signals\", \"eta_impact\", \"corridor\", \"truck_id\". No prose, no markdown fences.\n\nTruck: truck-47\nCorridor: I-95N\nSignals detected by cheap math: ['sustained_low_speed', 'stop_go_index', 'eta_slip']\nRolling average speed: 35.0 mph\nETA slip: 6.0 minutes\n\n\"severity\" MUST be exactly one of \"low\", \"medium\", or \"high\", using these exact ETA slip thresholds \u2014 no other rule: \"low\" means ETA slip under 5.0 minutes, \"medium\" means ETA slip from 5.0 up to (but not including) 15.0 minutes, \"high\" means ETA slip 15.0 minutes or more.\n\n\"eta_impact\" MUST be the ETA slip value given above (6.0) \u2014 copy it exactly, do not invent or estimate a different number. \"truck_id\" and \"corridor\" MUST be copied exactly from above. Do not reuse any value from the shape below \u2014\nit is a structure template, not a real answer.\n\nShape (placeholders only, not real values): {\"event\": \"<event_name>\", \"severity\": \"<low|medium|high>\", \"signals\": ['sustained_low_speed', 'stop_go_index', 'eta_slip'], \"eta_impact\": <copy the ETA slip value above>, \"corridor\": \"<copy the corridor above>\", \"truck_id\": \"<copy the truck id above>\"} [end of text]",
+            "error": "LLM completion did not contain a JSON object: 'You are generating a structured enrichment card for fleet dispatch. Cheap math has already detected the signals below \u2014 do not re-derive detection, just classify severity and describe the ETA impact.\\n\\nRespond with ONLY a single JSON object with exactly these keys: \"event\", \"severity\", \"signals\", \"eta_impact\", \"corridor\", \"truck_id\". No prose, no markdown fences.\\n\\nTruck: truck-47\\nCorridor: I-95N\\nSignals detected by cheap math: [\"sustained_low_speed\", \"stop_go_index\", \"eta_slip\"]\\nRolling average speed: 35.0 mph\\nETA slip: 6.0 minutes\\n\\n\"severity\" MUST be exactly one of \"low\", \"medium\", or \"high\", using these exact ETA slip thresholds \u2014 no other rule: \"low\" means ETA slip under 5.0 minutes, \"medium\" means ETA slip from 5.0 up to (but not including) 15.0 minutes, \"high\" means ETA slip 15.0 minutes or more.\\n\\n\"eta_impact\" MUST be the ETA slip value given above (6.0) \u2014 copy it exactly, do not invent or estimate a different number. \"truck_id\" and \"corridor\" MUST be copied exactly from above. Do not reuse any value from the shape below \u2014\\nit is a structure template, not a real answer.\\n\\nShape (placeholders only, not real values): {\"event\": \"<event_name>\", \"severity\": \"<low|medium|high>\", \"signals\": [\"sustained_low_speed\", \"stop_go_index\", \"eta_slip\"], \"eta_impact\": <copy the ETA slip value above>, \"corridor\": \"<copy the corridor above>\", \"truck_id\": \"<copy the truck id above>\"} [end of text]'"
+          },
+          {
+            "raw_output": "You are generating a structured enrichment card for fleet dispatch. Cheap math has already detected the signals below \u2014 do not re-derive detection, just classify severity and describe the ETA impact.\n\nRespond with ONLY a single JSON object with exactly these keys: \"event\", \"severity\", \"signals\", \"eta_impact\", \"corridor\", \"truck_id\". No prose, no markdown fences.\n\nTruck: truck-47\nCorridor: I-95N\nSignals detected by cheap math: ['sustained_low_speed', 'stop_go_index', 'eta_slip']\nRolling average speed: 35.0 mph\nETA slip: 6.0 minutes\n\n\"severity\" MUST be exactly one of \"low\", \"medium\", or \"high\", using these exact ETA slip thresholds \u2014 no other rule: \"low\" means ETA slip under 5.0 minutes, \"medium\" means ETA slip from 5.0 up to (but not including) 15.0 minutes, \"high\" means ETA slip 15.0 minutes or more.\n\n\"eta_impact\" MUST be the ETA slip value given above (6.0) \u2014 copy it exactly, do not invent or estimate a different number. \"truck_id\" and \"corridor\" MUST be copied exactly from above. Do not reuse any value from the shape below \u2014\nit is a structure template, not a real answer.\n\nShape (placeholders only, not real values): {\"event\": \"<event_name>\", \"severity\": \"<low|medium|high>\", \"signals\": ['sustained_low_speed', 'stop_go_index', 'eta_slip'], \"eta_impact\": <copy the ETA slip value above>, \"corridor\": \"<copy the corridor above>\", \"truck_id\": \"<copy the truck id above>\"} [end of text]",
+            "error": "LLM completion did not contain a JSON object: 'You are generating a structured enrichment card for fleet dispatch. Cheap math has already detected the signals below \u2014 do not re-derive detection, just classify severity and describe the ETA impact.\\n\\nRespond with ONLY a single JSON object with exactly these keys: \"event\", \"severity\", \"signals\", \"eta_impact\", \"corridor\", \"truck_id\". No prose, no markdown fences.\\n\\nTruck: truck-47\\nCorridor: I-95N\\nSignals detected by cheap math: [\"sustained_low_speed\", \"stop_go_index\", \"eta_slip\"]\\nRolling average speed: 35.0 mph\\nETA slip: 6.0 minutes\\n\\n\"severity\" MUST be exactly one of \"low\", \"medium\", or \"high\", using these exact ETA slip thresholds \u2014 no other rule: \"low\" means ETA slip under 5.0 minutes, \"medium\" means ETA slip from 5.0 up to (but not including) 15.0 minutes, \"high\" means ETA slip 15.0 minutes or more.\\n\\n\"eta_impact\" MUST be the ETA slip value given above (6.0) \u2014 copy it exactly, do not invent or estimate a different number. \"truck_id\" and \"corridor\" MUST be copied exactly from above. Do not reuse any value from the shape below \u2014\\nit is a structure template, not a real answer.\\n\\nShape (placeholders only, not real values): {\"event\": \"<event_name>\", \"severity\": \"<low|medium|high>\", \"signals\": [\"sustained_low_speed\", \"stop_go_index\", \"eta_slip\"], \"eta_impact\": <copy the ETA slip value above>, \"corridor\": \"<copy the corridor above>\", \"truck_id\": \"<copy the truck id above>\"} [end of text]'"
+          },
+          {
+            "raw_output": "You are generating a structured enrichment card for fleet dispatch. Cheap math has already detected the signals below \u2014 do not re-derive detection, just classify severity and describe the ETA impact.\n\nRespond with ONLY a single JSON object with exactly these keys: \"event\", \"severity\", \"signals\", \"eta_impact\", \"corridor\", \"truck_id\". No prose, no markdown fences.\n\nTruck: truck-47\nCorridor: I-95N\nSignals detected by cheap math: ['sustained_low_speed', 'stop_go_index', 'eta_slip']\nRolling average speed: 35.0 mph\nETA slip: 6.0 minutes\n\n\"severity\" MUST be exactly one of \"low\", \"medium\", or \"high\", using these exact ETA slip thresholds \u2014 no other rule: \"low\" means ETA slip under 5.0 minutes, \"medium\" means ETA slip from 5.0 up to (but not including) 15.0 minutes, \"high\" means ETA slip 15.0 minutes or more.\n\n\"eta_impact\" MUST be the ETA slip value given above (6.0) \u2014 copy it exactly, do not invent or estimate a different number. \"truck_id\" and \"corridor\" MUST be copied exactly from above. Do not reuse any value from the shape below \u2014\nit is a structure template, not a real answer.\n\nShape (placeholders only, not real values): {\"event\": \"<event_name>\", \"severity\": \"<low|medium|high>\", \"signals\": ['sustained_low_speed', 'stop_go_index', 'eta_slip'], \"eta_impact\": <copy the ETA slip value above>, \"corridor\": \"<copy the corridor above>\", \"truck_id\": \"<copy the truck id above>\"} [end of text]",
+            "error": "LLM completion did not contain a JSON object: 'You are generating a structured enrichment card for fleet dispatch. Cheap math has already detected the signals below \u2014 do not re-derive detection, just classify severity and describe the ETA impact.\\n\\nRespond with ONLY a single JSON object with exactly these keys: \"event\", \"severity\", \"signals\", \"eta_impact\", \"corridor\", \"truck_id\". No prose, no markdown fences.\\n\\nTruck: truck-47\\nCorridor: I-95N\\nSignals detected by cheap math: [\"sustained_low_speed\", \"stop_go_index\", \"eta_slip\"]\\nRolling average speed: 35.0 mph\\nETA slip: 6.0 minutes\\n\\n\"severity\" MUST be exactly one of \"low\", \"medium\", or \"high\", using these exact ETA slip thresholds \u2014 no other rule: \"low\" means ETA slip under 5.0 minutes, \"medium\" means ETA slip from 5.0 up to (but not including) 15.0 minutes, \"high\" means ETA slip 15.0 minutes or more.\\n\\n\"eta_impact\" MUST be the ETA slip value given above (6.0) \u2014 copy it exactly, do not invent or estimate a different number. \"truck_id\" and \"corridor\" MUST be copied exactly from above. Do not reuse any value from the shape below \u2014\\nit is a structure template, not a real answer.\\n\\nShape (placeholders only, not real values): {\"event\": \"<event_name>\", \"severity\": \"<low|medium|high>\", \"signals\": [\"sustained_low_speed\", \"stop_go_index\", \"eta_slip\"], \"eta_impact\": <copy the ETA slip value above>, \"corridor\": \"<copy the corridor above>\", \"truck_id\": \"<copy the truck id above>\"} [end of text]'"
+          },
+          {
+            "raw_output": "You are generating a structured enrichment card for fleet dispatch. Cheap math has already detected the signals below \u2014 do not re-derive detection, just classify severity and describe the ETA impact.\n\nRespond with ONLY a single JSON object with exactly these keys: \"event\", \"severity\", \"signals\", \"eta_impact\", \"corridor\", \"truck_id\". No prose, no markdown fences.\n\nTruck: truck-47\nCorridor: I-95N\nSignals detected by cheap math: ['sustained_low_speed', 'stop_go_index', 'eta_slip']\nRolling average speed: 35.0 mph\nETA slip: 6.0 minutes\n\n\"severity\" MUST be exactly one of \"low\", \"medium\", or \"high\", using these exact ETA slip thresholds \u2014 no other rule: \"low\" means ETA slip under 5.0 minutes, \"medium\" means ETA slip from 5.0 up to (but not including) 15.0 minutes, \"high\" means ETA slip 15.0 minutes or more.\n\n\"eta_impact\" MUST be the ETA slip value given above (6.0) \u2014 copy it exactly, do not invent or estimate a different number. \"truck_id\" and \"corridor\" MUST be copied exactly from above. Do not reuse any value from the shape below \u2014\nit is a structure template, not a real answer.\n\nShape (placeholders only, not real values): {\"event\": \"<event_name>\", \"severity\": \"<low|medium|high>\", \"signals\": ['sustained_low_speed', 'stop_go_index', 'eta_slip'], \"eta_impact\": <copy the ETA slip value above>, \"corridor\": \"<copy the corridor above>\", \"truck_id\": \"<copy the truck id above>\"} [end of text]",
+            "error": "LLM completion did not contain a JSON object: 'You are generating a structured enrichment card for fleet dispatch. Cheap math has already detected the signals below \u2014 do not re-derive detection, just classify severity and describe the ETA impact.\\n\\nRespond with ONLY a single JSON object with exactly these keys: \"event\", \"severity\", \"signals\", \"eta_impact\", \"corridor\", \"truck_id\". No prose, no markdown fences.\\n\\nTruck: truck-47\\nCorridor: I-95N\\nSignals detected by cheap math: [\"sustained_low_speed\", \"stop_go_index\", \"eta_slip\"]\\nRolling average speed: 35.0 mph\\nETA slip: 6.0 minutes\\n\\n\"severity\" MUST be exactly one of \"low\", \"medium\", or \"high\", using these exact ETA slip thresholds \u2014 no other rule: \"low\" means ETA slip under 5.0 minutes, \"medium\" means ETA slip from 5.0 up to (but not including) 15.0 minutes, \"high\" means ETA slip 15.0 minutes or more.\\n\\n\"eta_impact\" MUST be the ETA slip value given above (6.0) \u2014 copy it exactly, do not invent or estimate a different number. \"truck_id\" and \"corridor\" MUST be copied exactly from above. Do not reuse any value from the shape below \u2014\\nit is a structure template, not a real answer.\\n\\nShape (placeholders only, not real values): {\"event\": \"<event_name>\", \"severity\": \"<low|medium|high>\", \"signals\": [\"sustained_low_speed\", \"stop_go_index\", \"eta_slip\"], \"eta_impact\": <copy the ETA slip value above>, \"corridor\": \"<copy the corridor above>\", \"truck_id\": \"<copy the truck id above>\"} [end of text]'"
+          },
+          {
+            "raw_output": "You are generating a structured enrichment card for fleet dispatch. Cheap math has already detected the signals below \u2014 do not re-derive detection, just classify severity and describe the ETA impact.\n\nRespond with ONLY a single JSON object with exactly these keys: \"event\", \"severity\", \"signals\", \"eta_impact\", \"corridor\", \"truck_id\". No prose, no markdown fences.\n\nTruck: truck-47\nCorridor: I-95N\nSignals detected by cheap math: ['sustained_low_speed', 'stop_go_index', 'eta_slip']\nRolling average speed: 35.0 mph\nETA slip: 6.0 minutes\n\n\"severity\" MUST be exactly one of \"low\", \"medium\", or \"high\", using these exact ETA slip thresholds \u2014 no other rule: \"low\" means ETA slip under 5.0 minutes, \"medium\" means ETA slip from 5.0 up to (but not including) 15.0 minutes, \"high\" means ETA slip 15.0 minutes or more.\n\n\"eta_impact\" MUST be the ETA slip value given above (6.0) \u2014 copy it exactly, do not invent or estimate a different number. \"truck_id\" and \"corridor\" MUST be copied exactly from above. Do not reuse any value from the shape below \u2014\nit is a structure template, not a real answer.\n\nShape (placeholders only, not real values): {\"event\": \"<event_name>\", \"severity\": \"<low|medium|high>\", \"signals\": ['sustained_low_speed', 'stop_go_index', 'eta_slip'], \"eta_impact\": <copy the ETA slip value above>, \"corridor\": \"<copy the corridor above>\", \"truck_id\": \"<copy the truck id above>\"}\n\n<think>\nLet me analyze the request:\n\n- Truck: truck-47\n- Corridor: I-95N\n- Signals: ['sustained_low_speed', 'stop_go_index', 'eta_slip']\n- Rolling average speed: 35.0 mph\n- ETA slip: 6.0 minutes\n\nSeverity determination based on ETA slip thresholds:\n- \"low\" means ETA slip under 5.0 minutes\n- \"medium\" means ETA slip from 5.0 up to (but not including) 15.0 minutes\n- \"high\" means ETA slip 15.0 minutes or more\n\nETA slip is 6.0 minutes. 6.0 is >= 5.0 and < 15.0, so severity is \"medium\".\n\neta_impact: 6.0 (copy exactly)\ntruck_id: \"truck-47\"\ncorridor: \"I-95N\"\nsignals: ['sustained_low_speed', 'stop_go_index', 'eta_slip']\nevent: I need to come up with an event name. Given the signals (sustained low speed, stop-go index, eta slip), this looks like",
+            "error": "LLM completion did not contain a JSON object: 'You are generating a structured enrichment card for fleet dispatch. Cheap math has already detected the signals below \u2014 do not re-derive detection, just classify severity and describe the ETA impact.\\n\\nRespond with ONLY a single JSON object with exactly these keys: \"event\", \"severity\", \"signals\", \"eta_impact\", \"corridor\", \"truck_id\". No prose, no markdown fences.\\n\\nTruck: truck-47\\nCorridor: I-95N\\nSignals detected by cheap math: [\"sustained_low_speed\", \"stop_go_index\", \"eta_slip\"]\\nRolling average speed: 35.0 mph\\nETA slip: 6.0 minutes\\n\\n\"severity\" MUST be exactly one of \"low\", \"medium\", or \"high\", using these exact ETA slip thresholds \u2014 no other rule: \"low\" means ETA slip under 5.0 minutes, \"medium\" means ETA slip from 5.0 up to (but not including) 15.0 minutes, \"high\" means ETA slip 15.0 minutes or more.\\n\\n\"eta_impact\" MUST be the ETA slip value given above (6.0) \u2014 copy it exactly, do not invent or estimate a different number. \"truck_id\" and \"corridor\" MUST be copied exactly from above. Do not reuse any value from the shape below \u2014\\nit is a structure template, not a real answer.\\n\\nShape (placeholders only, not real values): {\"event\": \"<event_name>\", \"severity\": \"<low|medium|high>\", \"signals\": [\"sustained_low_speed\", \"stop_go_index\", \"eta_slip\"], \"eta_impact\": <copy the ETA slip value above>, \"corridor\": \"<copy the corridor above>\", \"truck_id\": \"<copy the truck id above>\"}\\n\\n<think>\\nLet me analyze the request:\\n\\n- Truck: truck-47\\n- Corridor: I-95N\\n- Signals: [\"sustained_low_speed\", \"stop_go_index\", \"eta_slip\"]\\n- Rolling average speed: 35.0 mph\\n- ETA slip: 6.0 minutes\\n\\nSeverity determination based on ETA slip thresholds:\\n- \"low\" means ETA slip under 5.0 minutes\\n- \"medium\" means ETA slip from 5.0 up to (but not including) 15.0 minutes\\n- \"high\" means ETA slip 15.0 minutes or more\\n\\nETA slip is 6.0 minutes. 6.0 is >= 5.0 and < 15.0, so severity is \"medium\".\\n\\neta_impact: 6.0 (copy exactly)\\ntruck_id: \"truck-47\"\\ncorridor: \"I-95N\"\\nsignals: [\"sustained_low_speed\", \"stop_go_index\", \"eta_slip\"]\\nevent: I need to come up with an event name. Given the signals (sustained low speed, stop-go index, eta slip), this looks like'"
+          }
+        ]
+      },
+      "grounding": {
+        "total": 5,
+        "violations": 0,
+        "violation_rate": 0.0,
+        "sample_violations": []
+      },
+      "severity_calibration": {
+        "total": 9,
+        "mismatches": 0,
+        "mismatch_rate": 0.0,
+        "sample_mismatches": [],
+        "gate2_confirmed": false
+      },
+      "severity_calibration_gate1": {
+        "total": 9,
+        "mismatches": 0,
+        "mismatch_rate": 0.0,
+        "sample_mismatches": [],
+        "gate2_confirmed": false
+      },
+      "directional_accuracy": {
+        "total": 180,
+        "confusion_matrix": {
+          "tp": 49,
+          "fp": 1,
+          "fn": 33,
+          "tn": 97
+        },
+        "precision": 0.98,
+        "recall": 0.5975609756097561,
+        "f1": 0.7424242424242423
+      },
+      "latency": {
+        "p50_seconds": 4.507125833508326,
+        "p95_seconds": 25.72231857500155,
+        "n": 140
+      },
+      "tokens_per_sec_approx": 23.57526426556058,
+      "tokens_per_sec_note": "approximate \u2014 whitespace word count / latency over parsed trials, not an exact tokenizer count",
+      "load_time_seconds": 8.997055165993515,
+      "resident_ram_mb_before": 10701.828125,
+      "resident_ram_mb_after": 32109.953125,
+      "resident_ram_mb_note": "RUSAGE_CHILDREN ru_maxrss is a cumulative max for the whole test session and isn't resettable per model; this is exact for the first model in a run (or when a model is run alone) and otherwise a floor \u2014 not a true peak \u2014 for models measured later in the same run."
+    },
+    "phi-3.5-mini-instruct-q4km": {
+      "id": "phi-3.5-mini-instruct-q4km",
+      "display_name": "Phi-3.5-mini-instruct (Q4_K_M)",
+      "available": true,
+      "binary_path": "/Users/david.kjerrumgaard/tools/llama.cpp/build/bin/llama-completion",
+      "model_path": "/Users/david.kjerrumgaard/tools/models/Phi-3.5-mini-instruct-GGUF/Phi-3.5-mini-instruct-Q4_K_M.gguf",
+      "extra_args": [
+        "-no-cnv"
+      ],
+      "format_reliability": {
+        "total": 30,
+        "parsed": 30,
+        "rate": 1.0,
+        "sample_failures": []
+      },
+      "grounding": {
+        "total": 30,
+        "violations": 10,
+        "violation_rate": 0.3333333333333333,
+        "sample_violations": [
+          {
+            "input_eta_slip_min": 18.0,
+            "output": {
+              "event": "",
+              "severity": "high",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": "18.0",
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            },
+            "problems": [
+              "eta_impact '18.0' not within 9.0min of input eta_slip_min 18.0"
+            ]
+          },
+          {
+            "input_eta_slip_min": 18.0,
+            "output": {
+              "event": "ETA Disruption",
+              "severity": "high",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": "18.0",
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            },
+            "problems": [
+              "eta_impact '18.0' not within 9.0min of input eta_slip_min 18.0"
+            ]
+          },
+          {
+            "input_eta_slip_min": 18.0,
+            "output": {
+              "event": "Traffic Delay",
+              "severity": "medium",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": "18.0",
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            },
+            "problems": [
+              "eta_impact '18.0' not within 9.0min of input eta_slip_min 18.0"
+            ]
+          },
+          {
+            "input_eta_slip_min": 18.0,
+            "output": {
+              "event": "Signal Detection",
+              "severity": "high",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": "18.0",
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            },
+            "problems": [
+              "eta_impact '18.0' not within 9.0min of input eta_slip_min 18.0"
+            ]
+          },
+          {
+            "input_eta_slip_min": 18.0,
+            "output": {
+              "event": "Truck delay",
+              "severity": "medium",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index"
+              ],
+              "eta_impact": "18.0",
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            },
+            "problems": [
+              "eta_impact '18.0' not within 9.0min of input eta_slip_min 18.0"
+            ]
+          }
+        ]
+      },
+      "severity_calibration": {
+        "total": 90,
+        "mismatches": 20,
+        "mismatch_rate": 0.2222222222222222,
+        "sample_mismatches": [
+          {
+            "input_eta_slip_min": 3.0,
+            "expected_severity": "low",
+            "actual_severity": "medium",
+            "output": {
+              "event": "Traffic Delay",
+              "severity": "medium",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": 3.0,
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            }
+          },
+          {
+            "input_eta_slip_min": 3.0,
+            "expected_severity": "low",
+            "actual_severity": "medium",
+            "output": {
+              "event": "ETA Slip",
+              "severity": "medium",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": 3.0,
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            }
+          },
+          {
+            "input_eta_slip_min": 3.0,
+            "expected_severity": "low",
+            "actual_severity": "medium",
+            "output": {
+              "event": "Traffic Congestion",
+              "severity": "medium",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": 3.0,
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            }
+          },
+          {
+            "input_eta_slip_min": 3.0,
+            "expected_severity": "low",
+            "actual_severity": "medium",
+            "output": {
+              "event": "Traffic Delay Notification",
+              "severity": "medium",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": 3.0,
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            }
+          },
+          {
+            "input_eta_slip_min": 3.0,
+            "expected_severity": "low",
+            "actual_severity": "medium",
+            "output": {
+              "event": "ETA Slip",
+              "severity": "medium",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": 3.0,
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            }
+          }
+        ],
+        "gate2_confirmed": true,
+        "gate2_per_tier_n": 30,
+        "gate2_format_threshold": 0.8
+      },
+      "severity_calibration_gate1": {
+        "total": 30,
+        "mismatches": 7,
+        "mismatch_rate": 0.23333333333333334,
+        "sample_mismatches": [
+          {
+            "input_eta_slip_min": 3.0,
+            "expected_severity": "low",
+            "actual_severity": "medium",
+            "output": {
+              "event": "Traffic Delay",
+              "severity": "medium",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": 3.0,
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            }
+          },
+          {
+            "input_eta_slip_min": 3.0,
+            "expected_severity": "low",
+            "actual_severity": "medium",
+            "output": {
+              "event": "ETA Slip",
+              "severity": "medium",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": 3.0,
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            }
+          },
+          {
+            "input_eta_slip_min": 3.0,
+            "expected_severity": "low",
+            "actual_severity": "medium",
+            "output": {
+              "event": "Traffic Delay",
+              "severity": "medium",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": "3.0",
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            }
+          },
+          {
+            "input_eta_slip_min": 20.0,
+            "expected_severity": "high",
+            "actual_severity": "medium",
+            "output": {
+              "event": "Traffic Event",
+              "severity": "medium",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": "20.0",
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            }
+          },
+          {
+            "input_eta_slip_min": 20.0,
+            "expected_severity": "high",
+            "actual_severity": "medium",
+            "output": {
+              "event": "Traffic Delay",
+              "severity": "medium",
+              "signals": [
+                "sustained_low_speed",
+                "stop_go_index",
+                "eta_slip"
+              ],
+              "eta_impact": "20.0",
+              "corridor": "I-95N",
+              "truck_id": "truck-47"
+            }
+          }
+        ],
+        "gate2_confirmed": false
+      },
+      "directional_accuracy": {
+        "total": 180,
+        "confusion_matrix": {
+          "tp": 49,
+          "fp": 1,
+          "fn": 33,
+          "tn": 97
+        },
+        "precision": 0.98,
+        "recall": 0.5975609756097561,
+        "f1": 0.7424242424242423
+      },
+      "latency": {
+        "p50_seconds": 5.490064499492291,
+        "p95_seconds": 5.857086810610781,
+        "n": 230
+      },
+      "tokens_per_sec_approx": 49.45923434634171,
+      "tokens_per_sec_note": "approximate \u2014 whitespace word count / latency over parsed trials, not an exact tokenizer count",
+      "load_time_seconds": 5.564636333001545,
+      "resident_ram_mb_before": 32109.953125,
+      "resident_ram_mb_after": 50481.59375,
+      "resident_ram_mb_note": "RUSAGE_CHILDREN ru_maxrss is a cumulative max for the whole test session and isn't resettable per model; this is exact for the first model in a run (or when a model is run alone) and otherwise a floor \u2014 not a true peak \u2014 for models measured later in the same run."
+    }
+  },
+  "comparison": {
+    "format_parse_rate": {
+      "direction": "higher",
+      "values": {
+        "qwen3-8b-q4km": 0.9666666666666667,
+        "gemma-3-1b-it-q4km": 1.0,
+        "qwen3.8-27b-q4km": 0.06666666666666667,
+        "phi-3.5-mini-instruct-q4km": 1.0
+      },
+      "best": "gemma-3-1b-it-q4km"
+    },
+    "grounding_violation_rate": {
+      "direction": "lower",
+      "values": {
+        "qwen3-8b-q4km": 0.0,
+        "gemma-3-1b-it-q4km": 0.0,
+        "qwen3.8-27b-q4km": 0.0,
+        "phi-3.5-mini-instruct-q4km": 0.3333333333333333
+      },
+      "best": "qwen3-8b-q4km"
+    },
+    "severity_mismatch_rate": {
+      "direction": "lower",
+      "values": {
+        "qwen3-8b-q4km": 0.21839080459770116,
+        "gemma-3-1b-it-q4km": 0.6444444444444445,
+        "qwen3.8-27b-q4km": 0.0,
+        "phi-3.5-mini-instruct-q4km": 0.2222222222222222
+      },
+      "best": "qwen3.8-27b-q4km"
+    },
+    "precision": {
+      "direction": "higher",
+      "values": {
+        "qwen3-8b-q4km": 0.98,
+        "gemma-3-1b-it-q4km": 0.98,
+        "qwen3.8-27b-q4km": 0.98,
+        "phi-3.5-mini-instruct-q4km": 0.98
+      },
+      "best": "qwen3-8b-q4km"
+    },
+    "recall": {
+      "direction": "higher",
+      "values": {
+        "qwen3-8b-q4km": 0.5975609756097561,
+        "gemma-3-1b-it-q4km": 0.5975609756097561,
+        "qwen3.8-27b-q4km": 0.5975609756097561,
+        "phi-3.5-mini-instruct-q4km": 0.5975609756097561
+      },
+      "best": "qwen3-8b-q4km"
+    },
+    "f1": {
+      "direction": "higher",
+      "values": {
+        "qwen3-8b-q4km": 0.7424242424242423,
+        "gemma-3-1b-it-q4km": 0.7424242424242423,
+        "qwen3.8-27b-q4km": 0.7424242424242423,
+        "phi-3.5-mini-instruct-q4km": 0.7424242424242423
+      },
+      "best": "qwen3-8b-q4km"
+    },
+    "latency_p50_seconds": {
+      "direction": "lower",
+      "values": {
+        "qwen3-8b-q4km": 6.263663020989043,
+        "gemma-3-1b-it-q4km": 1.757762229492073,
+        "qwen3.8-27b-q4km": 4.507125833508326,
+        "phi-3.5-mini-instruct-q4km": 5.490064499492291
+      },
+      "best": "gemma-3-1b-it-q4km"
+    },
+    "latency_p95_seconds": {
+      "direction": "lower",
+      "values": {
+        "qwen3-8b-q4km": 7.258592901747033,
+        "gemma-3-1b-it-q4km": 1.8165986127991345,
+        "qwen3.8-27b-q4km": 25.72231857500155,
+        "phi-3.5-mini-instruct-q4km": 5.857086810610781
+      },
+      "best": "gemma-3-1b-it-q4km"
+    },
+    "tokens_per_sec_approx": {
+      "direction": "higher",
+      "values": {
+        "qwen3-8b-q4km": 62.05699056994364,
+        "gemma-3-1b-it-q4km": 152.97838945394312,
+        "qwen3.8-27b-q4km": 23.57526426556058,
+        "phi-3.5-mini-instruct-q4km": 49.45923434634171
+      },
+      "best": "gemma-3-1b-it-q4km"
+    },
+    "load_time_seconds": {
+      "direction": "lower",
+      "values": {
+        "qwen3-8b-q4km": 1.9587574589822907,
+        "gemma-3-1b-it-q4km": 0.8252204169984907,
+        "qwen3.8-27b-q4km": 8.997055165993515,
+        "phi-3.5-mini-instruct-q4km": 5.564636333001545
+      },
+      "best": "gemma-3-1b-it-q4km"
+    },
+    "resident_ram_mb_after": {
+      "direction": "lower",
+      "values": {
+        "qwen3-8b-q4km": 10701.828125,
+        "gemma-3-1b-it-q4km": 10701.828125,
+        "qwen3.8-27b-q4km": 32109.953125,
+        "phi-3.5-mini-instruct-q4km": 50481.59375
+      },
+      "best": "qwen3-8b-q4km"
+    }
+  },
+  "recommendation": "format_parse_rate: Gemma-3-1B-it (Q4_K_M) leads (1.000) vs Qwen3-8B (Q4_K_M)=0.967, Qwen3.8-27B (Q4_K_M)=0.067, Phi-3.5-mini-instruct (Q4_K_M)=1.000\ngrounding_violation_rate: Qwen3-8B (Q4_K_M) leads (0.000) vs Gemma-3-1B-it (Q4_K_M)=0.000, Qwen3.8-27B (Q4_K_M)=0.000, Phi-3.5-mini-instruct (Q4_K_M)=0.333\nseverity_mismatch_rate: Qwen3.8-27B (Q4_K_M) leads (0.000) vs Qwen3-8B (Q4_K_M)=0.218, Gemma-3-1B-it (Q4_K_M)=0.644, Phi-3.5-mini-instruct (Q4_K_M)=0.222\nprecision: Qwen3-8B (Q4_K_M) leads (0.980) vs Gemma-3-1B-it (Q4_K_M)=0.980, Qwen3.8-27B (Q4_K_M)=0.980, Phi-3.5-mini-instruct (Q4_K_M)=0.980\nrecall: Qwen3-8B (Q4_K_M) leads (0.598) vs Gemma-3-1B-it (Q4_K_M)=0.598, Qwen3.8-27B (Q4_K_M)=0.598, Phi-3.5-mini-instruct (Q4_K_M)=0.598\nf1: Qwen3-8B (Q4_K_M) leads (0.742) vs Gemma-3-1B-it (Q4_K_M)=0.742, Qwen3.8-27B (Q4_K_M)=0.742, Phi-3.5-mini-instruct (Q4_K_M)=0.742\n[informational \u2014 non-target hardware] latency_p50_seconds: Gemma-3-1B-it (Q4_K_M) leads (1.758) vs Qwen3-8B (Q4_K_M)=6.264, Qwen3.8-27B (Q4_K_M)=4.507, Phi-3.5-mini-instruct (Q4_K_M)=5.490\n[informational \u2014 non-target hardware] latency_p95_seconds: Gemma-3-1B-it (Q4_K_M) leads (1.817) vs Qwen3-8B (Q4_K_M)=7.259, Qwen3.8-27B (Q4_K_M)=25.722, Phi-3.5-mini-instruct (Q4_K_M)=5.857\n[informational \u2014 non-target hardware] tokens_per_sec_approx: Gemma-3-1B-it (Q4_K_M) leads (152.978) vs Qwen3-8B (Q4_K_M)=62.057, Qwen3.8-27B (Q4_K_M)=23.575, Phi-3.5-mini-instruct (Q4_K_M)=49.459\n[informational \u2014 non-target hardware] load_time_seconds: Gemma-3-1B-it (Q4_K_M) leads (0.825) vs Qwen3-8B (Q4_K_M)=1.959, Qwen3.8-27B (Q4_K_M)=8.997, Phi-3.5-mini-instruct (Q4_K_M)=5.565\n[informational \u2014 non-target hardware] resident_ram_mb_after: Qwen3-8B (Q4_K_M) leads (10701.828) vs Gemma-3-1B-it (Q4_K_M)=10701.828, Qwen3.8-27B (Q4_K_M)=32109.953, Phi-3.5-mini-instruct (Q4_K_M)=50481.594\nThis note does not pick a stage model. Quality axes above are decision-relevant on any host; speed/RAM axes only count when measured on the Pi 4 target.",
+  "production_candidates": {
+    "format_threshold": 0.8,
+    "severity_threshold": 0.5,
+    "passed": [
+      {
+        "id": "qwen3-8b-q4km",
+        "display_name": "Qwen3-8B (Q4_K_M)",
+        "format_parse_rate": 0.9666666666666667,
+        "gate2_confirmed": true,
+        "severity_mismatch_rate": 0.21839080459770116,
+        "severity_sample_n": 87
+      },
+      {
+        "id": "phi-3.5-mini-instruct-q4km",
+        "display_name": "Phi-3.5-mini-instruct (Q4_K_M)",
+        "format_parse_rate": 1.0,
+        "gate2_confirmed": true,
+        "severity_mismatch_rate": 0.2222222222222222,
+        "severity_sample_n": 90
+      }
+    ],
+    "rejected": [
+      {
+        "id": "gemma-3-1b-it-q4km",
+        "display_name": "Gemma-3-1B-it (Q4_K_M)",
+        "format_parse_rate": 1.0,
+        "gate2_confirmed": true,
+        "severity_mismatch_rate": 0.6444444444444445,
+        "severity_sample_n": 90
+      },
+      {
+        "id": "qwen3.8-27b-q4km",
+        "display_name": "Qwen3.8-27B (Q4_K_M)",
+        "format_parse_rate": 0.06666666666666667,
+        "gate2_confirmed": false,
+        "severity_mismatch_rate": 0.0,
+        "severity_sample_n": 9
+      }
+    ]
+  }
+}
