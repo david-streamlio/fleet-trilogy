@@ -1,18 +1,22 @@
 [project]
 name = "talk3-pulsar-speaks-english"
 version = "0.1.0"
-description = "Talk 3 stub — Tier 2 global synthesis / full-loop demo (built in a future session)"
+description = "Talk 3 — Pulsar Speaks English: Tier 2 global synthesis, reroutes, and the spoken warning"
 requires-python = ">=3.11"
 dependencies = [
     "fleet-telemetry-model",
     "fleet-simulator",
     "llm-inference",
+    "pulsar-client>=3.5",
 ]
 
 [tool.uv.sources]
 fleet-telemetry-model = { workspace = true }
 fleet-simulator = { workspace = true }
 llm-inference = { workspace = true }
+
+[project.scripts]
+pulsar-speaks-english-report = "talk3_pulsar_speaks_english.report:main"
 
 [build-system]
 requires = ["hatchling"]
