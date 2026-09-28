@@ -1,4 +1,4 @@
-.PHONY: install test test-integration test-model compare-models compare-flow-b-models sim-dryrun
+.PHONY: install test test-integration test-model compare-models compare-flow-b-models compare-tier2-models sim-dryrun
 
 # Installs the whole uv workspace into one venv.
 install:
@@ -36,6 +36,18 @@ compare-models:
 # axes). Writes eval-results/compare-flow-b-<host>-<timestamp>.json.
 compare-flow-b-models:
 	uv run pytest tests/model/test_compare_flow_b_models.py -m model -s $(ARGS)
+
+# Opt-in. Same idea as compare-flow-b-models but for Tier 2 (talk3_pulsar_speaks_
+# english's synthesize()/generate_spoken_warning() — see tier2_eval_lib.py), a
+# fundamentally different task shape: the model never decides anything (scope/
+# reroute are plain code), it only paraphrases already-decided facts into a short
+# spoken-style warning. Measures format reliability (structured vs. fallback-to-
+# raw-text), speakability (TTS-appropriate: no markdown/JSON artifacts, length
+# ceiling), and grounding (does the prose stay faithful to corridor/reroute facts)
+# — none of which are Flow A/B axes. Writes eval-results/compare-tier2-<host>-
+# <timestamp>.json.
+compare-tier2-models:
+	uv run pytest tests/model/test_compare_tier2_models.py -m model -s $(ARGS)
 
 # Sample fleet-simulator output, no Pulsar connection required.
 sim-dryrun:

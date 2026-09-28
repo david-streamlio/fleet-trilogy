@@ -37,6 +37,12 @@ dev = [
 integration = [
     "testcontainers>=4.0",
 ]
+rag = [
+    # Eval-only, for the Flow B retrieval-augmented-precedent experiment
+    # (tests/model/rag_retrieval.py) -- not a dependency of any shipped talk
+    # package, kept out of the default `dev` group so `uv sync` stays lean.
+    "sentence-transformers>=3.0",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["shared", "talks"]
