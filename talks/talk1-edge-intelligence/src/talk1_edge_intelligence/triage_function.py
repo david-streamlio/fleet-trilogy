@@ -50,18 +50,29 @@ severity itself above. The model's only remaining free-text job is risk_synthesi
 explain the escalation decision, not restate it in different words. This removes
 the recommended_action/escalation contradiction by construction rather than by
 hoping a wording change avoids it.
+
+Runtime backend switched from SubprocessLlmBackend to LlmServerBackend
+(2026-09-26): a 14-model Flow B comparison run was measured taking far longer
+than the model spectrum alone predicted. Root cause: SubprocessLlmBackend shells
+out to a one-shot CLI binary per generate() call, so every one of the ~120 trials
+per model reloaded the full model weights and reinitialized the Metal GPU backend
+from scratch (confirmed via `lsof` showing the Metal shader library get re-mapped
+on every subprocess launch). LlmServerBackend starts `llama-server` once and keeps
+it running across every process() call instead — see its docstring in
+llm_inference/client.py for the measured before/after numbers, including the
+fact that this also fixes the file-based prompt cache (`--prompt-cache-ro`)
+having silently never worked at all, since nothing ever wrote that cache file.
 """
 
 from __future__ import annotations
 
 import json
 
-from llm_inference import LlmGenerationConfig, LlmInferenceError, SubprocessLlmBackend
+from llm_inference import LlmGenerationConfig, LlmInferenceError, LlmServerBackend
 from llm_inference.structured import extract_json_object
 
-DEFAULT_BINARY_PATH = "~/tools/llama.cpp/build/bin/llama-completion"
+DEFAULT_BINARY_PATH = "~/tools/llama.cpp/build/bin/llama-server"
 DEFAULT_MODEL_PATH = "~/tools/models/qwen2.5-3b-instruct-GGUF/qwen2.5-3b-instruct-q8_0.gguf"
-DEFAULT_CACHE_PATH = "/tmp/telemetry_base.cache"
 # 150 was fine for the old severity/event_label/dispatch_action shape, but a real
 # diagnostic run found it truncating 8/10 completions once risk_synthesis became
 # the model's only free-text field (Gemma-3-1B-it routinely writes 100+ word
@@ -71,7 +82,11 @@ DEFAULT_CACHE_PATH = "/tmp/telemetry_base.cache"
 # real run that failed 8/10 at 150.
 DEFAULT_MAX_TOKENS = 300
 DEFAULT_TEMPERATURE = 0.2
-DEFAULT_THREADS = 4
+# This dev machine (M4) has 12 performance + 4 efficiency cores (sysctl
+# hw.perflevel0/1.physicalcpu) -- 4 was leaving two-thirds of the performance
+# cores idle. 12 matches the performance-core count, leaving the 4 efficiency
+# cores for the OS/everything else rather than starving them.
+DEFAULT_THREADS = 12
 DEFAULT_TIMEOUT_SECONDS = 60.0
 
 SEVERITY_LEVELS = ("low", "medium", "high")
@@ -200,9 +215,8 @@ class LlmTriageFunction:
 
     def __init__(self) -> None:
         self._configured = False
-        self._backend: SubprocessLlmBackend | None = None
+        self._backend: LlmServerBackend | None = None
         self._prompt_template = DEFAULT_PROMPT_TEMPLATE
-        self._cache_path: str | None = None
         self._max_tokens = DEFAULT_MAX_TOKENS
         self._temperature = DEFAULT_TEMPERATURE
         self._threads = DEFAULT_THREADS
@@ -214,6 +228,12 @@ class LlmTriageFunction:
             self._configure(context)
 
         try:
+            # Idempotent after the first successful call (see LlmServerBackend.start's
+            # docstring) -- cheap to call unconditionally, and doing it here rather than
+            # in _configure keeps a missing binary/model caught by this try/except
+            # instead of propagating out of process() uncaught.
+            self._backend.start()
+
             payload = json.loads(input_item)
             truck_id = payload["truck_id"]
             corridor = payload["corridor"]
@@ -232,16 +252,20 @@ class LlmTriageFunction:
             )
             grammar = build_grammar(truck_id)
 
-            extra_args: tuple[str, ...] = ("--grammar", grammar, "--reverse-prompt", "}")
-            if self._cache_path:
-                extra_args += ("--prompt-cache", self._cache_path, "--prompt-cache-ro")
-
+            # No `stop` sequence here -- the grammar's root rule already ends with a
+            # required literal "}" and grammar-constrained decoding terminates on its
+            # own once that's satisfied (the grammar has no valid continuation after
+            # it). A real run under LlmServerBackend found this out the hard way:
+            # llama-server's `stop` field EXCLUDES the matched text from the returned
+            # content (unlike whatever the old SubprocessLlmBackend/--reverse-prompt
+            # CLI path did), so passing stop=("}",) here silently truncated the
+            # required closing brace off every single completion -- 0% format
+            # reliability, not a subtle miss.
             config = LlmGenerationConfig(
                 max_tokens=self._max_tokens,
                 temperature=self._temperature,
-                threads=self._threads,
                 timeout_seconds=self._timeout_seconds,
-                extra_args=extra_args,
+                grammar=grammar,
             )
             completion = self._backend.generate(prompt, config)
             card = extract_json_object(completion)
@@ -267,15 +291,25 @@ class LlmTriageFunction:
 
     def _configure(self, context) -> None:
         get = context.get_user_config_value
-        self._backend = SubprocessLlmBackend(
-            binary_path=get("llm_binary_path") or DEFAULT_BINARY_PATH,
-            model_path=get("llm_model_path") or DEFAULT_MODEL_PATH,
-            extra_args=("-no-cnv",),
-        )
         self._prompt_template = get("prompt_template") or DEFAULT_PROMPT_TEMPLATE
-        self._cache_path = get("prompt_cache_path") or DEFAULT_CACHE_PATH
         self._max_tokens = int(get("max_tokens") or DEFAULT_MAX_TOKENS)
         self._temperature = float(get("temperature") or DEFAULT_TEMPERATURE)
         self._threads = int(get("threads") or DEFAULT_THREADS)
         self._timeout_seconds = float(get("timeout_seconds") or DEFAULT_TIMEOUT_SECONDS)
+        self._backend = LlmServerBackend(
+            binary_path=get("llm_binary_path") or DEFAULT_BINARY_PATH,
+            model_path=get("llm_model_path") or DEFAULT_MODEL_PATH,
+            threads=self._threads,
+            startup_timeout_seconds=get("server_startup_timeout_seconds") or 60.0,
+        )
         self._configured = True
+
+    def close(self) -> None:
+        """Shuts down the backend's server process, if one was started. Not part of
+        the Pulsar Functions contract (that lifecycle has no explicit teardown hook;
+        a deployed function's server just runs for the process's lifetime) -- this
+        exists for callers that construct many short-lived instances back-to-back,
+        e.g. a multi-model eval harness, which must close model N's server before
+        starting model N+1's to avoid two servers competing for the GPU at once."""
+        if self._backend is not None:
+            self._backend.close()

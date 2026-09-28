@@ -1,21 +1,31 @@
 """Tier 3 model COMPARISON harness — runs the full existing Tier 3 eval set (format
-reliability, grounding, directional accuracy, latency, load time, resident RAM) for
-EVERY model in models.toml, on identical seeded inputs, and produces one combined
-side-by-side artifact + printed table.
+reliability, grounding, severity calibration, directional accuracy, latency, load
+time, resident RAM) for EVERY model in models.toml, on identical seeded inputs, and
+produces one combined side-by-side artifact + printed table.
 
 This file adds no new eval logic. It wraps the existing eval *definitions* —
-run_enrichment_trials / format_reliability / check_grounding / run_directional_accuracy
-from eval_lib.py, and the same event/labeled-batch builders the single-model Tier 3
-tests already use (_truck_47_slowdown_event, _known_value_event, _labeled_batch) — in
-a loop over models.toml, plus the aggregation/reporting that reuse doesn't give you
-for free. Reusing those builders (rather than re-deriving them) is what guarantees
-every model in a given run sees byte-identical prompts and the same labeled batch.
+run_enrichment_trials / format_reliability / check_grounding /
+check_severity_calibration / run_directional_accuracy from eval_lib.py, and the same
+event/labeled-batch builders the single-model Tier 3 tests already use
+(_truck_47_slowdown_event, _known_value_event, test_severity_calibration._event,
+_labeled_batch) — in a loop over models.toml, plus the aggregation/reporting that
+reuse doesn't give you for free. Reusing those builders (rather than re-deriving them)
+is what guarantees every model in a given run sees byte-identical prompts and the same
+labeled batch.
 
 Opt-in (@pytest.mark.model), run via `make compare-models`. Auto-skips if the manifest
 has zero available models, same as the single-model Tier 3 tests. If only SOME
 manifest models are available, the run proceeds and reports the rest as unavailable
 rather than skipping the whole comparison — that's a data point too, not a reason to
 hide the ones that ARE available.
+
+GATE 2 (severity confirmation): a model whose gate-1 format_parse_rate clears
+--model-format-threshold gets a second, bigger severity-calibration-only run (see
+--model-confirm-multiplier in conftest.py) — fixing the case where a low parse rate
+starves severity_calibration of samples. `_production_candidates()` then applies
+--model-severity-max-mismatch-rate to the gate-2-confirmed numbers to answer directly
+whether any model is reliable enough for production use on this task, printed as a
+PASS/reject list rather than left implicit in the per-axis comparison table.
 """
 
 from __future__ import annotations
@@ -32,6 +42,7 @@ from llm_inference import LlmGenerationConfig, SubprocessLlmBackend
 from tests.model.eval_lib import (
     _percentile,
     check_grounding,
+    check_severity_calibration,
     format_reliability,
     peak_child_rss_mb,
     run_directional_accuracy,
@@ -41,6 +52,7 @@ from tests.model.models_manifest import ModelEntry, load_models_manifest
 from tests.model.test_directional_accuracy import _labeled_batch
 from tests.model.test_format_reliability import _truck_47_slowdown_event
 from tests.model.test_grounding import _known_value_event
+from tests.model.test_severity_calibration import _event as _severity_tier_event
 
 pytestmark = pytest.mark.model
 
@@ -52,6 +64,7 @@ COHERENCE_PROMPT = "The capital of France is"
 AXES: list[tuple[str, tuple[str, ...], str]] = [
     ("format_parse_rate", ("format_reliability", "rate"), "higher"),
     ("grounding_violation_rate", ("grounding", "violation_rate"), "lower"),
+    ("severity_mismatch_rate", ("severity_calibration", "mismatch_rate"), "lower"),
     ("precision", ("directional_accuracy", "precision"), "higher"),
     ("recall", ("directional_accuracy", "recall"), "higher"),
     ("f1", ("directional_accuracy", "f1"), "higher"),
@@ -61,7 +74,14 @@ AXES: list[tuple[str, tuple[str, ...], str]] = [
     ("load_time_seconds", ("load_time_seconds",), "lower"),
     ("resident_ram_mb_after", ("resident_ram_mb_after",), "lower"),
 ]
-QUALITY_AXES = {"format_parse_rate", "grounding_violation_rate", "precision", "recall", "f1"}
+QUALITY_AXES = {
+    "format_parse_rate",
+    "grounding_violation_rate",
+    "severity_mismatch_rate",
+    "precision",
+    "recall",
+    "f1",
+}
 
 
 def _decision_grade() -> str:
@@ -120,20 +140,71 @@ def _run_one_model(entry: ModelEntry, request: pytest.FixtureRequest, labeled_ev
     load_time_seconds = _measure_load_time_seconds(backend)
 
     n = request.config.getoption("--model-eval-runs")
+    timeout_seconds = request.config.getoption("--model-timeout-seconds")
+    format_threshold = request.config.getoption("--model-format-threshold")
+    confirm_multiplier = request.config.getoption("--model-confirm-multiplier")
 
     fr_event = _truck_47_slowdown_event()
-    fr_trials = run_enrichment_trials(backend, fr_event, n)
+    fr_trials = run_enrichment_trials(backend, fr_event, n, timeout_seconds)
     fr_result = format_reliability(fr_trials)
 
     gr_event = _known_value_event()
-    gr_trials = run_enrichment_trials(backend, gr_event, n)
+    gr_trials = run_enrichment_trials(backend, gr_event, n, timeout_seconds)
     gr_result = check_grounding(gr_event, gr_trials)
 
-    da_result, da_latencies = run_directional_accuracy(backend, labeled_events)
+    # 3.0/10.0/20.0 -> low/medium/high per eval_lib's severity thresholds; same split as
+    # the single-model test_severity_calibration.py so this comparison run and a
+    # standalone `make test-model` run measure identically.
+    per_tier_n = max(1, n // 3)
+    sc_events_and_trials = []
+    sc_latencies: list[float] = []
+    for eta_slip_min in (3.0, 10.0, 20.0):
+        sc_event = _severity_tier_event(eta_slip_min)
+        sc_trials = run_enrichment_trials(backend, sc_event, per_tier_n, timeout_seconds)
+        sc_events_and_trials.append((sc_event, sc_trials))
+        sc_latencies.extend(t.latency_seconds for t in sc_trials)
+    sc_result_gate1 = check_severity_calibration(sc_events_and_trials)
+    sc_result_gate1["gate2_confirmed"] = False
+
+    # GATE 2: a model that parses reliably (gate 1's format_parse_rate clears the same
+    # bar test_format_reliability.py gates on) gets its severity check re-run at a much
+    # bigger sample, severity-axis only. This exists because a low parse rate silently
+    # starves severity_calibration of samples (e.g. a 0.4 format rate with n=10/tier
+    # leaves as few as 8 parsed cards total to judge severity on) — not reliable enough
+    # to call a model good or bad on this axis. Format/grounding/directional are NOT
+    # re-run here: they already have a full n-sample at gate 1, and re-running everything
+    # at 3x would roughly triple total runtime for every model that passes gate 1, most of
+    # which parse fine already.
+    gate2_promoted = fr_result["rate"] >= format_threshold
+    sc2_latencies: list[float] = []
+    sc2_trials_flat = []
+    if gate2_promoted:
+        confirm_per_tier_n = max(per_tier_n, round(per_tier_n * confirm_multiplier))
+        sc2_events_and_trials = []
+        for eta_slip_min in (3.0, 10.0, 20.0):
+            sc2_event = _severity_tier_event(eta_slip_min)
+            sc2_trials = run_enrichment_trials(backend, sc2_event, confirm_per_tier_n, timeout_seconds)
+            sc2_events_and_trials.append((sc2_event, sc2_trials))
+            sc2_latencies.extend(t.latency_seconds for t in sc2_trials)
+        sc_result = check_severity_calibration(sc2_events_and_trials)
+        sc_result["gate2_confirmed"] = True
+        sc_result["gate2_per_tier_n"] = confirm_per_tier_n
+        sc_result["gate2_format_threshold"] = format_threshold
+        sc2_trials_flat = [t for _event, trials in sc2_events_and_trials for t in trials]
+    else:
+        sc_result = sc_result_gate1
+
+    da_result, da_latencies = run_directional_accuracy(backend, labeled_events, timeout_seconds)
 
     ram_after_mb = peak_child_rss_mb()
 
-    all_latencies = [t.latency_seconds for t in fr_trials] + [t.latency_seconds for t in gr_trials] + da_latencies
+    all_latencies = (
+        [t.latency_seconds for t in fr_trials]
+        + [t.latency_seconds for t in gr_trials]
+        + sc_latencies
+        + sc2_latencies
+        + da_latencies
+    )
     ordered = sorted(all_latencies)
     latency = {
         "p50_seconds": _percentile(ordered, 0.50) if ordered else None,
@@ -141,9 +212,10 @@ def _run_one_model(entry: ModelEntry, request: pytest.FixtureRequest, labeled_ev
         "n": len(ordered),
     }
 
+    sc_trials_flat = [t for _event, trials in sc_events_and_trials for t in trials]
     tokens_per_sec_samples = [
         len(t.raw_output.split()) / t.latency_seconds
-        for t in (fr_trials + gr_trials)
+        for t in (fr_trials + gr_trials + sc_trials_flat + sc2_trials_flat)
         if t.parsed is not None and t.latency_seconds > 0
     ]
     tokens_per_sec_approx = (
@@ -159,6 +231,8 @@ def _run_one_model(entry: ModelEntry, request: pytest.FixtureRequest, labeled_ev
         "extra_args": list(entry.extra_args),
         "format_reliability": fr_result,
         "grounding": gr_result,
+        "severity_calibration": sc_result,
+        "severity_calibration_gate1": sc_result_gate1,
         "directional_accuracy": da_result,
         "latency": latency,
         "tokens_per_sec_approx": tokens_per_sec_approx,
@@ -205,7 +279,12 @@ def _build_recommendation(results: dict[str, dict], comparison: dict, decision_g
 
     for axis_name, path, direction in AXES:
         axis = comparison[axis_name]
-        if not axis["values"]:
+        # axis["values"] can be non-empty (a real dict entry) while every value in
+        # it is None -- e.g. severity_mismatch_rate when the only model in a run
+        # never reached gate 2. A bare truthiness check on the dict misses that and
+        # crashes below on results[None] -- checking axis["best"] (only set when
+        # _build_comparison found at least one non-None value) is the real signal.
+        if axis["best"] is None:
             lines.append(f"{axis_name}: no data.")
             continue
         best_id = axis["best"]
@@ -225,6 +304,46 @@ def _build_recommendation(results: dict[str, dict], comparison: dict, decision_g
         "on any host; speed/RAM axes only count when measured on the Pi 4 target."
     )
     return "\n".join(lines)
+
+
+def _production_candidates(
+    results: dict[str, dict], format_threshold: float, severity_threshold: float
+) -> dict:
+    """Models with an evidence-backed case for production use on THIS task: gate 1's
+    format_parse_rate cleared the bar (so gate 2 ran, giving a trustworthy severity
+    sample size) AND the gate-2-confirmed severity mismatch rate is at or below
+    severity_threshold. Answers "does anything here actually work" directly, rather
+    than leaving it implicit in a table of per-axis leaders — a model can "lead" an
+    axis among 9 bad options without being good enough to ship. Still not a final
+    pick: Pi 4 latency/RAM footprint applies to any PASS entry same as always."""
+    passed = []
+    rejected = []
+    for mid, r in results.items():
+        if not r.get("available"):
+            continue
+        sc = r.get("severity_calibration", {})
+        entry = {
+            "id": mid,
+            "display_name": r["display_name"],
+            "format_parse_rate": r.get("format_reliability", {}).get("rate"),
+            "gate2_confirmed": sc.get("gate2_confirmed", False),
+            "severity_mismatch_rate": sc.get("mismatch_rate"),
+            "severity_sample_n": sc.get("total"),
+        }
+        if (
+            sc.get("gate2_confirmed")
+            and sc.get("mismatch_rate") is not None
+            and sc["mismatch_rate"] <= severity_threshold
+        ):
+            passed.append(entry)
+        else:
+            rejected.append(entry)
+    return {
+        "format_threshold": format_threshold,
+        "severity_threshold": severity_threshold,
+        "passed": passed,
+        "rejected": rejected,
+    }
 
 
 def _render_table(report: dict, artifact_path: Path) -> str:
@@ -257,6 +376,34 @@ def _render_table(report: dict, artifact_path: Path) -> str:
     lines.append("")
     lines.append("--- recommendation (does not auto-pick — human decides) ---")
     lines.append(report["recommendation"])
+
+    pc = report["production_candidates"]
+    lines.append("")
+    lines.append(
+        f"--- production candidates (format_parse_rate>={pc['format_threshold']:.0%}, "
+        f"gate-2-confirmed severity_mismatch_rate<={pc['severity_threshold']:.0%}) ---"
+    )
+    if pc["passed"]:
+        for e in pc["passed"]:
+            lines.append(
+                f"  PASS   {e['display_name']}: severity_mismatch={e['severity_mismatch_rate']:.1%} "
+                f"(n={e['severity_sample_n']}, gate-2 confirmed)"
+            )
+    else:
+        lines.append(
+            "  NONE of the tested models met this bar. See rejected reasons below — "
+            "that is a real finding, not a reason to lower the bar quietly."
+        )
+    for e in pc["rejected"]:
+        if not e["gate2_confirmed"]:
+            reason = f"format_parse_rate={e['format_parse_rate']:.3f} below threshold — never reached gate 2"
+        else:
+            reason = f"severity_mismatch={e['severity_mismatch_rate']:.1%} (n={e['severity_sample_n']}) exceeds bar"
+        lines.append(f"  reject {e['display_name']}: {reason}")
+    lines.append(
+        "Evidence for/against production use on THIS task — not a final pick. Pi 4 "
+        "latency/RAM footprint still applies to any PASS entry before it ships."
+    )
     return "\n".join(lines)
 
 
@@ -277,6 +424,11 @@ def test_compare_models(request: pytest.FixtureRequest) -> None:
     comparison = _build_comparison(results)
     decision_grade = _decision_grade()
     recommendation = _build_recommendation(results, comparison, decision_grade)
+    production_candidates = _production_candidates(
+        results,
+        format_threshold=request.config.getoption("--model-format-threshold"),
+        severity_threshold=request.config.getoption("--model-severity-max-mismatch-rate"),
+    )
 
     report = {
         "host": platform.node(),
@@ -286,6 +438,7 @@ def test_compare_models(request: pytest.FixtureRequest) -> None:
         "timestamp": datetime.now(tz=UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "seed_config": {
             "model_eval_runs": request.config.getoption("--model-eval-runs"),
+            "model_timeout_seconds": request.config.getoption("--model-timeout-seconds"),
             "accuracy_fleet_size": request.config.getoption("--model-accuracy-fleet-size"),
             "accuracy_incident_trucks": request.config.getoption("--model-accuracy-incident-trucks"),
             "accuracy_ticks": request.config.getoption("--model-accuracy-ticks"),
@@ -294,6 +447,7 @@ def test_compare_models(request: pytest.FixtureRequest) -> None:
         "models": results,
         "comparison": comparison,
         "recommendation": recommendation,
+        "production_candidates": production_candidates,
     }
 
     EVAL_RESULTS_DIR.mkdir(exist_ok=True)

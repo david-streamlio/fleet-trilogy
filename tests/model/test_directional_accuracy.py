@@ -34,9 +34,10 @@ def _labeled_batch(request: pytest.FixtureRequest) -> list[LabeledEvent]:
 
 def test_directional_accuracy_meets_floor(request, llm_backend, tier3_report):
     floor = request.config.getoption("--model-accuracy-floor")
+    timeout_seconds = request.config.getoption("--model-timeout-seconds")
     labeled_events = _labeled_batch(request)
 
-    result, latencies = run_directional_accuracy(llm_backend, labeled_events)
+    result, latencies = run_directional_accuracy(llm_backend, labeled_events, timeout_seconds)
     tier3_report.directional_accuracy = result
     tier3_report.add_latencies(latencies)
 

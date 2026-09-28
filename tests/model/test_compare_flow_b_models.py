@@ -26,9 +26,9 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
-from llm_inference import LlmGenerationConfig, SubprocessLlmBackend
+from llm_inference import LlmServerBackend
 from talk1_edge_intelligence.coprocessor import TelemetryCoprocessorFunction
-from talk1_edge_intelligence.triage_function import LlmTriageFunction
+from talk1_edge_intelligence.triage_function import DEFAULT_THREADS, LlmTriageFunction
 
 from tests.model.conftest import _FlowBEvalContext
 from tests.model.eval_lib import (
@@ -46,7 +46,6 @@ pytestmark = pytest.mark.model
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 EVAL_RESULTS_DIR = REPO_ROOT / "eval-results"
-COHERENCE_PROMPT = "The capital of France is"
 
 AXES: list[tuple[str, tuple[str, ...], str]] = [
     ("format_parse_rate", ("format_reliability", "rate"), "higher"),
@@ -76,15 +75,50 @@ def _get_path(d: dict, path: tuple[str, ...]):
     return d
 
 
-def _measure_load_time_seconds(backend: SubprocessLlmBackend) -> float | None:
-    """Same approximation as test_compare_models.py's helper, on a standalone
-    backend (not the pipeline's internal one) so this warmup call is identical
-    across both comparison harnesses."""
+def _server_binary_path(completion_binary_path: Path | None) -> Path | None:
+    """models.toml's binary_path_env/default_binary_path all point at
+    llama-completion — correct for Flow A's test_compare_models.py, which still
+    uses SubprocessLlmBackend, so that can't just be repointed at llama-server.
+    Both binaries are always built side by side in the same llama.cpp build output
+    directory in this repo's setup (see docs/PI4-RUNBOOK.md /
+    cmake --build build --target llama-server), so llama-server's path is derived
+    from llama-completion's sibling rather than needing a second parallel set of
+    per-model env vars in models.toml just for this one axis. A real run found out
+    the hard way what happens without this: LlmServerBackend launched
+    llama-completion with --host/--port, which it doesn't understand, and it
+    exited immediately ("llama-server exited during startup (code 1)" — a
+    misleading error, since it wasn't actually running llama-server at all).
+    """
+    if completion_binary_path is None:
+        return None
+    return completion_binary_path.parent / "llama-server"
+
+
+def _measure_load_time_seconds(entry: ModelEntry, threads: int) -> float | None:
+    """Time to start a standalone LlmServerBackend and have it become healthy —
+    a real, direct measurement now that the backend is a persistent server, not
+    the old one-shot-completion warmup hack (that approach measured a single
+    generate() call's wall time as a proxy for load time; starting the actual
+    server IS the load). Closed immediately after — this is a throwaway
+    measurement, separate from the real backend LlmTriageFunction starts for the
+    trials below.
+
+    entry.extra_args (e.g. `-no-cnv`) is deliberately NOT passed here: it's a
+    llama-completion-specific one-shot flag, and llama-server rejects it outright
+    ("invalid argument: -no-cnv", verified live) — CLI flags are backend-specific,
+    not model-specific, so they don't carry over between SubprocessLlmBackend and
+    LlmServerBackend.
+    """
+    backend = LlmServerBackend(
+        binary_path=_server_binary_path(entry.binary_path), model_path=entry.model_path, threads=threads
+    )
     start = time.monotonic()
     try:
-        backend.generate(COHERENCE_PROMPT, LlmGenerationConfig(max_tokens=1))
+        backend.start()
     except Exception:  # noqa: BLE001 - a failed warmup call is "no reading", not a bug
         return None
+    finally:
+        backend.close()
     return time.monotonic() - start
 
 
@@ -102,61 +136,63 @@ def _run_one_model(entry: ModelEntry, request: pytest.FixtureRequest) -> dict:
     timeout_seconds = request.config.getoption("--model-timeout-seconds")
     format_threshold = request.config.getoption("--model-format-threshold")
     confirm_multiplier = request.config.getoption("--model-confirm-multiplier")
+    threads = request.config.getoption("--model-threads") or DEFAULT_THREADS
 
-    warmup_backend = SubprocessLlmBackend(
-        binary_path=entry.binary_path,
-        model_path=entry.model_path,
-        mock=False,
-        extra_args=entry.extra_args,
-    )
     ram_before_mb = peak_child_rss_mb()
-    load_time_seconds = _measure_load_time_seconds(warmup_backend)
+    load_time_seconds = _measure_load_time_seconds(entry, threads)
 
     context = _FlowBEvalContext(
         {
-            "llm_binary_path": str(entry.binary_path),
+            "llm_binary_path": str(_server_binary_path(entry.binary_path)),
             "llm_model_path": str(entry.model_path),
             "timeout_seconds": str(timeout_seconds),
+            "threads": str(threads),
         }
     )
     coprocessor = TelemetryCoprocessorFunction()
     triage = LlmTriageFunction()
+    try:
+        # Gate 1: format reliability on one canonical event, full N — see
+        # test_flow_b_triage.py's module docstring for why this is no longer
+        # tier-based (severity is cheap math now, identical for every model).
+        format_event = _canonical_event()
+        format_trials = run_flow_b_trials(coprocessor, triage, context, format_event, n)
+        fr_result = flow_b_format_reliability(format_event, format_trials)
 
-    # Gate 1: format reliability on one canonical event, full N — see
-    # test_flow_b_triage.py's module docstring for why this is no longer
-    # tier-based (severity is cheap math now, identical for every model).
-    format_event = _canonical_event()
-    format_trials = run_flow_b_trials(coprocessor, triage, context, format_event, n)
-    fr_result = flow_b_format_reliability(format_event, format_trials)
-
-    # GATE 2: same two-stage rationale as test_compare_models.py, retargeted at
-    # escalation direction (see eval_lib.check_escalation_direction) now that
-    # severity itself no longer varies by model. A model that parses reliably
-    # gets the three escalation scenarios re-run at a much bigger per-scenario
-    # sample so a low parse rate can't starve the escalation-direction sample.
-    per_scenario_n = max(1, n // 3)
-    gate2_promoted = fr_result["rate"] >= format_threshold
-    gate2_scenario_trials: dict[str, list] = {}
-    if gate2_promoted:
-        confirm_per_scenario_n = max(per_scenario_n, round(per_scenario_n * confirm_multiplier))
-        for scenario_name, scenario in ESCALATION_SCENARIOS.items():
-            scenario_event = _canonical_event()
-            trials = run_flow_b_trials(
-                coprocessor,
-                triage,
-                context,
-                scenario_event,
-                confirm_per_scenario_n,
-                contextual_trigger_overrides=scenario["contextual_triggers"],
-                baseline_severity_override="medium",
-            )
-            gate2_scenario_trials[scenario_name] = trials
-        ec_result = check_escalation_direction(gate2_scenario_trials)
-        ec_result["gate2_confirmed"] = True
-        ec_result["gate2_per_scenario_n"] = confirm_per_scenario_n
-        ec_result["gate2_format_threshold"] = format_threshold
-    else:
-        ec_result = {"total": 0, "matched": 0, "mismatches": 0, "mismatch_rate": None, "gate2_confirmed": False}
+        # GATE 2: same two-stage rationale as test_compare_models.py, retargeted at
+        # escalation direction (see eval_lib.check_escalation_direction) now that
+        # severity itself no longer varies by model. A model that parses reliably
+        # gets the three escalation scenarios re-run at a much bigger per-scenario
+        # sample so a low parse rate can't starve the escalation-direction sample.
+        per_scenario_n = max(1, n // 3)
+        gate2_promoted = fr_result["rate"] >= format_threshold
+        gate2_scenario_trials: dict[str, list] = {}
+        if gate2_promoted:
+            confirm_per_scenario_n = max(per_scenario_n, round(per_scenario_n * confirm_multiplier))
+            for scenario_name, scenario in ESCALATION_SCENARIOS.items():
+                scenario_event = _canonical_event()
+                trials = run_flow_b_trials(
+                    coprocessor,
+                    triage,
+                    context,
+                    scenario_event,
+                    confirm_per_scenario_n,
+                    contextual_trigger_overrides=scenario["contextual_triggers"],
+                    baseline_severity_override="medium",
+                )
+                gate2_scenario_trials[scenario_name] = trials
+            ec_result = check_escalation_direction(gate2_scenario_trials)
+            ec_result["gate2_confirmed"] = True
+            ec_result["gate2_per_scenario_n"] = confirm_per_scenario_n
+            ec_result["gate2_format_threshold"] = format_threshold
+        else:
+            ec_result = {"total": 0, "matched": 0, "mismatches": 0, "mismatch_rate": None, "gate2_confirmed": False}
+    finally:
+        # Must close this model's server before the manifest loop moves on to the
+        # next model, or two llama-server processes end up competing for the GPU
+        # at once — the exact contention this session already hit once and
+        # corrupted two runs (see docs/TALK2-DATA-ENGINEERING-IMPACT-TRACK.md).
+        triage.close()
 
     ram_after_mb = peak_child_rss_mb()
 
@@ -231,7 +267,12 @@ def _build_recommendation(results: dict[str, dict], comparison: dict, decision_g
 
     for axis_name, _path, _direction in AXES:
         axis = comparison[axis_name]
-        if not axis["values"]:
+        # axis["values"] can be non-empty (a real dict entry) while every value in
+        # it is None -- e.g. escalation_mismatch_rate when the only model in a run
+        # never reached gate 2. A bare truthiness check on the dict misses that and
+        # crashes below on results[None] -- checking axis["best"] (only set when
+        # _build_comparison found at least one non-None value) is the real signal.
+        if axis["best"] is None:
             lines.append(f"{axis_name}: no data.")
             continue
         best_id = axis["best"]

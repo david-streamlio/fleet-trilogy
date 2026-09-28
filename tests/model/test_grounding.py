@@ -37,9 +37,10 @@ def _known_value_event() -> TelemetryEvent:
 def test_grounding_violation_rate_within_bound(request, llm_backend, tier3_report):
     n = request.config.getoption("--model-eval-runs")
     max_violation_rate = request.config.getoption("--model-grounding-max-violation-rate")
+    timeout_seconds = request.config.getoption("--model-timeout-seconds")
     event = _known_value_event()
 
-    trials = run_enrichment_trials(llm_backend, event, n)
+    trials = run_enrichment_trials(llm_backend, event, n, timeout_seconds)
     result = check_grounding(event, trials)
     tier3_report.grounding = result
     tier3_report.add_latencies([t.latency_seconds for t in trials])

@@ -69,48 +69,50 @@ def test_flow_b_format_reliability_and_escalation_direction(request, flow_b_cont
 
     coprocessor = TelemetryCoprocessorFunction()
     triage = LlmTriageFunction()
-
-    # Gate 1: format reliability on one canonical event, full N.
-    format_event = _canonical_event()
-    format_trials = run_flow_b_trials(coprocessor, triage, flow_b_context, format_event, total_n)
-    assert len(format_trials) == total_n, (
-        f"coprocessor gated out the canonical event (eta_slip_min={format_event.signals.eta_slip_min}, "
-        "0 trials produced) — check the default gate bounds against this test's event"
-    )
-    flow_b_report.add_latencies([t.latency_seconds for t in format_trials])
-    format_result = flow_b_format_reliability(format_event, format_trials)
-    flow_b_report.format_reliability = format_result
-
-    assert format_result["rate"] >= format_threshold, (
-        f"Flow B format reliability {format_result['rate']:.1%} over {format_result['total']} runs "
-        f"is below threshold {format_threshold:.1%}; sample failures: {format_result['sample_failures']}"
-    )
-
-    # Gate 2 (only meaningful once gate 1 clears — a low parse rate would starve
-    # escalation-direction of samples the same way it used to starve severity
-    # calibration): escalation direction across the three operational-context
-    # scenarios, baseline_severity held at "medium" to isolate the context variable.
-    scenario_trials = {}
-    for scenario_name, scenario in ESCALATION_SCENARIOS.items():
-        scenario_event = _canonical_event()
-        trials = run_flow_b_trials(
-            coprocessor,
-            triage,
-            flow_b_context,
-            scenario_event,
-            per_scenario_n,
-            contextual_trigger_overrides=scenario["contextual_triggers"],
-            baseline_severity_override="medium",
+    try:
+        # Gate 1: format reliability on one canonical event, full N.
+        format_event = _canonical_event()
+        format_trials = run_flow_b_trials(coprocessor, triage, flow_b_context, format_event, total_n)
+        assert len(format_trials) == total_n, (
+            f"coprocessor gated out the canonical event (eta_slip_min={format_event.signals.eta_slip_min}, "
+            "0 trials produced) — check the default gate bounds against this test's event"
         )
-        scenario_trials[scenario_name] = trials
-        flow_b_report.add_latencies([t.latency_seconds for t in trials])
+        flow_b_report.add_latencies([t.latency_seconds for t in format_trials])
+        format_result = flow_b_format_reliability(format_event, format_trials)
+        flow_b_report.format_reliability = format_result
 
-    escalation_result = check_escalation_direction(scenario_trials)
-    flow_b_report.escalation_calibration = escalation_result
+        assert format_result["rate"] >= format_threshold, (
+            f"Flow B format reliability {format_result['rate']:.1%} over {format_result['total']} runs "
+            f"is below threshold {format_threshold:.1%}; sample failures: {format_result['sample_failures']}"
+        )
 
-    assert escalation_result["total"] > 0, "no grammar-valid triage cards were produced to check escalation on"
-    assert escalation_result["mismatch_rate"] <= max_mismatch_rate, (
-        f"Flow B escalation-direction mismatch rate {escalation_result['mismatch_rate']:.1%} over "
-        f"{escalation_result['total']} cards exceeds bound {max_mismatch_rate:.1%}; "
-        f"sample mismatches: {escalation_result['sample_mismatches']}"
-    )
+        # Gate 2 (only meaningful once gate 1 clears — a low parse rate would starve
+        # escalation-direction of samples the same way it used to starve severity
+        # calibration): escalation direction across the three operational-context
+        # scenarios, baseline_severity held at "medium" to isolate the context variable.
+        scenario_trials = {}
+        for scenario_name, scenario in ESCALATION_SCENARIOS.items():
+            scenario_event = _canonical_event()
+            trials = run_flow_b_trials(
+                coprocessor,
+                triage,
+                flow_b_context,
+                scenario_event,
+                per_scenario_n,
+                contextual_trigger_overrides=scenario["contextual_triggers"],
+                baseline_severity_override="medium",
+            )
+            scenario_trials[scenario_name] = trials
+            flow_b_report.add_latencies([t.latency_seconds for t in trials])
+
+        escalation_result = check_escalation_direction(scenario_trials)
+        flow_b_report.escalation_calibration = escalation_result
+
+        assert escalation_result["total"] > 0, "no grammar-valid triage cards were produced to check escalation on"
+        assert escalation_result["mismatch_rate"] <= max_mismatch_rate, (
+            f"Flow B escalation-direction mismatch rate {escalation_result['mismatch_rate']:.1%} over "
+            f"{escalation_result['total']} cards exceeds bound {max_mismatch_rate:.1%}; "
+            f"sample mismatches: {escalation_result['sample_mismatches']}"
+        )
+    finally:
+        triage.close()

@@ -128,12 +128,17 @@ def test_process_only_configures_once():
 
 def test_process_returns_grammar_shaped_card_via_mock_backend(monkeypatch):
     # LlmBackend.generate is stubbed directly rather than relying on
-    # SubprocessLlmBackend's mock-mode content-sniffing heuristic, which
-    # keys off phrases our DEFAULT_PROMPT_TEMPLATE doesn't happen to contain.
-    from llm_inference.client import SubprocessLlmBackend
+    # LlmServerBackend's mock-mode content-sniffing heuristic, which keys off
+    # phrases our DEFAULT_PROMPT_TEMPLATE doesn't happen to contain. start() is
+    # also stubbed -- process() calls it unconditionally now (see triage_function
+    # module docstring on the SubprocessLlmBackend -> LlmServerBackend switch), and
+    # the real one would try to launch a real llama-server binary that doesn't
+    # exist at DEFAULT_BINARY_PATH on a generic test machine.
+    from llm_inference.client import LlmServerBackend
 
+    monkeypatch.setattr(LlmServerBackend, "start", lambda self: self)
     monkeypatch.setattr(
-        SubprocessLlmBackend,
+        LlmServerBackend,
         "generate",
         lambda self, prompt, config=None: (
             '{"risk_synthesis": "wet roads plus liquid cargo raises real risk", '

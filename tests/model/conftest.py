@@ -17,6 +17,7 @@ import pytest
 from llm_inference import SubprocessLlmBackend
 
 from tests.model.eval_lib import FlowBReport, Tier3Report, peak_child_rss_mb
+from tests.model.tier2_eval_lib import Tier2Report
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 EVAL_RESULTS_DIR = REPO_ROOT / "eval-results"
@@ -41,6 +42,18 @@ def pytest_addoption(parser: pytest.Parser) -> None:
             "own default (60s) is too tight for a full max_tokens completion on a Pi 4 "
             "CPU-only backend at these prompt lengths — hitting it turns format-reliability "
             "and latency measurements into a measurement of the timeout, not the model."
+        ),
+    )
+    group.addoption(
+        "--model-threads",
+        type=int,
+        default=None,
+        help=(
+            "CPU threads to give each llama-server instance. Defaults to "
+            "talk1_edge_intelligence.triage_function.DEFAULT_THREADS (tuned for the M4 "
+            "dev machine's 12 performance cores) when unset -- pass this explicitly on "
+            "any other host (e.g. a Pi 4 has 4 cores total; 12 threads there means "
+            "oversubscription, not more parallelism)."
         ),
     )
     group.addoption(
@@ -184,12 +197,16 @@ def flow_b_context(request: pytest.FixtureRequest, llm_backend: SubprocessLlmBac
     binary = _resolve_path(request.config.getoption("--llm-binary"), "LLM_BINARY_PATH")
     model = _resolve_path(request.config.getoption("--llm-model"), "LLM_MODEL_PATH")
     timeout_seconds = request.config.getoption("--model-timeout-seconds")
+    threads = request.config.getoption("--model-threads")
+    config = {
+        "llm_binary_path": binary,
+        "llm_model_path": model,
+        "timeout_seconds": str(timeout_seconds),
+    }
+    if threads is not None:
+        config["threads"] = str(threads)
     return _FlowBEvalContext(
-        {
-            "llm_binary_path": binary,
-            "llm_model_path": model,
-            "timeout_seconds": str(timeout_seconds),
-        }
+        config
     )
 
 
@@ -215,6 +232,44 @@ def flow_b_report(request: pytest.FixtureRequest, llm_backend: SubprocessLlmBack
     return report
 
 
+@pytest.fixture(scope="session")
+def tier2_context(request: pytest.FixtureRequest, llm_backend: SubprocessLlmBackend) -> _FlowBEvalContext:
+    # _FlowBEvalContext is a generic get_logger()/get_user_config_value(key) stand-in
+    # for a Pulsar Functions Context -- nothing about it is Flow-B-specific, so it's
+    # reused as-is here rather than duplicating an identical class under a new name.
+    binary = _resolve_path(request.config.getoption("--llm-binary"), "LLM_BINARY_PATH")
+    model = _resolve_path(request.config.getoption("--llm-model"), "LLM_MODEL_PATH")
+    timeout_seconds = request.config.getoption("--model-timeout-seconds")
+    threads = request.config.getoption("--model-threads")
+    config = {
+        "llm_binary_path": binary,
+        "llm_model_path": model,
+        "timeout_seconds": str(timeout_seconds),
+    }
+    if threads is not None:
+        config["threads"] = str(threads)
+    return _FlowBEvalContext(config)
+
+
+@pytest.fixture(scope="session")
+def tier2_report(request: pytest.FixtureRequest, llm_backend: SubprocessLlmBackend) -> Tier2Report:
+    import platform
+
+    binary = _resolve_path(request.config.getoption("--llm-binary"), "LLM_BINARY_PATH")
+    model = _resolve_path(request.config.getoption("--llm-model"), "LLM_MODEL_PATH")
+    report = Tier2Report(
+        config={
+            "binary_path": binary,
+            "model_path": model,
+            "host": platform.node(),
+            "platform": platform.platform(),
+            "eval_runs": request.config.getoption("--model-eval-runs"),
+        }
+    )
+    request.config._tier2_report = report
+    return report
+
+
 def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
     EVAL_RESULTS_DIR.mkdir(exist_ok=True)
     timestamp = datetime.now(tz=UTC).strftime("%Y%m%dT%H%M%SZ")
@@ -232,11 +287,17 @@ def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
         artifact_path.write_text(json.dumps(flow_b_report.to_dict(), indent=2))
         session.config._flow_b_summary = flow_b_report.render_summary(artifact_path)
 
+    tier2_report: Tier2Report | None = getattr(session.config, "_tier2_report", None)
+    if tier2_report is not None:
+        artifact_path = EVAL_RESULTS_DIR / f"tier2-{timestamp}.json"
+        artifact_path.write_text(json.dumps(tier2_report.to_dict(), indent=2))
+        session.config._tier2_summary = tier2_report.render_summary(artifact_path)
+
 
 def pytest_terminal_summary(terminalreporter, exitstatus: int, config: pytest.Config) -> None:
     # pytest_terminal_summary (rather than printing during sessionfinish) is what
     # guarantees this shows up even though pytest captures stdout by default.
-    for attr in ("_tier3_summary", "_flow_b_summary"):
+    for attr in ("_tier3_summary", "_flow_b_summary", "_tier2_summary"):
         summary = getattr(config, attr, None)
         if summary:
             terminalreporter.write_line(summary)

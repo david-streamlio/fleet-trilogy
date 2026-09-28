@@ -9,6 +9,7 @@ touch Pulsar or the LLM runtime.
 from __future__ import annotations
 
 import threading
+import time
 from datetime import UTC, datetime
 
 import pulsar
@@ -70,9 +71,6 @@ def _incident_event() -> TelemetryEvent:
 
 def test_publish_consume_enrich_republish_end_to_end(pulsar_service_url):
     client = pulsar.Client(pulsar_service_url)
-    producer = client.create_producer(DEFAULT_TELEMETRY_TOPIC)
-    producer.send(to_json(_incident_event()).encode("utf-8"))
-    producer.close()
 
     stop_event = threading.Event()
     adapter_thread = threading.Thread(
@@ -85,6 +83,14 @@ def test_publish_consume_enrich_republish_end_to_end(pulsar_service_url):
         daemon=True,
     )
     adapter_thread.start()
+    # The adapter's consumer subscription must exist before we publish — a
+    # subscription created after a message is sent starts at Latest by
+    # default and never sees it.
+    time.sleep(2.0)
+
+    producer = client.create_producer(DEFAULT_TELEMETRY_TOPIC)
+    producer.send(to_json(_incident_event()).encode("utf-8"))
+    producer.close()
     try:
         result_consumer = client.subscribe(ENRICHMENT_CARDS_TOPIC, "test-consumer")
         msg = result_consumer.receive(timeout_millis=30_000)

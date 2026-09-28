@@ -35,9 +35,10 @@ def _truck_47_slowdown_event() -> TelemetryEvent:
 def test_format_reliability_meets_threshold(request, llm_backend, tier3_report):
     n = request.config.getoption("--model-eval-runs")
     threshold = request.config.getoption("--model-format-threshold")
+    timeout_seconds = request.config.getoption("--model-timeout-seconds")
     event = _truck_47_slowdown_event()
 
-    trials = run_enrichment_trials(llm_backend, event, n)
+    trials = run_enrichment_trials(llm_backend, event, n, timeout_seconds)
     result = format_reliability(trials)
     tier3_report.format_reliability = result
     tier3_report.add_latencies([t.latency_seconds for t in trials])
