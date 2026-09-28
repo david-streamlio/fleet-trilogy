@@ -18,6 +18,7 @@ from fleet_telemetry_model.topics import (
     ENRICHMENT_CARDS_TOPIC,
     INCIDENTS_TOPIC,
 )
+from fleet_telemetry_model.zscore_detection import RollingZScoreDetector
 
 __all__ = [
     "DEFAULT_TELEMETRY_TOPIC",
@@ -29,6 +30,7 @@ __all__ = [
     "EnrichmentCard",
     "GpsPosition",
     "IncidentSynthesis",
+    "RollingZScoreDetector",
     "Signals",
     "TelemetryEvent",
     "evaluate_signals",
