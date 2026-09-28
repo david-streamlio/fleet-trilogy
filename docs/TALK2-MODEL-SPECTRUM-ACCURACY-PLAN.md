@@ -1,17 +1,47 @@
 # Talk 2 model-spectrum accuracy plan: a wider chart, not just two points
 
-**Status: M4 accuracy gate complete — one candidate survives.** The gate-2-
-confirmed `make compare-models` run (2026-09-25, 18:57 UTC,
+**Status: both stages complete — M4 gate and Pi 4 decision-grade run.** This
+doc's original gate-2-confirmed run (below, 9 models, `severity_mismatch_rate`)
+has since been superseded twice: first by widening the candidate pool to 14
+models, then by the architectural pivot that moved `severity`/
+`recommended_action` to deterministic cheap math and narrowed the LLM's job
+to a bounded escalation decision (`severity_mismatch_rate` was replaced by
+`escalation-direction mismatch` as the gate metric — see git history around
+"Move Flow B severity + recommended_action to deterministic cheap math").
+Full detail and the run-by-run history live in
+`docs/TALK2-DATA-ENGINEERING-IMPACT-TRACK.md`'s running-total table (rows
+8-18); this status block gives the final numbers only.
+
+The full M4 gate (all 14 candidates, post-pivot metric) produced a 5-model
+clean tier: **Qwen3-8B, Phi-3.5-mini-instruct, Gemma-3-4B-it** (0.0%
+mismatch), **Llama-3.1-8B-Instruct** (5.6%), **GLM-4-9B-0414** (6.7%) — the
+other 9 candidates (including everything ≤0.6B) failed to clear the gate.
+All five went on to the Pi 4 decision-grade run (`docs/PI4-RUNBOOK.md`),
+which is now **complete** — no larger candidate list is still owed a Pi run:
+
+| model | Pi mismatch | notes |
+|---|---|---|
+| Phi-3.5-mini-instruct | 0.0% | matches M4 exactly; p50/p95 35.7s/157.8s, RAM 93% |
+| Llama-3.1-8B-Instruct | 0.0% | n=45, gate-2 confirmed; p50/p95 74.7s/232.3s, RAM 91% |
+| Qwen3-8B | 0.0% (43/43) | first Pi attempt collapsed to 66.7% format_parse_rate — traced to real thermal throttling (83.7°C, ARM clock cut to 600MHz), not a model or bug; recovered cleanly after a fan fix |
+| Gemma-3-4B-it | 2.2% | ~identical to M4's 0%; p50/p95 77.1s/101.4s, RAM 96% |
+| GLM-4-9B-0414 | **14.6%** (n=41) | the one outlier — concentrated entirely in the "benign" scenario (6/13 false-escalations), vs. 6.7% on M4 |
+
+Four of five hold 0-2.2% mismatch on real target hardware; GLM-4-9B-0414 is
+the one model whose M4 accuracy didn't fully transfer. This is a **separate
+axis** from `docs/TALK2-GPU-BENCHMARK-PLAN.md` — see "How this relates to
+the other GPU plan" below for exactly how they compose.
+
+### Original gate-2-confirmed result (2026-09-25, superseded above)
+
+The gate-2-confirmed `make compare-models` run (2026-09-25, 18:57 UTC,
 `eval-results/compare-COMP-J2D9D71YNJ-20260925T185711Z.json`) eliminated 8 of
-9 `models.toml` entries; **Qwen3-8B (Q4_K_M)** is the sole `production_candidates`
+9 `models.toml` entries; **Qwen3-8B (Q4_K_M)** was the sole `production_candidates`
 PASS (`severity_mismatch_rate` 20.5%, n=88, gate-2 confirmed). Full elimination
 table and reasons: `docs/TALK2-OUTLINE.md`'s "Update — gate-2-confirmed
-result" section. Remaining work is the Pi 4 decision-grade run on Qwen3-8B
-alone (`docs/PI4-RUNBOOK.md`) — not yet done; an 8B model's RAM/latency on a
-Pi 4 is an open question, not an assumption to carry forward from the
-1.5B/0.5B-era runbook. This was a **separate axis** from
-`docs/TALK2-GPU-BENCHMARK-PLAN.md` — see "How this relates to the other GPU
-plan" below for exactly how they compose.
+result" section. This was the state before the candidate pool widened to 14
+and the escalation-direction pivot replaced the gate metric — kept here for
+history, not as current status.
 
 ## Why (revised — the talk's own thesis has moved)
 

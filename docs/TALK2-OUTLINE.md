@@ -253,6 +253,17 @@ cliff chart would be.
 
 ## Update — gate-2-confirmed result, and the field is eliminated to one (2026-09-25, 18:57 UTC)
 
+**Superseded — kept for history, not current status.** This was a 9-model
+snapshot under the original `severity_mismatch_rate` metric. Both the
+candidate pool and the metric itself have since moved on: the pool widened to
+14 candidates, and the architectural pivot that moved `severity`/
+`recommended_action` to deterministic cheap math replaced
+`severity_mismatch_rate` with `escalation-direction mismatch` as the gate
+metric (Qwen3-8B is no longer "the one survivor" — it's one of a five-model
+clean tier, all five with real Pi 4 numbers). See "Final model recommendation"
+below for the current state, and `docs/TALK2-DATA-ENGINEERING-IMPACT-TRACK.md`
+rows 8-18 for the full run-by-run history in between.
+
 The run above was a first pass — this is the same 9-model spectrum, same
 harness, re-run under the v3 severity-threshold prompt with the harness's
 gate-2 confirmation logic (`production_candidates` in
@@ -287,16 +298,82 @@ severity-calibration bar — Llama-3.1-8B and GLM-4-9B both parse perfectly
 strongest version yet of the talk's point: format/grounding checks alone
 would have waved three of these four through.
 
-**This does not pick a stage model on its own** — it's still a quality-only
-run on non-target hardware (the M4). Qwen3-8B now needs the actual Pi 4
-decision-grade run (`docs/PI4-RUNBOOK.md`'s job, extended to this model's
-`LLM_BINARY_PATH_QWEN3_8B`/`LLM_MODEL_PATH_QWEN3_8B` env vars) before its RAM
-and latency footprint on the real target hardware are known — an 8B model is
-a meaningfully heavier footprint than the 1.5B/0.5B pair the original runbook
-was written for, and that gap is itself worth stating on stage: the model
-that won on accuracy is not the model the original resource-budget framing
+**At the time, this did not pick a stage model on its own** — it was still a
+quality-only run on non-target hardware (the M4), and Qwen3-8B still needed
+the actual Pi 4 decision-grade run before its RAM/latency footprint on the
+real target hardware was known. That run has since happened — not just for
+Qwen3-8B, but for the full five-model clean tier the gate metric pivot later
+produced (Qwen3-8B, Phi-3.5-mini-instruct, Gemma-3-4B-it, Llama-3.1-8B-Instruct,
+GLM-4-9B-0414). The original framing's worry was correct in spirit, though:
+an 8B model (or a 4B/9B one) is a meaningfully heavier Pi 4 footprint than the
+1.5B/0.5B pair the original runbook was written for, and the "Final model
+recommendation" section below is the resolution — the model that wins on one
+task's accuracy is not necessarily the model the resource-budget framing
 (Act 3, Slide 15: "small enough to share a Pi 4 with the function runtime")
-was written expecting to win.
+was written expecting to win, and it isn't even the same model across this
+talk's two LLM-driven tasks.
+
+## Final model recommendation: two tasks, two different winners (2026-09-28)
+
+The talk's Flow B (Tier 1 edge triage) and Tier 2 (talk3 spoken warning) gates
+each converged to their own real Pi 4 decision-grade dataset (full detail:
+`docs/TALK2-DATA-ENGINEERING-IMPACT-TRACK.md` rows 8-23). Four models clear
+*both* gates — Phi-3.5-mini-instruct, Gemma-3-4B-it, Llama-3.1-8B-Instruct,
+GLM-4-9B-0414 — but the best model is not the same one for both tasks, and
+the reason why is itself a talk beat, not just a footnote.
+
+**Flow B (escalation decision) → Phi-3.5-mini-instruct:**
+
+| Model | Mismatch | Pi p50 | Pi p95 | RAM |
+|---|---|---|---|---|
+| **Phi-3.5-mini-instruct** | 0.0% | **35.7s** | 157.8s | 7.11GB (93%) |
+| Llama-3.1-8B-Instruct | 0.0% | 74.7s | 232.3s | 6.92GB (91%) |
+| Gemma-3-4B-it | 2.2% | 77.1s | **101.4s** | 7.26GB (96%) |
+| GLM-4-9B-0414 | 14.6% | 94.3s | 300.1s (pinned) | 6.81GB |
+
+Ties for the best accuracy tier (0.0%, same as Llama and Qwen3-8B) and is
+more than 2x faster at the median than the next-fastest tied model, on the
+smallest model of the clean tier. Caveat worth stating on stage: Gemma-3-4B-it
+actually has the better p95 (101.4s vs. 157.8s) despite a slightly worse mean
+mismatch — a legitimate counter-argument if worst-case tail latency matters
+more than typical-case for a real-time edge decision.
+
+**Tier 2 (corridor paraphrase / spoken warning) → Gemma-3-4B-it:**
+
+| Model | Ground/speak viol | Pi p50 | Pi p95 | RAM |
+|---|---|---|---|---|
+| **Gemma-3-4B-it** | 0.0% / 0.0% | **43.7s** | **119.3s** | 7049MB |
+| GLM-4-9B-0414 | 0.0% / 0.0% | 57.6s | 179.5s | 6808MB |
+| Llama-3.1-8B-Instruct | 0.0% / 0.0% | 147.9s | 238.8s | 6815MB |
+| Phi-3.5-mini-instruct | 0.0% / 0.0% | 186.0s | 251.6s | 7171MB |
+
+**This is the mirror image of the Flow B pick, and that's the real finding.**
+Phi-3.5-mini-instruct — the Flow B winner — is the *slowest* of the four on
+Tier 2 (4x Gemma-3-4B-it's median), because it burns most of its token budget
+padding a "2-3 sentence" answer, while Gemma-3-4B-it is naturally terse here.
+Same models, same Pi 4, same quantization scheme — the ranking flips entirely
+between tasks. Root cause (real, not a hardware artifact — reproduces on the
+M4 too): Flow B's prompt invites open-ended justification
+(`risk_synthesis`), which Gemma-3-4B-it uses at length and Phi-3.5-mini
+answers tersely; Tier 2's prompt explicitly bounds scope ("2-3 sentences"),
+which Gemma-3-4B-it respects and Phi-3.5-mini doesn't. Full word-count
+evidence: `docs/TALK2-DATA-ENGINEERING-IMPACT-TRACK.md`'s "Cross-task latency
+comparison" section.
+
+**Talk beat this earns:** *the greenest model isn't a property of the model —
+it's a property of the model or a given task.* A single "pick the best model"
+slide would be actively wrong for one of these two tasks; the fact that the
+same evaluation funnel, run twice, recommends two different models for two
+adjacent tasks in the same pipeline is a stronger argument for the
+methodology than either model's individual numbers.
+
+**Worth a mention, not necessarily the headline:** GLM-4-9B-0414 is a close
+second for Tier 2 (also 0%/0%, only ~14s slower at the median) and
+Gemma-3-1B-it is a live alternative if RAM footprint outweighs raw speed —
+1.5GB vs. Gemma-3-4B-it's 7GB (~4.6x smaller), at the cost of a non-zero 10%
+grounding/3.3% speakability violation rate and a slightly slower median
+(60.1s). Given this talk's efficiency framing, that tradeoff may be worth a
+sentence even if Gemma-3-4B-it stays the headline pick.
 
 ## Not yet decided / needs your input
 

@@ -1069,6 +1069,7 @@ original finding.
 | 20 | RAG (query-dependent precedent retrieval), targeting the "can't calm down" archetype — Gemma-3-1B-it | — | No detectable accuracy effect (58.9%→57.8% mismatch, n=90, within noise) or M4 latency effect (0.54s→0.51s p50) | Real, unambiguous cost with zero measured benefit: embedder load 4.91s + 531.9MB RSS. Converges with row 3: two different intervention types (rule-tightening, retrieval) both unmoved this model — real evidence it's capacity-gated for this task, not technique-gated. Latency conclusion is M4-only; not tested on the Pi, where lower CPU throughput could still show a real prefill tax |
 | 21 | Static (non-retrieved) few-shot, targeting the "never raises" archetype — Qwen2.5-3B-Instruct and Qwen2.5-1.5B-Instruct | Qwen2.5-1.5B-Instruct: net improvement, 45.1%→27.3% mismatch (escalate-worthy 20.7%→86.2%) | **Qwen2.5-3B-Instruct got worse overall (50.0%→63.3% mismatch)**: escalate-worthy fixed (3.3%→100%) but benign (46.7%→3.3%) and de-escalate-worthy (100%→6.7%) collapsed — moved from "never raises" into "can't calm down." Qwen2.5-1.5B's improvement partly bought by trading away de-escalate-worthy (77.8%→66.7%) | Generalizes row 3's overcorrection finding beyond rule-tightening and beyond over-triggering models: biased worked examples produced the same failure shape on a different archetype. Checking all three per-scenario rates (not just the aggregate) is what caught this — the aggregate alone would have looked like a win for Qwen2.5-3B on the one scenario it targeted |
 | 22 | Pi 4 decision-grade run, Tier 2 (talk3), all 6 M4-passing models | Gemma-3-1B-it, Phi-3.5-mini-instruct, Gemma-3-4B-it, GLM-4-9B-0414, and (after the max_tokens fix below) Llama-3.1-8B-Instruct all transfer cleanly from M4 to Pi | **Qwen3-8B**: initially collapsed to 10.0% nonempty on the Pi (256-token default, no stop sequence, ~555-560s needed at its measured throughput vs. the 300s budget). Fixed the timeout-wiring bug and the token budget (capped at 110, sized off `MAX_SPEAKABLE_WORDS`) — nonempty recovered to 100%, but structured_rate/speakability then revealed a genuine, hardware-independent problem: Qwen3-8B reasons out loud in raw-completion mode, and 110 tokens sometimes runs out before it reaches the JSON. Confirmed by re-running on M4 under the identical config (structured 90%→73.3%, speak_viol 10%→26.7%) — same direction on both hosts, so this is a real model/config interaction, not a Pi artifact | Two real bugs found and fixed en route: `--model-timeout-seconds` never wired into `run_tier2_trials` (hardcoded 180s default, invisible on M4, corrupted Phi-3.5-mini's first Pi attempt); then no grammar/stop-sequence on a task that only needs a short answer. Fixing the second bug's overly generous token budget is what *exposed* Qwen3-8B's real weakness — the original PASS was an artifact of budget slack, not evidence of quality. **Qwen3-8B removed from the Tier 2 PASS list** (now 5 models, not 6) |
+| 23 | Cross-task latency comparison, Flow B vs. Tier 2, the four models that pass both | Diagnosed the Pi latency swap between the two tasks (below) down to per-model output length, not throughput or hardware | — | Real, model-specific verbosity/task interaction: Phi-3.5-mini-instruct and Llama-3.1-8B-Instruct write far more text on Tier 2 than Flow B (and vice versa for Gemma-3-4B-it and GLM-4-9B-0414) — same pattern visible on M4, so not a Pi artifact |
 
 ---
 
@@ -1138,6 +1139,83 @@ under the fix, n=30 each:
 |---|---|---|---|---|---|
 | Llama-3.1-8B-Instruct | **100.0%** | 100.0% | 0.0% | 0.0% | 147.9s/238.8s |
 | Qwen3-8B | **100.0%** | 63.3% | 36.7% | 10.0% | 151.2s/244.6s |
+
+---
+
+## Cross-task latency comparison: Flow B vs. Tier 2, same models, same hardware
+
+The four models that clear both Pi 4 gates (Phi-3.5-mini-instruct,
+Gemma-3-4B-it, Llama-3.1-8B-Instruct, GLM-4-9B-0414) show an unexpected
+pattern when their Flow B and Tier 2 Pi latencies are put side by side:
+Phi-3.5-mini-instruct and Llama-3.1-8B-Instruct get markedly *slower* on
+Tier 2 than Flow B, while Gemma-3-4B-it and GLM-4-9B-0414 get *faster*:
+
+| Model | Flow B Pi p50/p95 | Flow B tok/s | Tier 2 Pi p50/p95 | Tier 2 tok/s |
+|---|---|---|---|---|
+| Phi-3.5-mini-instruct | 35.7s / 157.8s | 0.467 | 186.0s / 251.6s | 0.450 |
+| Llama-3.1-8B-Instruct | 74.7s / 232.3s | 0.499 | 147.9s / 238.8s | ~0.455 |
+| Gemma-3-4B-it | 77.1s / 101.4s | 0.867 | 43.7s / 119.3s | 0.690 |
+| GLM-4-9B-0414 | 94.3s / 300.1s | not reported | 57.6s / 179.5s | 0.304 |
+
+tok/s is roughly comparable per model across the two tasks, which rules out
+a throughput explanation — the swap has to come from how much each model
+*writes* per task, not how fast it writes. Since the Pi's raw completions
+for these two tasks aren't committed to this repo (Pi-generated artifacts
+live on the Pi, per this session's own convention), output length was
+reconstructed from each model's own M4 run instead — same model, same
+prompt, same sampling settings, so length is a model/task property, not a
+hardware one, even though wall-clock isn't. Every M4 comparison artifact
+already records `tokens_per_sec_approx` ("whitespace word count / latency"),
+so inverting `tokens_per_sec_approx × p50_latency` recovers an approximate
+word count per trial:
+
+| Model | Flow B words (M4, p50) | Tier 2 words (M4, p50, uncapped/pre-fix) | Tier 2 words (M4, p50, capped @110 tok) |
+|---|---|---|---|
+| Phi-3.5-mini-instruct | 18.6 | **114.9** | 47.6 |
+| Llama-3.1-8B-Instruct | 37.6 | **154.5** | 70.0 |
+| Gemma-3-4B-it | **71.9** | 32.5 | 33.0 |
+| GLM-4-9B-0414 | **36.2** | 22.3 | — (never needed the cap) |
+
+(Flow B: `eval-results/compare-flow-b-COMP-J2D9D71YNJ-20260926T215201Z.json`.
+Tier 2 uncapped: `eval-results/compare-tier2-COMP-J2D9D71YNJ-20260927T050845Z.json`.
+Tier 2 capped: `eval-results/compare-tier2-COMP-J2D9D71YNJ-20260928T151529Z.json`.)
+
+The word counts flip in exactly the direction the Pi latencies did. Phi-3.5-mini
+and Llama-3.1-8B are terse on Flow B (~19-38 words) but want to write
+115-155 words on Tier 2 with nothing stopping them — that's why their
+pre-fix Pi runs hit the 300s timeout ceiling (see the max_tokens fix above),
+and why even after the 110-token cap they still use most of the budget
+(47.6/70.0 words, 4-5x their Flow B output). Gemma-3-4B-it and GLM-4-9B-0414
+run the opposite way: verbose on Flow B's `risk_synthesis` field (32-72
+words justifying the escalation decision) but naturally terse on Tier 2's
+"2-3 sentence" paraphrase (~22-33 words), comfortably under any cap.
+
+**Why the two tasks pull different models in different directions:**
+Flow B's prompt (`triage_function.DEFAULT_PROMPT_TEMPLATE`) explicitly asks
+the model to justify itself — "First write risk_synthesis: name the
+SPECIFIC field(s) that drove your decision and why" — an open-ended
+reasoning field whose *length* the GBNF grammar never constrains, only its
+structure (`build_grammar`'s `[^"]*` term accepts any length). Gemma-3-4B-it
+treats that as license to explain at length; Phi-3.5-mini and Llama-3.1-8B
+answer it tersely. Tier 2's prompt
+(`talk3_pulsar_speaks_english.prompting.SYNTHESIS_WARNING_PROMPT`) explicitly
+bounds scope instead — "2-3 sentences," "your only job is to phrase the
+warning" — and has no reasoning task and no grammar at all. GLM-4-9B and
+Gemma-3-4B-it comply; Phi-3.5-mini and Llama-3.1-8B don't, padding well past
+2-3 sentences (the same family of failure as Qwen3-8B's documented
+reasoning-out-loud problem above, just verbose restating rather than
+visible chain-of-thought). Neither harness uses a `stop` sequence for the
+same documented reason (see the max_tokens fix above), so in both cases only
+`max_tokens` or the model's own EOS choice ends generation — and which one
+fires first is a model x task property this project doesn't otherwise
+control for.
+
+**Takeaway for the talk:** a model's per-task verbosity is not predictable
+from its behavior on a different task, even a structurally similar one on
+the same hardware — Gemma-3-4B-it and Phi-3.5-mini-instruct essentially trade
+places between the two tasks. Any resource-budget story that treats "this
+model's speed" as a single number, rather than a per-prompt property, would
+be wrong for at least half of this project's own top-tier models.
 
 The timeout collapse is gone for both — comfortably under the 300s budget
 now. Llama-3.1-8B-Instruct is a clean win, matching its M4 quality exactly.
