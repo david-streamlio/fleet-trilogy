@@ -5,12 +5,25 @@ conform to this document. If code and canon disagree, canon wins — fix the cod
 
 ## Model
 
-- **Microsoft BitNet b1.58-2B**, ~1.2GB quantized, run via **bitnet.cpp**.
-- **CPU-only.** No GPU anywhere in the architecture — not on the edge device, not in the
-  cloud tier. This is the whole point of a 1-bit model: it's cheap enough to run
-  everywhere without one.
-- Target edge device: **Raspberry Pi 5**. In demos, a Pi (or a container throttled to
-  Pi-like resources) simulates on-truck compute.
+- **Small, quantized instruct models (Q4_K_M GGUF)**, run via **mainline llama.cpp**
+  (subprocess). Not BitNet: a literal 1-bit BitNet b1.58-2B model was the original
+  plan and was abandoned after producing garbage output on ARM — see
+  `docs/BITNET-POSTMORTEM.md` for the full record. The "1-bit" framing in the talk
+  titles now refers to that story, not to the literal quantization of the models
+  actually shipped.
+- **CPU-only.** No GPU anywhere in the core architecture — not on the edge device, not
+  in the cloud tier. Talk 2's efficiency story ("The Greenest Token") separately
+  contrasts this CPU-only approach against a full-precision GPU comparison point
+  (`docs/TALK2-GPU-BENCHMARK-PLAN.md`) — that's a deliberate side-by-side for the talk,
+  not a second production path.
+- Target edge device: **Raspberry Pi 4**, 8GB RAM (`docs/PI4-RUNBOOK.md`). In demos, a
+  Pi (or a container throttled to Pi-like resources) simulates on-truck compute.
+- The specific model per task is decided by real accuracy/latency/RAM gates run on the
+  Pi, not fixed here — that pick has changed more than once as the candidate pool and
+  gate metrics evolved, and hardcoding a name in this file is exactly how it went stale
+  last time (it named BitNet long after BitNet was dropped). Current picks and the full
+  decision trail live in `docs/TALK2-OUTLINE.md` ("Final model recommendation") and
+  `docs/TALK2-DATA-ENGINEERING-IMPACT-TRACK.md`.
 
 ## Use case
 
@@ -32,35 +45,36 @@ conform to this document. If code and canon disagree, canon wins — fix the cod
 
   Any one of these alone is noise. The combination is the incident.
 
-## Architecture — two tiers, both 1-bit, both CPU
+## Architecture — two tiers, both small quantized models, both CPU
 
 ```
-        TRUCK 47 (edge / Pi)                      CLOUD (hive)
+        TRUCK 47 (edge / Pi 4)                     CLOUD (hive)
    ┌───────────────────────────┐          ┌───────────────────────────┐
    │ raw telemetry samples     │          │  many trucks' enrichment  │
    │        │                  │          │  cards arrive on Pulsar   │
    │        v                  │          │        │                  │
    │  cheap math detection     │          │        v                  │
-   │  (thresholds, oscillation │          │  TIER 2: 1-bit LLM        │
-   │   variance, ETA delta)    │          │  GLOBAL SYNTHESIS +       │
+   │  (thresholds, oscillation │          │  TIER 2: small quantized  │
+   │   variance, ETA delta)    │          │  LLM — GLOBAL SYNTHESIS + │
    │        │                  │          │  LANGUAGE                 │
    │        v                  │  Pulsar  │   - one truck vs many?    │
-   │  TIER 1: 1-bit LLM        │ ───────> │   - reroute decision      │
-   │  LOCAL INTERPRETATION     │  topic   │   - spoken warning text   │
+   │  TIER 1: small quantized  │ ───────> │   - reroute decision      │
+   │  LLM — LOCAL INTERPRETATION│ topic   │   - spoken warning text   │
    │  -> "enrichment card"     │          │                           │
    └───────────────────────────┘          └───────────────────────────┘
 ```
 
-- **Tier 1 (edge)**: a 1-bit LLM runs inline inside a Pulsar Function on the truck/Pi.
-  Detection is done by cheap math, **not** the LLM — thresholds, sustained-duration
-  checks, oscillation/variance on the speed series, and ETA delta. The LLM's only job is
-  **interpretation**: turn the correlated raw signals into a structured, human-readable
-  **enrichment card**. The LLM interprets; it never detects.
-- **Tier 2 (cloud/hive)**: a second 1-bit LLM runs inline inside a Pulsar Function in the
-  cloud tier. It performs **global synthesis and language generation**: aggregate
-  enrichment cards from many trucks, decide whether this is one truck's local problem or
-  a corridor-wide incident, decide on a reroute, and generate the spoken proactive
-  warning text.
+- **Tier 1 (edge)**: a small quantized instruct LLM runs inline inside a Pulsar
+  Function on the truck/Pi. Detection is done by cheap math, **not** the LLM —
+  thresholds, sustained-duration checks, oscillation/variance on the speed series, and
+  ETA delta. The LLM's only job is **interpretation**: turn the correlated raw signals
+  into a structured, human-readable **enrichment card**. The LLM interprets; it never
+  detects.
+- **Tier 2 (cloud/hive)**: a second small quantized instruct LLM runs inline inside a
+  Pulsar Function in the cloud tier. It performs **global synthesis and language
+  generation**: aggregate enrichment cards from many trucks, decide whether this is one
+  truck's local problem or a corridor-wide incident, decide on a reroute, and generate
+  the spoken proactive warning text.
 
 Neither tier ever uses a GPU. Neither tier skips the cheap-math detection step and asks
 the LLM to "notice" the anomaly from raw numbers — the LLM only ever sees signals that
@@ -70,10 +84,12 @@ math has already decided are worth interpreting.
 
 - **Python 3.11+** throughout, no exceptions.
 - Pulsar via the official `pulsar-client` package and Python Pulsar Functions.
-- `bitnet.cpp` is accessed by **subprocess** for now (shell out to the compiled
-  `llama-cli`-style binary). An in-process binding (e.g. via `ctypes`/pybind) is a known
-  future path — the code should leave that door open (an abstract backend interface) but
-  must **not** implement it yet.
+- Mainline **llama.cpp** is accessed by **subprocess** for now (shell out to the
+  compiled `llama-completion`-style binary), via `shared/llm-inference` — a generic
+  wrapper package, originally named `shared/bitnet-inference` before the BitNet-to-
+  llama.cpp pivot (`docs/BITNET-POSTMORTEM.md`). An in-process binding (e.g. via
+  `ctypes`/pybind) is a known future path — the code should leave that door open (an
+  abstract backend interface) but must **not** implement it yet.
 
 ## One shared codebase
 
@@ -83,5 +99,9 @@ math has already decided are worth interpreting.
 - Talk packages (`talks/talk1-*`, `talk2-*`, `talk3-*`) depend on `shared/` packages.
   Talk packages **never** depend on each other. If two talks need the same thing, that
   thing belongs in `shared/`, not copied.
-- This session scaffolds `shared/` only. Talk packages are stubs (empty package + README)
-  until their own build sessions.
+- `shared/` and all three talk packages (`talk1-edge-intelligence`,
+  `talk2-greenest-token`, `talk3-pulsar-speaks-english`) are built, not stubs — see
+  each package's own README and `deploy/README.md` for the runnable end-to-end local
+  demo. What's still open: a slide deck (not started yet) and the handful of items in
+  `docs/TALK2-OUTLINE.md`'s "Not yet decided" section; talk1 and talk3 don't have their
+  own outline docs yet.

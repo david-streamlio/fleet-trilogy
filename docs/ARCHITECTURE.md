@@ -6,7 +6,7 @@ See [CANON.md](CANON.md) for the locked facts this diagram must stay consistent 
 
 ```
  ┌────────────────────────────────────────────────────────────────────┐
- │ Truck 47 — I-95N — Raspberry Pi 5 (edge compute, CPU-only)          │
+ │ Truck 47 — I-95N — Raspberry Pi 4 (edge compute, CPU-only)          │
  │                                                                      │
  │  fleet-simulator                                                    │
  │       │ TruckTelemetry samples (speed, lat/lon, eta, ...)           │
@@ -20,7 +20,8 @@ See [CANON.md](CANON.md) for the locked facts this diagram must stay consistent 
  │       │     - speed oscillation (stop/go)?                          │
  │       │     - ETA slip trend?                                       │
  │       │                                                              │
- │       └─ if all three correlate -> ask the 1-bit LLM to INTERPRET   │
+ │       └─ if all three correlate -> ask the small quantized LLM to  │
+ │            INTERPRET                                                │
  │            (llm-inference, subprocess call to a llama.cpp-family runtime)│
  │                │                                                     │
  │                v                                                     │
@@ -35,7 +36,7 @@ See [CANON.md](CANON.md) for the locked facts this diagram must stay consistent 
  │       ├─ aggregates enrichment cards across trucks + corridor       │
  │       ├─ decides: isolated truck issue vs. corridor-wide incident   │
  │       ├─ decides: reroute recommendation                            │
- │       └─ 1-bit LLM generates the spoken proactive warning           │
+ │       └─ small quantized LLM generates the spoken proactive warning│
  │                │                                                     │
  │                v                                                     │
  │          IncidentSynthesis (reroute + spoken warning text)          │
@@ -52,8 +53,8 @@ See [CANON.md](CANON.md) for the locked facts this diagram must stay consistent 
 | `fleet-telemetry-model` | `shared/fleet-telemetry-model` | `TruckTelemetry`, `EnrichmentCard`, `IncidentSynthesis` schemas; cheap-math anomaly detection; Pulsar topic name constants |
 | `fleet-simulator` | `shared/fleet-simulator` | The one fleet telemetry generator, including the Truck 47 / I-95N slowdown scenario |
 | `llm-inference` | `shared/llm-inference` | Subprocess wrapper around a llama.cpp-family CLI runtime; tier1/tier2 prompt templates; abstract backend interface (in-process binding reserved for later) |
-| `talk1-edge-intelligence` | `talks/talk1-edge-intelligence` | Stub — Tier 1 demo, future session |
-| `talk2-greenest-token` | `talks/talk2-greenest-token` | Stub — future session |
-| `talk3-pulsar-speaks-english` | `talks/talk3-pulsar-speaks-english` | Stub — Tier 2 / full-loop demo, future session |
+| `talk1-edge-intelligence` | `talks/talk1-edge-intelligence` | Built — Tier 1 demo |
+| `talk2-greenest-token` | `talks/talk2-greenest-token` | Built — the efficiency story |
+| `talk3-pulsar-speaks-english` | `talks/talk3-pulsar-speaks-english` | Built — Tier 2 / full-loop demo |
 
 Talk packages depend on `shared/*` only, never on each other.

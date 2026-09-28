@@ -1,6 +1,6 @@
 # fleet-trilogy
 
-A three-talk conference trilogy about running 1-bit LLMs (Microsoft BitNet) inside
+A three-talk conference trilogy about running small, CPU-only quantized LLMs inside
 Apache Pulsar for connected-fleet telemetry. One monorepo, one shared core, three talks.
 
 Locked facts live in [docs/CANON.md](docs/CANON.md) — read that first. The two-tier
@@ -10,12 +10,16 @@ architecture diagram is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 A delivery fleet's trucks (canonically **Truck 47**, on corridor **I-95N**) stream raw
 telemetry. Cheap math on each truck flags a possible **SLOWDOWN** — sustained ~35mph +
-a stop/go speed oscillation + a slipping ETA. A **1-bit BitNet model, CPU-only,
-Raspberry Pi 5**, running inline in a Pulsar Function on the truck, turns that into a
-structured enrichment card. In the cloud, a second 1-bit BitNet model — also CPU-only,
-no GPU anywhere in this architecture — aggregates enrichment cards across the fleet,
-decides whether this is one truck's problem or a corridor-wide incident, decides on a
-reroute, and speaks a proactive warning.
+a stop/go speed oscillation + a slipping ETA. A small, CPU-only quantized instruct
+model, running inline in a Pulsar Function on a **Raspberry Pi 4** on the truck, turns
+that into a structured enrichment card. In the cloud, a second small quantized model —
+also CPU-only, no GPU anywhere in this architecture — aggregates enrichment cards
+across the fleet, decides whether this is one truck's problem or a corridor-wide
+incident, decides on a reroute, and speaks a proactive warning.
+
+(The project set out to run a literal 1-bit model, Microsoft's BitNet, for this — it
+produced garbage output on ARM and was dropped. `docs/BITNET-POSTMORTEM.md` has the
+full story; it's now part of the talk, not a footnote.)
 
 Three talks, one underlying system, told from three angles:
 
@@ -26,10 +30,12 @@ Three talks, one underlying system, told from three angles:
 3. **Pulsar Speaks English** (`talks/talk3-pulsar-speaks-english`) — Tier 2: global
    synthesis, reroutes, and the spoken warning.
 
-**This repo is scaffolded talk-by-talk.** `shared/` is built, and Talk 1's Tier 1
-edge pipeline (`process_event` + its Pulsar adapter/Function) is built as the
-foundation for the demo deployment — see `deploy/README.md`. Talks 2 and 3 remain
-stubs (empty package + README) until their own sessions.
+**All three talk packages are built**, along with `shared/` and a runnable end-to-end
+local demo (`deploy/README.md` — Pulsar via docker-compose, a localrun script per
+tier, and a mock-LLM mode for dry runs without real models). What's still open: a
+slide deck (not started yet), and a handful of open questions tracked in
+`docs/TALK2-OUTLINE.md`'s "Not yet decided" section — talk1 and talk3 don't have
+their own outline docs yet.
 
 ## One shared codebase
 
@@ -48,8 +54,8 @@ fleet-trilogy/
     llm-inference/          subprocess wrapper around a llama.cpp-family runtime + tier1/tier2 prompts
   talks/
     talk1-edge-intelligence/       Tier 1 edge: process_event() + Pulsar adapter/Function
-    talk2-greenest-token/          stub
-    talk3-pulsar-speaks-english/   stub
+    talk2-greenest-token/          the efficiency story: ApproachProfile comparison + report
+    talk3-pulsar-speaks-english/   Tier 2 cloud: synthesis + spoken-warning generation
   deploy/                   docker-compose (local Pulsar), localrun script, topology docs
 ```
 
@@ -67,6 +73,9 @@ make test-integration   # opt-in: real Pulsar standalone via testcontainers (nee
 Each `shared/*` and `talks/*` directory is its own installable package with its own
 `pyproject.toml`; the root `pyproject.toml` just wires them together as a workspace.
 
-Nothing in this repo talks to a GPU. Model inference (BitNet b1.58-2B via `bitnet.cpp`)
-is CPU-only by design, targeting a Raspberry Pi 5 at the edge and ordinary CPU hosts in
-the cloud tier.
+Nothing in this repo's core architecture talks to a GPU. Model inference (small
+quantized instruct models via mainline `llama.cpp`) is CPU-only by design, targeting a
+Raspberry Pi 4 at the edge and ordinary CPU hosts in the cloud tier. (Talk 2 separately
+benchmarks a full-precision GPU comparison point for the efficiency story — see
+`docs/TALK2-GPU-BENCHMARK-PLAN.md` — that's a deliberate contrast for the talk, not a
+second production path.)
