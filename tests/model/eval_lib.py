@@ -381,6 +381,14 @@ def run_flow_b_trials(
     diagnose_operational_risk.py script validated before this became the real harness).
     Applied by mutating the coprocessor's real JSON payload post-hoc, not by changing
     what the coprocessor itself computes.
+
+    Calls triage.build_card, not triage.process, deliberately: process() applies the
+    uplink_min_severity gate (talks/talk1-edge-intelligence/TODO-TRIAGE-UPLINK-GATE.md)
+    and returns None for any card below threshold, which would make this harness's
+    format-reliability/escalation-direction scoring count a correctly-generated
+    low/medium card as a failure. build_card is the same generation logic, ungated —
+    this harness scores every card the model actually produces, independent of
+    whether that card would be uplinked.
     """
     payload = coprocessor.process(to_json(event), context)
     trials: list[FlowBTrial] = []
@@ -399,7 +407,7 @@ def run_flow_b_trials(
             # Deliberately blind, same as Flow A's run_enrichment_trials: a real
             # subprocess call can fail beyond LlmInferenceError, and a failure
             # here is a measurement (a format-reliability miss), not a bug.
-            raw = triage.process(payload, context)
+            raw = triage.build_card(payload, context)
         except Exception as exc:  # noqa: BLE001
             trials.append(
                 FlowBTrial(raw_output="", latency_seconds=time.monotonic() - start, parsed=None, error=str(exc))

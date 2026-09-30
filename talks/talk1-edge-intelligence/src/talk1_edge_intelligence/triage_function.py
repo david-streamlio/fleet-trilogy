@@ -68,6 +68,7 @@ from __future__ import annotations
 
 import json
 
+from fleet_telemetry_model import LOCAL_TRIAGE_TOPIC
 from llm_inference import LlmGenerationConfig, LlmInferenceError, LlmServerBackend
 from llm_inference.structured import extract_json_object
 
@@ -88,6 +89,11 @@ DEFAULT_TEMPERATURE = 0.2
 # cores for the OS/everything else rather than starving them.
 DEFAULT_THREADS = 12
 DEFAULT_TIMEOUT_SECONDS = 60.0
+# The deck's answer to the cloud observability bottleneck (slides 20-21): only
+# high-severity, ETA-impacting cards use the cellular link. Everything below this
+# threshold is held on the truck (LOCAL_TRIAGE_TOPIC) instead of reaching the
+# default output topic -- see process() below.
+DEFAULT_UPLINK_MIN_SEVERITY = "high"
 
 SEVERITY_LEVELS = ("low", "medium", "high")
 
@@ -221,8 +227,43 @@ class LlmTriageFunction:
         self._temperature = DEFAULT_TEMPERATURE
         self._threads = DEFAULT_THREADS
         self._timeout_seconds = DEFAULT_TIMEOUT_SECONDS
+        self._uplink_min_severity = DEFAULT_UPLINK_MIN_SEVERITY
 
     def process(self, input_item: str, context) -> str | None:
+        """Pulsar Functions entry point. Builds the full card via build_card, then
+        applies the uplink-severity gate (slides 20-21): a card whose final severity
+        doesn't meet uplink_min_severity is published to LOCAL_TRIAGE_TOPIC instead
+        of being returned, so it's held on the edge broker rather than reaching the
+        default output topic -- Pulsar Functions drops a None return entirely.
+        """
+        card_json = self.build_card(input_item, context)
+        if card_json is None:
+            return None
+
+        card = json.loads(card_json)
+        if self._meets_uplink_threshold(card["severity"]):
+            return card_json
+
+        context.get_logger().info(
+            f"[{card['truck_id']}] severity={card['severity']!r} below "
+            f"uplink_min_severity={self._uplink_min_severity!r} -- holding on "
+            f"{LOCAL_TRIAGE_TOPIC}, not uplinked"
+        )
+        context.publish(LOCAL_TRIAGE_TOPIC, card_json.encode("utf-8"))
+        return None
+
+    def _meets_uplink_threshold(self, severity: str) -> bool:
+        return SEVERITY_LEVELS.index(severity) >= SEVERITY_LEVELS.index(self._uplink_min_severity)
+
+    def build_card(self, input_item: str, context) -> str | None:
+        """The full triage card, ungated -- every payload that clears the
+        coprocessor gets a card here, regardless of final severity. process()
+        (above) is the gated Pulsar Functions entry point; this method exists
+        separately so callers that need every card regardless of the uplink gate
+        (tests/model/eval_lib.py's format-reliability/escalation-direction scoring)
+        can call it directly without the gate silently turning a low/medium card
+        into a measured failure.
+        """
         logger = context.get_logger()
         if not self._configured:
             self._configure(context)
@@ -296,6 +337,7 @@ class LlmTriageFunction:
         self._temperature = float(get("temperature") or DEFAULT_TEMPERATURE)
         self._threads = int(get("threads") or DEFAULT_THREADS)
         self._timeout_seconds = float(get("timeout_seconds") or DEFAULT_TIMEOUT_SECONDS)
+        self._uplink_min_severity = get("uplink_min_severity") or DEFAULT_UPLINK_MIN_SEVERITY
         self._backend = LlmServerBackend(
             binary_path=get("llm_binary_path") or DEFAULT_BINARY_PATH,
             model_path=get("llm_model_path") or DEFAULT_MODEL_PATH,

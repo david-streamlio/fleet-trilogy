@@ -121,6 +121,108 @@ docstring for exactly how that threshold works and why (Pulsar Functions are
 per-message, but Tier 2 needs multiple trucks' cards before it can decide
 anything).
 
+## Flow B: co-processor + LLM triage with an uplink gate
+
+Flow B is the pivot architecture later slides describe (see
+`docs/TALK1-SLIDE-PLAN.md` / `talks/talk1-edge-intelligence/slides`) — a
+two-stage pipeline in place of Tier 1's single `EdgeEnrichmentFunction`,
+with a severity-based gate on what actually leaves the edge broker:
+
+```
+truck-telemetry
+      │
+      ▼
+TelemetryCoprocessorFunction        (talk1_edge_intelligence.coprocessor)
+  cheap-math gate: is_probable_slowdown + an eta_slip_min magnitude window
+  -- no LLM runtime at this stage
+      │
+      ▼
+triage-payloads
+      │
+      ▼
+LlmTriageFunction                   (talk1_edge_intelligence.triage_function)
+  build_card() ──▶ SubprocessLlmBackend/LlmServerBackend ──▶ llama.cpp-family
+  subprocess ──▶ apply_escalation(baseline_severity, escalation)
+      │
+      ├── severity meets uplink_min_severity (default "high")
+      │     └──▶ enrichment-cards           (crosses the cellular link)
+      │
+      └── severity below uplink_min_severity
+            └──▶ triage-local-only          (held on the edge broker)
+```
+
+- `uplink_min_severity` is a `LlmTriageFunction` user-config value (one of
+  `low`/`medium`/`high`, default `"high"`) — see
+  `talks/talk1-edge-intelligence/TODO-TRIAGE-UPLINK-GATE.md` for the full
+  design and `test_triage_function.py` for the gate's test coverage.
+- `process()` is the gated Pulsar Functions entry point; `build_card()` is
+  the same card-generation logic, ungated — `tests/model/eval_lib.py`'s
+  `run_flow_b_trials` calls `build_card()` directly so eval scoring isn't
+  affected by cards the gate would otherwise hold.
+- Topic names (`TRIAGE_PAYLOADS_TOPIC`, `LOCAL_TRIAGE_TOPIC`, plus the
+  existing `ENRICHMENT_CARDS_TOPIC`) are defined once in
+  `fleet_telemetry_model.topics` — nothing in Flow B hardcodes a topic
+  string.
+
+### Running Flow B by hand
+
+Two localrun scripts, one per function, mirroring `run_tier1_localrun.sh`'s
+conventions:
+
+```bash
+./deploy/run_flowb_coprocessor_localrun.sh pulsar://localhost:6650 http://localhost:8080
+./deploy/run_flowb_triage_localrun.sh pulsar://localhost:6650 http://localhost:8080
+```
+
+`run_flowb_triage_localrun.sh` needs `LLM_BINARY_PATH` / `LLM_MODEL_PATH`
+the same way Tier 1 does, plus an optional `UPLINK_MIN_SEVERITY` override.
+`run_flowb_coprocessor_localrun.sh` takes optional
+`COPROCESSOR_MIN_ETA_SLIP_MIN` / `COPROCESSOR_MAX_ETA_SLIP_MIN` overrides.
+
+### The one-shot demo: `deploy/demo.sh`
+
+`deploy/demo.sh` runs the whole Flow B take in one script — broker check,
+both functions, a fixed simulator scenario, and a live side-by-side view of
+what got uplinked vs. what stayed local — so the "See It Running" recording
+(`talks/talk1-edge-intelligence/TODO-DEMO-RECORDING.md`) can be repeated
+identically. It deliberately launches Flow B, not
+`run_tier1_localrun.sh`'s `EdgeEnrichmentFunction`: Tier 1 has no
+co-processor gate, no severity escalation, and no local-only topic, so it
+can't produce the "raised to high and uplinked" + "stays local" pair the
+recording needs.
+
+Local dev / rehearsal (broker + functions + simulator all on this machine):
+
+```bash
+docker compose -f deploy/docker-compose.yml up -d   # or let demo.sh start it
+./deploy/demo.sh
+```
+
+Recording take, broker on the Pi (this take's documented placement — see
+"Broker placement" above), `fleet-simulator` on the laptop:
+
+```bash
+# on the Pi:
+./deploy/demo.sh pulsar://localhost:6650 --simulator-host <pi-hostname-or-ip>
+# demo.sh prints the exact fleet-simulate command to paste on the laptop,
+# then waits — Ctrl-C on the Pi tears everything down once the take is done.
+```
+
+The scenario is fixed and checked in at `deploy/demo-scenario.env`
+(`--fleet-size 1 --incident-corridor I-95N --incident-trucks 1 --seed 4747
+--rate 4 --duration 30`) — truck-47 forced onto I-95N with an early,
+deterministic incident start. See that file's comments for why this
+scenario is expected to produce both a card raised to `"high"` (uplinked)
+and at least one card lowered/held (stays local), and for the honest
+caveat that the raise itself is a real model decision each run, not
+scripted.
+
+Output is labelled, not raw log spam: one-line `[co-processor]`/`[llm]`
+startup banners (full logs go to a temp dir printed at startup), then a
+live `[uplink]`/`[local]` stream of whatever actually lands on
+`enrichment-cards` / `triage-local-only`. Requires `pulsar-admin` and
+`pulsar-client` on `PATH` in addition to Tier 1's requirements.
+
 ## Raspberry Pi provisioning
 
 See [PI4-RUNBOOK.md](../docs/PI4-RUNBOOK.md) for building mainline llama.cpp on

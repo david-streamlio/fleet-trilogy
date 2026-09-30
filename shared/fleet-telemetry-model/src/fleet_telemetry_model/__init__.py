@@ -17,6 +17,8 @@ from fleet_telemetry_model.topics import (
     DEFAULT_TELEMETRY_TOPIC,
     ENRICHMENT_CARDS_TOPIC,
     INCIDENTS_TOPIC,
+    LOCAL_TRIAGE_TOPIC,
+    TRIAGE_PAYLOADS_TOPIC,
 )
 from fleet_telemetry_model.zscore_detection import RollingZScoreDetector
 
@@ -25,8 +27,10 @@ __all__ = [
     "ENRICHMENT_CARDS_TOPIC",
     "ETA_SLIP_SIGNAL",
     "INCIDENTS_TOPIC",
+    "LOCAL_TRIAGE_TOPIC",
     "STOP_GO_INDEX_SIGNAL",
     "SUSTAINED_LOW_SPEED_SIGNAL",
+    "TRIAGE_PAYLOADS_TOPIC",
     "EnrichmentCard",
     "GpsPosition",
     "IncidentSynthesis",

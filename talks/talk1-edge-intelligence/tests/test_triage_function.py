@@ -1,6 +1,7 @@
 import json
 import logging
 
+from fleet_telemetry_model import LOCAL_TRIAGE_TOPIC
 from talk1_edge_intelligence.triage_function import (
     RECOMMENDED_ACTIONS,
     LlmTriageFunction,
@@ -12,19 +13,24 @@ from talk1_edge_intelligence.triage_function import (
 
 
 class _FakeContext:
-    """Minimal stand-in for a Pulsar Functions Context: get_logger() and
-    get_user_config_value(key), the two methods LlmTriageFunction calls.
+    """Minimal stand-in for a Pulsar Functions Context: get_logger(),
+    get_user_config_value(key), and publish(topic, data) -- the methods
+    LlmTriageFunction calls.
     """
 
     def __init__(self, user_config: dict | None = None) -> None:
         self._user_config = user_config or {}
         self._logger = logging.getLogger("test")
+        self.published: list[tuple[str, bytes]] = []
 
     def get_logger(self) -> logging.Logger:
         return self._logger
 
     def get_user_config_value(self, key: str) -> str | None:
         return self._user_config.get(key)
+
+    def publish(self, topic: str, data: bytes) -> None:
+        self.published.append((topic, data))
 
 
 def _payload(*, truck_id: str = "truck-03", eta_slip_min: float = 13.8, baseline_severity: str = "medium") -> str:
@@ -164,3 +170,98 @@ def test_process_returns_grammar_shaped_card_via_mock_backend(monkeypatch):
     # completion above doesn't even include it, and the card still gets one, always
     # in agreement with escalation by construction.
     assert card["recommended_action"] == RECOMMENDED_ACTIONS["raise"]
+
+
+def _mock_backend_returning(monkeypatch, escalation: str) -> None:
+    """Stubs LlmServerBackend the same way test_process_returns_grammar_shaped_card_
+    via_mock_backend does, but parameterized on escalation so the uplink-gate tests
+    below can drive process() to a specific final severity via apply_escalation.
+    """
+    from llm_inference.client import LlmServerBackend
+
+    monkeypatch.setattr(LlmServerBackend, "start", lambda self: self)
+    monkeypatch.setattr(
+        LlmServerBackend,
+        "generate",
+        lambda self, prompt, config=None: json.dumps(
+            {
+                "risk_synthesis": "scenario reasoning",
+                "escalation": escalation,
+                "truck_id": "placeholder",
+            }
+        ),
+    )
+
+
+def test_process_uplinks_a_card_raised_to_high(monkeypatch):
+    _mock_backend_returning(monkeypatch, "raise")
+    function = LlmTriageFunction()
+    context = _FakeContext()  # default uplink_min_severity: "high"
+
+    result = function.process(_payload(baseline_severity="medium"), context)
+
+    assert result is not None
+    card = json.loads(result)
+    assert card["severity"] == "high"  # medium + raise
+    assert context.published == []  # uplinked, not held locally
+
+
+def test_process_holds_a_card_lowered_to_medium(monkeypatch):
+    _mock_backend_returning(monkeypatch, "lower")
+    function = LlmTriageFunction()
+    context = _FakeContext()
+
+    result = function.process(_payload(baseline_severity="high"), context)
+
+    assert result is None  # "medium" doesn't meet the default "high" gate
+    assert len(context.published) == 1
+    topic, data = context.published[0]
+    assert topic == LOCAL_TRIAGE_TOPIC
+    published_card = json.loads(data.decode("utf-8"))
+    assert published_card["severity"] == "medium"  # high + lower
+
+
+def test_process_holds_a_card_held_at_low(monkeypatch):
+    _mock_backend_returning(monkeypatch, "hold")
+    function = LlmTriageFunction()
+    context = _FakeContext()
+
+    result = function.process(_payload(baseline_severity="low"), context)
+
+    assert result is None
+    assert len(context.published) == 1
+    topic, data = context.published[0]
+    assert topic == LOCAL_TRIAGE_TOPIC
+    published_card = json.loads(data.decode("utf-8"))
+    assert published_card["severity"] == "low"  # low + hold, unchanged
+
+
+def test_uplink_min_severity_config_override(monkeypatch):
+    _mock_backend_returning(monkeypatch, "hold")
+    function = LlmTriageFunction()
+    context = _FakeContext({"uplink_min_severity": "medium"})
+
+    result = function.process(_payload(baseline_severity="medium"), context)
+
+    # A "medium" card is held under the default gate ("high"), but this override
+    # lowers the bar to "medium" -- so the same card is uplinked instead.
+    assert result is not None
+    card = json.loads(result)
+    assert card["severity"] == "medium"
+    assert context.published == []
+
+
+def test_build_card_is_ungated(monkeypatch):
+    # build_card (used directly by tests/model/eval_lib.py's run_flow_b_trials) must
+    # return every card regardless of severity -- the uplink gate lives in process()
+    # only, so eval scoring isn't corrupted by cards the gate would otherwise hold.
+    _mock_backend_returning(monkeypatch, "hold")
+    function = LlmTriageFunction()
+    context = _FakeContext()
+
+    result = function.build_card(_payload(baseline_severity="low"), context)
+
+    assert result is not None
+    card = json.loads(result)
+    assert card["severity"] == "low"
+    assert context.published == []  # build_card never touches the local topic
