@@ -3,17 +3,19 @@
 # the recording (talks/talk1-edge-intelligence/TODO-DEMO-RECORDING.md) can be
 # repeated identically.
 #
-# This wires up FLOW B (coprocessor -> LLM triage -> uplink gate), not
-# run_tier1_localrun.sh's single-stage EdgeEnrichmentFunction: Tier 1 has no
-# co-processor gate, no severity escalation, and no local-only topic, so it
-# cannot produce the "raised to high and uplinked" + "stays local" pair the
-# recording needs. See deploy/README.md's Flow B section.
+# This wires up the EDGE TRIAGE PIPELINE (coprocessor -> LLM triage ->
+# uplink gate), not run_tier1_localrun.sh's single-stage
+# EdgeEnrichmentFunction: Tier 1 has no co-processor gate, no severity
+# escalation, and no local-only topic, so it cannot produce the "raised to
+# high and uplinked" + "stays local" pair the recording needs. See
+# deploy/README.md's Edge Triage Pipeline section.
 #
 # Usage:
 #   ./deploy/demo.sh [broker-url] [--simulator-host HOST]
 #
 #   broker-url         Default: pulsar://localhost:6650. This script and both
-#                       Flow B functions run against this broker. When
+#                       Edge Triage Pipeline functions run against this
+#                       broker. When
 #                       --simulator-host is NOT given, fleet-simulator also
 #                       runs against this same URL, from this machine.
 #   --simulator-host    Use when this script runs on the Pi with the broker
@@ -35,7 +37,7 @@
 # Requires on this machine: pulsar-admin, pulsar-client (both ship with a
 # Pulsar distribution), docker (only if the broker needs to be started
 # locally), curl, uv. Set LLM_BINARY_PATH / LLM_MODEL_PATH before running for
-# real -- see run_flowb_triage_localrun.sh.
+# real -- see run_edge_triage_llm_localrun.sh.
 #
 # Teardown: Ctrl-C always tears down every process this script started
 # (never fleet-simulator on a separate laptop). Without --simulator-host,
@@ -80,7 +82,7 @@ BROKER_HOST="${BROKER_URL#pulsar://}"
 BROKER_HOST="${BROKER_HOST%%:*}"
 ADMIN_URL="http://${BROKER_HOST}:8080"
 
-LOG_DIR="$(mktemp -d "${TMPDIR:-/tmp}/flowb-demo.XXXXXX")"
+LOG_DIR="$(mktemp -d "${TMPDIR:-/tmp}/edge-triage-demo.XXXXXX")"
 echo "[demo] broker: ${BROKER_URL}  admin: ${ADMIN_URL}"
 echo "[demo] logs: ${LOG_DIR}"
 
@@ -152,12 +154,12 @@ echo "[demo] broker reachable."
 
 echo "[co-processor] starting..."
 start_bg "${LOG_DIR}/coprocessor.log" \
-  "${SCRIPT_DIR}/run_flowb_coprocessor_localrun.sh" "${BROKER_URL}" "${ADMIN_URL}"
+  "${SCRIPT_DIR}/run_edge_triage_coprocessor_localrun.sh" "${BROKER_URL}" "${ADMIN_URL}"
 echo "[co-processor] launched (pid ${LAST_BG_PID}, log: ${LOG_DIR}/coprocessor.log)"
 
 echo "[llm] starting..."
 start_bg "${LOG_DIR}/triage.log" \
-  "${SCRIPT_DIR}/run_flowb_triage_localrun.sh" "${BROKER_URL}" "${ADMIN_URL}"
+  "${SCRIPT_DIR}/run_edge_triage_llm_localrun.sh" "${BROKER_URL}" "${ADMIN_URL}"
 echo "[llm] launched (pid ${LAST_BG_PID}, log: ${LOG_DIR}/triage.log)"
 
 echo "[demo] waiting ${FUNCTION_STARTUP_GRACE_SECONDS:-6}s for both functions to come up..."
@@ -193,7 +195,7 @@ FLEET_SIM_ARGS=(
 )
 
 if [[ -n "$SIMULATOR_HOST" ]]; then
-  echo "[demo] broker + Flow B functions are up here, reachable from the laptop at ${SIMULATOR_HOST}."
+  echo "[demo] broker + Edge Triage Pipeline functions are up here, reachable from the laptop at ${SIMULATOR_HOST}."
   echo "[demo] On the LAPTOP, run:"
   echo "  uv run fleet-simulate --service-url pulsar://${SIMULATOR_HOST}:6650 ${FLEET_SIM_ARGS[*]}"
   echo "[demo] Watching enrichment-cards / triage-local-only below. Press Ctrl-C here when the take is done."

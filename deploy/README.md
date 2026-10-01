@@ -121,9 +121,9 @@ docstring for exactly how that threshold works and why (Pulsar Functions are
 per-message, but Tier 2 needs multiple trucks' cards before it can decide
 anything).
 
-## Flow B: co-processor + LLM triage with an uplink gate
+## Edge Triage Pipeline: co-processor + LLM triage with an uplink gate
 
-Flow B is the pivot architecture later slides describe (see
+The Edge Triage Pipeline is the pivot architecture later slides describe (see
 `docs/TALK1-SLIDE-PLAN.md` / `talks/talk1-edge-intelligence/slides`) — a
 two-stage pipeline in place of Tier 1's single `EdgeEnrichmentFunction`,
 with a severity-based gate on what actually leaves the edge broker:
@@ -161,31 +161,32 @@ LlmTriageFunction                   (talk1_edge_intelligence.triage_function)
   affected by cards the gate would otherwise hold.
 - Topic names (`TRIAGE_PAYLOADS_TOPIC`, `LOCAL_TRIAGE_TOPIC`, plus the
   existing `ENRICHMENT_CARDS_TOPIC`) are defined once in
-  `fleet_telemetry_model.topics` — nothing in Flow B hardcodes a topic
-  string.
+  `fleet_telemetry_model.topics` — nothing in the Edge Triage Pipeline
+  hardcodes a topic string.
 
-### Running Flow B by hand
+### Running the Edge Triage Pipeline by hand
 
 Two localrun scripts, one per function, mirroring `run_tier1_localrun.sh`'s
 conventions:
 
 ```bash
-./deploy/run_flowb_coprocessor_localrun.sh pulsar://localhost:6650 http://localhost:8080
-./deploy/run_flowb_triage_localrun.sh pulsar://localhost:6650 http://localhost:8080
+./deploy/run_edge_triage_coprocessor_localrun.sh pulsar://localhost:6650 http://localhost:8080
+./deploy/run_edge_triage_llm_localrun.sh pulsar://localhost:6650 http://localhost:8080
 ```
 
-`run_flowb_triage_localrun.sh` needs `LLM_BINARY_PATH` / `LLM_MODEL_PATH`
+`run_edge_triage_llm_localrun.sh` needs `LLM_BINARY_PATH` / `LLM_MODEL_PATH`
 the same way Tier 1 does, plus an optional `UPLINK_MIN_SEVERITY` override.
-`run_flowb_coprocessor_localrun.sh` takes optional
+`run_edge_triage_coprocessor_localrun.sh` takes optional
 `COPROCESSOR_MIN_ETA_SLIP_MIN` / `COPROCESSOR_MAX_ETA_SLIP_MIN` overrides.
 
 ### The one-shot demo: `deploy/demo.sh`
 
-`deploy/demo.sh` runs the whole Flow B take in one script — broker check,
-both functions, a fixed simulator scenario, and a live side-by-side view of
-what got uplinked vs. what stayed local — so the "See It Running" recording
+`deploy/demo.sh` runs the whole Edge Triage Pipeline take in one script —
+broker check, both functions, a fixed simulator scenario, and a live
+side-by-side view of what got uplinked vs. what stayed local — so the "See
+It Running" recording
 (`talks/talk1-edge-intelligence/TODO-DEMO-RECORDING.md`) can be repeated
-identically. It deliberately launches Flow B, not
+identically. It deliberately launches the Edge Triage Pipeline, not
 `run_tier1_localrun.sh`'s `EdgeEnrichmentFunction`: Tier 1 has no
 co-processor gate, no severity escalation, and no local-only topic, so it
 can't produce the "raised to high and uplinked" + "stays local" pair the
@@ -225,9 +226,9 @@ live `[uplink]`/`[local]` stream of whatever actually lands on
 
 ### Multi-pane recording: `deploy/demo-tmux.sh`
 
-Same Flow B pipeline and scenario as `demo.sh` above, but each stage gets its
-own tmux pane instead of one labelled-prefix stream — useful when the
-recording should show distinct terminals per step rather than one
+Same Edge Triage Pipeline and scenario as `demo.sh` above, but each stage
+gets its own tmux pane instead of one labelled-prefix stream — useful when
+the recording should show distinct terminals per step rather than one
 multiplexed one:
 
 ```bash
@@ -235,23 +236,52 @@ multiplexed one:
 ./deploy/demo-tmux.sh pulsar://localhost:6650 --simulator-host <pi-hostname-or-ip>  # on the Pi
 ```
 
-Panes: `telemetry` (raw `truck-telemetry` events), `coprocessor`
-(`TelemetryCoprocessorFunction`'s forwarded payload, consumed straight off
-`triage-payloads`), `llm-input` (the exact prompt text handed to the model
-for that event, consumed off a dedicated log topic), `outcome`
-(`enrichment-cards` vs `triage-local-only`, same pair `demo.sh` tails), and
-`simulator`. Neither `coprocessor` nor `llm-input` grep a pane's own log
-output: Pulsar routes a function's `logger.info()` calls to a per-function
-log file on disk, never to `localrun`'s own stdout, so both panes sidestep
-that entirely — `coprocessor` by consuming the real `triage-payloads` output
-topic directly, `llm-input` by having `run_flowb_triage_localrun.sh` publish
-its log lines to a dedicated topic via `pulsar-admin functions localrun
---log-topic` (set `LOG_TOPIC` to enable it), since the prompt text itself
-isn't published to any domain topic the way `coprocessor`'s payload is.
-Requires `tmux` on `PATH` in addition to `demo.sh`'s requirements. Detach
-(`prefix` + `d`, default `Ctrl-b d`) to tear the whole session down — see
-the script's header for why plain `Ctrl-C` doesn't do that here the way it
-does in `demo.sh`.
+Panes, stacked top-to-bottom in a single equal-height column: `telemetry` (raw
+`truck-telemetry` events), `coprocessor` (`TelemetryCoprocessorFunction`'s
+forwarded payload, consumed straight off `triage-payloads`), `outcome`
+(`enrichment-cards` vs `triage-local-only`, same pair `demo.sh` tails —
+this pane also launches `LlmTriageFunction` itself in the background, the
+same way `coprocessor`'s pane launches its own function), and `simulator`.
+`coprocessor` doesn't grep its own pane's log output: Pulsar routes a
+function's `logger.info()` calls to a per-function log file on disk, never
+to `localrun`'s own stdout, so it sidesteps that entirely by consuming the
+real `triage-payloads` output topic directly instead. Every pane's
+`pulsar-client consume` output is filtered down to just each message's
+JSON (`content:` field) — the `----- got message -----` framing, periodic
+`ConsumerStatsRecorderImpl` stats lines, and `pulsar-client`'s one-time
+OpenTelemetry auto-configuration banner (printed on stderr, merged into
+the filtered stream with `2>&1`) are all stripped. Each pane
+also gets its own background tint (`window-style`, scoped per-pane) so the
+stages stay visually distinct in a recording. Requires `tmux` on `PATH` in
+addition to `demo.sh`'s requirements. Detach (`prefix` + `d`, default
+`Ctrl-b d`) to tear the whole session down — see the script's header for
+why plain `Ctrl-C` doesn't do that here the way it does in `demo.sh`.
+
+### Automated screen recording: `deploy/record-demo.sh`
+
+Watch a `demo-tmux.sh` take first (rehearse it, or `tmux attach -t
+edge-triage-demo`) before recording the one you'll actually keep — once you're
+happy with it, this script automates the capture end to end: it opens a
+fresh, sized Terminal.app window, runs `demo-tmux.sh` inside it with a real
+tty (so its own `tmux attach` works, unlike running the script from a
+non-interactive context), records exactly that window with `screencapture
+-v` for the scenario's duration plus an LLM-catch-up buffer, then trims the
+lead-in and exports a clean H.264 `.mp4` via `ffmpeg` — satisfying
+`talks/talk1-edge-intelligence/TODO-DEMO-RECORDING.md`'s resolution/codec
+spec.
+
+```bash
+./deploy/record-demo.sh                              # local rehearsal
+./deploy/record-demo.sh pulsar://localhost:6650 --simulator-host <pi-hostname-or-ip>
+```
+
+macOS-only (`osascript` + `screencapture`); needs `ffmpeg` on `PATH`
+(`brew install ffmpeg`) for the export step, and one-time Screen Recording +
+Automation permission grants for Terminal.app (System Settings > Privacy &
+Security) — a blank/black export almost always means one of those two is
+missing. Output lands in `deploy/recordings/` (gitignored). See the
+script's header for all flags (`--output`, `--window-size`, `--font-size`,
+`--wait-extra`, `--fullscreen`, `--teardown`).
 
 ## Raspberry Pi provisioning
 

@@ -28,6 +28,21 @@ MAX_INCIDENT_TICKS = 48
 BRAKE_EVENT_DECEL_THRESHOLD_MPH = 2.0
 DOWNSHIFT_EVENT_DECEL_THRESHOLD_MPH = 5.0
 
+# 1 g = 9.80665 m/s^2 = 21.937 mph/s. Converts a tick's raw speed drop into the
+# peak_deceleration_g IMU reading severity_classifier.py classifies on — this was
+# previously never computed (TelemetryEvent defaulted it to 0.0 on every event),
+# which made the g-based "high" severity bands unreachable from real simulator
+# output. The sharpest, most realistic g spike happens on the single tick a truck
+# drops from nominal highway speed into an incident's crawl speed, same as a real
+# hard-braking event into the back of traffic.
+MPH_PER_SEC_PER_G = 21.937
+
+# Same "strict" Class 8 harsh-braking bound severity_classifier.py's HIGH_G_FLOOR
+# cites (Geotab/FleetRabbit, ~0.47g) — the deceleration band where a laden heavy
+# truck is genuinely at wheel-lock risk, so ABS engagement is tied to the same
+# real-world threshold rather than an independently invented one.
+ABS_ENGAGEMENT_G = 0.45
+
 PLANNED_TRIP_MINUTES = 45.0
 SIMULATED_TICK_SECONDS = 5.0  # physical seconds of driving each event represents
 
@@ -84,6 +99,8 @@ class TruckState:
         decel = self.prior_speed_mph - speed
         brake_events = 1 if decel >= BRAKE_EVENT_DECEL_THRESHOLD_MPH else 0
         downshift_events = 1 if decel >= DOWNSHIFT_EVENT_DECEL_THRESHOLD_MPH else 0
+        peak_deceleration_g = max(0.0, decel) / SIMULATED_TICK_SECONDS / MPH_PER_SEC_PER_G
+        abs_engaged = peak_deceleration_g >= ABS_ENGAGEMENT_G
         self.prior_speed_mph = speed
 
         self.speed_window.append(speed)
@@ -106,6 +123,8 @@ class TruckState:
             signals=self._compute_signals(),
             brake_events=brake_events,
             downshift_events=downshift_events,
+            peak_deceleration_g=peak_deceleration_g,
+            abs_engaged=abs_engaged,
             _ground_truth="slowdown_incident" if self.in_incident else "normal",
         )
 

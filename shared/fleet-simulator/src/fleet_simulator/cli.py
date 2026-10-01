@@ -64,6 +64,13 @@ def build_parser() -> argparse.ArgumentParser:
         help="number of trucks to pin to --incident-corridor with a correlated, "
         "overlapping-window incident",
     )
+    parser.add_argument(
+        "--warmup-ticks",
+        type=int,
+        default=0,
+        help="ticks of normal baseline telemetry to emit before a forced "
+        "(--incident-corridor) incident begins",
+    )
 
     parser.add_argument(
         "--rate", type=float, default=None, help="target events/sec across the whole fleet"
@@ -168,6 +175,7 @@ def main(argv: list[str] | None = None) -> int:
         incident_rate=args.incident_rate,
         incident_corridor=args.incident_corridor,
         incident_trucks=args.incident_trucks,
+        warmup_ticks=args.warmup_ticks,
     )
 
     if args.dry_run:

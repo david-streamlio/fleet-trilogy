@@ -6,6 +6,9 @@ through the exact same TruckState.step() logic; --incident-corridor plus
 --incident-trucks just pins M of those trucks to one corridor and forces their
 incidents to start within the same few ticks, so Talk 3 has a correlated,
 overlapping-window incident to aggregate instead of isolated noise.
+--warmup-ticks pushes that forced start out by N ticks (default 0, same as
+before) so a demo can front-load N ticks of real "normal" baseline telemetry
+before the incident begins, instead of starting mid-incident.
 """
 
 from __future__ import annotations
@@ -40,6 +43,7 @@ class FleetSimulator:
         incident_rate: float = 0.03,
         incident_corridor: str | None = None,
         incident_trucks: int = 0,
+        warmup_ticks: int = 0,
         start_time: datetime | None = None,
     ) -> None:
         if incident_corridor and incident_trucks > fleet_size:
@@ -66,7 +70,8 @@ class FleetSimulator:
                     rng=random.Random(self._rng.random()),
                     incident_rate=incident_rate,
                     force_incident_start_tick=(
-                        self._rng.randint(0, FORCED_INCIDENT_START_JITTER_TICKS)
+                        warmup_ticks
+                        + self._rng.randint(0, FORCED_INCIDENT_START_JITTER_TICKS)
                         if is_forced
                         else None
                     ),
