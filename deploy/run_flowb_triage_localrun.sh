@@ -18,6 +18,11 @@
 # Requires LLM_BINARY_PATH / LLM_MODEL_PATH pointing at a built llama.cpp-
 # family binary and model on this machine. Optional UPLINK_MIN_SEVERITY
 # overrides the gate threshold (default "high" -- one of low/medium/high).
+# Optional LOG_TOPIC publishes this function's logger output (including
+# build_card's LLM_INPUT_BEGIN/END prompt dump) to a Pulsar topic via
+# --log-topic, since Pulsar's python-instance logger otherwise writes only to
+# a per-function log file on disk, never to this script's own stdout -- see
+# deploy/demo-tmux.sh's llm-input pane, which depends on this.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -31,10 +36,16 @@ USER_CONFIG=$(cat <<EOF
 EOF
 )
 
+LOG_TOPIC_ARGS=()
+if [[ -n "${LOG_TOPIC:-}" ]]; then
+  LOG_TOPIC_ARGS=(--log-topic "${LOG_TOPIC}")
+fi
+
 pulsar-admin --admin-url "${ADMIN_URL}" functions localrun \
   --py "${REPO_ROOT}/talks/talk1-edge-intelligence/src/talk1_edge_intelligence/triage_function.py" \
   --classname talk1_edge_intelligence.triage_function.LlmTriageFunction \
   --inputs persistent://public/default/triage-payloads \
   --output persistent://public/default/enrichment-cards \
   --broker-service-url "${SERVICE_URL}" \
-  --user-config "${USER_CONFIG}"
+  --user-config "${USER_CONFIG}" \
+  "${LOG_TOPIC_ARGS[@]}"

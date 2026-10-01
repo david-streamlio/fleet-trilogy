@@ -73,7 +73,7 @@ from llm_inference import LlmGenerationConfig, LlmInferenceError, LlmServerBacke
 from llm_inference.structured import extract_json_object
 
 DEFAULT_BINARY_PATH = "~/tools/llama.cpp/build/bin/llama-server"
-DEFAULT_MODEL_PATH = "~/tools/models/qwen2.5-3b-instruct-GGUF/qwen2.5-3b-instruct-q8_0.gguf"
+DEFAULT_MODEL_PATH = "~/tools/models/Qwen2.5-3B-Instruct-GGUF/qwen2.5-3b-instruct-q4_k_m.gguf"
 # 150 was fine for the old severity/event_label/dispatch_action shape, but a real
 # diagnostic run found it truncating 8/10 completions once risk_synthesis became
 # the model's only free-text field (Gemma-3-1B-it routinely writes 100+ word
@@ -292,6 +292,12 @@ class LlmTriageFunction:
                 dispatch_status=triggers.get("dispatch_status", "unknown"),
             )
             grammar = build_grammar(truck_id)
+
+            # BEGIN/END markers (not just a one-line prefix) so deploy/demo-tmux.sh's
+            # "llm-input" pane can isolate this multi-line prompt from a localrun
+            # process's other log noise with a simple `awk '/BEGIN/,/END/'` range,
+            # without needing the prompt's own line breaks escaped into one line.
+            logger.info(f"[{truck_id}] >>> LLM_INPUT_BEGIN\n{prompt}\n<<< LLM_INPUT_END")
 
             # No `stop` sequence here -- the grammar's root rule already ends with a
             # required literal "}" and grammar-constrained decoding terminates on its

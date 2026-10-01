@@ -94,8 +94,8 @@ class SubprocessLlmBackend(LlmBackend):
         mock: bool | None = None,
         extra_args: tuple[str, ...] = (),
     ) -> None:
-        self._binary_path = Path(binary_path) if binary_path else None
-        self._model_path = Path(model_path) if model_path else None
+        self._binary_path = Path(binary_path).expanduser() if binary_path else None
+        self._model_path = Path(model_path).expanduser() if model_path else None
         self._mock = mock if mock is not None else _mock_enabled_via_env()
         # Model-specific one-shot/template flags (e.g. mainline llama.cpp's `-no-cnv`)
         # that every call from this backend instance needs, regardless of which
@@ -284,8 +284,8 @@ class LlmServerBackend(LlmBackend):
         mock: bool | None = None,
         extra_args: tuple[str, ...] = (),
     ) -> None:
-        self._binary_path = Path(binary_path) if binary_path else None
-        self._model_path = Path(model_path) if model_path else None
+        self._binary_path = Path(binary_path).expanduser() if binary_path else None
+        self._model_path = Path(model_path).expanduser() if model_path else None
         self._threads = threads
         self._host = host
         self._port = port

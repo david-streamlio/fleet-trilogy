@@ -223,6 +223,36 @@ live `[uplink]`/`[local]` stream of whatever actually lands on
 `enrichment-cards` / `triage-local-only`. Requires `pulsar-admin` and
 `pulsar-client` on `PATH` in addition to Tier 1's requirements.
 
+### Multi-pane recording: `deploy/demo-tmux.sh`
+
+Same Flow B pipeline and scenario as `demo.sh` above, but each stage gets its
+own tmux pane instead of one labelled-prefix stream — useful when the
+recording should show distinct terminals per step rather than one
+multiplexed one:
+
+```bash
+./deploy/demo-tmux.sh                              # local rehearsal
+./deploy/demo-tmux.sh pulsar://localhost:6650 --simulator-host <pi-hostname-or-ip>  # on the Pi
+```
+
+Panes: `telemetry` (raw `truck-telemetry` events), `coprocessor`
+(`TelemetryCoprocessorFunction`'s forwarded payload, consumed straight off
+`triage-payloads`), `llm-input` (the exact prompt text handed to the model
+for that event, consumed off a dedicated log topic), `outcome`
+(`enrichment-cards` vs `triage-local-only`, same pair `demo.sh` tails), and
+`simulator`. Neither `coprocessor` nor `llm-input` grep a pane's own log
+output: Pulsar routes a function's `logger.info()` calls to a per-function
+log file on disk, never to `localrun`'s own stdout, so both panes sidestep
+that entirely — `coprocessor` by consuming the real `triage-payloads` output
+topic directly, `llm-input` by having `run_flowb_triage_localrun.sh` publish
+its log lines to a dedicated topic via `pulsar-admin functions localrun
+--log-topic` (set `LOG_TOPIC` to enable it), since the prompt text itself
+isn't published to any domain topic the way `coprocessor`'s payload is.
+Requires `tmux` on `PATH` in addition to `demo.sh`'s requirements. Detach
+(`prefix` + `d`, default `Ctrl-b d`) to tear the whole session down — see
+the script's header for why plain `Ctrl-C` doesn't do that here the way it
+does in `demo.sh`.
+
 ## Raspberry Pi provisioning
 
 See [PI4-RUNBOOK.md](../docs/PI4-RUNBOOK.md) for building mainline llama.cpp on

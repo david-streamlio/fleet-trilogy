@@ -187,12 +187,18 @@ class TelemetryCoprocessorFunction:
             return None
 
         triggered_signals = evaluate_signals(event)
-        return json.dumps(build_triage_payload(event, triggered_signals))
+        payload = build_triage_payload(event, triggered_signals)
+        logger.info(
+            f"[{event.truck_id}] high-value event detected -- signals={triggered_signals} "
+            f"eta_slip_min={eta_slip_min} baseline_severity={payload['baseline_severity']!r} "
+            f"-- forwarding to triage: {json.dumps(payload)}"
+        )
+        return json.dumps(payload)
 
     def _configure(self, context) -> None:
         get = context.get_user_config_value
         min_val = get("min_eta_slip_min")
         max_val = get("max_eta_slip_min")
-        self._min_eta_slip_min = float(min_val) if min_val is not None else DEFAULT_MIN_ETA_SLIP_MIN
-        self._max_eta_slip_min = float(max_val) if max_val is not None else DEFAULT_MAX_ETA_SLIP_MIN
+        self._min_eta_slip_min = float(min_val) if min_val else DEFAULT_MIN_ETA_SLIP_MIN
+        self._max_eta_slip_min = float(max_val) if max_val else DEFAULT_MAX_ETA_SLIP_MIN
         self._configured = True
