@@ -1,6 +1,6 @@
-"""Flow B (coprocessor -> LlmTriageFunction) Tier 3 model evals — see
+"""Edge Triage Pipeline (coprocessor -> LlmTriageFunction) Tier 3 model evals — see
 talk1_edge_intelligence.coprocessor / .triage_function. Opt-in, real
-llama.cpp-family runtime (see conftest.py's llm_backend/flow_b_context fixtures).
+llama.cpp-family runtime (see conftest.py's llm_backend/edge_triage_context fixtures).
 
 Post-pivot (docs/TALK2-DATA-ENGINEERING-IMPACT-TRACK.md section 5): severity is no
 longer a model output at all (severity_classifier.py computes baseline_severity
@@ -27,20 +27,20 @@ from talk1_edge_intelligence.triage_function import LlmTriageFunction
 from tests.model.eval_lib import (
     ESCALATION_SCENARIOS,
     check_escalation_direction,
-    flow_b_format_reliability,
-    run_flow_b_trials,
+    edge_triage_format_reliability,
+    run_edge_triage_trials,
 )
 
 pytestmark = pytest.mark.model
 
 
 def _canonical_event(eta_slip_min: float = 10.0) -> TelemetryEvent:
-    """One canonical Flow B event, used for both the format-reliability check and
+    """One canonical Edge Triage Pipeline event, used for both the format-reliability check and
     as the base for the escalation-direction scenarios below. truck_id="truck-47"
     matches trip_context.py's pre-seeded entry, so contextual_triggers carries real
     weather/cargo/dispatch data by default, same as production — the escalation
     scenarios below override those specific fields per-scenario without touching
-    the event itself (see run_flow_b_trials' contextual_trigger_overrides)."""
+    the event itself (see run_edge_triage_trials' contextual_trigger_overrides)."""
     now = datetime.now(tz=UTC)
     return TelemetryEvent(
         timestamp=now,
@@ -61,7 +61,7 @@ def _canonical_event(eta_slip_min: float = 10.0) -> TelemetryEvent:
     )
 
 
-def test_flow_b_format_reliability_and_escalation_direction(request, flow_b_context, flow_b_report):
+def test_edge_triage_format_reliability_and_escalation_direction(request, edge_triage_context, edge_triage_report):
     total_n = request.config.getoption("--model-eval-runs")
     per_scenario_n = max(1, total_n // 3)
     format_threshold = request.config.getoption("--model-format-threshold")
@@ -72,17 +72,17 @@ def test_flow_b_format_reliability_and_escalation_direction(request, flow_b_cont
     try:
         # Gate 1: format reliability on one canonical event, full N.
         format_event = _canonical_event()
-        format_trials = run_flow_b_trials(coprocessor, triage, flow_b_context, format_event, total_n)
+        format_trials = run_edge_triage_trials(coprocessor, triage, edge_triage_context, format_event, total_n)
         assert len(format_trials) == total_n, (
             f"coprocessor gated out the canonical event (eta_slip_min={format_event.signals.eta_slip_min}, "
             "0 trials produced) — check the default gate bounds against this test's event"
         )
-        flow_b_report.add_latencies([t.latency_seconds for t in format_trials])
-        format_result = flow_b_format_reliability(format_event, format_trials)
-        flow_b_report.format_reliability = format_result
+        edge_triage_report.add_latencies([t.latency_seconds for t in format_trials])
+        format_result = edge_triage_format_reliability(format_event, format_trials)
+        edge_triage_report.format_reliability = format_result
 
         assert format_result["rate"] >= format_threshold, (
-            f"Flow B format reliability {format_result['rate']:.1%} over {format_result['total']} runs "
+            f"Edge Triage Pipeline format reliability {format_result['rate']:.1%} over {format_result['total']} runs "
             f"is below threshold {format_threshold:.1%}; sample failures: {format_result['sample_failures']}"
         )
 
@@ -93,24 +93,24 @@ def test_flow_b_format_reliability_and_escalation_direction(request, flow_b_cont
         scenario_trials = {}
         for scenario_name, scenario in ESCALATION_SCENARIOS.items():
             scenario_event = _canonical_event()
-            trials = run_flow_b_trials(
+            trials = run_edge_triage_trials(
                 coprocessor,
                 triage,
-                flow_b_context,
+                edge_triage_context,
                 scenario_event,
                 per_scenario_n,
                 contextual_trigger_overrides=scenario["contextual_triggers"],
                 baseline_severity_override="medium",
             )
             scenario_trials[scenario_name] = trials
-            flow_b_report.add_latencies([t.latency_seconds for t in trials])
+            edge_triage_report.add_latencies([t.latency_seconds for t in trials])
 
         escalation_result = check_escalation_direction(scenario_trials)
-        flow_b_report.escalation_calibration = escalation_result
+        edge_triage_report.escalation_calibration = escalation_result
 
         assert escalation_result["total"] > 0, "no grammar-valid triage cards were produced to check escalation on"
         assert escalation_result["mismatch_rate"] <= max_mismatch_rate, (
-            f"Flow B escalation-direction mismatch rate {escalation_result['mismatch_rate']:.1%} over "
+            f"Edge Triage Pipeline escalation-direction mismatch rate {escalation_result['mismatch_rate']:.1%} over "
             f"{escalation_result['total']} cards exceeds bound {max_mismatch_rate:.1%}; "
             f"sample mismatches: {escalation_result['sample_mismatches']}"
         )

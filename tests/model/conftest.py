@@ -16,7 +16,7 @@ from pathlib import Path
 import pytest
 from llm_inference import SubprocessLlmBackend
 
-from tests.model.eval_lib import FlowBReport, Tier3Report, peak_child_rss_mb
+from tests.model.eval_lib import EdgeTriageReport, Tier3Report, peak_child_rss_mb
 from tests.model.tier2_eval_lib import Tier2Report
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -118,10 +118,11 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     )
     group.addoption("--model-accuracy-seed", type=int, default=1234)
     group.addoption(
-        "--flow-b-model-ids",
+        "--include-model-ids",
         default=None,
         help=(
-            "make compare-flow-b-models only: comma-separated models.toml ids to "
+            "make compare-edge-triage-models / compare-tier2-models only: comma-separated "
+            "models.toml ids to "
             "re-include for this run even if their `enabled` flag is false (see "
             "models_manifest.load_models_manifest's include_ids). Lets one run widen "
             "or narrow the model set without editing models.toml's durable, "
@@ -169,7 +170,7 @@ def tier3_report(request: pytest.FixtureRequest, llm_backend: SubprocessLlmBacke
     return report
 
 
-class _FlowBEvalContext:
+class _EdgeTriageEvalContext:
     """Minimal stand-in for a Pulsar Functions Context — get_logger() and
     get_user_config_value(key), the only two methods TelemetryCoprocessorFunction
     and LlmTriageFunction call. Configured with the same real binary/model paths
@@ -180,7 +181,7 @@ class _FlowBEvalContext:
 
     def __init__(self, user_config: dict) -> None:
         self._user_config = user_config
-        self._logger = logging.getLogger("flow_b_eval")
+        self._logger = logging.getLogger("edge_triage_eval")
 
     def get_logger(self) -> logging.Logger:
         return self._logger
@@ -190,8 +191,8 @@ class _FlowBEvalContext:
 
 
 @pytest.fixture(scope="session")
-def flow_b_context(request: pytest.FixtureRequest, llm_backend: SubprocessLlmBackend) -> _FlowBEvalContext:
-    # Depending on llm_backend (unused directly — both Flow B functions build
+def edge_triage_context(request: pytest.FixtureRequest, llm_backend: SubprocessLlmBackend) -> _EdgeTriageEvalContext:
+    # Depending on llm_backend (unused directly — both Edge Triage Pipeline functions build
     # their own backend from user config) inherits its skip-when-no-real-model
     # behavior, so this fixture never hands out a context with dead paths.
     binary = _resolve_path(request.config.getoption("--llm-binary"), "LLM_BINARY_PATH")
@@ -205,18 +206,18 @@ def flow_b_context(request: pytest.FixtureRequest, llm_backend: SubprocessLlmBac
     }
     if threads is not None:
         config["threads"] = str(threads)
-    return _FlowBEvalContext(
+    return _EdgeTriageEvalContext(
         config
     )
 
 
 @pytest.fixture(scope="session")
-def flow_b_report(request: pytest.FixtureRequest, llm_backend: SubprocessLlmBackend) -> FlowBReport:
+def edge_triage_report(request: pytest.FixtureRequest, llm_backend: SubprocessLlmBackend) -> EdgeTriageReport:
     import platform
 
     binary = _resolve_path(request.config.getoption("--llm-binary"), "LLM_BINARY_PATH")
     model = _resolve_path(request.config.getoption("--llm-model"), "LLM_MODEL_PATH")
-    report = FlowBReport(
+    report = EdgeTriageReport(
         config={
             "binary_path": binary,
             "model_path": model,
@@ -225,17 +226,17 @@ def flow_b_report(request: pytest.FixtureRequest, llm_backend: SubprocessLlmBack
             "eval_runs": request.config.getoption("--model-eval-runs"),
         }
     )
-    # Stashed separately from _tier3_report so Flow A and Flow B tests running in
+    # Stashed separately from _tier3_report so Flow A and Edge Triage Pipeline tests running in
     # the same session each get their own artifact instead of one overwriting
     # the other's fields.
-    request.config._flow_b_report = report
+    request.config._edge_triage_report = report
     return report
 
 
 @pytest.fixture(scope="session")
-def tier2_context(request: pytest.FixtureRequest, llm_backend: SubprocessLlmBackend) -> _FlowBEvalContext:
-    # _FlowBEvalContext is a generic get_logger()/get_user_config_value(key) stand-in
-    # for a Pulsar Functions Context -- nothing about it is Flow-B-specific, so it's
+def tier2_context(request: pytest.FixtureRequest, llm_backend: SubprocessLlmBackend) -> _EdgeTriageEvalContext:
+    # _EdgeTriageEvalContext is a generic get_logger()/get_user_config_value(key) stand-in
+    # for a Pulsar Functions Context -- nothing about it is specific to the Edge Triage Pipeline, so it's
     # reused as-is here rather than duplicating an identical class under a new name.
     binary = _resolve_path(request.config.getoption("--llm-binary"), "LLM_BINARY_PATH")
     model = _resolve_path(request.config.getoption("--llm-model"), "LLM_MODEL_PATH")
@@ -248,7 +249,7 @@ def tier2_context(request: pytest.FixtureRequest, llm_backend: SubprocessLlmBack
     }
     if threads is not None:
         config["threads"] = str(threads)
-    return _FlowBEvalContext(config)
+    return _EdgeTriageEvalContext(config)
 
 
 @pytest.fixture(scope="session")
@@ -281,11 +282,11 @@ def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
         artifact_path.write_text(json.dumps(report.to_dict(), indent=2))
         session.config._tier3_summary = report.render_summary(artifact_path)
 
-    flow_b_report: FlowBReport | None = getattr(session.config, "_flow_b_report", None)
-    if flow_b_report is not None:
-        artifact_path = EVAL_RESULTS_DIR / f"flow-b-{timestamp}.json"
-        artifact_path.write_text(json.dumps(flow_b_report.to_dict(), indent=2))
-        session.config._flow_b_summary = flow_b_report.render_summary(artifact_path)
+    edge_triage_report: EdgeTriageReport | None = getattr(session.config, "_edge_triage_report", None)
+    if edge_triage_report is not None:
+        artifact_path = EVAL_RESULTS_DIR / f"edge-triage-{timestamp}.json"
+        artifact_path.write_text(json.dumps(edge_triage_report.to_dict(), indent=2))
+        session.config._edge_triage_summary = edge_triage_report.render_summary(artifact_path)
 
     tier2_report: Tier2Report | None = getattr(session.config, "_tier2_report", None)
     if tier2_report is not None:
@@ -297,7 +298,7 @@ def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
 def pytest_terminal_summary(terminalreporter, exitstatus: int, config: pytest.Config) -> None:
     # pytest_terminal_summary (rather than printing during sessionfinish) is what
     # guarantees this shows up even though pytest captures stdout by default.
-    for attr in ("_tier3_summary", "_flow_b_summary", "_tier2_summary"):
+    for attr in ("_tier3_summary", "_edge_triage_summary", "_tier2_summary"):
         summary = getattr(config, attr, None)
         if summary:
             terminalreporter.write_line(summary)

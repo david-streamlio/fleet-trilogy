@@ -1,9 +1,9 @@
 """A held-out pool of synthetic escalation precedents for the RAG experiment
-(see `$CLAUDE_JOB_DIR/tmp/rag_flow_b_experiment.py`) — NOT used by the shipped
+(a one-off scratch script outside the repo, never committed) — NOT used by the shipped
 harness or `ESCALATION_SCENARIOS` in eval_lib.py.
 
 Real diagnostic grounding (2026-09-27, Gemma-3-1B-it, n=30/scenario,
-eval-results/compare-flow-b-COMP-J2D9D71YNJ-20260926T195623Z.json): the model's
+eval-results/compare-edge-triage-COMP-J2D9D71YNJ-20260926T195623Z.json): the model's
 failure isn't a simple directional bias. On "benign" (expected hold) it tallies
 lower=19/raise=8/hold=3 — over-reacts toward de-escalating a case with nothing
 notable either way. On "de-escalate-worthy" (expected lower_or_hold, a case with

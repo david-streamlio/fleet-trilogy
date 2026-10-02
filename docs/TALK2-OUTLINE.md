@@ -123,7 +123,7 @@ benchmark").
      harness's runtime-agnostic backend design needs raw completion, not a
      hidden template. Get this wrong and a perfectly capable model looks
      incompetent for reasons that have nothing to do with its judgment. If
-     your pipeline depends on grammar-constrained output (Flow B does —
+     your pipeline depends on grammar-constrained output (the Edge Triage Pipeline does —
      `triage_function.py`'s `build_grammar`), the same question applies to
      grammar support: verify it against the real runtime's parser, don't
      assume spec compliance.
@@ -137,7 +137,7 @@ benchmark").
    shipped. This is also the hinge into **harness design**: once a candidate
    list survives this filter, actually running the full comparison across
    it — many models, dozens of trials each, real subprocess calls — is
-   itself expensive (the 15-model Flow B pass alone took 54 minutes of CPU
+   itself expensive (the 15-model Edge Triage Pipeline pass alone took 54 minutes of CPU
    wall time, with individual calls running up to 25 seconds), which is the
    case for the harness's *own* infrastructure needing a GPU-backed
    environment — separate from, and orthogonal to, whether the deployed
@@ -315,14 +315,14 @@ talk's two LLM-driven tasks.
 
 ## Final model recommendation: two tasks, two different winners (2026-09-28)
 
-The talk's Flow B (Tier 1 edge triage) and Tier 2 (talk3 spoken warning) gates
+The talk's Edge Triage Pipeline (Tier 1) and Tier 2 (talk3 spoken warning) gates
 each converged to their own real Pi 4 decision-grade dataset (full detail:
 `docs/TALK2-DATA-ENGINEERING-IMPACT-TRACK.md` rows 8-23). Four models clear
 *both* gates — Phi-3.5-mini-instruct, Gemma-3-4B-it, Llama-3.1-8B-Instruct,
 GLM-4-9B-0414 — but the best model is not the same one for both tasks, and
 the reason why is itself a talk beat, not just a footnote.
 
-**Flow B (escalation decision) → Phi-3.5-mini-instruct:**
+**Edge Triage Pipeline (escalation decision) → Phi-3.5-mini-instruct:**
 
 | Model | Mismatch | Pi p50 | Pi p95 | RAM |
 |---|---|---|---|---|
@@ -347,13 +347,13 @@ more than typical-case for a real-time edge decision.
 | Llama-3.1-8B-Instruct | 0.0% / 0.0% | 147.9s | 238.8s | 6815MB |
 | Phi-3.5-mini-instruct | 0.0% / 0.0% | 186.0s | 251.6s | 7171MB |
 
-**This is the mirror image of the Flow B pick, and that's the real finding.**
-Phi-3.5-mini-instruct — the Flow B winner — is the *slowest* of the four on
+**This is the mirror image of the Edge Triage Pipeline pick, and that's the real finding.**
+Phi-3.5-mini-instruct — the Edge Triage Pipeline winner — is the *slowest* of the four on
 Tier 2 (4x Gemma-3-4B-it's median), because it burns most of its token budget
 padding a "2-3 sentence" answer, while Gemma-3-4B-it is naturally terse here.
 Same models, same Pi 4, same quantization scheme — the ranking flips entirely
 between tasks. Root cause (real, not a hardware artifact — reproduces on the
-M4 too): Flow B's prompt invites open-ended justification
+M4 too): the Edge Triage Pipeline's prompt invites open-ended justification
 (`risk_synthesis`), which Gemma-3-4B-it uses at length and Phi-3.5-mini
 answers tersely; Tier 2's prompt explicitly bounds scope ("2-3 sentences"),
 which Gemma-3-4B-it respects and Phi-3.5-mini doesn't. Full word-count

@@ -239,7 +239,7 @@ class LlmServerBackend(LlmBackend):
        showing the Metal shader library get re-mapped on every single subprocess
        launch) from scratch on EVERY call. For anything bigger than a couple
        hundred MB this dominates wall time; measured directly during a 14-model
-       Flow B comparison run that was taking far longer than the model spectrum
+       Edge Triage Pipeline comparison run that was taking far longer than the model spectrum
        alone would predict.
     2. SubprocessLlmBackend's file-based prompt cache (`--prompt-cache`/
        `--prompt-cache-ro`) needs something to have WRITTEN that file first —

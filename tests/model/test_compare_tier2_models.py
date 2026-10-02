@@ -1,13 +1,13 @@
 """Tier 3 model COMPARISON harness for Tier 2 (talk3_pulsar_speaks_english —
-see synthesizer.py / prompting.py). Same idea as test_compare_flow_b_models.py
+see synthesizer.py / prompting.py). Same idea as test_compare_edge_triage_models.py
 (run the full eval set for every model in models.toml, on identical seeded
 inputs, one combined side-by-side artifact + printed table) but for a task
-shape that has no Flow A/B analog — see tier2_eval_lib.py's module docstring.
+shape that has no Flow A or Edge Triage Pipeline analog — see tier2_eval_lib.py's module docstring.
 
-No gate-1/gate-2 two-stage promotion here, unlike Flow A/B: those exist to fix
+No gate-1/gate-2 two-stage promotion here, unlike Flow A and the Edge Triage Pipeline: those exist to fix
 a low-parse-rate model starving a downstream axis of samples, but each of
 Tier 2's three scenarios already gets a full, adequate sample directly (no
-axis here depends on another axis's sample size the way Flow A/B's severity
+axis here depends on another axis's sample size the way Flow A's and the Edge Triage Pipeline's severity
 confirmation depended on format_parse_rate).
 
 Opt-in (@pytest.mark.model), run via `make compare-tier2-models`. Auto-skips
@@ -27,7 +27,7 @@ import pytest
 from llm_inference import LlmServerBackend
 
 from tests.model.models_manifest import ModelEntry, load_models_manifest
-from tests.model.test_compare_flow_b_models import _server_binary_path
+from tests.model.test_compare_edge_triage_models import _server_binary_path
 from tests.model.tier2_eval_lib import (
     DEFAULT_THREADS,
     TIER2_SCENARIOS,
@@ -328,7 +328,7 @@ def _render_table(report: dict, artifact_path: Path) -> str:
 
 
 def test_compare_tier2_models(request: pytest.FixtureRequest) -> None:
-    raw_ids = request.config.getoption("--flow-b-model-ids")
+    raw_ids = request.config.getoption("--include-model-ids")
     include_ids = frozenset(x.strip() for x in raw_ids.split(",") if x.strip()) if raw_ids else None
     manifest = load_models_manifest(include_ids=include_ids)
     available = [e for e in manifest if e.is_available()]

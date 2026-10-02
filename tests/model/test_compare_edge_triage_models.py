@@ -1,4 +1,4 @@
-"""Tier 3 model COMPARISON harness for Flow B (TelemetryCoprocessorFunction ->
+"""Tier 3 model COMPARISON harness for the Edge Triage Pipeline (TelemetryCoprocessorFunction ->
 LlmTriageFunction — see talk1_edge_intelligence.coprocessor / .triage_function).
 Same idea as test_compare_models.py (run the full eval set for every model in
 models.toml, on identical seeded inputs, one combined side-by-side artifact +
@@ -7,13 +7,13 @@ not free-text EnrichmentCard JSON.
 
 Deliberately narrower axis set than Flow A's comparison: no grounding or
 directional_accuracy axes. Grounding doesn't apply here (eta_impact/truck_id
-are hardcoded post-generation, not model output — see eval_lib.py's Flow B
+are hardcoded post-generation, not model output — see eval_lib.py's Edge Triage Pipeline
 section), and directional accuracy would just be re-measuring the exact same
 is_probable_slowdown/evaluate_signals cheap math Flow A's comparison already
 covers, since TelemetryCoprocessorFunction reuses it verbatim rather than
 duplicating a second detection path.
 
-Opt-in (@pytest.mark.model), run via `make compare-flow-b-models`. Auto-skips
+Opt-in (@pytest.mark.model), run via `make compare-edge-triage-models`. Auto-skips
 if the manifest has zero available models, same as test_compare_models.py.
 """
 
@@ -30,17 +30,17 @@ from llm_inference import LlmServerBackend
 from talk1_edge_intelligence.coprocessor import TelemetryCoprocessorFunction
 from talk1_edge_intelligence.triage_function import DEFAULT_THREADS, LlmTriageFunction
 
-from tests.model.conftest import _FlowBEvalContext
+from tests.model.conftest import _EdgeTriageEvalContext
 from tests.model.eval_lib import (
     ESCALATION_SCENARIOS,
     _percentile,
     check_escalation_direction,
-    flow_b_format_reliability,
+    edge_triage_format_reliability,
     peak_child_rss_mb,
-    run_flow_b_trials,
+    run_edge_triage_trials,
 )
 from tests.model.models_manifest import ModelEntry, load_models_manifest
-from tests.model.test_flow_b_triage import _canonical_event
+from tests.model.test_edge_triage import _canonical_event
 
 pytestmark = pytest.mark.model
 
@@ -141,7 +141,7 @@ def _run_one_model(entry: ModelEntry, request: pytest.FixtureRequest) -> dict:
     ram_before_mb = peak_child_rss_mb()
     load_time_seconds = _measure_load_time_seconds(entry, threads)
 
-    context = _FlowBEvalContext(
+    context = _EdgeTriageEvalContext(
         {
             "llm_binary_path": str(_server_binary_path(entry.binary_path)),
             "llm_model_path": str(entry.model_path),
@@ -153,11 +153,11 @@ def _run_one_model(entry: ModelEntry, request: pytest.FixtureRequest) -> dict:
     triage = LlmTriageFunction()
     try:
         # Gate 1: format reliability on one canonical event, full N — see
-        # test_flow_b_triage.py's module docstring for why this is no longer
+        # test_edge_triage.py's module docstring for why this is no longer
         # tier-based (severity is cheap math now, identical for every model).
         format_event = _canonical_event()
-        format_trials = run_flow_b_trials(coprocessor, triage, context, format_event, n)
-        fr_result = flow_b_format_reliability(format_event, format_trials)
+        format_trials = run_edge_triage_trials(coprocessor, triage, context, format_event, n)
+        fr_result = edge_triage_format_reliability(format_event, format_trials)
 
         # GATE 2: same two-stage rationale as test_compare_models.py, retargeted at
         # escalation direction (see eval_lib.check_escalation_direction) now that
@@ -171,7 +171,7 @@ def _run_one_model(entry: ModelEntry, request: pytest.FixtureRequest) -> dict:
             confirm_per_scenario_n = max(per_scenario_n, round(per_scenario_n * confirm_multiplier))
             for scenario_name, scenario in ESCALATION_SCENARIOS.items():
                 scenario_event = _canonical_event()
-                trials = run_flow_b_trials(
+                trials = run_edge_triage_trials(
                     coprocessor,
                     triage,
                     context,
@@ -296,7 +296,7 @@ def _build_recommendation(results: dict[str, dict], comparison: dict, decision_g
 
 def _production_candidates(results: dict[str, dict], format_threshold: float, escalation_threshold: float) -> dict:
     """Same evidence-backed-case rule as test_compare_models.py's version, scoped
-    to Flow B's two quality axes (format_parse_rate, gate-2-confirmed
+    to the Edge Triage Pipeline's two quality axes (format_parse_rate, gate-2-confirmed
     escalation_mismatch_rate — see eval_lib.check_escalation_direction for why
     this replaced severity_mismatch_rate post-pivot)."""
     passed = []
@@ -347,7 +347,7 @@ def _render_table(report: dict, artifact_path: Path) -> str:
     widths = [max(len(str(r[i])) for r in ([headers] + rows)) for i in range(len(headers))]
     lines = [
         "",
-        "=== Tier 3 Flow B model COMPARISON ===",
+        "=== Tier 3 Edge Triage Pipeline model COMPARISON ===",
         f"artifact: {artifact_path}",
         f"host: {report['host']} ({report['arch']}, {report['platform']})",
         f"decision_grade: {report['decision_grade']}",
@@ -393,15 +393,15 @@ def _render_table(report: dict, artifact_path: Path) -> str:
     return "\n".join(lines)
 
 
-def test_compare_flow_b_models(request: pytest.FixtureRequest) -> None:
-    raw_ids = request.config.getoption("--flow-b-model-ids")
+def test_compare_edge_triage_models(request: pytest.FixtureRequest) -> None:
+    raw_ids = request.config.getoption("--include-model-ids")
     include_ids = frozenset(x.strip() for x in raw_ids.split(",") if x.strip()) if raw_ids else None
     manifest = load_models_manifest(include_ids=include_ids)
     available = [e for e in manifest if e.is_available()]
     if not available:
         pytest.skip(
             "No models.toml entries are available (missing binary/model paths). Set "
-            "the env vars named in models.toml, or run `make compare-flow-b-models` on "
+            "the env vars named in models.toml, or run `make compare-edge-triage-models` on "
             "a host with the models present. Skipped, not failed — `make test`/"
             "`make test-integration` are unaffected."
         )
@@ -434,9 +434,9 @@ def test_compare_flow_b_models(request: pytest.FixtureRequest) -> None:
 
     EVAL_RESULTS_DIR.mkdir(exist_ok=True)
     timestamp = datetime.now(tz=UTC).strftime("%Y%m%dT%H%M%SZ")
-    artifact_path = EVAL_RESULTS_DIR / f"compare-flow-b-{platform.node()}-{timestamp}.json"
+    artifact_path = EVAL_RESULTS_DIR / f"compare-edge-triage-{platform.node()}-{timestamp}.json"
     artifact_path.write_text(json.dumps(report, indent=2))
 
     # Printed directly (not via pytest_terminal_summary), same as test_compare_models.py
-    # — `make compare-flow-b-models` passes -s so this isn't captured.
+    # — `make compare-edge-triage-models` passes -s so this isn't captured.
     print(_render_table(report, artifact_path))

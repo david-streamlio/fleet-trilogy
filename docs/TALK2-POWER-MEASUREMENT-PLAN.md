@@ -19,7 +19,7 @@ this repo (`edge-node00`).
 
 - **Exactly 2 models, each on its own winning task only — not a 2x2 grid.**
   Per `docs/TALK2-OUTLINE.md`'s "Final model recommendation" section:
-  - **Phi-3.5-mini-instruct** on Flow B (escalation-direction decision).
+  - **Phi-3.5-mini-instruct** on the Edge Triage Pipeline (escalation-direction decision).
   - **Gemma-3-4B-it** on Tier 2 (corridor paraphrase / spoken warning).
 - What gets computed is **marginal energy per call and per token (joules)**,
   not raw instantaneous watts. Power alone doesn't answer "greenest" —
@@ -32,7 +32,7 @@ this repo (`edge-node00`).
   not a fair benchmark. That plan's own non-goal applies here too.
 - Does **not** require touching `tests/model/test_compare_models.py`'s
   multi-model harness. Reuse the existing single-model eval paths
-  (`tests/model/eval_lib.py` for Flow B, `tests/model/tier2_eval_lib.py` for
+  (`tests/model/eval_lib.py` for the Edge Triage Pipeline, `tests/model/tier2_eval_lib.py` for
   Tier 2) to generate real load while the meter samples — this is a
   measurement pass layered on top of runs that already exist, not a new
   comparison harness.
@@ -103,7 +103,7 @@ before sanity-checking the setup itself.
 
 For each of the two models, on its own task only:
 
-- **Phi-3.5-mini-instruct**: Flow B escalation batch, n=30 (same n as the
+- **Phi-3.5-mini-instruct**: Edge Triage Pipeline escalation batch, n=30 (same n as the
   published Pi decision-grade mismatch/latency numbers, for comparability
   with row 11 of the impact-track doc).
 - **Gemma-3-4B-it**: Tier 2 spoken-warning batch, n=30 across the 3
@@ -130,7 +130,7 @@ For each of the two models, on its own task only:
 - `energy_per_call_J = marginal_energy_J / 30`.
 - `energy_per_token_J = energy_per_call_J / mean_output_tokens` — reuse
   each model's already-known output length from row 23 (Phi
-  ~19 words on Flow B, Gemma ~33 words on Tier 2; convert word count to
+  ~19 words on the Edge Triage Pipeline, Gemma ~33 words on Tier 2; convert word count to
   tokens at ~1.3-1.4 tok/word, or pull an exact count from the harness's
   completion length if available).
 

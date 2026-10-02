@@ -4,7 +4,7 @@ DEFAULT_TELEMETRY_TOPIC = "persistent://public/default/truck-telemetry"
 ENRICHMENT_CARDS_TOPIC = "persistent://public/default/enrichment-cards"
 INCIDENTS_TOPIC = "persistent://public/default/incidents"
 
-# Flow B (talk1_edge_intelligence.coprocessor -> .triage_function) intermediate
+# Edge Triage Pipeline (talk1_edge_intelligence.coprocessor -> .triage_function) intermediate
 # topic: TelemetryCoprocessorFunction's output, LlmTriageFunction's input.
 TRIAGE_PAYLOADS_TOPIC = "persistent://public/default/triage-payloads"
 

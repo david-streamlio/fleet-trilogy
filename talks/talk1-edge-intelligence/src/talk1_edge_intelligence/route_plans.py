@@ -2,7 +2,7 @@
 during route planning (before a truck departs a segment), not fabricated at
 inference time.
 
-A real Tier-3 eval investigation (2026-09-26, chasing why the Flow B "low"
+A real Tier-3 eval investigation (2026-09-26, chasing why the Edge Triage Pipeline "low"
 severity tier stayed miscalibrated even after fixing the traffic_pattern
 confound in coprocessor.py) found that handing the LLM two raw numbers — actual
 speed and a bare planned-speed baseline — and letting it compute the deviation
@@ -32,7 +32,7 @@ class RouteSegmentPlan:
 
 
 # Illustrative pre-seeded data — keys must match TelemetryEvent.route_segment exactly.
-# "I-95N-segment-3" is the segment tests/model/test_flow_b_triage.py's severity-tier
+# "I-95N-segment-3" is the segment tests/model/test_edge_triage.py's severity-tier
 # fixture already uses, so those evals exercise a real (not "unknown") baseline.
 ROUTE_SEGMENT_PLANS: dict[str, RouteSegmentPlan] = {
     "I-95N-segment-3": RouteSegmentPlan(route_segment="I-95N-segment-3", planned_avg_speed_mph=45.0),

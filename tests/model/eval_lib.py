@@ -331,7 +331,7 @@ class Tier3Report:
 
 
 # ---------------------------------------------------------------------------
-# Flow B: TelemetryCoprocessorFunction -> LlmTriageFunction (see
+# Edge Triage Pipeline: TelemetryCoprocessorFunction -> LlmTriageFunction (see
 # talk1_edge_intelligence.coprocessor / .triage_function). A separate, currently
 # unwired pipeline from Flow A above — same cheap-math detection
 # (is_probable_slowdown/evaluate_signals), different downstream shape and a
@@ -351,14 +351,14 @@ class Tier3Report:
 
 
 @dataclass
-class FlowBTrial:
+class EdgeTriageTrial:
     raw_output: str
     latency_seconds: float
     parsed: dict | None
     error: str | None = None
 
 
-def run_flow_b_trials(
+def run_edge_triage_trials(
     coprocessor,
     triage,
     context,
@@ -366,7 +366,7 @@ def run_flow_b_trials(
     n: int,
     contextual_trigger_overrides: dict | None = None,
     baseline_severity_override: str | None = None,
-) -> list[FlowBTrial]:
+) -> list[EdgeTriageTrial]:
     """Runs `event` through the real coprocessor once (its output is deterministic
     per event, same as Flow A renders its prompt once) and the real triage step n
     times. If the coprocessor's own gate (is_probable_slowdown / eta_slip_min
@@ -391,7 +391,7 @@ def run_flow_b_trials(
     whether that card would be uplinked.
     """
     payload = coprocessor.process(to_json(event), context)
-    trials: list[FlowBTrial] = []
+    trials: list[EdgeTriageTrial] = []
     if payload is None:
         return trials
     if contextual_trigger_overrides or baseline_severity_override:
@@ -410,26 +410,26 @@ def run_flow_b_trials(
             raw = triage.build_card(payload, context)
         except Exception as exc:  # noqa: BLE001
             trials.append(
-                FlowBTrial(raw_output="", latency_seconds=time.monotonic() - start, parsed=None, error=str(exc))
+                EdgeTriageTrial(raw_output="", latency_seconds=time.monotonic() - start, parsed=None, error=str(exc))
             )
             continue
         latency = time.monotonic() - start
         if raw is None:
             trials.append(
-                FlowBTrial(raw_output="", latency_seconds=latency, parsed=None, error="process() returned None")
+                EdgeTriageTrial(raw_output="", latency_seconds=latency, parsed=None, error="process() returned None")
             )
             continue
         try:
             parsed = json.loads(raw)
         except Exception as exc:  # noqa: BLE001
-            trials.append(FlowBTrial(raw_output=raw, latency_seconds=latency, parsed=None, error=str(exc)))
+            trials.append(EdgeTriageTrial(raw_output=raw, latency_seconds=latency, parsed=None, error=str(exc)))
             continue
-        trials.append(FlowBTrial(raw_output=raw, latency_seconds=latency, parsed=parsed, error=None))
+        trials.append(EdgeTriageTrial(raw_output=raw, latency_seconds=latency, parsed=parsed, error=None))
     return trials
 
 
-def flow_b_format_reliability(event: TelemetryEvent, trials: list[FlowBTrial]) -> dict:
-    """(a) FORMAT RELIABILITY for Flow B, post-pivot (docs/TALK2-DATA-ENGINEERING-
+def edge_triage_format_reliability(event: TelemetryEvent, trials: list[EdgeTriageTrial]) -> dict:
+    """(a) FORMAT RELIABILITY for the Edge Triage Pipeline, post-pivot (docs/TALK2-DATA-ENGINEERING-
     IMPACT-TRACK.md section 5): a trial only counts as valid if baseline_severity/
     severity are grammar-and-cheap-math-legal values, escalation is one of the three
     grammar-forced values, recommended_action matches the deterministic template for
@@ -481,7 +481,7 @@ def flow_b_format_reliability(event: TelemetryEvent, trials: list[FlowBTrial]) -
     }
 
 
-# (f) ESCALATION DIRECTION for Flow B, post-pivot: severity is no longer a model
+# (f) ESCALATION DIRECTION for the Edge Triage Pipeline, post-pivot: severity is no longer a model
 # output (severity_classifier.py computes baseline_severity identically for every
 # model given the same event), so "did the model classify severity right" no longer
 # discriminates between models at all. What the model actually controls now is
@@ -522,14 +522,14 @@ ESCALATION_SCENARIOS: dict[str, dict] = {
 }
 
 
-def check_escalation_direction(scenario_trials: dict[str, list[FlowBTrial]]) -> dict:
+def check_escalation_direction(scenario_trials: dict[str, list[EdgeTriageTrial]]) -> dict:
     """Does each scenario's escalation decision match ESCALATION_SCENARIOS'
     expected_direction? "lower_or_hold" accepts either value — this session's real
     diagnostics never cleanly separated "lower" from "hold" for a model that's
     merely not over-reacting, and conflating them here is more honest than picking
     one arbitrarily. Only checks trials whose escalation parsed as one of the three
     grammar-legal values; a trial that failed format entirely is already counted by
-    flow_b_format_reliability, not double-counted here."""
+    edge_triage_format_reliability, not double-counted here."""
     per_scenario: dict[str, dict] = {}
     mismatches = []
     checked = 0
@@ -574,10 +574,10 @@ def check_escalation_direction(scenario_trials: dict[str, list[FlowBTrial]]) -> 
 
 
 @dataclass
-class FlowBReport:
+class EdgeTriageReport:
     """Same accumulate-then-dump-one-artifact convention as Tier3Report, kept
     separate (own dataclass, own artifact file) rather than reusing Tier3Report's
-    fields, since Flow A and Flow B tests can run in the same pytest session and
+    fields, since Flow A and Edge Triage Pipeline tests can run in the same pytest session and
     would otherwise silently overwrite each other's results."""
 
     config: dict
@@ -610,7 +610,7 @@ class FlowBReport:
         lat = self.latency_percentiles()
         lines = [
             "",
-            "=== Flow B (coprocessor -> triage) eval summary ===",
+            "=== Edge Triage Pipeline (coprocessor -> triage) eval summary ===",
             f"artifact: {artifact_path}",
             f"model: {self.config.get('model_path')} via {self.config.get('binary_path')}",
         ]

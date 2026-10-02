@@ -6,8 +6,8 @@ has since been superseded twice: first by widening the candidate pool to 14
 models, then by the architectural pivot that moved `severity`/
 `recommended_action` to deterministic cheap math and narrowed the LLM's job
 to a bounded escalation decision (`severity_mismatch_rate` was replaced by
-`escalation-direction mismatch` as the gate metric — see git history around
-"Move Flow B severity + recommended_action to deterministic cheap math").
+`escalation-direction mismatch` as the gate metric — see commit
+`5630c2d`, which moved severity + recommended_action to deterministic cheap math).
 Full detail and the run-by-run history live in
 `docs/TALK2-DATA-ENGINEERING-IMPACT-TRACK.md`'s running-total table (rows
 8-18); this status block gives the final numbers only.

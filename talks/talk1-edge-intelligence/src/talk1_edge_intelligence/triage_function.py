@@ -52,7 +52,7 @@ the recommended_action/escalation contradiction by construction rather than by
 hoping a wording change avoids it.
 
 Runtime backend switched from SubprocessLlmBackend to LlmServerBackend
-(2026-09-26): a 14-model Flow B comparison run was measured taking far longer
+(2026-09-26): a 14-model Edge Triage Pipeline comparison run was measured taking far longer
 than the model spectrum alone predicted. Root cause: SubprocessLlmBackend shells
 out to a one-shot CLI binary per generate() call, so every one of the ~120 trials
 per model reloaded the full model weights and reinitialized the Metal GPU backend

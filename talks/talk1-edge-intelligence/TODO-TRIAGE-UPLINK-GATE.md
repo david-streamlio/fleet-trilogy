@@ -18,7 +18,7 @@
   - lower → medium → `None`
   - hold → low → `None`
   - the config override works
-- Talk 2 / eval impact: `tests/model/eval_lib.py` and the Flow B comparison assume one card per payload. Check they read cards before the gate, or score the gate separately.
+- Talk 2 / eval impact: `tests/model/eval_lib.py` and the Edge Triage Pipeline comparison assume one card per payload. Check they read cards before the gate, or score the gate separately.
 
 ## Why
 This is the deck's answer to the cloud observability bottleneck: raw readings never leave the truck, and only high-severity, ETA-impacting cards use the cellular link. Until the gate exists, the claim on slide 21 is design, not behavior.

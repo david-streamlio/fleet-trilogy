@@ -193,10 +193,10 @@ display_name = "Gemma-3-1B-it (Q4_K_M)"
 enabled = false
 # Verified source: https://huggingface.co/ggml-org/gemma-3-1b-it-GGUF
 # (gemma-3-1b-it-Q4_K_M.gguf, 806 MB).
-# ELIMINATED (Flow B gate 2, 2026-09-26, eval-results/compare-flow-b-
+# ELIMINATED (Edge Triage Pipeline gate 2, 2026-09-26, eval-results/compare-edge-triage-
 # COMP-J2D9D71YNJ-20260926T195623Z.json): format_parse_rate=1.000 (cleared
 # gate 1) but escalation_mismatch_rate=0.511 (n=90) exceeds the 0.50 bar — the
-# only one of 7 models tested to fail Flow B's escalation-direction check
+# only one of 7 models tested to fail the Edge Triage Pipeline's escalation-direction check
 # (docs/TALK2-DATA-ENGINEERING-IMPACT-TRACK.md section 5). Every ad-hoc
 # diagnostic this session ran against this model found the same shape.
 binary_path_env = "LLM_BINARY_PATH_GEMMA3_1B"
@@ -217,7 +217,7 @@ enabled = false
 # ELIMINATED (Pi 4 target, hardware constraint, not a gate result): confirmed thermal
 # issues on the Pi 4 at this size/weight class — not a viable stage-model candidate
 # regardless of any M4 quality-gate result, so no longer run by default in any
-# comparison (Flow A or Flow B).
+# comparison (Flow A or the Edge Triage Pipeline).
 binary_path_env = "LLM_BINARY_PATH_QWEN38_27B"
 model_path_env = "LLM_MODEL_PATH_QWEN38_27B"
 default_binary_path = "~/tools/llama.cpp/build/bin/llama-completion"

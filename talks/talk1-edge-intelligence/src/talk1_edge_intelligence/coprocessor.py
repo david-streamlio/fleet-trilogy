@@ -1,4 +1,4 @@
-"""TelemetryCoprocessorFunction — Flow B's producer: a standalone Pulsar
+"""TelemetryCoprocessorFunction — the Edge Triage Pipeline's producer: a standalone Pulsar
 Function that sits upstream of LlmTriageFunction, consuming raw TelemetryEvent
 JSON from the existing (single, shared — see docs/CANON.md) telemetry topic and
 emitting the triage payload shape LlmTriageFunction.process() already expects.
@@ -64,7 +64,7 @@ def traffic_pattern_from_stop_go_index(stop_go_index: float) -> str:
     the more severe one, regardless of which two tiers were sharing text. Fewer
     than three distinct buckets across the reachable range silently miscalibrates
     the model reading this field, not just the eval measuring it — see
-    tests/model/test_flow_b_triage.py's _SEVERITY_SIGNAL_PROFILE comment for the
+    tests/model/test_edge_triage.py's _SEVERITY_SIGNAL_PROFILE comment for the
     full account.
     """
     if stop_go_index > 0.8:
@@ -92,7 +92,7 @@ def velocity_context(actual_speed_mph: float, route_segment: str) -> str | None:
     60%, and it was genuinely differentiated (a mix of low/medium/high outputs, not
     a keyword-triggered 100%-low overcorrection like an earlier, unfounded-assertion
     version of this same idea caused). Model-dependent, not a universal fix — see
-    tests/model/test_flow_b_triage.py's _SEVERITY_SIGNAL_PROFILE comment for the
+    tests/model/test_edge_triage.py's _SEVERITY_SIGNAL_PROFILE comment for the
     full multi-round account — but a real, no-downside win for at least one model,
     built on real data rather than an assertion.
     """
@@ -105,7 +105,7 @@ def velocity_context(actual_speed_mph: float, route_segment: str) -> str | None:
 
 
 def build_triage_payload(event: TelemetryEvent, triggered_signals: list[str]) -> dict:
-    """The Flow B payload shape LlmTriageFunction.process() parses.
+    """The Edge Triage Pipeline payload shape LlmTriageFunction.process() parses.
 
     `baseline_severity` is computed here, deterministically, by
     severity_classifier.classify_severity — not left for the LLM to derive. See
@@ -155,7 +155,7 @@ class TelemetryCoprocessorFunction:
 
     Config (the eta_slip_min gate bounds) is read from user config lazily on the
     first process() call — same convention as LlmTriageFunction, so both stages
-    of Flow B are tunable via `pulsar-admin functions update --user-config`
+    of the Edge Triage Pipeline are tunable via `pulsar-admin functions update --user-config`
     without a code change.
     """
 

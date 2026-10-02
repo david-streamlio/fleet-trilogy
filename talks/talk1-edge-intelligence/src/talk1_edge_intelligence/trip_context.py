@@ -34,7 +34,7 @@ class TripContext:
 
 
 # Illustrative pre-seeded data. truck-47 matches the fixture id used throughout
-# tests/model/test_flow_b_triage.py, so those evals exercise real (not "unknown")
+# tests/model/test_edge_triage.py, so those evals exercise real (not "unknown")
 # operational context.
 TRIP_CONTEXTS: dict[str, TripContext] = {
     "truck-47": TripContext(

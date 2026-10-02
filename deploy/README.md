@@ -157,7 +157,7 @@ LlmTriageFunction                   (talk1_edge_intelligence.triage_function)
   design and `test_triage_function.py` for the gate's test coverage.
 - `process()` is the gated Pulsar Functions entry point; `build_card()` is
   the same card-generation logic, ungated — `tests/model/eval_lib.py`'s
-  `run_flow_b_trials` calls `build_card()` directly so eval scoring isn't
+  `run_edge_triage_trials` calls `build_card()` directly so eval scoring isn't
   affected by cards the gate would otherwise hold.
 - Topic names (`TRIAGE_PAYLOADS_TOPIC`, `LOCAL_TRIAGE_TOPIC`, plus the
   existing `ENRICHMENT_CARDS_TOPIC`) are defined once in

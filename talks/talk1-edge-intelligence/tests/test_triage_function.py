@@ -252,7 +252,7 @@ def test_uplink_min_severity_config_override(monkeypatch):
 
 
 def test_build_card_is_ungated(monkeypatch):
-    # build_card (used directly by tests/model/eval_lib.py's run_flow_b_trials) must
+    # build_card (used directly by tests/model/eval_lib.py's run_edge_triage_trials) must
     # return every card regardless of severity -- the uplink gate lives in process()
     # only, so eval scoring isn't corrupted by cards the gate would otherwise hold.
     _mock_backend_returning(monkeypatch, "hold")

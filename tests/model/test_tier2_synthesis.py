@@ -2,7 +2,7 @@
 talk3_pulsar_speaks_english.synthesizer / .prompting. Opt-in, real
 llama.cpp-family runtime (see conftest.py's llm_backend/tier2_context fixtures).
 
-Unlike Flow A/B, scope and reroute are never model output at all (synthesizer.py
+Unlike Flow A and the Edge Triage Pipeline, scope and reroute are never model output at all (synthesizer.py
 decides both with plain code before the backend is ever invoked) — see
 tier2_eval_lib.py's module docstring for what that changes about what "format
 reliability" and "grounding" mean for this task.
@@ -29,7 +29,7 @@ def test_tier2_synthesis_format_speakability_and_grounding(
     request, tier2_context, tier2_report, llm_backend: SubprocessLlmBackend
 ):
     # llm_backend is depended on only for its skip-when-no-real-model behavior
-    # (same convention as flow_b_context) -- Tier 2's synthesize()/
+    # (same convention as edge_triage_context) -- Tier 2's synthesize()/
     # generate_spoken_warning() take a backend directly, no lazy-configure-
     # from-context layer to test the way LlmTriageFunction has, so this builds
     # its own LlmServerBackend from tier2_context's already-resolved paths

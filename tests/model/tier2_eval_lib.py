@@ -1,8 +1,8 @@
 """Shared harness for Tier 2 (talk3_pulsar_speaks_english) model evals — real
 llama.cpp-family runtime, real GGUF model.
 
-Deliberately separate from eval_lib.py (Flow A/Flow B): Tier 2's task shape is
-fundamentally different, not a variant of either. Flow A/B ask a model to
+Deliberately separate from eval_lib.py (Flow A / Edge Triage Pipeline): Tier 2's task shape is
+fundamentally different, not a variant of either. Flow A and the Edge Triage Pipeline ask a model to
 classify/decide (severity, escalation) over telemetry signals; Tier 2's model
 never decides anything (scope and reroute are plain code in synthesizer.py) —
 its only job is to paraphrase already-decided facts into a short spoken-style
@@ -16,9 +16,9 @@ warning. That changes what "format reliability" and "grounding" even mean here:
   single parse/fail axis.
 - Grounding here is about whether the *prose* stays faithful to already-decided
   facts (corridor name, the reroute call) — not exact-value copying the way
-  Flow A/B check truck_id/eta_impact equality, because there's no structured
+  Flow A and the Edge Triage Pipeline check truck_id/eta_impact equality, because there's no structured
   field to compare, just natural language.
-- Speakability is a genuinely new axis with no Flow A/B analog: this text is
+- Speakability is a genuinely new axis with no Flow A or Edge Triage Pipeline analog: this text is
   meant to be read aloud (TTS), so markdown/code-fence/leaked-JSON artifacts
   and runaway length are real failures that "valid JSON" would never catch.
 """
@@ -37,7 +37,7 @@ from talk3_pulsar_speaks_english.prompting import render_synthesis_prompt
 DEFAULT_EVAL_TIMEOUT_SECONDS = 180.0
 
 # LlmGenerationConfig's own default (256) is far more than this task ever needs and,
-# unlike Flow A/B, Tier 2 has no grammar/stop sequence to force early termination --
+# unlike Flow A and the Edge Triage Pipeline, Tier 2 has no grammar/stop sequence to force early termination --
 # a model that doesn't stop on its own burns the full budget every time. Real Pi 4
 # run (2026-09-28, eval-results/compare-tier2-edge-node00-20260928T000412Z.json):
 # Qwen3-8B and Llama-3.1-8B-Instruct collapsed to 10.0%/6.7% nonempty_rate, every
@@ -225,7 +225,7 @@ def check_tier2_format_reliability(trials: list[Tier2Trial]) -> dict:
 
 
 def check_speakability(trials: list[Tier2Trial]) -> dict:
-    """(b) SPEAKABILITY — no Flow A/B analog. This text is meant to be read
+    """(b) SPEAKABILITY — no Flow A or Edge Triage Pipeline analog. This text is meant to be read
     aloud by TTS, so markdown/code-fence/leaked-JSON-key artifacts and running
     on far past a "2-3 sentence" spoken warning are real failures a JSON parser
     would never catch."""
@@ -341,7 +341,7 @@ def _percentile(ordered: list[float], fraction: float) -> float:
 
 @dataclass
 class Tier2Report:
-    """Same accumulate-then-dump-one-artifact convention as FlowBReport/Tier3Report."""
+    """Same accumulate-then-dump-one-artifact convention as EdgeTriageReport/Tier3Report."""
 
     config: dict
     format_reliability: dict = field(default_factory=dict)
