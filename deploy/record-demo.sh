@@ -227,12 +227,15 @@ MARGIN=15
 GAP=15
 CELL_W=$(( (EXT_W - 3 * MARGIN) / 2 ))
 ROW1_H=$(( (EXT_H - 3 * MARGIN) * 65 / 100 ))
-ROW2_H=$(( EXT_H - 3 * MARGIN - ROW1_H ))
 COL1_X=$(( EXT_X + MARGIN ))
 COL2_X=$(( COL1_X + CELL_W + GAP ))
 ROW1_Y=$(( EXT_Y + MARGIN ))
-# ROW2_Y is NOT precomputed here -- see the row-1-placement loop below,
-# which derives it from row 1's actual achieved bottom edge.
+# ROW2_Y and ROW2_H are NOT precomputed here -- see the row-1-placement
+# loop below, which derives ROW2_Y from row 1's actual bottom edge and
+# then sizes ROW2_H to leave a MARGIN-sized gap above the display's
+# physical bottom edge (a row 2 ending flush with it was observed to let
+# Terminal's own on-screen repositioning push the whole window upward
+# into row 1 whenever its row-snapping landed even 1pt taller).
 
 # Setup + simulator windows, side by side near the top of the MAIN display
 # -- small and never recorded.
@@ -384,7 +387,8 @@ for i in 0 1; do
 done
 
 ROW2_Y=$(( ROW1_MAX_Y2 + GAP ))
-echo "[record-demo] row 1 actual bottom edge: ${ROW1_MAX_Y2} -> row 2 starts at ${ROW2_Y}"
+ROW2_H=$(( EXT_Y + EXT_H - ROW2_Y - MARGIN ))
+echo "[record-demo] row 1 actual bottom edge: ${ROW1_MAX_Y2} -> row 2 at ${ROW2_Y}, height ${ROW2_H} (bottom edge $(( ROW2_Y + ROW2_H )), display bottom edge $(( EXT_Y + EXT_H )))"
 GRID_CELLS_ROW2=(
   "${COL1_X} ${ROW2_Y} $(( COL1_X + CELL_W )) $(( ROW2_Y + ROW2_H ))"
   "${COL2_X} ${ROW2_Y} $(( COL2_X + CELL_W )) $(( ROW2_Y + ROW2_H ))"
