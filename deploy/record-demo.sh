@@ -20,6 +20,16 @@
 # Options:
 #   --output PATH        Final exported .mp4 path
 #                         (default: deploy/recordings/edge-triage-demo-<timestamp>.mp4)
+#                         In --per-window mode this is used as a basename:
+#                         each window's clip gets -<role> inserted before
+#                         the extension (e.g. ...-telemetry.mp4).
+#   --per-window          Instead of one combined grid recording, capture
+#                         each of the 4 output windows into its OWN clip
+#                         (4 separate .mp4 files) -- for dropping individual
+#                         windows into individual slides rather than one
+#                         big composite shot. Each window's own title bar
+#                         (which shows the macOS account name) is cropped
+#                         out of its clip as a side effect.
 #   --font-size N         Output windows' terminal font size, points
 #                         (default: 20 -- see talks/talk1-edge-intelligence/
 #                         TODO-DEMO-RECORDING.md's ">= 20pt" spec). The 2
@@ -63,17 +73,24 @@ SCENARIO_FILE="${SCRIPT_DIR}/demo-scenario.env"
 
 BROKER_URL="pulsar://localhost:6650"
 OUTPUT_PATH=""
+PER_WINDOW=""
 FONT_SIZE="20"
 EXCLUDED_FONT_SIZE="12"
 PROFILE="Clear Dark"
 LEAD_IN="2"
 WAIT_EXTRA="20"
 TEARDOWN=""
+# macOS's titled-window chrome, measured directly from a screenshot (not
+# inferred from row counts, which gave a misleading value) -- used only in
+# --per-window mode to crop each window's own title bar (and the account
+# name it shows) out of that window's clip.
+TITLE_BAR_HEIGHT=32
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --output) OUTPUT_PATH="${2:?--output requires a value}"; shift 2 ;;
     --output=*) OUTPUT_PATH="${1#*=}"; shift ;;
+    --per-window) PER_WINDOW="1"; shift ;;
     --font-size) FONT_SIZE="${2:?--font-size requires a value}"; shift 2 ;;
     --font-size=*) FONT_SIZE="${1#*=}"; shift ;;
     --lead-in) LEAD_IN="${2:?--lead-in requires a value}"; shift 2 ;;
@@ -136,6 +153,18 @@ mkdir -p "$RECORDINGS_DIR"
 : "${OUTPUT_PATH:="${RECORDINGS_DIR}/edge-triage-demo-${TIMESTAMP}.mp4"}"
 RAW_MOV="${RECORDINGS_DIR}/.raw-${TIMESTAMP}.mov"
 
+# output_for_role <role> -- inserts -<role> before OUTPUT_PATH's extension,
+# e.g. edge-triage-demo.mp4 -> edge-triage-demo-telemetry.mp4. Used only in
+# --per-window mode.
+output_for_role() {
+  local role="$1"
+  if [[ "$OUTPUT_PATH" == *.* ]]; then
+    echo "${OUTPUT_PATH%.*}-${role}.${OUTPUT_PATH##*.}"
+  else
+    echo "${OUTPUT_PATH}-${role}"
+  fi
+}
+
 # Screen geometry: the 2x2 recorded grid always goes on the non-main
 # NSScreen, converted from Cocoa (origin bottom-left, y-up) to the
 # AppleScript/Carbon screen-coordinate system `bounds of window` uses
@@ -186,15 +215,15 @@ EXCL_W=$(( (MAIN_W - 3 * MARGIN) / 2 ))
 SETUP_X=$MARGIN
 SIM_X=$(( SETUP_X + EXCL_W + GAP ))
 
-RECORD_PID=""
+RECORD_PIDS=()
 WINDOW_IDS=()
 cleanup() {
   local exit_code=$?
   trap - EXIT
-  if [[ -n "$RECORD_PID" ]] && kill -0 "$RECORD_PID" 2>/dev/null; then
-    kill -INT "$RECORD_PID" 2>/dev/null || true
-    sleep 2
-  fi
+  for pid in "${RECORD_PIDS[@]:-}"; do
+    [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null && kill -INT "$pid" 2>/dev/null
+  done
+  [[ "${#RECORD_PIDS[@]:-0}" -gt 0 ]] && sleep 2
   if [[ -n "$TEARDOWN" ]]; then
     echo "[record-demo] tearing down..."
     pkill -f 'talk1_edge_intelligence\.coprocessor\.TelemetryCoprocessorFunction' 2>/dev/null || true
@@ -264,6 +293,7 @@ echo "[record-demo] opening the 4 output windows..."
 # No associative arrays here -- macOS's /bin/bash is 3.2 (no Homebrew bash
 # installed), which predates bash 4's declare -A.
 GRID_SCRIPTS=(telemetry.sh coproc_out.sh local_only.sh uplink.sh)
+GRID_ROLES=(telemetry coproc-out local-only uplink)
 GRID_CELLS=(
   "${COL1_X} ${ROW1_Y} $(( COL1_X + CELL_W )) $(( ROW1_Y + CELL_H ))"
   "${COL2_X} ${ROW1_Y} $(( COL2_X + CELL_W )) $(( ROW1_Y + CELL_H ))"
@@ -275,6 +305,7 @@ MIN_X=""
 MIN_Y=""
 MAX_X=""
 MAX_Y=""
+PW_BOUNDS=()
 for i in 0 1 2 3; do
   script="${GRID_SCRIPTS[$i]}"
   wid="$(open_window "cd '${REPO_ROOT}' && bash deploy/windows/${script} '${BROKER_URL}'")"
@@ -285,19 +316,37 @@ for i in 0 1 2 3; do
   # rows/columns, so the real rectangle can differ slightly from requested)
   # and fold it into the capture region, rather than trusting the request.
   read -r ax1 ay1 ax2 ay2 <<< "$(osascript -e "tell application \"Terminal\" to bounds of window id ${wid}" | tr -d ',')"
+  PW_BOUNDS+=("${ax1} ${ay1} ${ax2} ${ay2}")
   [[ -z "$MIN_X" || "$ax1" -lt "$MIN_X" ]] && MIN_X="$ax1"
   [[ -z "$MIN_Y" || "$ay1" -lt "$MIN_Y" ]] && MIN_Y="$ay1"
   [[ -z "$MAX_X" || "$ax2" -gt "$MAX_X" ]] && MAX_X="$ax2"
   [[ -z "$MAX_Y" || "$ay2" -gt "$MAX_Y" ]] && MAX_Y="$ay2"
 done
 
-CAP_W=$(( MAX_X - MIN_X ))
-CAP_H=$(( MAX_Y - MIN_Y ))
-echo "[record-demo] recorded region: ${MIN_X},${MIN_Y} ${CAP_W}x${CAP_H} (4 output windows only)"
-
-echo "[record-demo] recording -> ${RAW_MOV}"
-screencapture -v -R "${MIN_X},${MIN_Y},${CAP_W},${CAP_H}" "$RAW_MOV" &
-RECORD_PID=$!
+RECORD_PIDS=()
+PW_RAW_MOVS=()
+if [[ -n "$PER_WINDOW" ]]; then
+  echo "[record-demo] recording 4 separate clips (one per output window, title bar cropped)..."
+  for i in 0 1 2 3; do
+    role="${GRID_ROLES[$i]}"
+    read -r bx1 by1 bx2 by2 <<< "${PW_BOUNDS[$i]}"
+    by1=$(( by1 + TITLE_BAR_HEIGHT ))
+    bw=$(( bx2 - bx1 ))
+    bh=$(( by2 - by1 ))
+    raw="${RECORDINGS_DIR}/.raw-${TIMESTAMP}-${role}.mov"
+    PW_RAW_MOVS+=("$raw")
+    echo "[record-demo]   ${role}: ${bx1},${by1} ${bw}x${bh} -> ${raw}"
+    screencapture -v -R "${bx1},${by1},${bw},${bh}" "$raw" &
+    RECORD_PIDS+=("$!")
+  done
+else
+  CAP_W=$(( MAX_X - MIN_X ))
+  CAP_H=$(( MAX_Y - MIN_Y ))
+  echo "[record-demo] recorded region: ${MIN_X},${MIN_Y} ${CAP_W}x${CAP_H} (4 output windows only)"
+  echo "[record-demo] recording -> ${RAW_MOV}"
+  screencapture -v -R "${MIN_X},${MIN_Y},${CAP_W},${CAP_H}" "$RAW_MOV" &
+  RECORD_PIDS+=("$!")
+fi
 
 sleep "$LEAD_IN"
 
@@ -308,21 +357,45 @@ echo "[record-demo] scenario duration ${DURATION}s + ${WAIT_EXTRA}s trailing-car
 sleep "$TOTAL_WAIT"
 
 echo "[record-demo] stopping recording..."
-kill -INT "$RECORD_PID" 2>/dev/null || true
-wait "$RECORD_PID" 2>/dev/null || true
-RECORD_PID=""
+for pid in "${RECORD_PIDS[@]}"; do
+  kill -INT "$pid" 2>/dev/null || true
+done
+for pid in "${RECORD_PIDS[@]}"; do
+  wait "$pid" 2>/dev/null || true
+done
+RECORD_PIDS=()
 sleep 2
 
-if [[ ! -s "$RAW_MOV" ]]; then
-  echo "[record-demo] ERROR: ${RAW_MOV} is empty or missing -- screen recording likely failed." >&2
-  echo "[record-demo] Check System Settings > Privacy & Security > Screen Recording for Terminal." >&2
-  exit 1
+export_clip() {
+  # export_clip <raw-mov> <output-mp4> <label>
+  local raw="$1" out="$2" label="$3"
+  if [[ ! -s "$raw" ]]; then
+    echo "[record-demo] ERROR: ${raw} is empty or missing -- ${label} recording likely failed." >&2
+    echo "[record-demo] Check System Settings > Privacy & Security > Screen Recording for Terminal." >&2
+    return 1
+  fi
+  echo "[record-demo] trimming lead-in, exporting H.264 mp4 -> ${out}"
+  ffmpeg -y -ss "$LEAD_IN" -i "$raw" -c:v libx264 -crf 18 -preset slow -pix_fmt yuv420p -an "$out" \
+    < /dev/null > "${RECORDINGS_DIR}/.ffmpeg-${TIMESTAMP}-${label}.log" 2>&1
+  rm -f "$raw"
+}
+
+if [[ -n "$PER_WINDOW" ]]; then
+  FAILED=""
+  for i in 0 1 2 3; do
+    role="${GRID_ROLES[$i]}"
+    out="$(output_for_role "$role")"
+    export_clip "${PW_RAW_MOVS[$i]}" "$out" "$role" || FAILED="1"
+  done
+  [[ -n "$FAILED" ]] && exit 1
+  echo "[record-demo] done:"
+  for i in 0 1 2 3; do
+    out="$(output_for_role "${GRID_ROLES[$i]}")"
+    echo "  ${GRID_ROLES[$i]}: ${out}"
+    ffprobe -v error -select_streams v:0 -show_entries stream=width,height,duration -of default=noprint_wrappers=1 "$out" 2>/dev/null || true
+  done
+else
+  export_clip "$RAW_MOV" "$OUTPUT_PATH" "combined" || exit 1
+  echo "[record-demo] done: ${OUTPUT_PATH}"
+  ffprobe -v error -select_streams v:0 -show_entries stream=width,height,duration -of default=noprint_wrappers=1 "$OUTPUT_PATH" 2>/dev/null || true
 fi
-
-echo "[record-demo] trimming lead-in, exporting H.264 mp4 -> ${OUTPUT_PATH}"
-ffmpeg -y -ss "$LEAD_IN" -i "$RAW_MOV" -c:v libx264 -crf 18 -preset slow -pix_fmt yuv420p -an "$OUTPUT_PATH" \
-  < /dev/null > "${RECORDINGS_DIR}/.ffmpeg-${TIMESTAMP}.log" 2>&1
-
-rm -f "$RAW_MOV"
-echo "[record-demo] done: ${OUTPUT_PATH}"
-ffprobe -v error -select_streams v:0 -show_entries stream=width,height,duration -of default=noprint_wrappers=1 "$OUTPUT_PATH" 2>/dev/null || true
