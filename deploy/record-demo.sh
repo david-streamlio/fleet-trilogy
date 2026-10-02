@@ -231,7 +231,8 @@ ROW2_H=$(( EXT_H - 3 * MARGIN - ROW1_H ))
 COL1_X=$(( EXT_X + MARGIN ))
 COL2_X=$(( COL1_X + CELL_W + GAP ))
 ROW1_Y=$(( EXT_Y + MARGIN ))
-ROW2_Y=$(( ROW1_Y + ROW1_H + GAP ))
+# ROW2_Y is NOT precomputed here -- see the row-1-placement loop below,
+# which derives it from row 1's actual achieved bottom edge.
 
 # Setup + simulator windows, side by side near the top of the MAIN display
 # -- small and never recorded.
@@ -347,11 +348,18 @@ GRID_ROLES=(telemetry coproc-out local-only uplink)
 # telemetry.sh / coproc_out.sh (row 1): label + JSON body is 25-26 lines
 # for a full telemetry event. local_only.sh / uplink.sh (row 2): 10-11
 # lines for a full triage-outcome event.
-GRID_CELLS=(
+#
+# Row 2's cells are NOT computed from the precomputed ROW2_Y below -- they
+# are anchored to row 1's windows' ACTUAL achieved bottom edge, read back
+# after placing row 1. Terminal snaps a requested size to the nearest
+# whole row/column at the current font, which was observed to make row 1
+# end up taller than requested; row 2 placed at a precomputed Y then
+# overlapped up into row 1's real (larger) extent. Reading back and
+# re-deriving row 2's position from reality avoids needing to predict that
+# snap at all.
+GRID_CELLS_ROW1=(
   "${COL1_X} ${ROW1_Y} $(( COL1_X + CELL_W )) $(( ROW1_Y + ROW1_H ))"
   "${COL2_X} ${ROW1_Y} $(( COL2_X + CELL_W )) $(( ROW1_Y + ROW1_H ))"
-  "${COL1_X} ${ROW2_Y} $(( COL1_X + CELL_W )) $(( ROW2_Y + ROW2_H ))"
-  "${COL2_X} ${ROW2_Y} $(( COL2_X + CELL_W )) $(( ROW2_Y + ROW2_H ))"
 )
 
 MIN_X=""
@@ -359,11 +367,34 @@ MIN_Y=""
 MAX_X=""
 MAX_Y=""
 PW_BOUNDS=()
-for i in 0 1 2 3; do
+ROW1_MAX_Y2=""
+for i in 0 1; do
   script="${GRID_SCRIPTS[$i]}"
   wid="$(open_window "cd '${REPO_ROOT}' && bash deploy/windows/${script} '${BROKER_URL}'")"
   WINDOW_IDS+=("$wid")
-  read -r cx1 cy1 cx2 cy2 <<< "${GRID_CELLS[$i]}"
+  read -r cx1 cy1 cx2 cy2 <<< "${GRID_CELLS_ROW1[$i]}"
+  place_window "$wid" "$FONT_SIZE" "$cx1" "$cy1" "$cx2" "$cy2"
+  read -r ax1 ay1 ax2 ay2 <<< "$(osascript -e "tell application \"Terminal\" to bounds of window id ${wid}" | tr -d ',')"
+  PW_BOUNDS+=("${ax1} ${ay1} ${ax2} ${ay2}")
+  [[ -z "$ROW1_MAX_Y2" || "$ay2" -gt "$ROW1_MAX_Y2" ]] && ROW1_MAX_Y2="$ay2"
+  [[ -z "$MIN_X" || "$ax1" -lt "$MIN_X" ]] && MIN_X="$ax1"
+  [[ -z "$MIN_Y" || "$ay1" -lt "$MIN_Y" ]] && MIN_Y="$ay1"
+  [[ -z "$MAX_X" || "$ax2" -gt "$MAX_X" ]] && MAX_X="$ax2"
+  [[ -z "$MAX_Y" || "$ay2" -gt "$MAX_Y" ]] && MAX_Y="$ay2"
+done
+
+ROW2_Y=$(( ROW1_MAX_Y2 + GAP ))
+echo "[record-demo] row 1 actual bottom edge: ${ROW1_MAX_Y2} -> row 2 starts at ${ROW2_Y}"
+GRID_CELLS_ROW2=(
+  "${COL1_X} ${ROW2_Y} $(( COL1_X + CELL_W )) $(( ROW2_Y + ROW2_H ))"
+  "${COL2_X} ${ROW2_Y} $(( COL2_X + CELL_W )) $(( ROW2_Y + ROW2_H ))"
+)
+
+for i in 2 3; do
+  script="${GRID_SCRIPTS[$i]}"
+  wid="$(open_window "cd '${REPO_ROOT}' && bash deploy/windows/${script} '${BROKER_URL}'")"
+  WINDOW_IDS+=("$wid")
+  read -r cx1 cy1 cx2 cy2 <<< "${GRID_CELLS_ROW2[$((i - 2))]}"
   place_window "$wid" "$FONT_SIZE" "$cx1" "$cy1" "$cx2" "$cy2"
   # Read back the ACTUAL applied bounds (Terminal snaps size to whole
   # rows/columns, so the real rectangle can differ slightly from requested)
