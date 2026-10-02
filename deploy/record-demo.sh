@@ -226,7 +226,7 @@ echo "[record-demo] external display: origin (${EXT_X},${EXT_Y}) size ${EXT_W}x$
 MARGIN=15
 GAP=15
 CELL_W=$(( (EXT_W - 3 * MARGIN) / 2 ))
-ROW1_H=$(( (EXT_H - 3 * MARGIN) * 65 / 100 ))
+ROW1_H=$(( (EXT_H - 3 * MARGIN) * 65 / 100 - 20 ))
 COL1_X=$(( EXT_X + MARGIN ))
 COL2_X=$(( COL1_X + CELL_W + GAP ))
 ROW1_Y=$(( EXT_Y + MARGIN ))
