@@ -35,12 +35,18 @@
 #                          so each pretty-printed message is readable
 #                          before the next arrives (default: 1)
 #   --font-size N         Output windows' terminal font size, points
-#                         (default: 14 -- TODO-DEMO-RECORDING.md's ">= 20pt"
-#                         spec assumed one single-window recording; with 4
-#                         windows tiled in a 2x2 grid, 20pt is cramped and
-#                         wraps lines awkwardly, so this script's own
-#                         default is smaller). The 2 excluded windows
-#                         always use a smaller fixed font,
+#                         (default: 12 -- TODO-DEMO-RECORDING.md's ">= 20pt"
+#                         spec assumed one single-window recording. With 4
+#                         windows tiled 2x2 on a 1080pt-tall external
+#                         display, a full telemetry event (the longest
+#                         pretty-printed payload -- label + JSON body is 26
+#                         lines) needs ~30 rows of headroom per cell to
+#                         never scroll its own label off the top; 12pt is
+#                         the largest font that still clears that bar on
+#                         this geometry. Going bigger means either a
+#                         shorter message or losing some of a longer one's
+#                         top every time a new message arrives). The 2
+#                         excluded windows always use a smaller fixed font,
 #                         since they never appear on camera.
 #   --lead-in SEC         Settle time recorded before the simulator starts
 #                         (default: 2)
@@ -82,7 +88,7 @@ BROKER_URL="pulsar://localhost:6650"
 OUTPUT_PATH=""
 PER_WINDOW=""
 RATE="1"
-FONT_SIZE="14"
+FONT_SIZE="12"
 EXCLUDED_FONT_SIZE="12"
 PROFILE="Clear Dark"
 LEAD_IN="2"
@@ -207,15 +213,25 @@ fi
 echo "[record-demo] external display: origin (${EXT_X},${EXT_Y}) size ${EXT_W}x${EXT_H}"
 
 # 2x2 grid of the 4 output windows, filling the external display with a
-# 20pt margin/gap.
-MARGIN=20
-GAP=20
+# 15pt margin/gap. The two rows are NOT equal height: telemetry and
+# coprocessor-output print a long payload (label + JSON body is 25-26
+# lines for a full telemetry event, the longest of the four), while
+# local-only and uplink print a short one (~10 lines) -- an even split
+# starves row 1 and scrolls its own label off the top before a full event
+# finishes printing. These row heights are sized, with headroom, from
+# those actual line counts (see the per-role comment below) rather than
+# split evenly, and then inflated further to absorb Terminal's own
+# row-quantization (observed to round a requested height down by several
+# percent rather than up).
+MARGIN=15
+GAP=15
 CELL_W=$(( (EXT_W - 3 * MARGIN) / 2 ))
-CELL_H=$(( (EXT_H - 3 * MARGIN) / 2 ))
+ROW1_H=$(( (EXT_H - 3 * MARGIN) * 65 / 100 ))
+ROW2_H=$(( EXT_H - 3 * MARGIN - ROW1_H ))
 COL1_X=$(( EXT_X + MARGIN ))
 COL2_X=$(( COL1_X + CELL_W + GAP ))
 ROW1_Y=$(( EXT_Y + MARGIN ))
-ROW2_Y=$(( ROW1_Y + CELL_H + GAP ))
+ROW2_Y=$(( ROW1_Y + ROW1_H + GAP ))
 
 # Setup + simulator windows, side by side near the top of the MAIN display
 # -- small and never recorded.
@@ -328,11 +344,14 @@ echo "[record-demo] opening the 4 output windows..."
 # installed), which predates bash 4's declare -A.
 GRID_SCRIPTS=(telemetry.sh coproc_out.sh local_only.sh uplink.sh)
 GRID_ROLES=(telemetry coproc-out local-only uplink)
+# telemetry.sh / coproc_out.sh (row 1): label + JSON body is 25-26 lines
+# for a full telemetry event. local_only.sh / uplink.sh (row 2): 10-11
+# lines for a full triage-outcome event.
 GRID_CELLS=(
-  "${COL1_X} ${ROW1_Y} $(( COL1_X + CELL_W )) $(( ROW1_Y + CELL_H ))"
-  "${COL2_X} ${ROW1_Y} $(( COL2_X + CELL_W )) $(( ROW1_Y + CELL_H ))"
-  "${COL1_X} ${ROW2_Y} $(( COL1_X + CELL_W )) $(( ROW2_Y + CELL_H ))"
-  "${COL2_X} ${ROW2_Y} $(( COL2_X + CELL_W )) $(( ROW2_Y + CELL_H ))"
+  "${COL1_X} ${ROW1_Y} $(( COL1_X + CELL_W )) $(( ROW1_Y + ROW1_H ))"
+  "${COL2_X} ${ROW1_Y} $(( COL2_X + CELL_W )) $(( ROW1_Y + ROW1_H ))"
+  "${COL1_X} ${ROW2_Y} $(( COL1_X + CELL_W )) $(( ROW2_Y + ROW2_H ))"
+  "${COL2_X} ${ROW2_Y} $(( COL2_X + CELL_W )) $(( ROW2_Y + ROW2_H ))"
 )
 
 MIN_X=""
