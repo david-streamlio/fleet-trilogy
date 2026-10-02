@@ -218,15 +218,18 @@ echo "[record-demo] external display: origin (${EXT_X},${EXT_Y}) size ${EXT_W}x$
 # lines for a full telemetry event, the longest of the four), while
 # local-only and uplink print a short one (~10 lines) -- an even split
 # starves row 1 and scrolls its own label off the top before a full event
-# finishes printing. These row heights are sized, with headroom, from
-# those actual line counts (see the per-role comment below) rather than
-# split evenly, and then inflated further to absorb Terminal's own
-# row-quantization (observed to round a requested height down by several
-# percent rather than up).
+# finishes printing.
+#
+# ROW1_H is a fixed value, not a formula: it was tuned by hand (launch via
+# this script, drag row 1's windows to the desired height, read the
+# result back with `bounds of window`) until there was a clearly visible
+# gap to row 2 on this exact external display (1920x1080). If the display
+# geometry ever changes, re-tune it the same way rather than guessing a
+# new formula from scratch.
 MARGIN=15
 GAP=15
 CELL_W=$(( (EXT_W - 3 * MARGIN) / 2 ))
-ROW1_H=$(( (EXT_H - 3 * MARGIN) * 65 / 100 - 20 ))
+ROW1_H=562
 COL1_X=$(( EXT_X + MARGIN ))
 COL2_X=$(( COL1_X + CELL_W + GAP ))
 ROW1_Y=$(( EXT_Y + MARGIN ))
@@ -247,9 +250,11 @@ SIM_X=$(( SETUP_X + EXCL_W + GAP ))
 
 RECORD_PIDS=()
 WINDOW_IDS=()
+WATCHDOG_PID=""
 cleanup() {
   local exit_code=$?
   trap - EXIT
+  [[ -n "$WATCHDOG_PID" ]] && kill "$WATCHDOG_PID" 2>/dev/null
   for pid in "${RECORD_PIDS[@]:-}"; do
     [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null && kill -INT "$pid" 2>/dev/null
   done
@@ -399,17 +404,65 @@ for i in 2 3; do
   wid="$(open_window "cd '${REPO_ROOT}' && bash deploy/windows/${script} '${BROKER_URL}'")"
   WINDOW_IDS+=("$wid")
   read -r cx1 cy1 cx2 cy2 <<< "${GRID_CELLS_ROW2[$((i - 2))]}"
-  place_window "$wid" "$FONT_SIZE" "$cx1" "$cy1" "$cx2" "$cy2"
-  # Read back the ACTUAL applied bounds (Terminal snaps size to whole
-  # rows/columns, so the real rectangle can differ slightly from requested)
-  # and fold it into the capture region, rather than trusting the request.
-  read -r ax1 ay1 ax2 ay2 <<< "$(osascript -e "tell application \"Terminal\" to bounds of window id ${wid}" | tr -d ',')"
+  # Row 2's windows sit entirely within [0, main-display-height], the
+  # vertical band both displays share -- an observed macOS quirk silently
+  # shifts a window placed there by ~98pt (= -EXT_Y on this geometry,
+  # i.e. exactly the two displays' vertical offset), and it can race our
+  # own read-back (sometimes the first read already reflects the shifted
+  # position, sometimes not), so a single read-and-trust isn't reliable.
+  # Converge instead: if the actual Y lands off from what we asked, shift
+  # the NEXT request by that same delta to cancel it out, and repeat
+  # until it settles near the intended value (a few pt of slop is normal
+  # row-quantization, not this bug).
+  req_y1="$cy1"
+  req_y2="$cy2"
+  ay1="$cy1"
+  for attempt in 1 2 3 4; do
+    place_window "$wid" "$FONT_SIZE" "$cx1" "$req_y1" "$cx2" "$req_y2"
+    read -r ax1 ay1 ax2 ay2 <<< "$(osascript -e "tell application \"Terminal\" to bounds of window id ${wid}" | tr -d ',')"
+    drift=$(( cy1 - ay1 ))
+    [[ "$drift" -lt 0 ]] && drift=$(( -drift ))
+    [[ "$drift" -le 10 ]] && break
+    echo "[record-demo] ${GRID_ROLES[$i]} landed at y1=${ay1}, wanted ${cy1} (attempt ${attempt}) -- retrying"
+    req_y1=$(( req_y1 + (cy1 - ay1) ))
+    req_y2=$(( req_y2 + (cy1 - ay1) ))
+  done
   PW_BOUNDS+=("${ax1} ${ay1} ${ax2} ${ay2}")
   [[ -z "$MIN_X" || "$ax1" -lt "$MIN_X" ]] && MIN_X="$ax1"
   [[ -z "$MIN_Y" || "$ay1" -lt "$MIN_Y" ]] && MIN_Y="$ay1"
   [[ -z "$MAX_X" || "$ax2" -gt "$MAX_X" ]] && MAX_X="$ax2"
   [[ -z "$MAX_Y" || "$ay2" -gt "$MAX_Y" ]] && MAX_Y="$ay2"
 done
+
+# Watchdog: row 2's windows (whose Y-range falls entirely within
+# [0, main-display-height], the vertical band both displays share) have
+# been observed to silently drift away from their placed bounds -- NOT
+# immediately, but sometime after the fact (minutes into a run, not at
+# placement), so a one-time re-check after a fixed delay isn't reliable.
+# This keeps re-asserting every output window's intended bounds for as
+# long as the recording runs, correcting any drift whenever it happens.
+WATCHDOG_IDS=()
+WATCHDOG_BOUNDS=()
+for i in 0 1 2 3; do
+  WATCHDOG_IDS+=("${WINDOW_IDS[$(( i + 2 ))]}")
+  WATCHDOG_BOUNDS+=("${PW_BOUNDS[$i]}")
+done
+(
+  while true; do
+    for i in 0 1 2 3; do
+      wid="${WATCHDOG_IDS[$i]}"
+      read -r ix1 iy1 ix2 iy2 <<< "${WATCHDOG_BOUNDS[$i]}"
+      cur="$(osascript -e "tell application \"Terminal\" to bounds of window id ${wid}" 2>/dev/null | tr -d ',')"
+      [[ -z "$cur" ]] && continue
+      read -r cx1 cy1 cx2 cy2 <<< "$cur"
+      if [[ "$cx1" != "$ix1" || "$cy1" != "$iy1" || "$cx2" != "$ix2" || "$cy2" != "$iy2" ]]; then
+        osascript -e "tell application \"Terminal\" to set bounds of window id ${wid} to {${ix1}, ${iy1}, ${ix2}, ${iy2}}" >/dev/null 2>&1
+      fi
+    done
+    sleep 2
+  done
+) &
+WATCHDOG_PID=$!
 
 RECORD_PIDS=()
 PW_RAW_MOVS=()
@@ -445,6 +498,8 @@ echo "[record-demo] scenario duration ${DURATION}s + ${WAIT_EXTRA}s trailing-car
 sleep "$TOTAL_WAIT"
 
 echo "[record-demo] stopping recording..."
+kill "$WATCHDOG_PID" 2>/dev/null || true
+WATCHDOG_PID=""
 for pid in "${RECORD_PIDS[@]}"; do
   kill -INT "$pid" 2>/dev/null || true
 done
