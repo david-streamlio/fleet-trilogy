@@ -11,9 +11,12 @@
 # part starts.
 #
 # Usage:
-#   ./deploy/windows/simulator.sh [broker-url]
+#   ./deploy/windows/simulator.sh [broker-url] [rate]
 #
-# Optional WARMUP_TICKS env var overrides the warmup length (default 25).
+# [rate] overrides demo-scenario.env's RATE (events/sec) -- e.g. a slower
+# rate for a recording, so each pretty-printed JSON message is readable
+# before the next one arrives. Optional WARMUP_TICKS env var overrides the
+# warmup length (default 25).
 set -uo pipefail
 
 WINDOWS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -21,11 +24,13 @@ REPO_ROOT="$(cd "${WINDOWS_DIR}/../.." && pwd)"
 SCENARIO_FILE="${REPO_ROOT}/deploy/demo-scenario.env"
 
 BROKER_URL="${1:-pulsar://localhost:6650}"
+RATE_OVERRIDE="${2:-}"
 
 printf '\033]0;Fleet Simulator (Generates Truck Telemetry)\007'
 
 # shellcheck source=../demo-scenario.env
 . "$SCENARIO_FILE"
+RATE="${RATE_OVERRIDE:-$RATE}"
 
 cd "$REPO_ROOT"
 uv run fleet-simulate --service-url "$BROKER_URL" \

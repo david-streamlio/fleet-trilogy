@@ -30,6 +30,10 @@
 #                         big composite shot. Each window's own title bar
 #                         (which shows the macOS account name) is cropped
 #                         out of its clip as a side effect.
+#   --rate EPS            Events/sec override for the simulator, slower
+#                          than deploy/demo-scenario.env's live-demo default
+#                          so each pretty-printed message is readable
+#                          before the next arrives (default: 1)
 #   --font-size N         Output windows' terminal font size, points
 #                         (default: 20 -- see talks/talk1-edge-intelligence/
 #                         TODO-DEMO-RECORDING.md's ">= 20pt" spec). The 2
@@ -74,6 +78,7 @@ SCENARIO_FILE="${SCRIPT_DIR}/demo-scenario.env"
 BROKER_URL="pulsar://localhost:6650"
 OUTPUT_PATH=""
 PER_WINDOW=""
+RATE="1"
 FONT_SIZE="20"
 EXCLUDED_FONT_SIZE="12"
 PROFILE="Clear Dark"
@@ -91,6 +96,8 @@ while [[ $# -gt 0 ]]; do
     --output) OUTPUT_PATH="${2:?--output requires a value}"; shift 2 ;;
     --output=*) OUTPUT_PATH="${1#*=}"; shift ;;
     --per-window) PER_WINDOW="1"; shift ;;
+    --rate) RATE="${2:?--rate requires a value}"; shift 2 ;;
+    --rate=*) RATE="${1#*=}"; shift ;;
     --font-size) FONT_SIZE="${2:?--font-size requires a value}"; shift 2 ;;
     --font-size=*) FONT_SIZE="${1#*=}"; shift ;;
     --lead-in) LEAD_IN="${2:?--lead-in requires a value}"; shift 2 ;;
@@ -226,12 +233,16 @@ cleanup() {
   [[ "${#RECORD_PIDS[@]:-0}" -gt 0 ]] && sleep 2
   if [[ -n "$TEARDOWN" ]]; then
     echo "[record-demo] tearing down..."
-    pkill -f 'talk1_edge_intelligence\.coprocessor\.TelemetryCoprocessorFunction' 2>/dev/null || true
-    pkill -f 'talk1_edge_intelligence\.triage_function\.LlmTriageFunction' 2>/dev/null || true
-    pkill -f 'PulsarAdminTool.*functions localrun' 2>/dev/null || true
-    pkill -f 'llama-server' 2>/dev/null || true
-    pkill -f 'fleet_simulator.cli|bin/fleet-simulate' 2>/dev/null || true
-    pkill -f 'PulsarClientTool.*consume' 2>/dev/null || true
+    TEARDOWN_PATTERN='talk1_edge_intelligence\.coprocessor\.TelemetryCoprocessorFunction|talk1_edge_intelligence\.triage_function\.LlmTriageFunction|PulsarAdminTool.*functions localrun|llama-server|fleet_simulator.cli|bin/fleet-simulate|PulsarClientTool.*consume'
+    pkill -9 -f "$TEARDOWN_PATTERN" 2>/dev/null || true
+    # Closing a window via AppleScript while it still has a live child
+    # process pops Terminal's own "terminate running processes?" sheet,
+    # which blocks waiting for a click that never comes in an automated
+    # run -- wait for pkill's SIGKILLs to actually land first.
+    for _ in $(seq 1 10); do
+      pgrep -f "$TEARDOWN_PATTERN" >/dev/null 2>&1 || break
+      sleep 1
+    done
     for wid in "${WINDOW_IDS[@]}"; do
       osascript -e "tell application \"Terminal\" to close window id ${wid} saving no" >/dev/null 2>&1 || true
     done
@@ -246,24 +257,38 @@ open_window() {
   # script is the only reliable id-recovery pattern on this Terminal
   # version; reusing an existing window later via `do script ... in window
   # id` is NOT reliable (observed to silently replace/orphan the window).
+  # The 1s settle delay before querying "front window" matters: opening
+  # windows back-to-back with no delay has been observed to race Terminal's
+  # own window-creation animation, which can make "front window" resolve to
+  # the PREVIOUS window -- causing later placements to silently stack
+  # multiple windows on top of each other instead of each landing in its
+  # own spot.
   osascript -e "tell application \"Terminal\" to do script \"$1\"" >/dev/null
+  sleep 1
   osascript -e 'tell application "Terminal" to id of front window'
 }
 
 place_window() {
   # place_window <window-id> <font-size> <x1> <y1> <x2> <y2> -- sets profile
   # and font size BEFORE bounds (setting font after bounds has been observed
-  # to silently resize the window, undoing the position).
+  # to silently resize the window, undoing the position). Applies bounds
+  # TWICE, with a short delay in between: macOS's own new-window cascade
+  # placement can override a bounds change made too soon after the window
+  # was created, so the first application can get silently clobbered a
+  # moment later. The second application lands after that cascade settles.
   local wid="$1" font="$2" x1="$3" y1="$4" x2="$5" y2="$6"
-  osascript <<EOF
-tell application "Terminal"
+  local script="
+tell application \"Terminal\"
   set w to window id ${wid}
-  set current settings of selected tab of w to settings set "${PROFILE}"
+  set current settings of selected tab of w to settings set \"${PROFILE}\"
   set font size of current settings of selected tab of w to ${font}
   set bounds of w to {${x1}, ${y1}, ${x2}, ${y2}}
   set visible of w to true
 end tell
-EOF
+"
+  osascript -e "$script"
+  sleep 0.5
+  osascript -e "$script"
 }
 
 echo "[record-demo] opening setup window (coprocessor + triage, not recorded)..."
@@ -351,7 +376,7 @@ fi
 sleep "$LEAD_IN"
 
 echo "[record-demo] starting the simulator..."
-osascript -e "tell application \"Terminal\" to do script \"cd '${REPO_ROOT}' && bash deploy/windows/simulator.sh '${BROKER_URL}'\" in window id ${SIM_WID}" >/dev/null
+osascript -e "tell application \"Terminal\" to do script \"cd '${REPO_ROOT}' && bash deploy/windows/simulator.sh '${BROKER_URL}' '${RATE}'\" in window id ${SIM_WID}" >/dev/null
 
 echo "[record-demo] scenario duration ${DURATION}s + ${WAIT_EXTRA}s trailing-card wait => recording ~${TOTAL_WAIT}s after lead-in..."
 sleep "$TOTAL_WAIT"
