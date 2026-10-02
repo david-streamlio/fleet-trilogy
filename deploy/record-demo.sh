@@ -35,9 +35,12 @@
 #                          so each pretty-printed message is readable
 #                          before the next arrives (default: 1)
 #   --font-size N         Output windows' terminal font size, points
-#                         (default: 20 -- see talks/talk1-edge-intelligence/
-#                         TODO-DEMO-RECORDING.md's ">= 20pt" spec). The 2
-#                         excluded windows always use a smaller fixed font,
+#                         (default: 14 -- TODO-DEMO-RECORDING.md's ">= 20pt"
+#                         spec assumed one single-window recording; with 4
+#                         windows tiled in a 2x2 grid, 20pt is cramped and
+#                         wraps lines awkwardly, so this script's own
+#                         default is smaller). The 2 excluded windows
+#                         always use a smaller fixed font,
 #                         since they never appear on camera.
 #   --lead-in SEC         Settle time recorded before the simulator starts
 #                         (default: 2)
@@ -79,7 +82,7 @@ BROKER_URL="pulsar://localhost:6650"
 OUTPUT_PATH=""
 PER_WINDOW=""
 RATE="1"
-FONT_SIZE="20"
+FONT_SIZE="14"
 EXCLUDED_FONT_SIZE="12"
 PROFILE="Clear Dark"
 LEAD_IN="2"
