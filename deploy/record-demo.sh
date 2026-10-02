@@ -233,7 +233,13 @@ cleanup() {
   [[ "${#RECORD_PIDS[@]:-0}" -gt 0 ]] && sleep 2
   if [[ -n "$TEARDOWN" ]]; then
     echo "[record-demo] tearing down..."
-    TEARDOWN_PATTERN='talk1_edge_intelligence\.coprocessor\.TelemetryCoprocessorFunction|talk1_edge_intelligence\.triage_function\.LlmTriageFunction|PulsarAdminTool.*functions localrun|llama-server|fleet_simulator.cli|bin/fleet-simulate|PulsarClientTool.*consume'
+    # Includes deploy/windows/*.sh's own bash + tail processes (the
+    # wrapper scripts' foreground `tail -f` and shell), not just the things
+    # they launch -- leaving those alive was observed to leave "bash, tail"
+    # as still-running when Terminal tries to close the window, which pops
+    # its own blocking confirmation sheet despite everything else already
+    # being dead.
+    TEARDOWN_PATTERN='talk1_edge_intelligence\.coprocessor\.TelemetryCoprocessorFunction|talk1_edge_intelligence\.triage_function\.LlmTriageFunction|PulsarAdminTool.*functions localrun|llama-server|fleet_simulator.cli|bin/fleet-simulate|PulsarClientTool.*consume|deploy/windows/.*\.sh|edge-triage-setup-log'
     pkill -9 -f "$TEARDOWN_PATTERN" 2>/dev/null || true
     # Closing a window via AppleScript while it still has a live child
     # process pops Terminal's own "terminate running processes?" sheet,
