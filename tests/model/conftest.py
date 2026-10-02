@@ -129,6 +129,16 @@ def pytest_addoption(parser: pytest.Parser) -> None:
             "cross-run elimination record."
         ),
     )
+    group.addoption(
+        "--only-model-ids",
+        default=None,
+        help=(
+            "make compare-edge-triage-models / compare-tier2-models only: comma-separated "
+            "models.toml ids to run EXCLUSIVELY (re-included even if `enabled = false`; "
+            "every other entry is skipped; overrides --include-model-ids). For "
+            "single-model measurement windows, e.g. docs/TALK2-POWER-MEASUREMENT-PLAN.md."
+        ),
+    )
 
 
 def _resolve_path(cli_value: str | None, env_var: str) -> str | None:

@@ -37,20 +37,39 @@ def _resolve(env_var: str, default_path: str | None) -> Path | None:
     return Path(raw).expanduser() if raw else None
 
 
+def parse_model_ids(raw: str | None) -> frozenset[str] | None:
+    """Comma-separated `--include-model-ids` / `--only-model-ids` value -> id set."""
+    return frozenset(x.strip() for x in raw.split(",") if x.strip()) if raw else None
+
+
 def load_models_manifest(
     manifest_path: Path = DEFAULT_MANIFEST_PATH,
     include_ids: frozenset[str] | None = None,
+    only_ids: frozenset[str] | None = None,
 ) -> list[ModelEntry]:
     """`include_ids`, when given, re-includes specific `enabled = false` entries by
     id for one caller/run without touching the manifest file itself — the `enabled`
     flag is a durable, cross-run historical record (see models.toml's own header
     comment), and a single comparison run wanting a wider or narrower slice of it
-    shouldn't have to edit that record to get one."""
+    shouldn't have to edit that record to get one.
+
+    `only_ids`, when given, narrows the run to exactly those entries (re-including
+    them if disabled, same as `include_ids`) — e.g. one model per power-meter window
+    (docs/TALK2-POWER-MEASUREMENT-PLAN.md), where any other model running inside
+    the window would contaminate the reading. An id not in the manifest at all is a
+    ValueError, not a silent skip: a typo must not quietly yield a wrong/empty run."""
     with manifest_path.open("rb") as f:
         data = tomllib.load(f)
+    if only_ids is not None:
+        unknown = only_ids - {raw["id"] for raw in data.get("models", [])}
+        if unknown:
+            raise ValueError(f"--only-model-ids not in {manifest_path.name}: {sorted(unknown)}")
     entries = []
     for raw in data.get("models", []):
-        if not raw.get("enabled", True) and raw["id"] not in (include_ids or frozenset()):
+        if only_ids is not None:
+            if raw["id"] not in only_ids:
+                continue
+        elif not raw.get("enabled", True) and raw["id"] not in (include_ids or frozenset()):
             continue
         entries.append(
             ModelEntry(

@@ -26,7 +26,7 @@ from pathlib import Path
 import pytest
 from llm_inference import LlmServerBackend
 
-from tests.model.models_manifest import ModelEntry, load_models_manifest
+from tests.model.models_manifest import ModelEntry, load_models_manifest, parse_model_ids
 from tests.model.test_compare_edge_triage_models import _server_binary_path
 from tests.model.tier2_eval_lib import (
     DEFAULT_THREADS,
@@ -328,9 +328,10 @@ def _render_table(report: dict, artifact_path: Path) -> str:
 
 
 def test_compare_tier2_models(request: pytest.FixtureRequest) -> None:
-    raw_ids = request.config.getoption("--include-model-ids")
-    include_ids = frozenset(x.strip() for x in raw_ids.split(",") if x.strip()) if raw_ids else None
-    manifest = load_models_manifest(include_ids=include_ids)
+    manifest = load_models_manifest(
+        include_ids=parse_model_ids(request.config.getoption("--include-model-ids")),
+        only_ids=parse_model_ids(request.config.getoption("--only-model-ids")),
+    )
     available = [e for e in manifest if e.is_available()]
     if not available:
         pytest.skip(
