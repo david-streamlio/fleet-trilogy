@@ -317,7 +317,7 @@ talk's two LLM-driven tasks.
 
 The talk's Edge Triage Pipeline (Tier 1) and Tier 2 (talk3 spoken warning) gates
 each converged to their own real Pi 4 decision-grade dataset (full detail:
-`docs/TALK2-DATA-ENGINEERING-IMPACT-TRACK.md` rows 8-23). Four models clear
+`docs/TALK2-DATA-ENGINEERING-IMPACT-TRACK.md` rows 8-27). Four models clear
 *both* gates — Phi-3.5-mini-instruct, Gemma-3-4B-it, Llama-3.1-8B-Instruct,
 GLM-4-9B-0414 — but the best model is not the same one for both tasks, and
 the reason why is itself a talk beat, not just a footnote.
@@ -326,17 +326,29 @@ the reason why is itself a talk beat, not just a footnote.
 
 | Model | Mismatch | Pi p50 | Pi p95 | RAM |
 |---|---|---|---|---|
-| **Phi-3.5-mini-instruct** | 0.0% | **35.7s** | 157.8s | 7.11GB (93%) |
+| **Phi-3.5-mini-instruct** (2026-10-02 re-run) | 0.0% | **31.7s** | **38.8s** | 7.21GB (92%) |
+| Phi-3.5-mini-instruct (2026-09-26, throttled start†) | 0.0% | 35.7s | 157.8s | 7.11GB (93%) |
 | Llama-3.1-8B-Instruct | 0.0% | 74.7s | 232.3s | 6.92GB (91%) |
-| Gemma-3-4B-it | 2.2% | 77.1s | **101.4s** | 7.26GB (96%) |
+| Gemma-3-4B-it | 2.2% | 77.1s | 101.4s | 7.26GB (96%) |
 | GLM-4-9B-0414 | 14.6% | 94.3s | 300.1s (pinned) | 6.81GB |
+
+† Both Phi runs are kept. The original started one second after a Qwen3-8B run
+had hard-throttled the Pi to 600MHz at 83.7°C, with no fan yet — the first fan
+went in partway through it. Its median barely differs from the re-run, but its
+tail does (p95 157.8s vs. 38.8s) and its two format failures were empty
+outputs, consistent with 300s timeouts. The 2026-10-02 re-run (same flags, the
+power-measurement run, external fan) is the fair comparison: the other four
+models' published runs all started after the first fan was fitted, and their
+2026-10-03 re-runs match them within ~1-10% on latency. Diagnosis:
+`docs/TALK2-DATA-ENGINEERING-IMPACT-TRACK.md` row 26.
 
 Ties for the best accuracy tier (0.0%, same as Llama and Qwen3-8B) and is
 more than 2x faster at the median than the next-fastest tied model, on the
-smallest model of the clean tier. Caveat worth stating on stage: Gemma-3-4B-it
-actually has the better p95 (101.4s vs. 157.8s) despite a slightly worse mean
-mismatch — a legitimate counter-argument if worst-case tail latency matters
-more than typical-case for a real-time edge decision.
+smallest model of the clean tier — and, measured fairly, it has the best tail
+too (38.8s p95 vs. Gemma-3-4B-it's 101.4s). The earlier caveat that Gemma-3-4B-it
+"has the better p95" (101.4s vs. 157.8s) came from the throttled Phi run, not
+from the models: on equal thermal footing Phi-3.5-mini wins both the median and
+the tail on this task.
 
 **Tier 2 (corridor paraphrase / spoken warning) → Gemma-3-4B-it:**
 

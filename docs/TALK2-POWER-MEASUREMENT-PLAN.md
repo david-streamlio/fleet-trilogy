@@ -1,9 +1,10 @@
 # Talk 2 power/energy measurement plan: real Pi 4 draw for the two winners
 
-**Status: not started — candidate device identified (YEREADW KWS-2303C),
-not yet ordered.** This is a plan to execute once the device is ordered,
-arrives, and is in place on the Pi, not a runbook for something already
-set up (contrast with `docs/PI4-RUNBOOK.md`, which is live).
+**Status: done (2026-10-02).** Results: `docs/TALK2-DATA-ENGINEERING-IMPACT-TRACK.md`
+row 24 and its "Pi 4 power measurement" section — idle 3.40 W; Phi-3.5-mini on the
+Edge Triage Pipeline ≈154 J/call above idle; Gemma-3-4B-it on Tier 2 ≈208 J/call;
+Mac M4 contrast ≈15 / ≈23 J/call (chip only). The plan below is kept as written,
+with corrections from the real run marked **(as run)**.
 
 ## Why
 
@@ -64,11 +65,13 @@ this repo (`edge-node00`).
     accumulator does the power-integration work in hardware, so
     continuous logging isn't needed — just a reading before and after
     each measurement window (see step 3).
-  - Unconfirmed: whether there's a dedicated reset for the mAh/mWh/time
-    counters (not mentioned in the listing; check the included manual).
-    Doesn't block anything — record the value at the *start* and *end* of
-    each window and use the delta, which works whether or not it resets
-    to a hard zero.
+  - **(as run)** Confirmed from the manual (KOWSI-branded, same KWS-2303C):
+    a 3-second button hold zeroes mAh, mWh and the timer (not the MAX
+    readings). mWh is a whole-number counter (1 mWh resolution), the timer
+    whole seconds. It uses a TI INA226 and measures current in both
+    directions, with a direction arrow. Every window was reset at its start,
+    then read once at the end from a single phone photo — both values from
+    the same instant.
   - Reading caution: the "CPU" field on the meter's rotated screens is the
     **meter's own onboard chip temperature**, not the Pi's — don't
     conflate it with `vcgencmd measure_temp`'s reading of the Pi itself.
@@ -76,6 +79,13 @@ this repo (`edge-node00`).
   **USB-C power-in port** — the single USB-C port next to the two
   micro-HDMI ports — not any of the 4 USB-A peripheral ports on the
   Ethernet edge.
+- **(as run)** The manual's orientation is **male end toward the power
+  source, female end toward the device**. The first wiring read 4.63 V /
+  0.00 A while the Pi ran — the meter wasn't carrying the Pi's power;
+  re-wiring so the supply feeds the meter and the meter feeds the Pi gave
+  5.218 V / 0.650 A / 3.392 W at idle. Every re-wire cuts the Pi's power: it
+  reboots, and on Wi-Fi it took ~25 minutes to rejoin once — wire once,
+  then leave it.
 
 ## 1. Coherence check before anything else
 
@@ -95,7 +105,9 @@ before sanity-checking the setup itself.
   `docs/TALK2-DATA-ENGINEERING-IMPACT-TRACK.md` — 83.7°C, ARM clock cut to
   600MHz, fixed with a fan). A throttled idle state understates real power.
 - Read the meter's `mWh` and elapsed-`time` values, wait ≥2 minutes, then
-  read them again.
+  read them again. **(as run)** 10 minutes, before each model: at 1 mWh /
+  1 s resolution a 3-minute window is only good to ~±1%, a 10-minute one to
+  ~±0.2%. The two baselines came out at 3.405 W and 3.401 W.
   `P_idle_W = ((mWh_end - mWh_start) * 3.6) / (time_end - time_start)`.
 - Result: `P_idle_W`.
 
@@ -103,9 +115,9 @@ before sanity-checking the setup itself.
 
 For each of the two models, on its own task only:
 
-- **Phi-3.5-mini-instruct**: Edge Triage Pipeline escalation batch, n=30 (same n as the
-  published Pi decision-grade mismatch/latency numbers, for comparability
-  with row 11 of the impact-track doc).
+- **Phi-3.5-mini-instruct**: Edge Triage Pipeline escalation batch.
+  **(as run)** `--model-eval-runs 15` (60 calls: 15 format + 45 escalation) —
+  what the published row 11 run actually used, not n=30.
 - **Gemma-3-4B-it**: Tier 2 spoken-warning batch, n=30 across the 3
   scenarios (comparable to row 22).
 - Read and note the meter's `mWh` and elapsed-`time` values the instant
@@ -127,7 +139,9 @@ For each of the two models, on its own task only:
 - `idle_energy_for_duration_J = P_idle_W * batch_duration_s` (from step
   2's idle baseline).
 - `marginal_energy_J = batch_energy_J - idle_energy_for_duration_J`.
-- `energy_per_call_J = marginal_energy_J / 30`.
+- `energy_per_call_J = marginal_energy_J / 30`. **(as run)** Divide by the run's
+  actual call count — the artifact's `latency.n` (60 for Phi's Edge Triage run,
+  30 for Gemma's Tier 2 run), since an Edge Triage eval run makes ~4 calls.
 - `energy_per_token_J = energy_per_call_J / mean_output_tokens` — reuse
   each model's already-known output length from row 23 (Phi
   ~19 words on the Edge Triage Pipeline, Gemma ~33 words on Tier 2; convert word count to

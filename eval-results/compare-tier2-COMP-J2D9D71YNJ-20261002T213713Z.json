@@ -1,0 +1,154 @@
+{
+  "host": "COMP-J2D9D71YNJ",
+  "arch": "arm64",
+  "platform": "macOS-26.7.1-arm64-arm-64bit-Mach-O",
+  "decision_grade": "quality-only (non-target hardware)",
+  "timestamp": "2026-10-02T21:37:13Z",
+  "seed_config": {
+    "model_eval_runs": 30,
+    "model_timeout_seconds": 180.0
+  },
+  "models": {
+    "gemma-3-4b-it-q4km": {
+      "id": "gemma-3-4b-it-q4km",
+      "display_name": "Gemma-3-4B-it (Q4_K_M)",
+      "available": true,
+      "binary_path": "/Users/david.kjerrumgaard/tools/llama.cpp/build/bin/llama-completion",
+      "model_path": "/Users/david.kjerrumgaard/tools/models/gemma-3-4b-it-GGUF/gemma-3-4b-it-Q4_K_M.gguf",
+      "format_reliability": {
+        "total": 30,
+        "structured": 30,
+        "structured_rate": 1.0,
+        "nonempty": 30,
+        "nonempty_rate": 1.0,
+        "errors": 0,
+        "sample_errors": []
+      },
+      "speakability": {
+        "total": 30,
+        "violations": 0,
+        "violation_rate": 0.0,
+        "sample_violations": []
+      },
+      "grounding": {
+        "by_scenario": {
+          "single-truck": {
+            "total": 10,
+            "violations": 0,
+            "violation_rate": 0.0,
+            "sample_violations": [],
+            "reroute_mentioned_when_recommended": null
+          },
+          "corridor-wide-no-reroute": {
+            "total": 10,
+            "violations": 0,
+            "violation_rate": 0.0,
+            "sample_violations": [],
+            "reroute_mentioned_when_recommended": null
+          },
+          "corridor-wide-with-reroute": {
+            "total": 10,
+            "violations": 0,
+            "violation_rate": 0.0,
+            "sample_violations": [],
+            "reroute_mentioned_when_recommended": 7
+          }
+        },
+        "max_violation_rate": 0.0
+      },
+      "latency": {
+        "p50_seconds": 0.5076779589999205,
+        "p95_seconds": 0.6284175829987362,
+        "n": 30
+      },
+      "tokens_per_sec_approx": 62.468361443361665,
+      "tokens_per_sec_note": "approximate \u2014 whitespace word count / latency over trials with no error, not an exact tokenizer count",
+      "load_time_seconds": 1.525262749999456,
+      "resident_ram_mb_before": 0.0,
+      "resident_ram_mb_after": 6000.578125,
+      "resident_ram_mb_note": "RUSAGE_CHILDREN ru_maxrss is a cumulative max for the whole test session and isn't resettable per model; this is exact for the first model in a run (or when a model is run alone) and otherwise a floor \u2014 not a true peak \u2014 for models measured later in the same run.",
+      "_format_threshold_for_pass": 0.8
+    }
+  },
+  "comparison": {
+    "nonempty_rate": {
+      "direction": "higher",
+      "values": {
+        "gemma-3-4b-it-q4km": 1.0
+      },
+      "best": "gemma-3-4b-it-q4km"
+    },
+    "structured_rate": {
+      "direction": "higher",
+      "values": {
+        "gemma-3-4b-it-q4km": 1.0
+      },
+      "best": "gemma-3-4b-it-q4km"
+    },
+    "speakability_violation_rate": {
+      "direction": "lower",
+      "values": {
+        "gemma-3-4b-it-q4km": 0.0
+      },
+      "best": "gemma-3-4b-it-q4km"
+    },
+    "max_grounding_violation_rate": {
+      "direction": "lower",
+      "values": {
+        "gemma-3-4b-it-q4km": 0.0
+      },
+      "best": "gemma-3-4b-it-q4km"
+    },
+    "latency_p50_seconds": {
+      "direction": "lower",
+      "values": {
+        "gemma-3-4b-it-q4km": 0.5076779589999205
+      },
+      "best": "gemma-3-4b-it-q4km"
+    },
+    "latency_p95_seconds": {
+      "direction": "lower",
+      "values": {
+        "gemma-3-4b-it-q4km": 0.6284175829987362
+      },
+      "best": "gemma-3-4b-it-q4km"
+    },
+    "tokens_per_sec_approx": {
+      "direction": "higher",
+      "values": {
+        "gemma-3-4b-it-q4km": 62.468361443361665
+      },
+      "best": "gemma-3-4b-it-q4km"
+    },
+    "load_time_seconds": {
+      "direction": "lower",
+      "values": {
+        "gemma-3-4b-it-q4km": 1.525262749999456
+      },
+      "best": "gemma-3-4b-it-q4km"
+    },
+    "resident_ram_mb_after": {
+      "direction": "lower",
+      "values": {
+        "gemma-3-4b-it-q4km": 6000.578125
+      },
+      "best": "gemma-3-4b-it-q4km"
+    }
+  },
+  "recommendation": "nonempty_rate: Gemma-3-4B-it (Q4_K_M) leads (1.000)\nstructured_rate: Gemma-3-4B-it (Q4_K_M) leads (1.000)\nspeakability_violation_rate: Gemma-3-4B-it (Q4_K_M) leads (0.000)\nmax_grounding_violation_rate: Gemma-3-4B-it (Q4_K_M) leads (0.000)\n[informational \u2014 non-target hardware] latency_p50_seconds: Gemma-3-4B-it (Q4_K_M) leads (0.508)\n[informational \u2014 non-target hardware] latency_p95_seconds: Gemma-3-4B-it (Q4_K_M) leads (0.628)\n[informational \u2014 non-target hardware] tokens_per_sec_approx: Gemma-3-4B-it (Q4_K_M) leads (62.468)\n[informational \u2014 non-target hardware] load_time_seconds: Gemma-3-4B-it (Q4_K_M) leads (1.525)\n[informational \u2014 non-target hardware] resident_ram_mb_after: Gemma-3-4B-it (Q4_K_M) leads (6000.578)\nThis note does not pick a stage model. Quality axes above are decision-relevant on any host; speed/RAM axes only count when measured on the Pi 4 target.",
+  "production_candidates": {
+    "format_threshold": 0.8,
+    "grounding_threshold": 0.2,
+    "passed": [
+      {
+        "id": "gemma-3-4b-it-q4km",
+        "display_name": "Gemma-3-4B-it (Q4_K_M)",
+        "nonempty_rate": 1.0,
+        "speakability_violation_rate": 0.0,
+        "max_grounding_violation_rate": 0.0,
+        "sample_n": 30
+      }
+    ],
+    "rejected": []
+  }
+}

@@ -21,7 +21,7 @@ which is now **complete** — no larger candidate list is still owed a Pi run:
 
 | model | Pi mismatch | notes |
 |---|---|---|
-| Phi-3.5-mini-instruct | 0.0% | matches M4 exactly; p50/p95 35.7s/157.8s, RAM 93% |
+| Phi-3.5-mini-instruct | 0.0% | matches M4 exactly; p50/p95 31.7s/38.8s, RAM 92% on the 2026-10-02 re-run — the first run's 35.7s/157.8s (RAM 93%) started on a throttled, fanless Pi (impact-track row 26); both kept |
 | Llama-3.1-8B-Instruct | 0.0% | n=45, gate-2 confirmed; p50/p95 74.7s/232.3s, RAM 91% |
 | Qwen3-8B | 0.0% (43/43) | first Pi attempt collapsed to 66.7% format_parse_rate — traced to real thermal throttling (83.7°C, ARM clock cut to 600MHz), not a model or bug; recovered cleanly after a fan fix |
 | Gemma-3-4B-it | 2.2% | ~identical to M4's 0%; p50/p95 77.1s/101.4s, RAM 96% |

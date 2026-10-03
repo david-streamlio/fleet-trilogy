@@ -339,14 +339,15 @@
         <div class="tblwrap">
           <table class="data">
             <tr><th>Model</th><th>M4 mismatch</th><th>Pi mismatch</th><th>Pi p50</th><th>Pi p95</th><th>Pi RAM</th></tr>
-            <tr><td class="label">Phi-3.5-mini-instruct</td><td class="num-good">0.0%</td><td class="num-good">0.0%</td><td>35.7s</td><td>157.8s</td><td>7.11GB</td></tr>
+            <tr><td class="label">Phi-3.5-mini-instruct</td><td class="num-good">0.0%</td><td class="num-good">0.0%</td><td>31.7s</td><td>38.8s</td><td>7.21GB</td></tr>
+            <tr><td class="label">Phi-3.5-mini-instruct (first run, throttled start*)</td><td class="num-good">0.0%</td><td class="num-good">0.0%</td><td>35.7s</td><td>157.8s</td><td>7.11GB</td></tr>
             <tr><td class="label">Gemma-3-4B-it</td><td class="num-good">0.0%</td><td class="num-good">2.2%</td><td>77.1s</td><td>101.4s</td><td>7.26GB</td></tr>
             <tr><td class="label">Llama-3.1-8B-Instruct</td><td class="num-good">5.6%</td><td class="num-good">0.0%</td><td>74.7s</td><td>232.3s</td><td>6.92GB</td></tr>
             <tr><td class="label">GLM-4-9B-0414</td><td class="num-good">6.7%</td><td class="num-warn">14.6%</td><td>94.3s</td><td>300.1s</td><td>6.81GB</td></tr>
             <tr><td class="label">Qwen3-8B</td><td class="num-good">0.0%</td><td class="num-good">0.0%</td><td>127.0s</td><td>300.0s</td><td>7.02GB</td></tr>
           </table>
         </div>
-        <p class="figcap">Escalation-mismatch rate, n=90 per host except GLM-4-9B-0414 on Pi (n=41). RAM figures past the first model in a queued run are a floor, not a true peak (session-cumulative high-water mark). GLM-4-9B's Pi regression concentrated entirely in one scenario (false-escalating a calm case 6/13 times) — on a modest sample, flagged rather than dismissed.</p>
+        <p class="figcap">Escalation-mismatch rate, n=90 per host except GLM-4-9B-0414 on Pi (n=41). RAM figures past the first model in a queued run are a floor, not a true peak (session-cumulative high-water mark). GLM-4-9B's Pi regression concentrated entirely in one scenario (false-escalating a calm case 6/13 times) — on a modest sample, flagged rather than dismissed. *Phi-3.5-mini-instruct's first Pi run started one second after a Qwen3-8B run had throttled the Pi to 600MHz, before any fan was fitted — its tail (p95 157.8s) and two timeouts reflect that, not the model. The first row is a 2026-10-02 re-run on a cooled Pi with the same flags; both are kept.</p>
 
         <h3><span class="subnum">2.3</span>Paraphrase task — full M4-to-Pi comparison, corrected</h3>
         <p>The final, corrected set after two measurement bugs were found and fixed (§2.5, §5.6):</p>

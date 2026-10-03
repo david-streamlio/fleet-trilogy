@@ -860,7 +860,9 @@ has a real Pi 4 number:**
 
 RAM readings past the first model in a queued run are a floor, not a true
 peak (`ru_maxrss` is cumulative for the whole process session — see the
-harness's own `resident_ram_mb_note`). Four of five hold 0-2.2% mismatch on
+harness's own `resident_ram_mb_note`). (Phi-3.5-mini's row is from a run that started on a
+throttled, fanless Pi — kept as recorded; re-run and diagnosis in row 26 and "Cooling re-run"
+below. The other four rows ran after the first fan was fitted.) Four of five hold 0-2.2% mismatch on
 the real target hardware; GLM-4-9B is the one outlier at 14.6%. This is the
 complete Tier 1 (Edge Triage Pipeline) Pi dataset for this project so far — the M4 gate
 found a clean cliff at exactly these five models (0-6.7% mismatch there vs.
@@ -1057,7 +1059,7 @@ original finding.
 | 8 | Full M4 gate, all 14 candidates | **Qwen3-8B, Phi-3.5-mini-instruct, Gemma-3-4B-it** (0.0%); Llama-3.1-8B-Instruct (5.6%), GLM-4-9B-0414 (6.7%) — 5-model clean tier | Qwen3-0.6B, LFM2.5-350M, Granite-4.0-H-350M (64-67%, all ≤0.6B) | 11/14 pass the 50% bar; format reliability solved everywhere (13/14 at exactly 1.000); richest candidate pool in this whole project — next step is the Pi 4 decision-grade run |
 | 9 | Pi 4 decision-grade run, Qwen3-8B (first of the top-5 queue) | — | Qwen3-8B: failed gate 1 on the Pi (0.667 format_parse_rate, 5/15 timeouts at 300s) | Not a model-quality finding — thermal throttling (see row 10) is the far more likely cause than the model itself |
 | 10 | Pi 4 thermal throttling, discovered live mid-run | — | Confirmed: 83.7°C, `get_throttled` live bits set, ARM clock reduced to 600MHz (40% of stock) during sustained inference | Reframes `models.toml`'s "only Qwen3.8-27B has thermal issues" note — may be a property of sustained load on this Pi's cooling generally, not one model's weight class. A fan added mid-session (same sustained workload) brought it to 76.4°C, live throttle bits clear, clock back to full 1800MHz boost — encouraging but only 2 data points so far |
-| 11 | Pi 4 decision-grade run, Phi-3.5-mini-instruct | **First gate cleared: accurate LLM output on the real Pi 4** (0.0% mismatch, identical to M4) | — | Latency (35.7s p50/157.8s p95) and RAM (93%) captured for the talk's data set; optimization out of scope for this pass |
+| 11 | Pi 4 decision-grade run, Phi-3.5-mini-instruct | **First gate cleared: accurate LLM output on the real Pi 4** (0.0% mismatch, identical to M4) | — | Latency (35.7s p50/157.8s p95) and RAM (93%) captured for the talk's data set; optimization out of scope for this pass. *(Kept as recorded — this run started on a throttled, fanless Pi; its 2026-10-02 re-run measured 31.7s/38.8s, 100% format. See row 26.)* |
 | 12 | Pi 4 decision-grade run, Gemma-3-4B-it | Second model clears the same bar (2.2% mismatch, ~identical to M4's 0%) | — | Latency (77.1s p50/101.4s p95) and RAM (96%) captured; optimization out of scope for this pass |
 | 13 | Pi 4 decision-grade run, Llama-3.1-8B-Instruct | Third model clears the same bar (0.0% mismatch, n=45, gate-2 confirmed) | — | Latency (74.7s p50/232.3s p95) and RAM (91%) captured; optimization out of scope for this pass |
 | 14 | Tier 2 (talk3) harness bug: negation-blind grounding checks | Fixed both, verified against real output before trusting the numbers | — | Gemma-3-4B-it's "I-95 North" (natural paraphrase of "I-95N") and Qwen3-8B's "No reroute is recommended" (correct hold, contains the keyword "reroute") were both scored as violations by naive exact-string/keyword checks — same lesson as this whole project's "verify against real ground truth" discipline, applied to the eval harness's own code this time |
@@ -1070,6 +1072,10 @@ original finding.
 | 21 | Static (non-retrieved) few-shot, targeting the "never raises" archetype — Qwen2.5-3B-Instruct and Qwen2.5-1.5B-Instruct | Qwen2.5-1.5B-Instruct: net improvement, 45.1%→27.3% mismatch (escalate-worthy 20.7%→86.2%) | **Qwen2.5-3B-Instruct got worse overall (50.0%→63.3% mismatch)**: escalate-worthy fixed (3.3%→100%) but benign (46.7%→3.3%) and de-escalate-worthy (100%→6.7%) collapsed — moved from "never raises" into "can't calm down." Qwen2.5-1.5B's improvement partly bought by trading away de-escalate-worthy (77.8%→66.7%) | Generalizes row 3's overcorrection finding beyond rule-tightening and beyond over-triggering models: biased worked examples produced the same failure shape on a different archetype. Checking all three per-scenario rates (not just the aggregate) is what caught this — the aggregate alone would have looked like a win for Qwen2.5-3B on the one scenario it targeted |
 | 22 | Pi 4 decision-grade run, Tier 2 (talk3), all 6 M4-passing models | Gemma-3-1B-it, Phi-3.5-mini-instruct, Gemma-3-4B-it, GLM-4-9B-0414, and (after the max_tokens fix below) Llama-3.1-8B-Instruct all transfer cleanly from M4 to Pi | **Qwen3-8B**: initially collapsed to 10.0% nonempty on the Pi (256-token default, no stop sequence, ~555-560s needed at its measured throughput vs. the 300s budget). Fixed the timeout-wiring bug and the token budget (capped at 110, sized off `MAX_SPEAKABLE_WORDS`) — nonempty recovered to 100%, but structured_rate/speakability then revealed a genuine, hardware-independent problem: Qwen3-8B reasons out loud in raw-completion mode, and 110 tokens sometimes runs out before it reaches the JSON. Confirmed by re-running on M4 under the identical config (structured 90%→73.3%, speak_viol 10%→26.7%) — same direction on both hosts, so this is a real model/config interaction, not a Pi artifact | Two real bugs found and fixed en route: `--model-timeout-seconds` never wired into `run_tier2_trials` (hardcoded 180s default, invisible on M4, corrupted Phi-3.5-mini's first Pi attempt); then no grammar/stop-sequence on a task that only needs a short answer. Fixing the second bug's overly generous token budget is what *exposed* Qwen3-8B's real weakness — the original PASS was an artifact of budget slack, not evidence of quality. **Qwen3-8B removed from the Tier 2 PASS list** (now 5 models, not 6) |
 | 23 | Cross-task latency comparison, Edge Triage Pipeline vs. Tier 2, the four models that pass both | Diagnosed the Pi latency swap between the two tasks (below) down to per-model output length, not throughput or hardware | — | Real, model-specific verbosity/task interaction: Phi-3.5-mini-instruct and Llama-3.1-8B-Instruct write far more text on Tier 2 than the Edge Triage Pipeline (and vice versa for Gemma-3-4B-it and GLM-4-9B-0414) — same pattern visible on M4, so not a Pi artifact |
+| 24 | Real Pi 4 power measurement (inline USB-C meter, KWS-2303C), the two final picks on their own tasks (2026-10-02) | **Measured, not modelled:** idle 3.405 W / 3.401 W (two 10-min baselines, 0.1% apart); Phi-3.5-mini on the Edge Triage Pipeline (n=15 eval runs, 60 calls) **≈154 J/call** above idle; Gemma-3-4B-it on Tier 2 (n=30) **≈208 J/call** above idle | — | Pi draws ~7.3 W running inference vs. ~3.4 W idle — about half of every call's wall-socket energy is just keeping the board on. Mac M4 Max contrast (`powermetrics`, chip only, harness overhead included — an upper bound): ≈15 J and ≈23 J/call, ~10x less per call despite ~4x the power, because it's ~88x faster. Different classes of machine, not a fair benchmark. Detail: "Pi 4 power measurement" below |
+| 25 | Cooling re-run: all five Edge Triage Pipeline candidates with a new external fan, same flags (2026-10-02/03) | Gemma-3-4B-it, Llama-3.1-8B, GLM-4-9B, Qwen3-8B latencies match their published (first-fan) runs within ~1-10%; quality within noise (Llama 0→2 of 45, GLM 6→3 of 41); all five still gate-2 PASS | — | Old fan vs. new fan changes almost nothing — both prevent the 600MHz hard throttle. The fan doesn't stop the 8-9B models touching the 80°C soft limit (5-9% of 30s trace samples, clock trimmed to ≥1580MHz). GLM's 7.3% now sits near its M4 6.7%, so its earlier Pi gap (14.6%) may not be a Pi effect — two runs can't say. Detail: "Cooling re-run" below |
+| 26 | Phi-3.5-mini's published Pi run (row 11) diagnosed as throttle-affected | Re-run (2026-10-02, cooled Pi, external fan): **31.7s p50 / 38.8s p95, 100% format**, 0.0% mismatch (n=45) | — | Not a model change: the row 11 run started one second after a Qwen3-8B run had throttled the Pi to 600MHz (row 10), before any fan; the fan went in mid-run. Only its tail moved (p50 −11%, p95 157.8→38.8s) and its two format failures were empty outputs, consistent with 300s timeouts. Both runs kept; the re-run is the fair cross-model comparison (the other four never ran fanless) |
+| 27 | Tier 2 `reroute_detail` overstated severity — a plain-code grounding bug the LLM narrated (2026-10-02) | Fixed in `synthesizer.decide_reroute` | — | Said "N trucks reporting a correlated high-severity slowdown" whenever ANY card was high; with 3 trucks (2 high, 1 medium) Gemma then said "three trucks are experiencing high-severity delays" aloud. Now "3 trucks reporting a correlated slowdown, 2 at high severity." Same lesson as row 14, from the other side: verify the facts code hands the model, not just the model |
 
 ---
 
@@ -1248,3 +1254,140 @@ from the Tier 2 PASS list** — the corrected list is Llama-3.1-8B-Instruct,
 GLM-4-9B-0414, Gemma-3-1B-it, Phi-3.5-mini-instruct, Gemma-3-4B-it (5
 models, not 6).
 
+
+---
+
+## Pi 4 power measurement: real energy per call (2026-10-02)
+
+Row 24 in detail — the measurement `docs/TALK2-POWER-MEASUREMENT-PLAN.md`
+planned, now done. A YEREADW/KOWSI **KWS-2303C** USB-C meter sits inline between
+the wall supply and the Pi's USB-C power-in port (its **male end toward the
+power source** — the manual's orientation). It's display-only: each window was
+read by hand from one phone photo (accumulated mWh and elapsed time, read
+together), with the counters zeroed by a 3-second button hold at the start.
+Energy counts in whole mWh, time in whole seconds. Every window ran through
+`/mnt/data/fleet-trilogy/pi_power_trial.sh` on the Pi, which logs Pi-side
+timestamps and a 30s temperature/clock/throttle trace; all readings are in
+`/mnt/data/fleet-trilogy/pi_power_trial.log`.
+
+Energy above idle = `mWh × 3.6 − P_idle × meter_seconds`. The seconds between
+the reset and the run's start, and between its end and the photo, are idle
+time counted on both sides of that subtraction, so reading lag cancels.
+
+| Window | Meter | Pi elapsed | Energy above idle | Per call |
+|---|---|---|---|---|
+| Idle baseline 1 (fan on, 39°C) | 680 mWh / 719 s → **3.405 W** | 600.0 s | — | — |
+| **Phi-3.5-mini, Edge Triage Pipeline**, n=15 (60 calls) | 5212 mWh / 2803 s | 2362.8 s | 9,219 J | **≈154 J** (0.043 Wh) |
+| Idle baseline 2 | 563 mWh / 596 s → **3.401 W** | 600.0 s | — | — |
+| Gemma-3-4B-it, Tier 2, n=30 — first run (fan re-aimed 11 min in; 3/55 soft-limit samples) | 3360 mWh / 1662 s | 1625.1 s | 6,444 J | ≈215 J |
+| **Gemma-3-4B-it, Tier 2, n=30 — clean re-run** (0/53 throttled) | 3266 mWh / 1619 s | 1570.7 s | 6,251 J | **≈208 J** (0.058 Wh) |
+
+Artifacts (on the Pi, `eval-results/`): Phi `compare-edge-triage-edge-node00-20261002T222637Z.json`;
+Gemma `compare-tier2-edge-node00-20261002T231503Z.json` (first) and
+`…20261002T234456Z.json` (clean). Quality held throughout: Phi 100% format /
+0.0% mismatch (n=45); Gemma 100% structured, 0% speakability and grounding
+violations.
+
+Cross-checks that held on every window: mWh ÷ mAh = 5.09–5.26 V average (the
+supply's real range); meter seconds minus Pi seconds = 37–52 s of photo/reset
+lag; the two idle baselines agree to 0.1%; the throttled first Gemma run lands
+within 3% of the clean one. A 4-core CPU-only load (`yes` × 4) peaked at
+6.17 W, but inference averaged 7.3–7.4 W — the extra watt is memory traffic,
+which a pure-ALU load doesn't exercise. Excluded: a 3-call trial run used only
+to validate the reading process (throttled for half of it; 280 J/call isn't a
+result).
+
+**Mac M4 Max contrast** (`sudo powermetrics --samplers cpu_power,gpu_power -i 1000`,
+same two model/task pairs, same `--model-eval-runs`, 3 reps each):
+
+| | Calls/rep | Avg chip power | Energy above idle / rep | Per call | Rep spread |
+|---|---|---|---|---|---|
+| Phi-3.5-mini, Edge Triage Pipeline | 60 | 30.8 W | 918.5 J | **≈15.3 J** | ±0.4% |
+| Gemma-3-4B-it, Tier 2 | 30 | 39.4 W | 680.4 J | **≈22.7 J** | ±1.7% |
+
+Mac idle chip power was 0.30 W, so idle subtraction changes these by ~1%.
+Artifacts: `eval-results/compare-edge-triage-COMP-J2D9D71YNJ-20261002T213056Z.json`,
+`…213226Z`, `…213355Z` and `compare-tier2-COMP-J2D9D71YNJ-20261002T213713Z.json`,
+`…213830Z`, `…213948Z`. Two caveats, both favouring the Mac: `powermetrics`
+measures the chip only (CPU+GPU+ANE — not DRAM, SSD, display or PSU losses),
+while the Pi meter measures the whole board at the wall; and each Mac rep
+includes harness startup and model load (~30% of a 30 s Phi rep, ~13% of a
+Gemma rep), so these per-call figures are upper bounds.
+
+**What it shows:** the Pi draws ~4x less power but takes ~88x longer per call
+(31.7 s vs. 0.36 s median), so it spends **~10x more energy per call** on both
+tasks — even doubling the Mac's chip figure for wall losses leaves the Pi ~5x
+behind. And on the Pi, idle is half of every call's wall energy (≈288 J total
+vs. ≈154 J above idle, Phi), which matters for an edge box that's always on
+anyway. Framing per `docs/TALK2-POWER-MEASUREMENT-PLAN.md`: different classes
+of machine, not a fair benchmark.
+
+Two things this doesn't settle: per-token energy (Pi calls are dominated by
+prompt processing, so per-call is the meaningful unit until exact completion
+lengths are pulled), and `efficiency.py`'s `SMALL_MODEL_CPU.power_watts`, still
+the illustrative constant — whether to anchor it on one task's number or
+represent both is the open design question the plan already names. Also noted:
+the Mac's per-call latency today (0.36 s Phi, 0.51 s Gemma p50) is about twice as
+fast as the published M4 figures (0.75 s, 0.63 s); not yet diagnosed.
+
+## Cooling re-run: five Edge Triage Pipeline models, three cooling conditions (2026-10-02/03)
+
+Rows 25-26 in detail. The Pi has now run under three cooling setups, and the
+published top-5 table mixes the first two:
+
+| Condition | When | Models measured |
+|---|---|---|
+| **No fan** | 2026-09-26, start of the top-5 queue | Qwen3-8B's first attempt only (600MHz hard throttle, 83.7°C, gate-1 FAIL with 5/15 timeouts — rows 9-10), and the first part of Phi-3.5-mini's run |
+| **First fan** (fitted mid-way through Phi's run) | 2026-09-26/27 | The published top-5 set: Phi (mixed), Gemma-3-4B-it, Llama-3.1-8B, GLM-4-9B, Qwen3-8B re-run |
+| **External fan** | 2026-10-02/03 | All five: Phi from the power run (row 24), the other four in an unattended queue (`/mnt/data/fleet-trilogy/pi_cooling_rerun_queue.sh`, same flags as the published runs, each model started below 50°C) |
+
+No model has a complete no-fan Edge Triage run except Qwen3-8B's failure.
+
+| Model | First fan (published): format / mismatch / p50 / p95 | External fan: format / mismatch / p50 / p95 | Trace: median / peak / ≥80°C / soft-limit samples |
+|---|---|---|---|
+| Phi-3.5-mini-instruct | 86.7% / 0.0% / 35.7s / 157.8s *(started fanless)* | **100% / 0.0% / 31.7s / 38.8s** | 72.0 / 81.8°C / 11% / 3 of 79 |
+| Gemma-3-4B-it | 100% / 2.2% / 77.1s / 101.4s | 100% / 2.2% / 78.8s / 102.7s | 71.1 / 82.3°C / 3% / 0 of 168 |
+| Llama-3.1-8B-Instruct | 86.7% / 0.0% / 74.7s / 232.3s | 86.7% / 4.4% / 72.5s / 230.3s | 70.6 / 82.7°C / 14% / 9 of 176 |
+| GLM-4-9B-0414 | 86.7% / 14.6% / 94.3s / 300.1s | 86.7% / 7.3% / 103.6s / 300.1s | 69.6 / 83.2°C / 19% / 23 of 258 |
+| Qwen3-8B | 86.7% / 0.0% / 127.0s / 300.0s | 86.7% / 0.0% / 128.8s / 300.1s | 69.6 / 82.7°C / 13% / 16 of 293 |
+
+External-fan artifacts (on the Pi, `eval-results/`): Phi
+`compare-edge-triage-edge-node00-20261002T222637Z.json`; Gemma `…20261003T011051Z`,
+Llama `…20261003T023919Z`, GLM `…20261003T044858Z`, Qwen3-8B `…20261003T071555Z`.
+Traces: `trace_edge_triage_<model>_fan2.log` and the power run's
+`trace_edge-triage-phi35-n15-20261002T214714Z.log`.
+
+**Old fan vs. new fan: almost no difference.** The four models whose published
+runs started with a fan reproduce their latency within ~1-10% and stay gate-2
+PASS. Both fans prevent the 600MHz hard throttle that broke Qwen3-8B's first
+run; neither keeps the 8-9B models fully under the Pi's 80°C soft limit, which
+trims the clock to no lower than 1580MHz for brief stretches (clustered in each
+run's first ~10 minutes and a couple of later bursts). No undervoltage on any
+run. The quality shifts (Llama 0→2 of 45, GLM 6→3 of 41) are small enough to be
+run-to-run noise; GLM's 7.3% now sits next to its M4 6.7%, so the earlier
+"GLM regresses on the Pi" reading (14.6%) is no longer clearly a Pi effect.
+
+**Phi is the exception, and it's the start condition, not the model** (row
+26). Timeline from `pi_queue.log` and the run logs:
+
+| Time (UTC) | Event |
+|---|---|
+| 2026-09-26 21:37 → 22:32:29 | Qwen3-8B, fanless, throttling at 600MHz / 83.7°C; FAILs gate 1 |
+| 22:32:30 | Phi-3.5-mini starts — one second later, same heat-soaked fanless Pi |
+| during Phi's run | first fan fitted (83.7°C / 600MHz → 76.4°C / 1800MHz) |
+| 23:25:21 onward | Gemma, Llama, GLM, Qwen3-8B re-run — all with the fan |
+
+Only Phi's tail moved (p50 −11%; p95 157.8 → 38.8 s): most calls ran at full
+clock in both runs, and a minority ran 3-4x slower in the first — what part of a
+run at a third of the clock looks like. Its two format failures were empty
+outputs (`process() returned None`, no raw completion), consistent with 300s
+timeouts — the same failure that sank the Qwen3-8B run just before it. A cool
+start alone can't explain this: with a fan the Pi reaches its steady ~70-72°C
+within ~2 minutes regardless of where it started. Both Phi runs are kept; the
+external-fan run is the fair cross-model comparison, and it also removes the
+outline's earlier caveat that Gemma-3-4B-it had the better tail (101.4s vs.
+157.8s) — on equal thermal footing Phi wins the tail too (38.8s).
+
+**For the "cooling is part of the energy budget" beat:** the evidence is fan vs.
+no fan (rows 9-10, and Phi's throttled tail), not old fan vs. new fan. A
+controlled no-fan run of the other models doesn't exist yet.
