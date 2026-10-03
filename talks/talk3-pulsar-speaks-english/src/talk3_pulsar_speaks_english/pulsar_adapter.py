@@ -12,11 +12,15 @@ returns at most one EnrichmentCard), so its adapter has no state between receive
 Tier 2 is fundamentally different — CANON.md's synthesize() needs *multiple*
 trucks' cards for the same corridor to decide single_truck vs corridor_wide. This
 adapter therefore keeps a simple in-memory `dict[corridor, list[EnrichmentCard]]`
-accumulator and, on every receive-loop timeout tick (the same
+accumulator. Each corridor's window opens when its *first* card arrives and
+closes `window_seconds` later; on every receive-loop tick (the same
 `receive_timeout_millis` idle-tick pattern talk1 uses, just repurposed here as a
-"check if it's time to flush" signal rather than a no-op), synthesizes and
-publishes one IncidentSynthesis per corridor that has accumulated any cards, then
-clears that corridor's list.
+"check if it's time to flush" signal rather than a no-op), every corridor whose
+window has closed is synthesized into one IncidentSynthesis, published, and
+cleared. (An earlier version flushed every corridor on one global wall-clock
+timer that started with the adapter, so two cards published back-to-back could
+straddle a flush boundary and come out as two single_truck incidents instead of
+one corridor_wide one — seen live in a Talk 3 demo run.)
 
 This is deliberately a toy polling/batching window for a conference demo, NOT a
 real streaming windowing implementation: there's no event-time semantics, no
@@ -51,8 +55,9 @@ logger = logging.getLogger("talk3_pulsar_speaks_english.pulsar_adapter")
 DEFAULT_SUBSCRIPTION_NAME = "tier2-global-synthesizer"
 
 # How often (in seconds) the accumulator is flushed, i.e. how often we ask
-# "does any corridor have enough cards to synthesize an incident yet?". This is
-# a plain wall-clock polling interval, not an event-time window boundary.
+# How long (in seconds) a corridor's window stays open after its first card
+# arrives, i.e. how long we wait for other trucks on the same corridor before
+# synthesizing. Plain wall-clock time, not an event-time window boundary.
 DEFAULT_WINDOW_SECONDS = 5.0
 
 
@@ -67,9 +72,9 @@ def run(
     receive_timeout_millis: int = 1000,
     window_seconds: float = DEFAULT_WINDOW_SECONDS,
 ) -> None:
-    """Consume input_topic, accumulate EnrichmentCards per corridor, and every
-    `window_seconds` call synthesize() per corridor that has accumulated any
-    cards, publishing each resulting IncidentSynthesis to output_topic.
+    """Consume input_topic, accumulate EnrichmentCards per corridor, and once a
+    corridor's window (opened by its first card) is `window_seconds` old, call
+    synthesize() on its cards and publish the IncidentSynthesis to output_topic.
 
     Loops until stop_event is set. Callers own the backend's lifecycle (e.g. a
     SubprocessLlmBackend pointed at a local llama.cpp binary/model in the cloud
@@ -83,7 +88,7 @@ def run(
     stop_event = stop_event or threading.Event()
     client = pulsar.Client(service_url)
     accumulator: dict[str, list[EnrichmentCard]] = defaultdict(list)
-    last_flush = time.monotonic()
+    opened_at: dict[str, float] = {}
     try:
         consumer = client.subscribe(input_topic, subscription_name)
         producer = client.create_producer(output_topic)
@@ -97,6 +102,7 @@ def run(
                     try:
                         card = from_json(EnrichmentCard, msg.data())
                         accumulator[card.corridor].append(card)
+                        opened_at.setdefault(card.corridor, time.monotonic())
                         consumer.acknowledge(msg)
                     except Exception:
                         logger.exception(
@@ -104,10 +110,7 @@ def run(
                         )
                         consumer.negative_acknowledge(msg)
 
-                now = time.monotonic()
-                if now - last_flush >= window_seconds:
-                    _flush(accumulator, backend, producer)
-                    last_flush = now
+                _flush(accumulator, opened_at, backend, producer, window_seconds)
         finally:
             producer.close()
             consumer.close()
@@ -117,15 +120,18 @@ def run(
 
 def _flush(
     accumulator: dict[str, list[EnrichmentCard]],
+    opened_at: dict[str, float],
     backend: LlmBackend,
     producer: pulsar.Producer,
+    window_seconds: float,
 ) -> None:
-    """Synthesize and publish one IncidentSynthesis per corridor with any
-    accumulated cards, then clear every corridor's list. Corridors with no
-    cards this window are left untouched (nothing to flush).
+    """Synthesize and publish one IncidentSynthesis per corridor whose window has
+    been open at least `window_seconds`, then clear that corridor's list and
+    window. Corridors still inside their window are left to keep accumulating.
     """
+    now = time.monotonic()
     for corridor, cards in list(accumulator.items()):
-        if not cards:
+        if not cards or now - opened_at.get(corridor, now) < window_seconds:
             continue
         try:
             synthesis = synthesize(cards, backend)
@@ -135,3 +141,4 @@ def _flush(
             logger.exception("failed to synthesize incident for corridor %s", corridor)
         finally:
             accumulator[corridor] = []
+            opened_at.pop(corridor, None)

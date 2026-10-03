@@ -86,13 +86,15 @@ def test_publish_consume_synthesize_republish_end_to_end(pulsar_service_url):
     # subscription created after a message is sent starts at Latest by
     # default and never sees it.
     time.sleep(2.0)
+    # Same rule for the result side: subscribe to the incidents topic before
+    # anything can be published to it, or a fast synthesis is missed entirely.
+    result_consumer = client.subscribe(INCIDENTS_TOPIC, "test-consumer")
 
     producer = client.create_producer(ENRICHMENT_CARDS_TOPIC)
     producer.send(to_json(_card("truck-47")).encode("utf-8"))
     producer.send(to_json(_card("truck-48")).encode("utf-8"))
     producer.close()
     try:
-        result_consumer = client.subscribe(INCIDENTS_TOPIC, "test-consumer")
         msg = result_consumer.receive(timeout_millis=30_000)
         synthesis = from_json(IncidentSynthesis, msg.data())
         result_consumer.acknowledge(msg)
