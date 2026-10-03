@@ -95,6 +95,11 @@ DEFAULT_TIMEOUT_SECONDS = 60.0
 # default output topic -- see process() below.
 DEFAULT_UPLINK_MIN_SEVERITY = "high"
 
+# The card's `event` for Tier 2: the coprocessor only forwards events that passed
+# cheap math's is_probable_slowdown gate, so every card here is a SLOWDOWN
+# (docs/CANON.md's canonical anomaly) by construction.
+UPLINK_EVENT = "slowdown"
+
 SEVERITY_LEVELS = ("low", "medium", "high")
 
 # Static rules sit first so they form a stable --prompt-cache-ro prefix across
@@ -328,6 +333,14 @@ class LlmTriageFunction:
             card["severity"] = apply_escalation(baseline_severity, escalation)
             card["recommended_action"] = recommended_action_for(escalation)
             card["eta_impact"] = eta_slip_min
+            # Tier 2's EnrichmentCard fields (fleet_telemetry_model.schemas), so an
+            # uplinked card is directly consumable by talk3's GlobalSynthesisFunction:
+            # it groups by corridor and keeps the triggering signals as evidence.
+            # Cheap-math facts again, straight from the coprocessor's payload. Without
+            # these, Tier 2 couldn't parse a real uplinked card at all.
+            card["corridor"] = corridor
+            card["signals"] = list(payload.get("signals", []))
+            card["event"] = UPLINK_EVENT
             return json.dumps(card)
         except LlmInferenceError as exc:
             logger.error(f"LLM triage inference failed for {input_item!r}: {exc}")

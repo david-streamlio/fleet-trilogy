@@ -1,7 +1,7 @@
 import json
 import logging
 
-from fleet_telemetry_model import LOCAL_TRIAGE_TOPIC
+from fleet_telemetry_model import LOCAL_TRIAGE_TOPIC, EnrichmentCard, from_json
 from talk1_edge_intelligence.triage_function import (
     RECOMMENDED_ACTIONS,
     LlmTriageFunction,
@@ -170,6 +170,22 @@ def test_process_returns_grammar_shaped_card_via_mock_backend(monkeypatch):
     # completion above doesn't even include it, and the card still gets one, always
     # in agreement with escalation by construction.
     assert card["recommended_action"] == RECOMMENDED_ACTIONS["raise"]
+
+
+def test_uplinked_card_is_a_valid_tier2_enrichment_card(monkeypatch):
+    # The trilogy's wire contract: what this function uplinks is exactly what
+    # talk3's GlobalSynthesisFunction parses (fleet_telemetry_model.EnrichmentCard).
+    # Before corridor/signals/event were copied onto the card, Tier 2 couldn't parse
+    # a real uplinked card at all -- found building Talk 3's demo, not by any test.
+    _mock_backend_returning(monkeypatch, "raise")
+    result = LlmTriageFunction().build_card(_payload(), _FakeContext())
+
+    card = from_json(EnrichmentCard, result)
+    assert card.corridor == "I-95N (Near Exit 4)"
+    assert card.signals == ["sustained_low_speed", "stop_go_index"]
+    assert card.event == "slowdown"
+    assert card.severity == "high"
+    assert card.truck_id == "truck-03"
 
 
 def _mock_backend_returning(monkeypatch, escalation: str) -> None:

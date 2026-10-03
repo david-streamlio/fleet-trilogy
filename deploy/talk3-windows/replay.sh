@@ -7,9 +7,9 @@
 # Only the INPUT is fixed: three trucks' cards on I-95N, disclosed on stage as
 # replayed edge output. Everything downstream is live on every take -- Tier 2's
 # plain-code scope/reroute decision, Gemma's wording, Piper's voice. (Live
-# upstream from Talk 1's Edge Triage Pipeline isn't used: its uplinked cards
-# carry no corridor/event/signals, which Tier 2's EnrichmentCard requires, and
-# only truck-47 has trip context that escalates past the "high" uplink gate.)
+# upstream from Talk 1's Edge Triage Pipeline isn't used: only truck-47 has trip
+# context that escalates past the "high" uplink gate, so Tier 2 would only ever
+# see one truck -- never the corridor-wide reroute.)
 #
 # Usage:
 #   ./deploy/talk3-windows/replay.sh [broker-url] [seconds-between-cards]

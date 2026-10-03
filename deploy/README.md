@@ -139,9 +139,11 @@ that is live on every take — the real `GlobalSynthesisFunction` via localrun
 (Gemma-3-4B-it), its plain-code scope/reroute decision, the LLM's wording, and the
 speaker voicing it with Piper TTS (setup and licensing:
 `talks/talk3-pulsar-speaks-english/README.md`). Replay rather than Talk 1's live
-upstream, because the Edge Triage Pipeline's uplinked cards carry no
-`corridor`/`event`/`signals` (which Tier 2's `EnrichmentCard` requires) and only
-truck-47 has trip context that escalates past the `high` uplink gate.
+upstream because only truck-47 has trip context that escalates past the `high`
+uplink gate, so a live run would only ever give Tier 2 one truck -- never the
+corridor-wide reroute. (The Edge Triage Pipeline's uplinked cards are themselves
+valid Tier 2 input: they carry `corridor`/`event`/`signals`, contract-tested in
+talk1's `test_uplinked_card_is_a_valid_tier2_enrichment_card`.)
 
 By hand, one window per script (`deploy/talk3-windows/`), in this order:
 
