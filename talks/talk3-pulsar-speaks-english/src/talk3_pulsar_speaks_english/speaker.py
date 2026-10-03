@@ -8,8 +8,10 @@ GlobalSynthesisFunction / pulsar_adapter.run publish to, and hands each
 `spoken_warning` to speech.PiperSpeaker.
 
 `--text` speaks one warning without Pulsar at all (for checking a voice);
-`--save-dir` keeps every WAV, numbered in arrival order, for cutting into a
-recorded demo.
+`--save-dir` keeps every WAV, numbered in arrival order, plus a `playback.log`
+line (`<epoch seconds> <wav name>`) stamped the instant each one starts playing —
+deploy/record-talk3-demo.sh lays the WAVs back onto the screen recording at those
+offsets, since macOS screen capture can't record system audio on its own.
 """
 
 from __future__ import annotations
@@ -17,6 +19,7 @@ from __future__ import annotations
 import argparse
 import logging
 import threading
+import time
 from pathlib import Path
 
 import pulsar
@@ -44,7 +47,11 @@ def run(
     if save_dir is not None:
         save_dir.mkdir(parents=True, exist_ok=True)
     spoken = 0
-    client = pulsar.Client(service_url)
+    # Warn, not the client's default Info: this process's output is the on-camera
+    # transcript in the recorded demo (deploy/talk3-windows/spoken.sh).
+    client = pulsar.Client(
+        service_url, logger=pulsar.ConsoleLogger(pulsar.LoggerLevel.Warn)
+    )
     try:
         consumer = client.subscribe(input_topic, subscription_name)
         try:
@@ -65,7 +72,11 @@ def run(
                         f"[{synthesis.corridor} / {synthesis.scope}] {normalize_for_speech(synthesis.spoken_warning)}",
                         flush=True,  # visible live even when stdout is a pipe/log
                     )
-                    speaker.speak(synthesis.spoken_warning, save_to=save_to)
+                    speaker.speak(
+                        synthesis.spoken_warning,
+                        save_to=save_to,
+                        on_play=_log_playback(save_dir) if save_dir else None,
+                    )
                     consumer.acknowledge(msg)
                 except Exception:
                     logger.exception("failed to speak message %s", msg.message_id())
@@ -74,6 +85,14 @@ def run(
             consumer.close()
     finally:
         client.close()
+
+
+def _log_playback(save_dir: Path):
+    def log(wav: Path) -> None:
+        with (save_dir / "playback.log").open("a") as f:
+            f.write(f"{time.time():.3f} {wav.name}\n")
+
+    return log
 
 
 def main(argv: list[str] | None = None) -> None:

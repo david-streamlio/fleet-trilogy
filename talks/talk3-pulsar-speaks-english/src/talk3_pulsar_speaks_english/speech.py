@@ -27,6 +27,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from collections.abc import Callable
 from pathlib import Path
 
 _DIRECTIONS = {"N": "North", "S": "South", "E": "East", "W": "West"}
@@ -85,25 +86,35 @@ class PiperSpeaker:
         )
         return wav_path
 
-    def speak(self, text: str, *, save_to: str | Path | None = None) -> Path | None:
+    def speak(
+        self,
+        text: str,
+        *,
+        save_to: str | Path | None = None,
+        on_play: Callable[[Path], None] | None = None,
+    ) -> Path | None:
         """Synthesize and play `text`. Keeps the WAV at `save_to` if given (e.g. to
-        cut into a recorded demo); otherwise uses a temp file. Returns the kept WAV's
-        path, or None (temp file, or mock mode)."""
+        cut into a recorded demo); otherwise uses a temp file. `on_play(wav)` runs
+        right before playback starts — the recorder uses it to timestamp each clip so
+        the saved WAVs can be laid back onto the screen recording in sync. Returns
+        the kept WAV's path, or None (temp file, or mock mode)."""
         if self.mock:
             print(f"[speak:mock] {normalize_for_speech(text)}")
             return None
         if save_to is not None:
             wav = self.synthesize(text, save_to)
-            self._play(wav)
+            self._play(wav, on_play)
             return wav
         with tempfile.TemporaryDirectory() as tmp:
             wav = self.synthesize(text, Path(tmp) / "warning.wav")
-            self._play(wav)
+            self._play(wav, on_play)
         return None
 
-    def _play(self, wav: Path) -> None:
+    def _play(self, wav: Path, on_play: Callable[[Path], None] | None = None) -> None:
         if self.player is None:
             raise RuntimeError(
                 "no audio player found (expected afplay on macOS, aplay on Linux)"
             )
+        if on_play is not None:
+            on_play(wav)
         subprocess.run([*self.player, str(wav)], check=True)

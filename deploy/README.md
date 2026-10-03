@@ -119,7 +119,67 @@ consumes `enrichment-cards`, accumulates cards per corridor, and publishes an
 to synthesize — see `talk3_pulsar_speaks_english.function.GlobalSynthesisFunction`'s
 docstring for exactly how that threshold works and why (Pulsar Functions are
 per-message, but Tier 2 needs multiple trucks' cards before it can decide
-anything).
+anything). Two optional settings pass through `--user-config`: `LLM_EXTRA_ARGS`
+(the model's one-shot flags from `models.toml` — `-no-cnv` for Gemma-3-4B-it,
+otherwise llama.cpp wraps the prompt in its chat template) and
+`CORRIDOR_THRESHOLD` (cards per corridor before synthesizing; default 2).
+
+**Every `*localrun*.sh` script needs the `functions` dependency group** — the
+imports of `pulsar-admin functions localrun`'s Python instance (protobuf 6.x,
+grpcio, prometheus_client, ratelimit, the BookKeeper client). It's in
+`pyproject.toml`'s default groups, so a plain `uv sync` installs it; before that it
+was only ever installed by hand, and `uv sync` silently removed it, failing every
+localrun with `No module named 'google'`.
+
+## Talk 3 demo: edge cards → Tier 2 Function → spoken warning
+
+Checked-in input (`deploy/talk3-demo-cards.jsonl`: three trucks' cards on I-95N,
+two high-severity, one medium) replayed onto `enrichment-cards`; everything after
+that is live on every take — the real `GlobalSynthesisFunction` via localrun
+(Gemma-3-4B-it), its plain-code scope/reroute decision, the LLM's wording, and the
+speaker voicing it with Piper TTS (setup and licensing:
+`talks/talk3-pulsar-speaks-english/README.md`). Replay rather than Talk 1's live
+upstream, because the Edge Triage Pipeline's uplinked cards carry no
+`corridor`/`event`/`signals` (which Tier 2's `EnrichmentCard` requires) and only
+truck-47 has trip context that escalates past the `high` uplink gate.
+
+By hand, one window per script (`deploy/talk3-windows/`), in this order:
+
+```bash
+./deploy/talk3-windows/tier2.sh      # Tier 2 Function (log; defaults: Gemma, -no-cnv, threshold 3)
+./deploy/talk3-windows/cards.sh      # cards arriving
+./deploy/talk3-windows/decision.sh   # "[Decided by code]" + "[Worded by the LLM]"
+./deploy/talk3-windows/spoken.sh     # the voice (norman); WAVs + playback.log -> $DEMO_AUDIO_DIR
+./deploy/talk3-windows/replay.sh     # publishes the three cards, 3s apart -- start this last
+```
+
+### Automated screen recording: `deploy/record-talk3-demo.sh`
+
+```bash
+./deploy/record-talk3-demo.sh --teardown   # -> deploy/recordings/talk3-demo-<timestamp>.mp4
+```
+
+Opens all five windows (three recorded, on the external display; the Tier 2 log
+and the replay on the main display), clears the demo subscriptions' backlog so a
+take never replays leftovers, records, and exports H.264 + AAC. Differences from
+`record-demo.sh`, each forced by a real take:
+
+- **One `ffmpeg -f avfoundation` capture of the external display**, not one
+  `screencapture` per window — `screencapture` writes variable-frame-rate video
+  whose duration ends at the last *changed* frame, which put the windows seconds
+  apart. The ffmpeg capture is constant 30 fps, so first-frame time = stop time −
+  duration (measured within ~40 ms of a timed on-screen change).
+- **Only each window's content area is in the video**, composed onto a black
+  canvas: Terminal's title bar shows the working directory (the macOS account
+  name) and can't be turned off from AppleScript, and gaps between windows showed
+  other apps. Crops are read after the windows settle and clamped so one never
+  reaches into another's title bar.
+- **Sound is added after the fact** — macOS screen capture can't record system
+  audio. The speaker stamps `playback.log` the instant each WAV starts playing, and
+  the export lays each WAV onto the video at that offset (with 1.5 dB of headroom:
+  Piper peaks right at 0 dBFS).
+- The mouse pointer is parked on the main display first (avfoundation's
+  `-capture_cursor 0` isn't honoured on this macOS).
 
 ## Edge Triage Pipeline: co-processor + LLM triage with an uplink gate
 
