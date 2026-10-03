@@ -1314,6 +1314,42 @@ while the Pi meter measures the whole board at the wall; and each Mac rep
 includes harness startup and model load (~30% of a 30 s Phi rep, ~13% of a
 Gemma rep), so these per-call figures are upper bounds.
 
+**Reading these numbers — batch totals vs. per-call averages.** "Same
+workload" means the identical batch on both machines: the same GGUF file, the
+same harness (`test_compare_edge_triage_models.py` / `test_compare_tier2_models.py`),
+the same prompts and scenarios, and the same `--model-eval-runs` — **60 model
+calls** for Phi's Edge Triage batch, **30** for Gemma's Tier 2 batch — each batch
+including its own startup, model load and teardown. What differs is the machine
+and its llama.cpp build: CPU-only on the Pi; on the Mac, Metal on the **GPU**
+(powermetrics during the runs: GPU 18-28 W, CPU 12-15 W, Neural Engine 0 W) —
+the GPU comparison point the talk plans for, not a CPU-to-CPU match. Thread
+count and timeout settings also differ per machine; they don't change the call
+count. Time and energy below are cumulative over the whole batch (Pi: one
+batch; Mac: mean of 3 batches, which agreed within 2%); the per-call columns are
+those totals divided by the call count, setup amortized in — no individual call
+was metered on its own.
+
+| | Pi: whole batch | Mac: whole batch (mean of 3) | Pi: per call | Mac: per call |
+|---|---|---|---|---|
+| **Phi-3.5-mini, Edge Triage Pipeline (60 calls)** | | | | |
+| Time | 39.4 min | 30.2 s | ~39 s | ~0.5 s |
+| Average power | 7.31 W | 30.7 W | — | — |
+| Energy above idle | 9,219 J | 918 J | **154 J** | **15.3 J** |
+| Total energy | 17,264 J (4.8 Wh) | 928 J (0.26 Wh) | 288 J | 15.5 J |
+| **Gemma-3-4B-it, Tier 2 (30 calls)** | | | | |
+| Time | 26.2 min | 17.4 s | ~52 s | ~0.6 s |
+| Average power | 7.38 W | 39.3 W | — | — |
+| Energy above idle | 6,251 J | 680 J | **208 J** | **22.7 J** |
+| Total energy | 11,593 J (3.2 Wh) | 686 J (0.19 Wh) | 386 J | 22.9 J |
+
+Pi ÷ Mac: 10.0x / 9.2x above idle (the fairer ratio), 18.6x / 16.9x total — the
+total ratio overstates the gap, since it counts the Pi board's 3.4 W idle but
+only the Mac chip's 0.3 W (a MacBook's wall-socket idle, unmeasured here, is
+several watts). Per-call time includes amortized setup; pure inference medians
+are 31.7 s / 43.6 s on the Pi vs. 0.36 s / 0.51 s on the Mac. The Pi's "total"
+runs exclude the post-run seconds before the meter photo (idle, subtracted at
+the measured idle power).
+
 **What it shows:** the Pi draws ~4x less power but takes ~88x longer per call
 (31.7 s vs. 0.36 s median), so it spends **~10x more energy per call** on both
 tasks — even doubling the Mac's chip figure for wall losses leaves the Pi ~5x
