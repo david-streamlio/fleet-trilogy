@@ -14,6 +14,10 @@ dependencies = [
 
 [tool.uv]
 package = false
+# `functions` is in the default set so a plain `uv sync` keeps the Pulsar Functions
+# Python runtime's imports installed -- without it, every deploy/*localrun*.sh fails
+# with "No module named 'google'" (see the group's own comment below).
+default-groups = ["dev", "functions"]
 
 [tool.uv.sources]
 fleet-telemetry-model = { workspace = true }
@@ -36,6 +40,17 @@ dev = [
 ]
 integration = [
     "testcontainers>=4.0",
+]
+functions = [
+    # What `pulsar-admin functions localrun`'s Python instance imports
+    # (protobuf, grpcio, prometheus_client, ratelimit, apache-bookkeeper-client) --
+    # it runs on the .venv/bin python the deploy/*localrun*.sh scripts put on PATH.
+    # Previously only installed by hand, so `uv sync` (which removes anything not
+    # in the lockfile) silently broke every localrun demo; declared here instead.
+    "pulsar-client[functions]>=3.5",
+    # Same major as the runtime's generated *_pb2.py stubs (Protobuf 6.31.1 in Pulsar
+    # 4.2.4) -- cross-major runtime support isn't guaranteed (python-instance/README.md).
+    "protobuf>=6.33.6,<7",
 ]
 rag = [
     # Eval-only, for the Edge Triage Pipeline retrieval-augmented-precedent experiment
