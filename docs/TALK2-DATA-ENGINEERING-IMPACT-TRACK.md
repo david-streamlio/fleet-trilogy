@@ -1076,6 +1076,7 @@ original finding.
 | 25 | Cooling re-run: all five Edge Triage Pipeline candidates with a new external fan, same flags (2026-10-02/03) | Gemma-3-4B-it, Llama-3.1-8B, GLM-4-9B, Qwen3-8B latencies match their published (first-fan) runs within ~1-10%; quality within noise (Llama 0→2 of 45, GLM 6→3 of 41); all five still gate-2 PASS | — | Old fan vs. new fan changes almost nothing — both prevent the 600MHz hard throttle. The fan doesn't stop the 8-9B models touching the 80°C soft limit (5-9% of 30s trace samples, clock trimmed to ≥1580MHz). GLM's 7.3% now sits near its M4 6.7%, so its earlier Pi gap (14.6%) may not be a Pi effect — two runs can't say. Detail: "Cooling re-run" below |
 | 26 | Phi-3.5-mini's published Pi run (row 11) diagnosed as throttle-affected | Re-run (2026-10-02, cooled Pi, external fan): **31.7s p50 / 38.8s p95, 100% format**, 0.0% mismatch (n=45) | — | Not a model change: the row 11 run started one second after a Qwen3-8B run had throttled the Pi to 600MHz (row 10), before any fan; the fan went in mid-run. Only its tail moved (p50 −11%, p95 157.8→38.8s) and its two format failures were empty outputs, consistent with 300s timeouts. Both runs kept; the re-run is the fair cross-model comparison (the other four never ran fanless) |
 | 27 | Tier 2 `reroute_detail` overstated severity — a plain-code grounding bug the LLM narrated (2026-10-02) | Fixed in `synthesizer.decide_reroute` | — | Said "N trucks reporting a correlated high-severity slowdown" whenever ANY card was high; with 3 trucks (2 high, 1 medium) Gemma then said "three trucks are experiencing high-severity delays" aloud. Now "3 trucks reporting a correlated slowdown, 2 at high severity." Same lesson as row 14, from the other side: verify the facts code hands the model, not just the model |
+| 28 | Uplink data + radio energy: what per-call energy leaves out — edge vs. stream-everything-to-the-cloud (2026-10-03) | **Data:** raw telemetry is 532 B every 5 s = 9.2 MB/truck/day; the Edge Triage Pipeline uplinks **nothing** in normal driving (0 false triggers in 2.3 truck-days) and ~4.0 KB per incident (12.2 escalated cards), or nothing when Phi doesn't escalate | — | **Energy depends on the radio** (published measurements, not ours): with 2012 phone-class LTE, streaming every 5 s pins the radio at ~1.06 W all day (92 kJ), and the edge design wins below ~28 incidents/truck/day; with a modern LTE-M modem, streaming costs ~2.5 kJ/day and the edge loses above ~1 incident/day. Two bigger terms: the pipeline calls the LLM on **every 5 s tick** of an incident (~23 calls, ~3.5 kJ on the Pi — and 12-15 min of LLM work per 2-4 min incident); and the Pi 4's own **3.4 W idle (294 kJ/day)** outweighs everything, so the edge only competes on energy when the computer is one the vehicle runs anyway. Detail: "Uplink and radio energy" below |
 
 ---
 
@@ -1427,3 +1428,89 @@ outline's earlier caveat that Gemma-3-4B-it had the better tail (101.4s vs.
 **For the "cooling is part of the energy budget" beat:** the evidence is fan vs.
 no fan (rows 9-10, and Phi's throttled tail), not old fan vs. new fan. A
 controlled no-fan run of the other models doesn't exist yet.
+
+## Uplink and radio energy: what the per-call number leaves out (2026-10-03)
+
+Row 28 in detail. Per call, the Pi spends ~10x the GPU's energy (row 24) — but a
+cloud design also has to get the data there. Two separate decisions hide inside
+"edge vs. cloud": **where** to compute (on the vehicle vs. in the cloud: decided by
+transmission, connectivity, latency, privacy) and **on what** (a CPU board vs. an
+embedded GPU/NPU: decided by energy per call). Row 24 measured the second; this
+section estimates the first. An AV-class vehicle's onboard GPU gets the same
+transmission saving as the Pi and is fast like the M4, so this argues for
+on-vehicle compute, not for low-power hardware as such.
+
+**Data volume (measured, `uv run python -m tests.model.uplink_budget`):** real
+fleet simulator, real coprocessor gate, real `LlmTriageFunction` with
+Phi-3.5-mini on the Mac (real escalation decisions and card sizes). The
+simulator's default incident rate is demo-tuned — a 3% chance per 5 s tick, so a
+truck would spend about half its time in incidents — so normal driving and
+incidents were measured separately:
+
+| Regime | Measured |
+|---|---|
+| Raw telemetry | 532 B per event (JSON), one per truck every 5 s: 17,280/day, **9.2 MB/day** for 24 h operation (3.8 MB for a 10 h shift) |
+| Normal driving (20 trucks × 2,000 ticks = 2.3 truck-days, incidents off) | **0** coprocessor gate passes — no LLM calls, nothing uplinked |
+| One incident, truck-47 (escalate-worthy trip context), ×5 | 17-28 LLM calls each (mean 21.6); 61 of 108 cards escalated to `high` and uplinked: **12.2 cards ≈ 4.0 KB per incident** (cards ~330 B) |
+| One incident, trucks with no trip context, ×5 | 19-28 LLM calls each (mean 24.2); Phi never escalated: **0 B uplinked** (all held on the truck as low/medium) |
+
+So for one escalating incident a day, the truck sends ~4 KB instead of 9.2 MB —
+about 2,300x less — and on a normal day nothing at all.
+
+**Radio energy (published, two very different radios):**
+
+| Radio | Streaming every 5 s | One isolated small uplink | Source |
+|---|---|---|---|
+| 2012 LTE smartphone | 5 s < LTE's 11.576 s tail, so the radio never leaves its connected tail state: **~1.06 W continuously** (92 kJ/day for 24 h) | **12.76 J** (promotion + tail) | Huang et al., MobiSys 2012, Table 3 + §1 |
+| LTE-M IoT modem (Nordic Thingy:91 / nRF9160) | ~12 s transmit phase per uplink at 29.4 mW average, so 5 s events keep it there: **~29 mW** (2.5 kJ/day) | **0.35 J** | Nepal et al., arXiv:2601.17656 (2026), Table IV |
+
+Cards leave the Pi ~30-40 s apart (that's its per-call latency), so each is an
+isolated uplink.
+
+**Per truck per day (model — assumptions stated, incidents/day unknown):** edge =
+LLM compute on the Pi (23 calls × 154 J ≈ 3.5 kJ per incident) + card uplinks;
+cloud = the radio streaming every event + GPU compute for the same calls
+(23 × 15.3 J ≈ 0.35 kJ per incident, Mac-class, an upper bound). Excludes
+datacenter and network-core overhead (which would add to the cloud side) and
+device idle (below).
+
+| Radio, operating hours | Stream everything | Edge cheaper below… | …with one LLM call per incident |
+|---|---|---|---|
+| 2012 LTE, 24 h | 92 kJ/day | ~28 incidents/day | ~600 incidents/day |
+| 2012 LTE, 10 h | 38 kJ/day | ~12 incidents/day | ~250 incidents/day |
+| LTE-M, 24 h | 2.5 kJ/day | **~0.8 incidents/day** | ~18 incidents/day |
+| LTE-M, 10 h | 1.1 kJ/day | **~0.3 incidents/day** | ~8 incidents/day |
+
+**What this says:**
+- With an old phone-class radio, not transmitting is a big energy win; with a
+  modern IoT modem built for exactly this, streaming is cheap enough that the
+  Pi's slow inference becomes the dominant cost.
+- **The edge pipeline's biggest energy problem is self-inflicted:** the
+  coprocessor forwards every 5 s tick of an incident, so each incident costs ~23
+  near-identical LLM calls. One call per incident (or per change in baseline
+  severity) cuts that ~20x, puts the edge ahead in every row above, and fixes a
+  real-time problem too — today each 2-4 minute incident generates 12-15 minutes
+  of LLM work on the Pi (~23 × 32-39 s), so cards arrive long after the incident.
+  Not changed here; it's a pipeline-design decision.
+- **The largest term of all is idle:** the Pi 4 draws 3.4 W doing nothing —
+  294 kJ/day, more than 3x a day of old-LTE streaming and ~100x LTE-M. A
+  stream-only design still needs a gateway on the truck, but a modem-plus-
+  microcontroller one idles at milliwatts. So the edge design competes on
+  energy when the computer is one the vehicle runs anyway (a telematics or AV
+  computer) — not when a Pi is bolted on just for triage.
+- In money terms none of this is large: the Pi's 288 J/call is ~$0.00001 at an
+  assumed $0.15/kWh, and its 24 h idle is ~$4.50/year. Economics are decided by
+  connectivity, per-call service fees, latency, privacy and hardware cost, not
+  electricity.
+
+Not measured here: the gate pass rate on real fleet data (the simulator's
+incident model is synthetic), a real cellular modem on this truck's link, and
+modern edge silicon (a phone-class SoC with LPDDR5X and an NPU would likely cut
+the Pi's per-call energy by several times — the M4 gap tracks memory bandwidth,
+~100x).
+
+Sources: Huang, Qian, Gerber, Mao, Sen, Spatscheck, "A Close Examination of
+Performance and Power Characteristics of 4G LTE Networks," MobiSys 2012
+(https://web.eecs.umich.edu/~zmao/Papers/RRC4G_mobisys2012.pdf); Nepal et al.,
+"Battery-Free and Gateway-Free Cellular IoT Water Leak Detection System,"
+arXiv:2601.17656 (https://arxiv.org/abs/2601.17656).
