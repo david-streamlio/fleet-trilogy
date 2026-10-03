@@ -171,6 +171,20 @@ def test_synthesize_corridor_wide_produces_reroute_and_spoken_warning():
     assert result.spoken_warning
 
 
+def test_reroute_detail_only_claims_high_severity_for_trucks_that_reported_it():
+    mixed = [
+        _card(truck_id="truck-47", corridor="I-95N", severity="high"),
+        _card(truck_id="truck-12", corridor="I-95N", severity="high"),
+        _card(truck_id="truck-31", corridor="I-95N", severity="medium"),
+    ]
+    _, detail = decide_reroute(mixed, SCOPE_CORRIDOR_WIDE)
+    assert detail == "Reroute traffic around I-95N — 3 trucks reporting a correlated slowdown, 2 at high severity."
+
+    all_high = [_card(truck_id=t, corridor="I-95N", severity="high") for t in ("truck-47", "truck-12")]
+    _, detail = decide_reroute(all_high, SCOPE_CORRIDOR_WIDE)
+    assert detail == "Reroute traffic around I-95N — 2 trucks reporting a correlated high-severity slowdown."
+
+
 def test_synthesize_only_considers_the_first_card_corridor_when_batch_is_mixed():
     backend = SubprocessLlmBackend(mock=True)
     cards = [

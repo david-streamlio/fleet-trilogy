@@ -64,10 +64,22 @@ def decide_reroute(cards: list[EnrichmentCard], scope: str) -> tuple[bool, str |
         return False, None
     corridor = cards[0].corridor
     truck_count = len({card.truck_id for card in cards})
-    detail = (
-        f"Reroute traffic around {corridor} — {truck_count} trucks reporting a "
-        "correlated high-severity slowdown."
+    high_count = len(
+        {card.truck_id for card in cards if card.severity.lower() == HIGH_SEVERITY}
     )
+    # Only claim "high-severity" for every truck when it's true -- the LLM narrates
+    # this text verbatim-ish, so an overstated fact here becomes an overstated
+    # spoken warning (seen in a Talk 3 demo run: 3 trucks, 2 high, 1 medium).
+    if high_count == truck_count:
+        detail = (
+            f"Reroute traffic around {corridor} — {truck_count} trucks reporting a "
+            "correlated high-severity slowdown."
+        )
+    else:
+        detail = (
+            f"Reroute traffic around {corridor} — {truck_count} trucks reporting a "
+            f"correlated slowdown, {high_count} at high severity."
+        )
     return True, detail
 
 

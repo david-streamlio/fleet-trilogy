@@ -74,12 +74,26 @@ class GlobalSynthesisFunction:
         return to_json(synthesis) if synthesis is not None else None
 
     def _build_backend(self, context) -> SubprocessLlmBackend:
+        """One-time setup on the first message, from the Function's --user-config.
+
+        `llm_extra_args` (space-separated, e.g. "-no-cnv") carries the model's
+        one-shot flags from models.toml — without -no-cnv, mainline llama.cpp wraps
+        Gemma's prompt in its chat template, which isn't the configuration the
+        Tier 2 gates measured. `corridor_threshold` overrides how many cards a
+        corridor needs before it's synthesized (e.g. 3 for a three-truck demo).
+        """
         user_config = context.get_user_config_map() if context is not None else {}
+        extra_args = user_config.get("llm_extra_args") or os.environ.get(
+            "LLM_EXTRA_ARGS", ""
+        )
         backend = SubprocessLlmBackend(
             binary_path=user_config.get("llm_binary_path")
             or os.environ.get("LLM_BINARY_PATH"),
             model_path=user_config.get("llm_model_path")
             or os.environ.get("LLM_MODEL_PATH"),
+            extra_args=tuple(extra_args.split()),
         )
+        if user_config.get("corridor_threshold"):
+            self._corridor_threshold = int(user_config["corridor_threshold"])
         self._backend = backend
         return backend
