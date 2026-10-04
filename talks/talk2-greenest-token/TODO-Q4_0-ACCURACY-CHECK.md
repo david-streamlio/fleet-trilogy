@@ -3,7 +3,15 @@
 **Status:** first answer in, 2026-10-04: **accuracy depends on the model.**
 - Measured on M1 Metal (mac2, run `C-workload-20261004T055729Z-q4_0`), against Q4_K_M's forward and reverse C runs. Same pairs and flags, 3 reps.
 - **Reproduced on M4 Metal** (mac-m4, `C-workload-20261004T120252Z-q4_0`): Gemma-3-4B Edge Triage mismatch 0/135 → 43/135; Llama 11 → 16/135; GLM 10 → 4/135; Qwen3 0 → 2/135; Phi 0 → 0. J/call -10 to -36%.
-- Still open: ARM-CPU latency for Q4_0 on the real workload, and confirming Gemma's regression at higher n.
+- **Confirmed at n=45** (mac-m4, `Q-confirm-20261004T150321Z-n45`: 2 runs per format, 270 escalation calls each, Edge Triage Pipeline).
+
+  | Model | Q4_K_M | Q4_0 | IQ4_XS | IQ4_NL |
+  |---|---|---|---|---|
+  | Gemma-3-4B | **0.0%** | **30.4%** | 23.3% | 16.7% |
+  | Llama-3.1-8B | 6.3% | **14.4%** | — | — |
+
+  Format was 90/90 in every case. **Every non-k 4-bit format degrades Gemma-3-4B's calibration; Q4_K_M alone stays clean.** Llama's Q4_0 shift is real (2.3×). Per-call latency within ~10% across formats.
+- Still open: ARM-CPU latency for Q4_0 on the real workload.
 
 Raised 2026-10-03 from the L3 results (`docs/TALK2-HARDWARE-SPECTRUM-TEST-CATALOG.md`).
 

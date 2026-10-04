@@ -22,9 +22,11 @@ SOURCES = {
     "I": HERE / "scripts/bench_extras.sh",
     "G": HERE / "scripts/bench_extras_gh.sh",
     "L3/L4": HERE / "scripts/bench_linux_extras.sh",
+    "R3": HERE / "scripts/bench_round3.sh",
 }
-NOT_RUN = {"Qwen3.8-27B-UD-Q4_K_M.gguf": "iphone-flagship extra; mac-m4 never allocated"}
+NOT_RUN: dict[str, str] = {}  # file -> why it is listed but was never run
 GGUF = re.compile(r'([\w.-]+/[\w.-]+-GGUF)["\s,]+(?:file\s*=\s*")?([\w.-]+\.gguf)')
+URL = re.compile(r"huggingface\.co/([\w.-]+/[\w.-]+-GGUF)/resolve/main/([\w.-]+\.gguf)")  # round 3's direct downloads
 MLX = re.compile(r"^(mlx-community/[\w.-]+)\s*$", re.M)
 
 
@@ -37,7 +39,7 @@ def main():
     wanted = {}  # (repo, file or None) -> set of tests
     for test, path in SOURCES.items():
         text = path.read_text()
-        for repo, file in GGUF.findall(text):
+        for repo, file in GGUF.findall(text) + URL.findall(text):
             wanted.setdefault((repo, file), set()).add(test)
         if test == "G":
             for repo in MLX.findall(text):

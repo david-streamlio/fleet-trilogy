@@ -1,0 +1,585 @@
+{
+ "host": "COMP-J2D9D71YNJ",
+ "arch": "arm64",
+ "platform": "macOS-26.7.1-arm64-arm-64bit-Mach-O",
+ "timestamp": "2026-10-04T18:59:27Z",
+ "config": {
+  "task": "full",
+  "mode": "chat-on",
+  "n_per_cell": 1,
+  "gguf": "/Users/david.kjerrumgaard/tools/models/Qwen3.8-27B-GGUF/Qwen3.8-27B-UD-Q4_K_M.gguf",
+  "server": "/Users/david.kjerrumgaard/tools/llama.cpp-v0.5.0/build/bin/llama-server",
+  "threads": 12,
+  "temperature": 0.2,
+  "n_predict": 2498,
+  "think_budget": 2048,
+  "timeout_seconds": 684.5
+ },
+ "summary": {
+  "n": 18,
+  "rates": {
+   "action_ok": 0.6666666666666666,
+   "all_ok": 0.6666666666666666,
+   "baseline_ok": 0.9444444444444444,
+   "consistent": 0.9444444444444444,
+   "escalation_ok": 0.6666666666666666,
+   "format_ok": 0.9444444444444444,
+   "severity_ok": 0.6666666666666666
+  },
+  "latency_p50_seconds": 62.01569749999908,
+  "latency_p95_seconds": 147.707992458003,
+  "tokens_predicted_mean": 785.6666666666666,
+  "think_tokens_mean": 458.27777777777777,
+  "truncated": 1,
+  "errors": 1,
+  "by_scenario": {
+   "escalate-worthy": {
+    "n": 6,
+    "escalations": {
+     "raise": 6
+    },
+    "all_ok": 6
+   },
+   "benign": {
+    "n": 6,
+    "escalations": {
+     "unparsed": 1,
+     "lower": 5
+    },
+    "all_ok": 0
+   },
+   "de-escalate-worthy": {
+    "n": 6,
+    "escalations": {
+     "lower": 6
+    },
+    "all_ok": 6
+   }
+  },
+  "by_profile": {
+   "low": {
+    "n": 3,
+    "baseline_ok": 2,
+    "all_ok": 2
+   },
+   "medium-volatile": {
+    "n": 3,
+    "baseline_ok": 3,
+    "all_ok": 2
+   },
+   "medium": {
+    "n": 3,
+    "baseline_ok": 3,
+    "all_ok": 2
+   },
+   "high-volatile": {
+    "n": 3,
+    "baseline_ok": 3,
+    "all_ok": 2
+   },
+   "high-decel": {
+    "n": 3,
+    "baseline_ok": 3,
+    "all_ok": 2
+   },
+   "high-abs": {
+    "n": 3,
+    "baseline_ok": 3,
+    "all_ok": 2
+   }
+  }
+ },
+ "calls": [
+  {
+   "scenario": "escalate-worthy",
+   "profile": "low",
+   "latency_seconds": 16.152617041996564,
+   "content": "Let me work through this step by step.\n\nSTEP 1 - BASELINE SEVERITY:\n- Peak deceleration: 0.15 g\n- ABS engaged: no\n- Traffic pattern: elevated velocity variance (frequent speed cycling)\n\nRules:\n- high if ABS engaged is yes, or peak deceleration > 0.45 g \u2192 No (ABS is no, 0.15 </think>\n\n\t\t{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"Two fields are genuine risk multipliers: (1) Cargo is a Liquids/Chemical Tanker, which is hazardous and dangerous if spilled or shifted, making it a risk multiplier; (2) Weather is Heavy rain on wet asphalt, which degrades both traction and visibility, making it a risk multiplier. The dispatch status of running 20 minutes behind schedule is also a genuine risk factor as it indicates schedule pressure on the driver. All three fields point toward elevated operational risk, with no field indicating safe or controlled conditions that would offset them.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 278,
+   "tokens_evaluated": 622,
+   "think_tokens": 90,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "Two fields are genuine risk multipliers: (1) Cargo is a Liquids/Chemical Tanker, which is hazardous and dangerous if spilled or shifted, making it a risk multiplier; (2) Weather is Heavy rain on wet asphalt, which degrades both traction and visibility, making it a risk multiplier. The dispatch status of running 20 minutes behind schedule is also a genuine risk factor as it indicates schedule pressure on the driver. All three fields point toward elevated operational risk, with no field indicating safe or controlled conditions that would offset them.",
+    "escalation": "raise",
+    "severity": "medium",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "low",
+   "latency_seconds": 147.707992458003,
+   "content": "Let me work through this step by step.\n\nSTEP 1 - BASELINE SEVERITY:\n- Peak deceleration: 0.15 g\n- ABS engaged: no\n- Traffic pattern: elevated velocity variance (frequent speed cycling)\n\nRules:\n- high if ABS engaged is yes, or peak deceleration > 0.45 g \u2192 No (ABS is no, 0.15 </think>\n  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  \t\t\t\t\t  ",
+   "tokens_predicted": 2498,
+   "tokens_evaluated": 616,
+   "think_tokens": 90,
+   "stop_type": "limit",
+   "card": null,
+   "error": "unparsable card: Expecting value: line 1 column 1 (char 0)",
+   "scores": {
+    "format_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "low",
+   "latency_seconds": 71.9630463749927,
+   "content": "Let me work through this step by step.\n\nSTEP 1 - BASELINE SEVERITY:\n- Peak deceleration: 0.15 g\n- ABS engaged: no\n- Traffic pattern: elevated velocity variance (frequent speed cycling)\n\nRules:\n- high if ABS engaged is yes, or peak deceleration > 0.45 g \u2192 ABS is no, 0.15 g is not > 0.45 g. Not high.\n- Otherwise, if peak deceleration is 0.22 g or below: medium if traffic pattern is severe stop-and-go compaction, else low.\n  - 0.15 g is \u2264 0.22 g. Traffic pattern is \"elevated velocity variance (frequent speed cycling)\" \u2014 this is NOT \"severe stop-and-go compaction.\" So: LOW.\n\nBaseline severity: LOW\n\nSTEP 2 - ESCALATION:\n- Weather: Clear conditions, light traffic \u2192 NOT a risk factor (clear/dry conditions)\n- Cargo: Empty trailer, non-hazardous \u2192 NOT a risk factor (empty, dry, general freight)\n- Dispatch status: Ahead of schedule; driver executed a documented defensive maneuver for a merging vehicle \u2192 This is evidence the driver is in control. Being ahead of schedule is NOT a risk factor. A documented defensive maneuver is a reason to hold or lower, never raise.\n\nDecision:\n- raise: at least one field is a genuine risk multiplier \u2192 No fields are risk multipliers.\n- lower: none of the fields are risk multipliers, AND at least one positively indicates safe, controlled conditions \u2192 None are risk multipliers. The dispatch status (documented defensive maneuver, ahead of schedule) positively indicates safe, controlled conditions. Weather is clear. So this qualifies for \"lower.\"\n- hold: mixed or none clearly point either way.\n\nThe dispatch status clearly indicates the driver is in control (documented defensive maneuver, ahead of schedule). Weather is clear. Cargo is empty/non-hazardous. None are risk multipliers, and the dispatch status positively indicates safe, controlled conditions. This is \"lower.\"\n\nEscalation: lower\n\nSTEP 3 - FINAL SEVERITY AND ACTION:\n- Baseline: LOW\n- Escalation: lower \u2192 move one level down\n- LOW is the limit, so it stays LOW.\n- Severity: LOW\n- Recommended action for \"lower\": \"Log and continue; no immediate action needed.\"\n\nNow let me format the response properly. The user wants:\n- baseline_severity\n- risk_synthesis (naming specific fields that drove escalation and why)\n- escalation\n- severity\n- recommended_action\n\nNo markdown code boxes, no introductory prose.\n</think>\n\n{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"No operational field qualifies as a risk multiplier. Weather is clear with light traffic (no traction or visibility degradation). Cargo is an empty, non-hazardous trailer (no spill or shift hazard). Dispatch status shows the driver ahead of schedule and having executed a documented defensive maneuver for a merging vehicle, which positively indicates the driver is in control and the event was a managed, non-urgent response. These fields collectively point to safe, controlled conditions with no aggravating context.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 738,
+   "tokens_evaluated": 630,
+   "think_tokens": 574,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "No operational field qualifies as a risk multiplier. Weather is clear with light traffic (no traction or visibility degradation). Cargo is an empty, non-hazardous trailer (no spill or shift hazard). Dispatch status shows the driver ahead of schedule and having executed a documented defensive maneuver for a merging vehicle, which positively indicates the driver is in control and the event was a managed, non-urgent response. These fields collectively point to safe, controlled conditions with no aggravating context.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "medium-volatile",
+   "latency_seconds": 67.8613053750014,
+   "content": "Let me work through this step by step.\n\nSTEP 1 - BASELINE SEVERITY:\n- Peak deceleration: 0.15 g\n- ABS engaged: no\n- Traffic pattern: severe stop-and-go compaction (repeated hard braking)\n\nRules:\n- high if ABS engaged is yes, or peak deceleration > 0.45 g \u2192 ABS is no, 0.15 g is not > 0.45 g. Not high.\n- Otherwise, if peak deceleration is 0.22 g or below: medium if traffic pattern is severe stop-and-go compaction, else low.\n  - 0.15 g is \u2264 0.22 g \u2192 check traffic pattern\n  - Traffic pattern IS severe stop-and-go compaction \u2192 medium\n\nBaseline severity: medium\n\nSTEP 2 - ESCALATION:\nOperational context:\n- Weather: Heavy rain, wet asphalt \u2192 This degrades traction. This IS a risk multiplier.\n- Cargo: Liquids / Chemical Tanker \u2192 This is hazardous, liquid, dangerous if spilled or shifted. This IS a risk multiplier.\n- Dispatch status: Running 20 minutes behind schedule \u2192 Being behind schedule under pressure IS a genuine risk factor.\n\nSo we have:\n- Weather: genuine risk multiplier (degrades traction)\n- Cargo: genuine risk multiplier (hazardous/liquid)\n- Dispatch: genuine risk factor (behind schedule under pressure)\n\nAt least one field is a genuine risk multiplier \u2192 raise.\n\nActually, let me re-read the decision rules:\n- raise: at least one field above is a genuine risk multiplier by the rules above\n- lower: none of the fields are risk multipliers, and at least one positively indicates safe, controlled conditions\n- hold: the fields are mixed, or none clearly point either way\n\nWe have multiple genuine risk multipliers (weather, cargo, dispatch). This clearly points to raise.\n\nEscalation: raise\n\nSTEP 3 - FINAL SEVERITY AND ACTION:\n- Baseline: medium\n- Escalation: raise \u2192 move one level up\n- medium + one level up = high\n- recommended_action for raise: \"Escalate for driver/dispatcher review.\"\n\nLet me format the response properly. The user wants:\n- baseline_severity\n- risk_synthesis (naming specific fields)\n- escalation\n- severity\n- recommended_action\n\nNo markdown code boxes, no introductory prose.\n</think>\n\n{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Peak deceleration of 0.15 g is at or below the 0.22 g threshold and ABS was not engaged, so the baseline is governed by the traffic pattern, which is severe stop-and-go compaction, yielding medium. For escalation, three fields independently qualify as genuine risk multipliers: (1) Weather \u2013 heavy rain on wet asphalt directly degrades traction, a clear risk multiplier; (2) Cargo \u2013 a liquids/chemical tanker is hazardous and dangerous if spilled or shifted, a clear risk multiplier; (3) Dispatch status \u2013 running 20 minutes behind schedule places the driver under time pressure, which the rules identify as a genuine risk factor. No field points toward safe or controlled conditions. The convergence of degraded traction, hazardous liquid cargo, and schedule pressure makes the operational context unambiguously a raise.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 766,
+   "tokens_evaluated": 625,
+   "think_tokens": 524,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Peak deceleration of 0.15 g is at or below the 0.22 g threshold and ABS was not engaged, so the baseline is governed by the traffic pattern, which is severe stop-and-go compaction, yielding medium. For escalation, three fields independently qualify as genuine risk multipliers: (1) Weather \u2013 heavy rain on wet asphalt directly degrades traction, a clear risk multiplier; (2) Cargo \u2013 a liquids/chemical tanker is hazardous and dangerous if spilled or shifted, a clear risk multiplier; (3) Dispatch status \u2013 running 20 minutes behind schedule places the driver under time pressure, which the rules identify as a genuine risk factor. No field points toward safe or controlled conditions. The convergence of degraded traction, hazardous liquid cargo, and schedule pressure makes the operational context unambiguously a raise.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "medium-volatile",
+   "latency_seconds": 61.196243416998186,
+   "content": "Let me work through this step by step.\n\nSTEP 1 - BASELINE SEVERITY:\n- Peak deceleration: 0.15 g\n- ABS engaged: no\n- Traffic pattern: severe stop-and-go compaction (repeated hard braking)\n\nRules:\n- high if ABS engaged is yes, or peak deceleration above 0.45 g \u2192 ABS is no, 0.15 g is not above 0.45 g. Not high.\n- Otherwise, if peak deceleration is 0.22 g or below: medium if traffic pattern is severe stop-and-go compaction, else low.\n  - 0.15 g is 0.22 g or below. Traffic pattern IS severe stop-and-go compaction. \u2192 medium.\n\nBaseline severity: medium\n\nSTEP 2 - ESCALATION:\n- Weather: Clear skies, dry pavement \u2192 NOT a risk factor (clear/dry conditions)\n- Cargo: Dry goods / General freight \u2192 NOT a risk factor (dry, general freight)\n- Dispatch status: On schedule \u2192 NOT a risk factor (on schedule is not a risk; being behind schedule under pressure would be)\n\nNow, the decision:\n- raise: at least one field is a genuine risk multiplier \u2192 None are. Not raise.\n- lower: none of the fields are risk multipliers, AND at least one positively indicates safe, controlled conditions.\n  - None are risk multipliers: correct.\n  - At least one positively indicates safe, controlled conditions: Clear skies and dry pavement positively indicate safe conditions. On schedule also indicates no pressure. So yes, at least one positively indicates safe, controlled conditions.\n  - \u2192 lower\n- hold: mixed or none clearly point either way.\n\nSo escalation: lower\n\nSTEP 3 - FINAL SEVERITY AND ACTION:\n- Baseline: medium\n- Escalation: lower \u2192 move one level down\n- medium \u2192 low\n- severity: low\n- recommended_action for lower: \"Log and continue; no immediate action needed.\"\n\nLet me verify all five agree:\n- baseline_severity: medium\n- risk_synthesis: Weather (clear skies, dry pavement) and cargo (dry goods/general freight) are not risk multipliers; dispatch status (on schedule) is not a risk factor. Clear/dry weather positively indicates safe, controlled conditions.\n- escalation: lower\n- severity: low\n- recommended_action: \"Log and continue; no immediate action needed.\"\n\nAll consistent. Let me format the response.\n</think>\n\n{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Peak deceleration of 0.15 g is at or below the 0.22 g threshold, and the traffic pattern is severe stop-and-go compaction, placing the baseline at medium. For escalation: weather (clear skies, dry pavement) is not a risk multiplier and positively indicates safe, controlled traction conditions; cargo (dry goods / general freight) is not a risk multiplier; dispatch status (on schedule) is not a risk factor. No field acts as a genuine risk multiplier, and clear/dry weather positively indicates safe, controlled conditions, supporting a downward adjustment.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 726,
+   "tokens_evaluated": 619,
+   "think_tokens": 537,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Peak deceleration of 0.15 g is at or below the 0.22 g threshold, and the traffic pattern is severe stop-and-go compaction, placing the baseline at medium. For escalation: weather (clear skies, dry pavement) is not a risk multiplier and positively indicates safe, controlled traction conditions; cargo (dry goods / general freight) is not a risk multiplier; dispatch status (on schedule) is not a risk factor. No field acts as a genuine risk multiplier, and clear/dry weather positively indicates safe, controlled conditions, supporting a downward adjustment.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "medium-volatile",
+   "latency_seconds": 63.691671416992904,
+   "content": "Let me work through this step by step.\n\nSTEP 1 - BASELINE SEVERITY:\n- Peak deceleration: 0.15 g\n- ABS engaged: no\n- Traffic pattern: severe stop-and-go compaction (repeated hard braking)\n\nRules:\n- high if ABS engaged is yes, or peak deceleration > 0.45 g \u2192 ABS is no, 0.15 g is not > 0.45 g. Not high.\n- Otherwise, if peak deceleration is 0.22 g or below: medium if traffic pattern is severe stop-and-go compaction, else low.\n  - 0.15 g \u2264 0.22 g \u2192 yes, this applies.\n  - Traffic pattern IS severe stop-and-go compaction \u2192 medium.\n\nBaseline severity: medium\n\nSTEP 2 - ESCALATION:\n- Weather: Clear conditions, light traffic \u2192 NOT a risk factor (clear/dry conditions)\n- Cargo: Empty trailer, non-hazardous \u2192 NOT a risk factor (empty, dry, general freight)\n- Dispatch status: Ahead of schedule; driver executed a documented defensive maneuver for a merging vehicle \u2192 This is evidence the driver is in control. Being ahead of schedule is NOT a risk factor. A documented defensive maneuver is a reason to hold or lower, never a reason to raise.\n\nDecision:\n- raise: at least one field is a genuine risk multiplier \u2192 No fields are risk multipliers.\n- lower: none of the fields are risk multipliers, AND at least one positively indicates safe, controlled conditions \u2192 None are risk multipliers. The dispatch status (documented defensive maneuver, ahead of schedule) positively indicates safe, controlled conditions. Weather is clear. So this qualifies for \"lower.\"\n- hold: mixed or none clearly point either way.\n\nThe dispatch status clearly positively indicates safe, controlled conditions (documented defensive maneuver, ahead of schedule). Weather is clear (not a risk factor but also indicates safe conditions). Cargo is empty (not a risk factor). None are risk multipliers, and at least one (dispatch status) positively indicates safe, controlled conditions.\n\nEscalation: lower\n\nSTEP 3 - FINAL SEVERITY AND ACTION:\n- Baseline: medium\n- Escalation: lower \u2192 move one level down\n- medium \u2192 low\n- Severity: low\n- Recommended action for lower: \"Log and continue; no immediate action needed.\"\n\nNow let me format the response properly. The user wants:\n- baseline_severity\n- risk_synthesis (naming specific fields that drove escalation and why)\n- escalation\n- severity\n- recommended_action\n\nNo markdown code boxes, no introductory prose.\n</think>\n\n{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"No operational field acts as a risk multiplier. Weather is clear with light traffic, which does not degrade traction or visibility. Cargo is an empty, non-hazardous trailer, which carries no spill or shift risk. The dispatch status explicitly documents a defensive maneuver for a merging vehicle and notes the driver is ahead of schedule; per the weighting rules this is positive evidence of a controlled, in-command driver and is a reason to lower, never to raise. The specific field driving the escalation is the dispatch status (documented defensive maneuver + ahead of schedule), which positively indicates safe, controlled conditions.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 758,
+   "tokens_evaluated": 633,
+   "think_tokens": 570,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "No operational field acts as a risk multiplier. Weather is clear with light traffic, which does not degrade traction or visibility. Cargo is an empty, non-hazardous trailer, which carries no spill or shift risk. The dispatch status explicitly documents a defensive maneuver for a merging vehicle and notes the driver is ahead of schedule; per the weighting rules this is positive evidence of a controlled, in-command driver and is a reason to lower, never to raise. The specific field driving the escalation is the dispatch status (documented defensive maneuver + ahead of schedule), which positively indicates safe, controlled conditions.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "medium",
+   "latency_seconds": 56.205305833995226,
+   "content": "Let me work through this step by step.\n\nSTEP 1 - BASELINE SEVERITY:\n- Peak deceleration: 0.3 g\n- ABS engaged: no\n- Traffic pattern: elevated velocity variance (frequent speed cycling)\n\nRules:\n- high if ABS engaged is yes, or peak deceleration > 0.45 g \u2192 ABS is no, 0.3 g is not > 0.45 g. Not high.\n- Otherwise, if peak deceleration is 0.22 g or below: medium if severe stop-and-go compaction, else low. \u2192 0.3 g is NOT 0.22 g or below. Skip.\n- Otherwise (above 0.22 g, up to 0.45 g): high if severe stop-and-go compaction, else medium. \u2192 0.3 g is above 0.22 and up to 0.45. Traffic pattern is \"elevated velocity variance (frequent speed cycling)\" which is NOT \"severe stop-and-go compaction.\" So: medium.\n\nBaseline severity: medium\n\nSTEP 2 - ESCALATION:\n- Weather: Heavy rain, wet asphalt \u2192 This degrades traction. This IS a risk multiplier.\n- Cargo: Liquids / Chemical Tanker \u2192 This is hazardous/liquid/dangerous if spilled or shifted. This IS a risk multiplier.\n- Dispatch status: Running 20 minutes behind schedule \u2192 Being behind schedule under pressure IS a genuine risk factor.\n\nAll three fields are genuine risk multipliers. This clearly points to \"raise.\"\n\nEscalation: raise\n\nSTEP 3 - FINAL SEVERITY AND ACTION:\n- Baseline: medium\n- Escalation: raise \u2192 move one level up\n- Final severity: high\n- Recommended action: \"Escalate for driver/dispatcher review.\"\n\nLet me format this properly without markdown code boxes or introductory prose.\n</think>\n\n{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Peak deceleration of 0.3 g falls in the 0.22\u20130.45 g band and the traffic pattern is elevated velocity variance (frequent speed cycling), not severe stop-and-go compaction, yielding a medium baseline. Escalation is driven by three concurrent risk multipliers: (1) Weather \u2013 heavy rain on wet asphalt directly degrades traction, increasing the likelihood of loss of control during the speed-cycling pattern; (2) Cargo \u2013 a liquids/chemical tanker is hazardous and dangerous if shifted or spilled, amplifying the consequence of any further deceleration event; (3) Dispatch status \u2013 running 20 minutes behind schedule introduces time-pressure that can push the driver toward aggressive speed recovery, compounding the wet-road and cargo risks. All three fields independently qualify as genuine risk multipliers under the stated rules.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 658,
+   "tokens_evaluated": 621,
+   "think_tokens": 413,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Peak deceleration of 0.3 g falls in the 0.22\u20130.45 g band and the traffic pattern is elevated velocity variance (frequent speed cycling), not severe stop-and-go compaction, yielding a medium baseline. Escalation is driven by three concurrent risk multipliers: (1) Weather \u2013 heavy rain on wet asphalt directly degrades traction, increasing the likelihood of loss of control during the speed-cycling pattern; (2) Cargo \u2013 a liquids/chemical tanker is hazardous and dangerous if shifted or spilled, amplifying the consequence of any further deceleration event; (3) Dispatch status \u2013 running 20 minutes behind schedule introduces time-pressure that can push the driver toward aggressive speed recovery, compounding the wet-road and cargo risks. All three fields independently qualify as genuine risk multipliers under the stated rules.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "medium",
+   "latency_seconds": 68.99037116699037,
+   "content": "Let me work through this step by step.\n\nSTEP 1 - BASELINE SEVERITY:\n- Peak deceleration: 0.3 g\n- ABS engaged: no\n- Traffic pattern: elevated velocity variance (frequent speed cycling)\n\nRules:\n- high if ABS engaged is yes, or peak deceleration above 0.45 g \u2192 ABS is no, 0.3 g is not above 0.45 g. Not high by first rule.\n- Otherwise, if peak deceleration is 0.22 g or below: medium if severe stop-and-go compaction, else low. \u2192 0.3 g is NOT 0.22 g or below. Skip this.\n- Otherwise (above 0.22 g, up to 0.45 g): high if severe stop-and-go compaction, else medium. \u2192 0.3 g is above 0.22 g and up to 0.45 g. Traffic pattern is \"elevated velocity variance (frequent speed cycling)\" which is NOT \"severe stop-and-go compaction.\" So baseline = medium.\n\nBaseline severity: medium\n\nSTEP 2 - ESCALATION:\n- Weather: Clear skies, dry pavement \u2192 NOT a risk factor (clear/dry conditions)\n- Cargo: Dry goods / General freight \u2192 NOT a risk factor (dry, general freight)\n- Dispatch status: On schedule \u2192 NOT a risk factor (on schedule is not behind schedule under pressure)\n\nNow, the decision:\n- raise: at least one field is a genuine risk multiplier \u2192 None are.\n- lower: none of the fields are risk multipliers, AND at least one positively indicates safe, controlled conditions. \u2192 None are risk multipliers. Does at least one positively indicate safe, controlled conditions? Clear skies and dry pavement positively indicate safe conditions. On schedule indicates no pressure. So yes, at least one positively indicates safe, controlled conditions.\n- hold: mixed or none clearly point either way.\n\nSince none are risk multipliers and clear/dry weather positively indicates safe conditions, this is \"lower.\"\n\nEscalation: lower\n\nSTEP 3 - FINAL SEVERITY AND ACTION:\n- Baseline: medium\n- Escalation: lower \u2192 move one level down \u2192 low\n- Severity: low\n- Recommended action for lower: \"Log and continue; no immediate action needed.\"\n\nLet me verify all five agree:\n- baseline_severity: medium\n- risk_synthesis: Weather (clear skies, dry pavement) and cargo (dry goods/general freight) are not risk multipliers; dispatch status (on schedule) is not a risk factor. Clear/dry conditions positively indicate safe, controlled driving environment.\n- escalation: lower\n- severity: low\n- recommended_action: \"Log and continue; no immediate action needed.\"\n\nAll consistent. Let me format the response.\n</think>\n\n{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Peak deceleration of 0.3 g falls in the 0.22\u20130.45 g band with no ABS engagement, and the traffic pattern is elevated velocity variance rather than severe stop-and-go compaction, yielding a medium baseline. For escalation: weather (clear skies, dry pavement) does not degrade traction or visibility and is not a risk multiplier; cargo (dry goods / general freight) is not hazardous, liquid, or dangerous if shifted and is not a risk multiplier; dispatch status (on schedule) carries no pressure-driven risk. No field qualifies as a genuine risk multiplier, and the clear, dry pavement condition positively indicates a safe, controlled driving environment, satisfying the 'lower' criterion.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 823,
+   "tokens_evaluated": 615,
+   "think_tokens": 608,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Peak deceleration of 0.3 g falls in the 0.22\u20130.45 g band with no ABS engagement, and the traffic pattern is elevated velocity variance rather than severe stop-and-go compaction, yielding a medium baseline. For escalation: weather (clear skies, dry pavement) does not degrade traction or visibility and is not a risk multiplier; cargo (dry goods / general freight) is not hazardous, liquid, or dangerous if shifted and is not a risk multiplier; dispatch status (on schedule) carries no pressure-driven risk. No field qualifies as a genuine risk multiplier, and the clear, dry pavement condition positively indicates a safe, controlled driving environment, satisfying the 'lower' criterion.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "medium",
+   "latency_seconds": 69.78439912501199,
+   "content": "Let me work through this step by step.\n\nSTEP 1 - BASELINE SEVERITY:\n- Peak deceleration: 0.3 g\n- ABS engaged: no\n- Traffic pattern: elevated velocity variance (frequent speed cycling)\n\nRules:\n- high if ABS engaged is yes, or peak deceleration above 0.45 g \u2192 ABS is no, 0.3 g is not above 0.45 g. Not high by this rule.\n- Otherwise, if peak deceleration is 0.22 g or below: medium if severe stop-and-go compaction, else low. \u2192 0.3 g is NOT 0.22 g or below. Skip.\n- Otherwise (above 0.22 g, up to 0.45 g): high if severe stop-and-go compaction, else medium. \u2192 0.3 g is above 0.22 g and up to 0.45 g. Traffic pattern is \"elevated velocity variance (frequent speed cycling)\" which is NOT \"severe stop-and-go compaction.\" So baseline = medium.\n\nBaseline severity: medium\n\nSTEP 2 - ESCALATION:\n- Weather: Clear conditions, light traffic \u2192 NOT a risk factor (clear/dry conditions)\n- Cargo: Empty trailer, non-hazardous \u2192 NOT a risk factor (empty, dry, general freight)\n- Dispatch status: Ahead of schedule; driver executed a documented defensive maneuver for a merging vehicle \u2192 This is evidence the driver is in control. Being ahead of schedule is NOT a risk factor. A documented defensive maneuver is a reason to hold or lower, never raise.\n\nDecision: None of the fields are risk multipliers. At least one positively indicates safe, controlled conditions (the documented defensive maneuver shows the driver is in control; clear weather; empty trailer). This points to \"lower.\"\n\nEscalation: lower\n\nSTEP 3 - FINAL SEVERITY AND ACTION:\n- Baseline: medium\n- Escalation: lower \u2192 move one level down\n- medium \u2192 low\n- Severity: low\n- Recommended action for lower: \"Log and continue; no immediate action needed.\"\n\nLet me verify all five agree:\n- baseline_severity: medium\n- risk_synthesis: The specific fields that drove the escalation are the dispatch status (documented defensive maneuver for a merging vehicle, ahead of schedule) which positively indicates safe, controlled conditions, combined with clear weather and empty non-hazardous cargo (neither being risk multipliers). None of the fields are risk multipliers, and the dispatch status positively indicates the driver is in control.\n- escalation: lower\n- severity: low\n- recommended_action: \"Log and continue; no immediate action needed.\"\n\nAll consistent. Let me format the response properly.\n</think>\n\n{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Peak deceleration of 0.3 g falls in the 0.22\u20130.45 g band and the traffic pattern is elevated velocity variance (frequent speed cycling), not severe stop-and-go compaction, yielding a medium baseline. For escalation, no field qualifies as a risk multiplier: weather is clear with light traffic (no traction or visibility degradation), cargo is an empty non-hazardous trailer (no spill or shift hazard), and the dispatch status records the driver ahead of schedule having executed a documented defensive maneuver for a merging vehicle\u2014evidence of a controlled, in-command response rather than pressure or loss of control. The documented defensive maneuver is the specific field that positively indicates safe, controlled conditions, and with no genuine risk multiplier present, the context supports a one-level reduction.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 823,
+   "tokens_evaluated": 629,
+   "think_tokens": 591,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Peak deceleration of 0.3 g falls in the 0.22\u20130.45 g band and the traffic pattern is elevated velocity variance (frequent speed cycling), not severe stop-and-go compaction, yielding a medium baseline. For escalation, no field qualifies as a risk multiplier: weather is clear with light traffic (no traction or visibility degradation), cargo is an empty non-hazardous trailer (no spill or shift hazard), and the dispatch status records the driver ahead of schedule having executed a documented defensive maneuver for a merging vehicle\u2014evidence of a controlled, in-command response rather than pressure or loss of control. The documented defensive maneuver is the specific field that positively indicates safe, controlled conditions, and with no genuine risk multiplier present, the context supports a one-level reduction.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-volatile",
+   "latency_seconds": 57.14781170799688,
+   "content": "Let me work through this step by step.\n\nSTEP 1 - BASELINE SEVERITY:\n- Peak deceleration: 0.3 g\n- ABS engaged: no\n- Traffic pattern: severe stop-and-go compaction (repeated hard braking)\n\nRules:\n- high if ABS engaged is yes, OR peak deceleration > 0.45 g \u2192 ABS is no, 0.3 g is not > 0.45 g. So NOT high by first rule.\n- Otherwise, if peak deceleration is 0.22 g or below: medium if severe stop-and-go, else low. \u2192 0.3 g is NOT \u2264 0.22 g. So this rule doesn't apply.\n- Otherwise (above 0.22 g, up to 0.45 g): high if severe stop-and-go compaction, else medium. \u2192 0.3 g is above 0.22 g and up to 0.45 g. Traffic pattern IS severe stop-and-go compaction. So baseline = HIGH.\n\nBaseline severity: HIGH\n\nSTEP 2 - ESCALATION:\n- Weather: Heavy rain, wet asphalt \u2192 degrades traction. This IS a risk multiplier.\n- Cargo: Liquids / Chemical Tanker \u2192 hazardous, liquid, dangerous if spilled or shifted. This IS a risk multiplier.\n- Dispatch status: Running 20 minutes behind schedule \u2192 Being behind schedule under pressure IS a genuine risk factor.\n\nAll three fields are genuine risk multipliers. This clearly points to \"raise.\"\n\nEscalation: raise\n\nSTEP 3 - FINAL SEVERITY AND ACTION:\n- Baseline: HIGH\n- Escalation: raise (move one level up)\n- But HIGH is the limit. So severity stays HIGH.\n- Recommended action for raise: \"Escalate for driver/dispatcher review.\"\n\nLet me format the response properly. The user wants:\n- baseline_severity\n- risk_synthesis (naming specific fields)\n- escalation\n- severity\n- recommended_action\n\nNo markdown code boxes, no introductory prose.\n</think>\n\n{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Peak deceleration of 0.3 g falls in the 0.22\u20130.45 g band and the traffic pattern is severe stop-and-go compaction, which by the baseline rules yields high. For escalation, three fields independently qualify as genuine risk multipliers: (1) Weather \u2013 heavy rain on wet asphalt degrades traction and visibility; (2) Cargo \u2013 a liquids/chemical tanker is hazardous and dangerous if spilled or shifted, making any hard-braking event a spill risk; (3) Dispatch status \u2013 running 20 minutes behind schedule places the driver under time pressure, a genuine risk factor that can encourage aggressive speed recovery. All three point in the same direction (raise); none indicate safe or controlled conditions.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 671,
+   "tokens_evaluated": 624,
+   "think_tokens": 449,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Peak deceleration of 0.3 g falls in the 0.22\u20130.45 g band and the traffic pattern is severe stop-and-go compaction, which by the baseline rules yields high. For escalation, three fields independently qualify as genuine risk multipliers: (1) Weather \u2013 heavy rain on wet asphalt degrades traction and visibility; (2) Cargo \u2013 a liquids/chemical tanker is hazardous and dangerous if spilled or shifted, making any hard-braking event a spill risk; (3) Dispatch status \u2013 running 20 minutes behind schedule places the driver under time pressure, a genuine risk factor that can encourage aggressive speed recovery. All three point in the same direction (raise); none indicate safe or controlled conditions.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-volatile",
+   "latency_seconds": 67.40555991699512,
+   "content": "Let me work through this step by step.\n\nSTEP 1 - BASELINE SEVERITY:\n- Peak deceleration: 0.3 g\n- ABS engaged: no\n- Traffic pattern: severe stop-and-go compaction (repeated hard braking)\n\nRules:\n- high if ABS engaged is yes, or peak deceleration > 0.45 g \u2192 ABS is no, 0.3 g is not > 0.45 g. Not high by this rule.\n- Otherwise, if peak deceleration is 0.22 g or below: medium if severe stop-and-go, else low. \u2192 0.3 g is NOT 0.22 g or below. Skip.\n- Otherwise (above 0.22 g, up to 0.45 g): high if severe stop-and-go compaction, else medium. \u2192 0.3 g is above 0.22 g and up to 0.45 g. Traffic pattern IS severe stop-and-go compaction. \u2192 HIGH.\n\nBaseline severity: HIGH\n\nSTEP 2 - ESCALATION:\n- Weather: Clear skies, dry pavement \u2192 NOT a risk factor (clear/dry conditions)\n- Cargo: Dry goods / General freight \u2192 NOT a risk factor (dry, general freight)\n- Dispatch status: On schedule \u2192 NOT a risk factor (on schedule is not behind schedule under pressure)\n\nNow, the decision:\n- raise: at least one field is a genuine risk multiplier \u2192 None are.\n- lower: none of the fields are risk multipliers, AND at least one positively indicates safe, controlled conditions. \u2192 None are risk multipliers. Does at least one positively indicate safe, controlled conditions? Clear skies and dry pavement positively indicate safe conditions (good traction, good visibility). On schedule means no pressure. So yes, at least one positively indicates safe, controlled conditions.\n- hold: mixed or none clearly point either way.\n\nSince none are risk multipliers and clear/dry weather positively indicates safe conditions, this is LOWER.\n\nEscalation: lower\n\nSTEP 3 - FINAL SEVERITY AND ACTION:\n- Baseline: HIGH\n- Escalation: lower \u2192 move one level down \u2192 MEDIUM\n- Recommended action for lower: \"Log and continue; no immediate action needed.\"\n\nLet me verify all five agree:\n- baseline_severity: high\n- risk_synthesis: Weather (clear skies, dry pavement) and cargo (dry goods/general freight) are not risk multipliers; dispatch status (on schedule) is not a risk factor. Clear/dry conditions positively indicate safe, controlled driving environment.\n- escalation: lower\n- severity: medium\n- recommended_action: \"Log and continue; no immediate action needed.\"\n\nAll consistent. Let me format the response.\n</think>\n\n{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Peak deceleration of 0.3 g falls in the 0.22\u20130.45 g band and the traffic pattern is severe stop-and-go compaction, which by the rules yields a high baseline. For escalation: weather (clear skies, dry pavement) is not a risk multiplier and positively indicates safe traction and visibility; cargo (dry goods / general freight) is not a risk multiplier; dispatch status (on schedule) is not a risk factor and does not indicate pressure. No field is a genuine risk multiplier, and the clear/dry weather condition positively indicates safe, controlled operating conditions, satisfying the 'lower' criterion.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 792,
+   "tokens_evaluated": 618,
+   "think_tokens": 591,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Peak deceleration of 0.3 g falls in the 0.22\u20130.45 g band and the traffic pattern is severe stop-and-go compaction, which by the rules yields a high baseline. For escalation: weather (clear skies, dry pavement) is not a risk multiplier and positively indicates safe traction and visibility; cargo (dry goods / general freight) is not a risk multiplier; dispatch status (on schedule) is not a risk factor and does not indicate pressure. No field is a genuine risk multiplier, and the clear/dry weather condition positively indicates safe, controlled operating conditions, satisfying the 'lower' criterion.",
+    "escalation": "lower",
+    "severity": "medium",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-volatile",
+   "latency_seconds": 60.82952708400262,
+   "content": "Let me work through this step by step.\n\nSTEP 1 - BASELINE SEVERITY:\n- Peak deceleration: 0.3 g\n- ABS engaged: no\n- Traffic pattern: severe stop-and-go compaction (repeated hard braking)\n\nRules:\n- high if ABS engaged is yes, OR peak deceleration is above 0.45 g. \u2192 ABS is no, 0.3 g is not above 0.45 g. So NOT high by this rule.\n- Otherwise, if peak deceleration is 0.22 g or below: medium if severe stop-and-go, else low. \u2192 0.3 g is NOT 0.22 g or below. So this rule doesn't apply.\n- Otherwise (above 0.22 g, up to 0.45 g): high if severe stop-and-go compaction, else medium. \u2192 0.3 g is above 0.22 g and up to 0.45 g. Traffic pattern IS severe stop-and-go compaction. So baseline = HIGH.\n\nBaseline severity: HIGH\n\nSTEP 2 - ESCALATION:\n- Weather: Clear conditions, light traffic \u2192 NOT a risk factor (clear/dry conditions are not a risk factor)\n- Cargo: Empty trailer, non-hazardous \u2192 NOT a risk factor (empty, dry, or general freight is NOT a risk factor)\n- Dispatch status: Ahead of schedule; driver executed a documented defensive maneuver for a merging vehicle \u2192 This is evidence the driver is in control. Being ahead of schedule is NOT a risk factor. A documented defensive maneuver is a reason to hold or lower, never a reason to raise.\n\nSo:\n- No field is a genuine risk multiplier.\n- At least one positively indicates safe, controlled conditions (the documented defensive maneuver, clear weather, ahead of schedule).\n\nDecision: LOWER (none of the fields are risk multipliers, and at least one positively indicates safe, controlled conditions).\n\nSTEP 3 - FINAL SEVERITY AND ACTION:\n- Baseline: HIGH\n- Escalation: lower \u2192 move one level down\n- HIGH \u2192 MEDIUM\n- Recommended action for lower: \"Log and continue; no immediate action needed.\"\n\nNow let me format the response properly. The user wants:\n- baseline_severity\n- risk_synthesis (naming specific fields that drove escalation and why)\n- escalation\n- severity\n- recommended_action\n\nNo markdown code boxes, no introductory prose.\n</think>\n\n{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"No operational field acts as a risk multiplier. Weather is clear with light traffic, which does not degrade traction or visibility. Cargo is an empty, non-hazardous trailer, which carries no spill or shift risk. Dispatch status shows the driver ahead of schedule and having executed a documented defensive maneuver for a merging vehicle, which is positive evidence of a controlled, in-command operator. The documented defensive maneuver and clear conditions together indicate safe, controlled operation with no aggravating factor present.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 694,
+   "tokens_evaluated": 632,
+   "think_tokens": 529,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "No operational field acts as a risk multiplier. Weather is clear with light traffic, which does not degrade traction or visibility. Cargo is an empty, non-hazardous trailer, which carries no spill or shift risk. Dispatch status shows the driver ahead of schedule and having executed a documented defensive maneuver for a merging vehicle, which is positive evidence of a controlled, in-command operator. The documented defensive maneuver and clear conditions together indicate safe, controlled operation with no aggravating factor present.",
+    "escalation": "lower",
+    "severity": "medium",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-decel",
+   "latency_seconds": 49.954898083989974,
+   "content": "Let me work through this step by step.\n\nSTEP 1 - BASELINE SEVERITY:\n\nVehicle physics:\n- Peak deceleration: 0.5 g\n- ABS engaged: no\n- Traffic pattern: elevated velocity variance (frequent speed cycling)\n\nRules:\n- high if ABS engaged is yes, OR peak deceleration is above 0.45 g.\n- 0.5 g > 0.45 g \u2192 HIGH\n\nBaseline severity: HIGH\n\nSTEP 2 - ESCALATION:\n\nOperational context:\n- Weather: Heavy rain, wet asphalt \u2192 degrades traction. This IS a risk multiplier.\n- Cargo: Liquids / Chemical Tanker \u2192 hazardous, liquid, dangerous if spilled or shifted. This IS a risk multiplier.\n- Dispatch status: Running 20 minutes behind schedule \u2192 being behind schedule under pressure IS a genuine risk factor.\n\nAll three fields are genuine risk multipliers. This clearly points to \"raise.\"\n\nDecision: raise\n\nSTEP 3 - FINAL SEVERITY AND ACTION:\n\n- Baseline: HIGH\n- Escalation: raise \u2192 move one level up\n- But HIGH is the limit. So severity stays HIGH.\n- Recommended action for raise: \"Escalate for driver/dispatcher review.\"\n\nLet me format the response properly. The user wants:\n1. baseline_severity\n2. risk_synthesis (naming specific fields)\n3. escalation\n4. severity\n5. recommended_action\n\nNo markdown code boxes, no introductory prose.\n</think>\n\n{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Peak deceleration of 0.5 g exceeds the 0.45 g threshold, placing the event at high severity on physics alone. Escalation is driven by three concurrent risk multipliers: (1) Weather \u2014 heavy rain on wet asphalt directly degrades traction, compounding the already-elevated deceleration demand; (2) Cargo \u2014 a liquids/chemical tanker is hazardous and dangerous if spilled or shifted under hard braking, making the 0.5 g event materially more consequential than the same deceleration in a dry general-freight box; (3) Dispatch status \u2014 running 20 minutes behind schedule introduces time-pressure that can push a driver toward aggressive recovery maneuvers, reducing margin for safe response. All three fields independently qualify as genuine risk multipliers under the weighting rules, and together they form a convergent escalation case.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 569,
+   "tokens_evaluated": 621,
+   "think_tokens": 324,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Peak deceleration of 0.5 g exceeds the 0.45 g threshold, placing the event at high severity on physics alone. Escalation is driven by three concurrent risk multipliers: (1) Weather \u2014 heavy rain on wet asphalt directly degrades traction, compounding the already-elevated deceleration demand; (2) Cargo \u2014 a liquids/chemical tanker is hazardous and dangerous if spilled or shifted under hard braking, making the 0.5 g event materially more consequential than the same deceleration in a dry general-freight box; (3) Dispatch status \u2014 running 20 minutes behind schedule introduces time-pressure that can push a driver toward aggressive recovery maneuvers, reducing margin for safe response. All three fields independently qualify as genuine risk multipliers under the weighting rules, and together they form a convergent escalation case.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-decel",
+   "latency_seconds": 62.01569749999908,
+   "content": "Let me work through this step by step.\n\nSTEP 1 - BASELINE SEVERITY:\n\nVehicle physics:\n- Peak deceleration: 0.5 g\n- ABS engaged: no\n- Traffic pattern: elevated velocity variance (frequent speed cycling)\n\nRules:\n- high if ABS engaged is yes, OR peak deceleration is above 0.45 g.\n- 0.5 g > 0.45 g \u2192 HIGH\n\nBaseline severity: HIGH\n\nSTEP 2 - ESCALATION:\n\nOperational context:\n- Weather: Clear skies, dry pavement \u2192 NOT a risk factor (clear/dry conditions)\n- Cargo: Dry goods / General freight \u2192 NOT a risk factor (dry, general freight)\n- Dispatch status: On schedule \u2192 NOT a risk factor (on schedule is not a risk; only behind schedule under pressure is)\n\nNow, the decision:\n- raise: at least one field is a genuine risk multiplier \u2192 No fields are risk multipliers.\n- lower: none of the fields are risk multipliers, AND at least one positively indicates safe, controlled conditions.\n  - None are risk multipliers: YES\n  - At least one positively indicates safe, controlled conditions: Clear skies/dry pavement positively indicates safe conditions. On schedule also indicates no pressure. So YES.\n- hold: mixed or none clearly point either way.\n\nSo the decision is: LOWER\n\nWait, let me reconsider. The baseline is HIGH. Can we lower from HIGH? The rules say \"low and high are the limits\" for the final severity. So lowering from HIGH would go to MEDIUM.\n\nActually, let me re-read: \"severity: the baseline moved one level up for raise and one level down for lower (low and high are the limits), unchanged for hold.\"\n\nSo HIGH \u2192 lower \u2192 MEDIUM. That's valid since MEDIUM is not a limit.\n\nSTEP 3 - FINAL SEVERITY AND ACTION:\n- Baseline: HIGH\n- Escalation: lower\n- Final severity: MEDIUM (one level down from HIGH)\n- Recommended action for lower: \"Log and continue; no immediate action needed.\"\n\nNow let me format the response properly. The user wants:\n1. baseline_severity\n2. risk_synthesis (naming specific fields that drove escalation and why)\n3. escalation\n4. severity\n5. recommended_action\n\nNo markdown code boxes, no introductory prose. Let me write it in a clean format.\n</think>\n\n{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Peak deceleration of 0.5 g exceeds the 0.45 g threshold, triggering the high baseline regardless of ABS status or traffic pattern. For escalation, no operational field acts as a genuine risk multiplier: weather is clear skies with dry pavement (no traction or visibility degradation), cargo is dry goods / general freight (not hazardous, liquid, or spill-risk), and dispatch status is on schedule (no pressure-driven risk). Clear dry pavement and on-schedule status positively indicate safe, controlled operating conditions with no compounding hazard.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 702,
+   "tokens_evaluated": 615,
+   "think_tokens": 523,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Peak deceleration of 0.5 g exceeds the 0.45 g threshold, triggering the high baseline regardless of ABS status or traffic pattern. For escalation, no operational field acts as a genuine risk multiplier: weather is clear skies with dry pavement (no traction or visibility degradation), cargo is dry goods / general freight (not hazardous, liquid, or spill-risk), and dispatch status is on schedule (no pressure-driven risk). Clear dry pavement and on-schedule status positively indicate safe, controlled operating conditions with no compounding hazard.",
+    "escalation": "lower",
+    "severity": "medium",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-decel",
+   "latency_seconds": 58.98981712499517,
+   "content": "Let me work through this step by step.\n\nSTEP 1 - BASELINE SEVERITY:\n- Peak deceleration: 0.5 g\n- ABS engaged: no\n- Traffic pattern: elevated velocity variance (frequent speed cycling)\n\nRules:\n- high if ABS engaged is yes, OR peak deceleration is above 0.45 g.\n- 0.5 g > 0.45 g \u2192 HIGH\n\nBaseline severity: HIGH\n\nSTEP 2 - ESCALATION:\n- Weather: Clear conditions, light traffic \u2192 NOT a risk factor (clear/dry conditions)\n- Cargo: Empty trailer, non-hazardous \u2192 NOT a risk factor (empty, dry, general freight)\n- Dispatch status: Ahead of schedule; driver executed a documented defensive maneuver for a merging vehicle \u2192 This is evidence the driver is in control. Being ahead of schedule is NOT a risk factor. A documented defensive maneuver is a reason to hold or lower, never a reason to raise.\n\nSo:\n- No field is a genuine risk multiplier.\n- At least one positively indicates safe, controlled conditions (the documented defensive maneuver, clear weather, ahead of schedule).\n\nDecision: LOWER (none of the fields are risk multipliers, and at least one positively indicates safe, controlled conditions)\n\nSTEP 3 - FINAL SEVERITY AND ACTION:\n- Baseline: HIGH\n- Escalation: LOWER \u2192 move one level down\n- HIGH \u2192 MEDIUM\n- Recommended action for \"lower\": \"Log and continue; no immediate action needed.\"\n\nLet me verify all five agree:\n- baseline_severity: high\n- risk_synthesis: The specific fields that drove the escalation are the dispatch status (documented defensive maneuver, ahead of schedule) and weather (clear conditions) and cargo (empty, non-hazardous). None are risk multipliers. The documented defensive maneuver positively indicates safe, controlled conditions.\n- escalation: lower\n- severity: medium\n- recommended_action: \"Log and continue; no immediate action needed.\"\n\nAll consistent. Let me format the response.\n</think>\n\n{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Peak deceleration of 0.5 g exceeds the 0.45 g threshold, placing the event at high baseline regardless of ABS status. For escalation, no operational field acts as a genuine risk multiplier: weather is clear with light traffic (no traction or visibility degradation), cargo is an empty non-hazardous trailer (no spill or shift risk), and the dispatch status records the driver ahead of schedule having executed a documented defensive maneuver for a merging vehicle. That documented defensive maneuver is positive evidence of a controlled, in-command driver, and being ahead of schedule carries no pressure risk. With zero risk multipliers present and at least one field (the documented defensive maneuver under clear conditions) positively indicating safe, controlled operation, the context supports a one-level reduction.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 660,
+   "tokens_evaluated": 629,
+   "think_tokens": 436,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Peak deceleration of 0.5 g exceeds the 0.45 g threshold, placing the event at high baseline regardless of ABS status. For escalation, no operational field acts as a genuine risk multiplier: weather is clear with light traffic (no traction or visibility degradation), cargo is an empty non-hazardous trailer (no spill or shift risk), and the dispatch status records the driver ahead of schedule having executed a documented defensive maneuver for a merging vehicle. That documented defensive maneuver is positive evidence of a controlled, in-command driver, and being ahead of schedule carries no pressure risk. With zero risk multipliers present and at least one field (the documented defensive maneuver under clear conditions) positively indicating safe, controlled operation, the context supports a one-level reduction.",
+    "escalation": "lower",
+    "severity": "medium",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-abs",
+   "latency_seconds": 49.676472332997946,
+   "content": "Let me work through this step by step.\n\nSTEP 1 - BASELINE SEVERITY:\n- Peak deceleration: 0.15 g\n- ABS engaged: yes\n- Traffic pattern: elevated velocity variance (frequent speed cycling)\n\nRules:\n- high if ABS engaged is yes, OR peak deceleration is above 0.45 g.\n- ABS engaged is YES \u2192 baseline severity = HIGH\n\nSo baseline_severity = high.\n\nSTEP 2 - ESCALATION:\nOperational context:\n- Weather: Heavy rain, wet asphalt \u2192 degrades traction. This IS a risk multiplier.\n- Cargo: Liquids / Chemical Tanker \u2192 hazardous, liquid, dangerous if spilled or shifted. This IS a risk multiplier.\n- Dispatch status: Running 20 minutes behind schedule \u2192 being behind schedule under pressure IS a genuine risk factor.\n\nAll three fields are genuine risk multipliers. This clearly points to \"raise.\"\n\nDecision: raise (at least one field is a genuine risk multiplier - in fact all three are).\n\nSTEP 3 - FINAL SEVERITY AND ACTION:\n- Baseline: high\n- Escalation: raise \u2192 move one level up\n- But high is the limit. So severity stays at high.\n- recommended_action for raise: \"Escalate for driver/dispatcher review.\"\n\nLet me format the response properly. The user wants:\n- baseline_severity\n- risk_synthesis (naming specific fields)\n- escalation\n- severity\n- recommended_action\n\nNo markdown code boxes, no introductory prose.\n</think>\n\n{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"ABS engagement (yes) triggers the high baseline regardless of the 0.15 g peak deceleration. For escalation, three fields independently qualify as genuine risk multipliers: (1) Weather \u2013 heavy rain on wet asphalt directly degrades traction, increasing the likelihood of a secondary loss-of-control event; (2) Cargo \u2013 a liquids/chemical tanker is hazardous and dangerous if spilled or shifted, amplifying the consequence of any further deceleration or lateral excursion; (3) Dispatch status \u2013 running 20 minutes behind schedule places the driver under time pressure, a documented risk factor that can encourage aggressive re-acceleration or reduced following distance. All three fields point in the same direction (raise); none indicate safe or controlled conditions.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 553,
+   "tokens_evaluated": 622,
+   "think_tokens": 332,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "ABS engagement (yes) triggers the high baseline regardless of the 0.15 g peak deceleration. For escalation, three fields independently qualify as genuine risk multipliers: (1) Weather \u2013 heavy rain on wet asphalt directly degrades traction, increasing the likelihood of a secondary loss-of-control event; (2) Cargo \u2013 a liquids/chemical tanker is hazardous and dangerous if spilled or shifted, amplifying the consequence of any further deceleration or lateral excursion; (3) Dispatch status \u2013 running 20 minutes behind schedule places the driver under time pressure, a documented risk factor that can encourage aggressive re-acceleration or reduced following distance. All three fields point in the same direction (raise); none indicate safe or controlled conditions.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-abs",
+   "latency_seconds": 69.146078167003,
+   "content": "Let me work through this step by step.\n\nSTEP 1 - BASELINE SEVERITY:\n\nVehicle physics:\n- Peak deceleration: 0.15 g\n- ABS engaged: yes\n- Traffic pattern: elevated velocity variance (frequent speed cycling)\n\nRules:\n- high if ABS engaged is yes, OR peak deceleration is above 0.45 g.\n- Otherwise, if peak deceleration is 0.22 g or below: medium if traffic pattern is severe stop-and-go compaction, else low.\n- Otherwise (above 0.22 g, up to 0.45 g): high if traffic pattern is severe stop-and-go compaction, else medium.\n\nABS engaged is YES \u2192 baseline severity = HIGH.\n\nSTEP 2 - ESCALATION:\n\nOperational context:\n- Weather: Clear skies, dry pavement \u2192 NOT a risk factor (clear/dry conditions)\n- Cargo: Dry goods / General freight \u2192 NOT a risk factor (dry, general freight)\n- Dispatch status: On schedule \u2192 NOT a risk factor (on schedule is not a risk; being behind schedule under pressure IS a risk)\n\nNow, the decision:\n- raise: at least one field is a genuine risk multiplier \u2192 No fields qualify.\n- lower: none of the fields are risk multipliers, AND at least one positively indicates safe, controlled conditions.\n- hold: fields are mixed, or none clearly point either way.\n\nNone of the fields are risk multipliers. Do any positively indicate safe, controlled conditions?\n- Weather: Clear skies, dry pavement \u2192 This positively indicates safe conditions (good traction, good visibility).\n- Cargo: Dry goods / General freight \u2192 This is neutral, not really \"positively indicating safe conditions\" in the sense of the driver being in control.\n- Dispatch status: On schedule \u2192 This is neutral (not a risk factor, but also not really \"positively indicating safe, controlled conditions\" in the way a defensive maneuver would).\n\nActually, let me re-read the rules. \"lower: none of the fields are risk multipliers, and at least one positively indicates safe, controlled conditions.\"\n\nClear skies and dry pavement positively indicate safe, controlled conditions (good traction, good visibility). This seems to qualify.\n\nSo escalation = lower.\n\nSTEP 3 - FINAL SEVERITY AND ACTION:\n\nBaseline: HIGH\nEscalation: lower \u2192 move one level down \u2192 MEDIUM\n\nRecommended action for lower: \"Log and continue; no immediate action needed.\"\n\nLet me verify all five agree:\n- baseline_severity: high (ABS engaged = yes)\n- risk_synthesis: Weather (clear skies, dry pavement) positively indicates safe conditions; cargo is general freight (not a risk); dispatch is on schedule (not a risk). No risk multipliers present.\n- escalation: lower\n- severity: medium (high moved one level down)\n- recommended_action: \"Log and continue; no immediate action needed.\"\n\nAll consistent. Let me format the response.\n</think>\n\n{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"ABS engagement (yes) triggers the high baseline regardless of the modest 0.15 g peak deceleration. For escalation, no operational field acts as a risk multiplier: weather is clear skies with dry pavement (no traction or visibility degradation), cargo is dry goods / general freight (not hazardous, liquid, or spill-risk), and dispatch status is on schedule (no pressure-driven risk). Clear skies and dry pavement positively indicate safe, controlled driving conditions, satisfying the 'lower' criterion.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 807,
+   "tokens_evaluated": 616,
+   "think_tokens": 638,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "ABS engagement (yes) triggers the high baseline regardless of the modest 0.15 g peak deceleration. For escalation, no operational field acts as a risk multiplier: weather is clear skies with dry pavement (no traction or visibility degradation), cargo is dry goods / general freight (not hazardous, liquid, or spill-risk), and dispatch status is on schedule (no pressure-driven risk). Clear skies and dry pavement positively indicate safe, controlled driving conditions, satisfying the 'lower' criterion.",
+    "escalation": "lower",
+    "severity": "medium",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-abs",
+   "latency_seconds": 54.85091854199709,
+   "content": "Let me work through this step by step.\n\nSTEP 1 - BASELINE SEVERITY:\n\nVehicle physics:\n- Peak deceleration: 0.15 g\n- ABS engaged: yes\n- Traffic pattern: elevated velocity variance (frequent speed cycling)\n\nRules:\n- high if ABS engaged is yes, OR peak deceleration is above 0.45 g.\n\nABS engaged is YES. So baseline severity = HIGH.\n\nSTEP 2 - ESCALATION:\n\nOperational context:\n- Weather: Clear conditions, light traffic \u2192 NOT a risk factor (clear/dry conditions)\n- Cargo: Empty trailer, non-hazardous \u2192 NOT a risk factor (empty, dry, general freight)\n- Dispatch status: Ahead of schedule; driver executed a documented defensive maneuver for a merging vehicle \u2192 This is evidence the driver is in control. Being ahead of schedule is NOT a risk factor. A documented defensive maneuver is a reason to hold or lower, never a reason to raise.\n\nDecision:\n- raise: at least one field is a genuine risk multiplier \u2192 No fields are risk multipliers.\n- lower: none of the fields are risk multipliers, AND at least one positively indicates safe, controlled conditions \u2192 None are risk multipliers. The dispatch status (documented defensive maneuver, ahead of schedule) positively indicates safe, controlled conditions. Weather is clear. So this qualifies for \"lower.\"\n- hold: mixed or none clearly point either way.\n\nSo escalation = lower.\n\nSTEP 3 - FINAL SEVERITY AND ACTION:\n\nBaseline: HIGH\nEscalation: lower \u2192 move one level down \u2192 MEDIUM\n\nSeverity: MEDIUM\n\nRecommended action for \"lower\": \"Log and continue; no immediate action needed.\"\n\nNow let me format the response properly. The user wants:\n- baseline_severity\n- risk_synthesis (naming specific fields that drove escalation and why)\n- escalation\n- severity\n- recommended_action\n\nNo markdown code boxes, no introductory prose. Let me write it in a clean validated format.\n</think>\n\n{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"ABS engaged (yes) triggers the high baseline regardless of the 0.15 g peak deceleration. For escalation, no operational field acts as a risk multiplier: weather is clear with light traffic (no traction or visibility degradation), cargo is an empty non-hazardous trailer (no spill or shift risk), and the dispatch status records the driver ahead of schedule executing a documented defensive maneuver for a merging vehicle, which positively indicates the driver is in control. The documented defensive maneuver and clear-weather/light-traffic conditions together constitute at least one field positively indicating safe, controlled conditions, with no field pointing toward added risk.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 626,
+   "tokens_evaluated": 630,
+   "think_tokens": 430,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "ABS engaged (yes) triggers the high baseline regardless of the 0.15 g peak deceleration. For escalation, no operational field acts as a risk multiplier: weather is clear with light traffic (no traction or visibility degradation), cargo is an empty non-hazardous trailer (no spill or shift risk), and the dispatch status records the driver ahead of schedule executing a documented defensive maneuver for a merging vehicle, which positively indicates the driver is in control. The documented defensive maneuver and clear-weather/light-traffic conditions together constitute at least one field positively indicating safe, controlled conditions, with no field pointing toward added risk.",
+    "escalation": "lower",
+    "severity": "medium",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  }
+ ]
+}

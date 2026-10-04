@@ -5,7 +5,7 @@ Step-by-step instructions for re-running every test in `docs/TALK2-HARDWARE-SPEC
 - This file covers *how to run it*.
 - Pinned versions are below; model files are pinned in `MODELS.lock.tsv`.
 
-The original runs were 2026-10-03/04, and their outputs are in `eval-results/phone-proxies/`. Compare a re-run against those, with the scripts in §8.
+The original runs were 2026-10-03/04, and their outputs are in `eval-results/phone-proxies/`. Compare a re-run against those, with the scripts in §9.
 
 ## 1. Pinned environment
 
@@ -158,7 +158,46 @@ deploy/aws-phone-proxies/scripts/bench_workload_m4max.sh "$PWD" "$PWD/eval-resul
 - Its last window is the five-model session diagnostic.
 - Copy `/tmp/m4max-powermetrics.txt` into the run directory afterwards.
 
-## 8. Collecting, checking and analysing
+## 8. Round 3: the harder task, thinking modes, prompt ablation
+
+What and why: the log's §5 "Round 3". The harness files (`tests/model/round3_eval.py`, `test_round3_tasks.py`, `round3_ablation.py`, `test_round3_ablation.py`, and the `--round3-*` options in `conftest.py`) are newer than the harness commit in §1. Use the commit that added them.
+
+**Check the scorers first** (pure tests, no model): `uv run pytest tests/model/test_round3_scoring.py tests/model/test_round3_ablation_scoring.py` (14 tests).
+
+**On a Mac proxy.** The 12-14B models come from test I's `~/phoneproxy/models-phase2/`, so run I first or download them there. `bench_round3.sh` and `bench_budget.sh` fetch Qwen3.5-9B themselves.
+1. Copy the repo source to the Mac as for test C (§5, step 1), or refresh `tests/model/` in an existing copy by copy-then-rename.
+2. Push the runners the same way: `scp scripts/bench_round3.sh ec2-user@<ip>:phoneproxy/.bench_round3.sh.new`, then `mv` it over `bench_round3.sh` (likewise `bench_budget.sh`).
+3. Start round 3 detached (n = 2 per cell; ~4.5 h on M1, ~3 h on M4):
+   ```bash
+   ssh ... 'B=~/phoneproxy; ( trap "" HUP; exec $B/bench_round3.sh $B $HOME/fleet-trilogy 2 ) > $B/round3.nohup 2>&1 < /dev/null &'
+   ```
+4. Then budget forcing (Qwen models, chat-budget at 1,024 thinking tokens):
+   ```bash
+   ssh ... 'B=~/phoneproxy; ( trap "" HUP; exec $B/bench_budget.sh $B $HOME/fleet-trilogy 2 1024 ) > $B/budget.nohup 2>&1 < /dev/null &'
+   ```
+5. Pull `~/fleet-trilogy/eval-results/` into `eval-results/phone-proxies/<key>/C-artifacts/` (as for C) and `proxyctl.sh collect <key>`.
+
+The original skipped round 3's two Qwen3.5-9B chat-on sessions on both hosts (`scripts/oneoff/skip_qwen35_chaton.sh`, run alongside). Without it they run, and are expected to hit the think budget.
+
+**On the MacBook (or another Mac).** Models go under `~/tools/models/<repo-dir>/<file>` (§7); `scripts/oneoff/round3_local.sh` shows the four extra downloads. Then:
+```bash
+sudo powermetrics --samplers cpu_power,gpu_power,thermal -i 500 -o /tmp/m4max-powermetrics-4.txt   # separate terminal
+export GATE_PM=/tmp/m4max-powermetrics-4.txt LLAMA_ARG_CTX_SIZE=8192
+R="$PWD/eval-results/phone-proxies/m4max-macbook"
+deploy/aws-phone-proxies/scripts/bench_round3_m4max.sh "$PWD" "$R/$(date -u +%Y%m%dT%H%M%SZ)-round3" 2
+deploy/aws-phone-proxies/scripts/bench_ablation_m4max.sh "$PWD" "$R/$(date -u +%Y%m%dT%H%M%SZ)-ablation" 2
+deploy/aws-phone-proxies/scripts/bench_budget_m4max.sh "$PWD" "$R/$(date -u +%Y%m%dT%H%M%SZ)-round3-budget" 2 1024
+```
+- **Context size.** The original M4 Max round 3 (`20261004T153710Z-round3`) ran without `LLAMA_ARG_CTX_SIZE`, so `llama-server` sized each KV cache to the model's training context and the 64 GB machine swapped (log, incident 23). Every later M4 Max run set 8192, as above. Omit it only to reproduce that run's conditions.
+- **The thermal gate.** Each script waits for 60 s of Nominal pressure in `GATE_PM` before every session. The trace must include the `thermal` sampler.
+- **The context-size check:** `bench_workload_m4max.sh "$PWD" "$R/<ts>-ctx8192-check" '^edge_triage_(phi-3.5-mini-instruct-q4km|llama-3.1-8b-instruct-q4km)_r[0-9]+$' "1 2 3"` with the same exports.
+- **The 4,096-token think-budget re-run** is `scripts/oneoff/thinkbudget_after_ablation.sh` (drop its wait loop, set `LLAMA_ARG_CTX_SIZE=8192`).
+- **Exact order and hand-offs:** `scripts/oneoff/m4max_chain_after_thinkbudget.sh` and the oneoff README.
+- Copy the powermetrics trace into each run directory afterwards (the scripts read it, they don't own it).
+
+**Tabulate:** `python3 scripts/round3_report.py [--trace /tmp/m4max-powermetrics-4.txt] <run-dir>…` (round 3, budget, thinkbudget and ablation dirs, any platforms). Host runs use their own `powermetrics.txt`.
+
+## 9. Collecting, checking and analysing
 
 - **Collect:** `scripts/proxyctl.sh collect <key>` for each host, plus the `C-artifacts/` and `L7-artifacts/` pulls above.
 - **Check:**
@@ -168,7 +207,7 @@ deploy/aws-phone-proxies/scripts/bench_workload_m4max.sh "$PWD" "$PWD/eval-resul
 - **Tabulate:** `python3 scripts/summarize.py ../../eval-results/phone-proxies/<key> [<run>]` gives per-run tables. On macOS it also gives energy per token above idle, with powermetrics alignment as in the log's §4.
 - **Cross-platform:** `python3 scripts/prelim_report.py` (written against the original run IDs; edit them at its top for a re-run).
 
-## 9. Teardown
+## 10. Teardown
 
 - Collect everything first. Eval artifacts live only in each host's `~/fleet-trilogy/eval-results/` until pulled.
 - `terraform destroy` removes all but Mac hosts allocated less than 24 h ago. `terraform output mac_hosts_earliest_release` gives that time; destroy again after it.

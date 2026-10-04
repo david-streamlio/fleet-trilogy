@@ -2,7 +2,7 @@
 
 **The question:** can phones democratize edge intelligence? Measure the same models across the consumer computing spectrum (Pi → phones → laptops), 5 years on from the Pi 4 baseline.
 
-This is the index of every test: done, running, proposed, deferred and rejected. Results live in `eval-results/`. Measured rows go into `TALK2-DATA-ENGINEERING-IMPACT-TRACK.md`. Last updated 2026-10-03 (evening).
+This is the index of every test: done, running, proposed, deferred and rejected. Results live in `eval-results/`. Measured rows go into `TALK2-DATA-ENGINEERING-IMPACT-TRACK.md`. Last updated 2026-10-04 19:45 UTC.
 
 ## Done
 
@@ -38,6 +38,14 @@ Caveat: the published runtime and measurement method aren't verified to match ou
 - **M4 Max gated-reverse:** thermal-gated, reverse order.
 - **iphone-flagship full suite** (mac-m4.metal, us-west-2b, ≥ $29.52, releasable 2026-10-05 04:29 UTC).
 - Android proxies destroyed 04:26 UTC after collection.
+
+**Round 3 (2026-10-04): a harder task, and thinking on vs off. Running.** Details, run IDs and first results: test log §5 "Round 3". Tabulate with `scripts/round3_report.py`.
+- **Task:** undo the Pi-era narrowing. The LLM classifies the baseline severity, decides the escalation, and derives the final severity and action, scored exactly against the deterministic code. The production (narrow) task runs alongside as the baseline.
+- **Modes:** raw (production), Qwen chat format with thinking off, on (2,048-token budget), and budget-forced (1,024).
+- **Done:** M4 Max, 10 models, 15:37-19:00 UTC. Accuracy valid; latency and energy wait on the context-size check (test log incident 23).
+- **Running:** mac2 and the mac-m4, 26 of 28 sessions at 19:30 (Qwen3.5-9B chat-on skipped by user decision); the M4 Max 4,096-token think-budget re-run.
+- **Queued:** M4 Max context-size check → prompt ablation (4 models × 7 variants) → budget forcing; mac-m4 budget forcing after its round 3.
+- **First finding:** the narrowing was justified (raw full task ≤ 58% end to end; the small models 11-22%). The chat format lifts Qwen3-14B and Qwen3.5-9B to 72%; thinking adds little for 4-11× the latency; Qwen3.5-9B's thinking runs away.
 
 **Phase 1 full suite on the Linux proxies:** 17 models, 3 reps, a thread sweep, and STREAM bandwidth at each thread count. Each is collected automatically when it finishes.
 All three finished 2026-10-03 and are collected.
@@ -82,17 +90,17 @@ Partial results (generation tok/s at full threads; c9g/c7g at t=8):
 
 **Reproducibility package (2026-10-04):**
 - `deploy/aws-phone-proxies/REPRODUCE.md`: runbook with every pinned version.
-- `MODELS.lock.tsv`: 104 model files with revision and SHA-256.
+- `MODELS.lock.tsv`: 105 model files with revision and SHA-256 (104 + round 3's Qwen3.5-9B).
 - `docs/TALK2-HARDWARE-SPECTRUM-TEST-LOG.md`: the lab notebook (methods, run IDs, incidents, caveats).
 - **Prepared for publishing:** mac2 host identifiers redacted (and no longer recorded); power traces committed as `.txt.gz`.
 
 ## Awaiting a decision
 
-- **mac-m4 Phase 1.** Allocating the host costs ≥ $29.52 for 24 h. Decision deferred until mac2 finished (now done).
-  - Against: base M4 has ~120 GB/s, which overshoots every iPhone, while mac2 already matches iPhone 17 Pro generation (table above). The M4 Max laptop is already measured.
-  - For: a newer-generation GPU for prompt processing.
+- ~~**mac-m4 Phase 1.**~~ Decided 2026-10-04: allocated as iphone-flagship; its full suite ran in round 2.
 - **Phase 2 (larger models).** "Decide after Phase 1."
-- **Paper (IEEE-quality, Markdown for now).** The user wants it as a separate artifact from the talk. **Start the outline only after every run has finished** (user, 2026-10-04).
+- **Paper (IEEE-quality, Markdown for now).** A separate artifact from the talk. **Outline started 2026-10-04: `docs/TALK2-PAPER-OUTLINE.md`** (research questions, methods, figure/table → data plan, threats to validity, open items).
+- **Files from other Claude sessions** (Talk 1 slide plan, images and slides, the Talk 2 deck-build prompt; the misconceptions and Talk 3 docs are referenced but not on disk): commit, keep local, move or delete? See `docs/TODO-OTHER-SESSION-FILES.md` (2026-10-04).
+- ~~**Round 3 (harder LLM task on newer hardware).**~~ Decided 2026-10-04: items 1 (undo the narrowing) and 2 (thinking on/off) built and running (above), plus the prompt ablation and budget forcing. The other proposals (root cause, fleet correlation, uplink gate) stay in the paper outline §VII.
 
 ### mac2 extra-test menu (all nine selected 2026-10-03)
 Estimates are scaled from the 20-minute Phase 1 run.

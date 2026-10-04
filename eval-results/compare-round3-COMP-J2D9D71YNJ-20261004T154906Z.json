@@ -1,0 +1,444 @@
+{
+ "host": "COMP-J2D9D71YNJ",
+ "arch": "arm64",
+ "platform": "macOS-26.7.1-arm64-arm-64bit-Mach-O",
+ "timestamp": "2026-10-04T15:49:06Z",
+ "config": {
+  "task": "narrow",
+  "mode": "raw",
+  "n_per_cell": 2,
+  "gguf": "/Users/david.kjerrumgaard/tools/models/GLM-4-9B-0414-GGUF/GLM-4-9B-0414-Q4_K_M.gguf",
+  "server": "/Users/david.kjerrumgaard/tools/llama.cpp-v0.5.0/build/bin/llama-server",
+  "threads": 12,
+  "temperature": 0.2,
+  "n_predict": 300,
+  "think_budget": 0,
+  "timeout_seconds": 180.0
+ },
+ "summary": {
+  "n": 18,
+  "rates": {
+   "all_ok": 0.8888888888888888,
+   "escalation_ok": 0.8888888888888888,
+   "format_ok": 1.0
+  },
+  "latency_p50_seconds": 0.9357960829947842,
+  "latency_p95_seconds": 1.740600875011296,
+  "tokens_predicted_mean": 56.94444444444444,
+  "think_tokens_mean": 0.0,
+  "truncated": 0,
+  "errors": 0,
+  "by_scenario": {
+   "escalate-worthy": {
+    "n": 6,
+    "escalations": {
+     "raise": 6
+    },
+    "all_ok": 6
+   },
+   "benign": {
+    "n": 6,
+    "escalations": {
+     "hold": 4,
+     "raise": 2
+    },
+    "all_ok": 4
+   },
+   "de-escalate-worthy": {
+    "n": 6,
+    "escalations": {
+     "hold": 3,
+     "lower": 3
+    },
+    "all_ok": 6
+   }
+  },
+  "by_profile": {
+   "canonical": {
+    "n": 18,
+    "baseline_ok": 0,
+    "all_ok": 16
+   }
+  }
+ },
+ "calls": [
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 1.740600875011296,
+   "content": "{\n  \"risk_synthesis\": \"Weather is a risk multiplier ONLY if it degrades traction or visibility (rain, ice, snow, fog). Clear or dry conditions are NOT a risk factor. Heavy rain, wet asphalt is a risk factor.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 71,
+   "tokens_evaluated": 423,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Weather is a risk multiplier ONLY if it degrades traction or visibility (rain, ice, snow, fog). Clear or dry conditions are NOT a risk factor. Heavy rain, wet asphalt is a risk factor.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 1.212652292000712,
+   "content": "{\n  \"risk_synthesis\": \"Dispatch status is on schedule, indicating no unusual pressure or risk factors related to time.\",\n  \"escalation\": \"hold\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 46,
+   "tokens_evaluated": 418,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Dispatch status is on schedule, indicating no unusual pressure or risk factors related to time.",
+    "escalation": "hold",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 1.3013688330102013,
+   "content": "{\n  \"risk_synthesis\": \"Dispatch status indicates safe, controlled conditions due to the documented defensive maneuver. Weather and cargo are not risk factors.\",\n  \"escalation\": \"hold\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 51,
+   "tokens_evaluated": 432,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Dispatch status indicates safe, controlled conditions due to the documented defensive maneuver. Weather and cargo are not risk factors.",
+    "escalation": "hold",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 0.7210772079997696,
+   "content": "{\n  \"risk_synthesis\": \"Weather is a risk multiplier because heavy rain on wet asphalt degrades traction.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 44,
+   "tokens_evaluated": 423,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Weather is a risk multiplier because heavy rain on wet asphalt degrades traction.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 0.7671590419922723,
+   "content": "{\n  \"risk_synthesis\": \"Dispatch status is a risk factor because being on schedule under pressure is a genuine risk factor.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 47,
+   "tokens_evaluated": 418,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Dispatch status is a risk factor because being on schedule under pressure is a genuine risk factor.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 0.9355889590078732,
+   "content": "{\n  \"risk_synthesis\": \"Dispatch status indicates the driver executed a documented defensive maneuver, which suggests the driver is in control and mitigating risk, outweighing the baseline severity.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 58,
+   "tokens_evaluated": 432,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Dispatch status indicates the driver executed a documented defensive maneuver, which suggests the driver is in control and mitigating risk, outweighing the baseline severity.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 0.7686811250023311,
+   "content": "{\n  \"risk_synthesis\": \"Weather is a risk multiplier because heavy rain, wet asphalt degrades traction and visibility.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 46,
+   "tokens_evaluated": 423,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Weather is a risk multiplier because heavy rain, wet asphalt degrades traction and visibility.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 1.114211082996917,
+   "content": "{\n  \"risk_synthesis\": \"Dispatch status is on schedule, which indicates the driver is handling the situation safely and is in control. Neither weather nor cargo are risk factors. This is sufficient evidence to hold the baseline severity.\",\n  \"escalation\": \"hold\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 67,
+   "tokens_evaluated": 418,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Dispatch status is on schedule, which indicates the driver is handling the situation safely and is in control. Neither weather nor cargo are risk factors. This is sufficient evidence to hold the baseline severity.",
+    "escalation": "hold",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 0.8857628749974538,
+   "content": "{\n  \"risk_synthesis\": \"Dispatch status indicates a defensive maneuver was executed safely, which suggests the driver is in control and mitigating potential risks.\",\n  \"escalation\": \"hold\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 52,
+   "tokens_evaluated": 432,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Dispatch status indicates a defensive maneuver was executed safely, which suggests the driver is in control and mitigating potential risks.",
+    "escalation": "hold",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 0.7621903750114143,
+   "content": "{\n  \"risk_synthesis\": \"Weather is a risk multiplier because heavy rain on wet asphalt degrades traction.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 44,
+   "tokens_evaluated": 423,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Weather is a risk multiplier because heavy rain on wet asphalt degrades traction.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 1.0942657499981578,
+   "content": "{\n  \"risk_synthesis\": \"Dispatch status is a risk factor because being on schedule does not inherently indicate safety, but it does not provide enough evidence to raise the severity. Weather and cargo are not risk factors.\",\n  \"escalation\": \"hold\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 65,
+   "tokens_evaluated": 418,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Dispatch status is a risk factor because being on schedule does not inherently indicate safety, but it does not provide enough evidence to raise the severity. Weather and cargo are not risk factors.",
+    "escalation": "hold",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 0.9357960829947842,
+   "content": "{\n  \"risk_synthesis\": \"Dispatch status indicates the driver executed a documented defensive maneuver, which is evidence of safe, controlled conditions and warrants lowering the baseline severity.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 55,
+   "tokens_evaluated": 432,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Dispatch status indicates the driver executed a documented defensive maneuver, which is evidence of safe, controlled conditions and warrants lowering the baseline severity.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 1.1919527080026455,
+   "content": "{\n  \"risk_synthesis\": \"Weather is a risk multiplier ONLY if it degrades traction or visibility (rain, ice, snow, fog). Clear or dry conditions are NOT a risk factor. Heavy rain, wet asphalt is a risk multiplier.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 71,
+   "tokens_evaluated": 423,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Weather is a risk multiplier ONLY if it degrades traction or visibility (rain, ice, snow, fog). Clear or dry conditions are NOT a risk factor. Heavy rain, wet asphalt is a risk multiplier.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 1.3677297919930425,
+   "content": "{\n  \"risk_synthesis\": \"The decision is to hold the baseline severity. Neither Weather nor Cargo are risk multipliers under the given conditions. Dispatch status is on schedule, which does not indicate a risk factor but also does not provide evidence of control or safety that would warrant lowering the severity.\",\n  \"escalation\": \"hold\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 81,
+   "tokens_evaluated": 418,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "The decision is to hold the baseline severity. Neither Weather nor Cargo are risk multipliers under the given conditions. Dispatch status is on schedule, which does not indicate a risk factor but also does not provide evidence of control or safety that would warrant lowering the severity.",
+    "escalation": "hold",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 1.4212554580008145,
+   "content": "{\n  \"risk_synthesis\": \"The decision is 'hold' because none of the operational-context fields are genuine risk multipliers by the rules above. Weather is clear, cargo is empty and non-hazardous, and the dispatch status indicates the driver executed a defensive maneuver safely, which is evidence of control.\",\n  \"escalation\": \"hold\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 84,
+   "tokens_evaluated": 432,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "The decision is 'hold' because none of the operational-context fields are genuine risk multipliers by the rules above. Weather is clear, cargo is empty and non-hazardous, and the dispatch status indicates the driver executed a defensive maneuver safely, which is evidence of control.",
+    "escalation": "hold",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 0.7902064579975558,
+   "content": "{\n  \"risk_synthesis\": \"Weather is a risk multiplier because heavy rain, wet asphalt degrade traction and visibility.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 45,
+   "tokens_evaluated": 423,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Weather is a risk multiplier because heavy rain, wet asphalt degrade traction and visibility.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 0.8290112919930834,
+   "content": "{\n  \"risk_synthesis\": \"Dispatch status is a risk factor because being on schedule under pressure is a genuine risk factor.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 47,
+   "tokens_evaluated": 418,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Dispatch status is a risk factor because being on schedule under pressure is a genuine risk factor.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 0.913255958002992,
+   "content": "{\n  \"risk_synthesis\": \"Dispatch status indicates a defensive maneuver was executed safely, which is evidence the driver is in control and reduces risk.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 51,
+   "tokens_evaluated": 432,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Dispatch status indicates a defensive maneuver was executed safely, which is evidence the driver is in control and reduces risk.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  }
+ ]
+}

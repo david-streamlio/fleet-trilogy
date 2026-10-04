@@ -139,6 +139,15 @@ def pytest_addoption(parser: pytest.Parser) -> None:
             "single-model measurement windows, e.g. docs/TALK2-POWER-MEASUREMENT-PLAN.md."
         ),
     )
+    # Round 3 (tests/model/round3_eval.py, test_round3_tasks.py): one model x task x mode per run.
+    group.addoption("--round3-server", default=None, help="round 3: path to llama-server")
+    group.addoption("--round3-gguf", default=None, help="round 3: path to the model's GGUF")
+    group.addoption("--round3-task", default="full", choices=("narrow", "full"), help="round 3: narrow (production) or full (un-narrowed) task")
+    group.addoption("--round3-mode", default="raw", choices=("raw", "chat-off", "chat-on", "chat-budget"), help="round 3: raw /completion, or the Qwen chat format with thinking off / on / on with budget forcing")
+    group.addoption("--round3-n", type=int, default=2, help="round 3: calls per scenario cell (full: 6 profiles x 3 scenarios; narrow: 3 scenarios x 3n)")
+    group.addoption("--round3-think-budget", type=int, default=2048, help="round 3: chat-on token budget for reasoning, on top of the card's 300")
+    group.addoption("--round3-temperature", type=float, default=0.2, help="round 3: production's DEFAULT_TEMPERATURE, the same in every mode")
+    group.addoption("--round3-variant", default="base", help="round 3 ablation (test_round3_ablation.py): base|facts|tables|template|examples|temp0|grammar")
 
 
 def _resolve_path(cli_value: str | None, env_var: str) -> str | None:

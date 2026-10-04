@@ -404,6 +404,96 @@ Checks: 36/36 model hashes match, 502/502 llama-bench JSONs valid, 759/759 windo
 - Both Android proxies destroyed 04:26, after collection and hash checks (17/17 each).
 - `enabled_proxies` default = `["iphone-older", "iphone-flagship"]`.
 
+### Round 3 (2026-10-04): a harder task, and thinking on vs off
+
+**Why.** The 2026-09-26 narrowing (impact track row 5) was made for the Pi 4. Small models asked for severity, action and escalation in one call contradicted themselves, so severity and the action moved into deterministic code and the LLM kept only a bounded escalation. Round 3 asks whether newer hardware and bigger models can take the whole job back, and what the chat format and thinking add. Requested by the user 2026-10-04; proposals in the paper outline §VII.
+
+**Harness** (opt-in, entirely in `tests/`; the production pipeline is untouched, and its prompt, grammar and deterministic functions are imported, never modified):
+- `tests/model/round3_eval.py`: tasks, modes, grammars, scoring.
+- `tests/model/test_round3_tasks.py`: one pytest session = one model × task × mode. Artifact `eval-results/compare-round3-<host>-<ts>.json` with the config, a summary and every call (content, tokens, latency, scores).
+- `tests/model/test_round3_scoring.py`: 7 pure tests of the scorer.
+- Options in `tests/model/conftest.py`: `--round3-server`, `--round3-gguf`, `--round3-task`, `--round3-mode`, `--round3-n` (2), `--round3-think-budget` (2048), `--round3-temperature` (0.2, production's), `--round3-variant`.
+
+**Tasks:**
+
+| Task | What the LLM does | Cells (n = 2) | Card budget |
+|---|---|---|---|
+| `narrow` | Production's prompt and grammar: the bounded escalation only | production's gate-2 shape: the canonical event, baseline held at medium, the three `ESCALATION_SCENARIOS`, 3n calls each = 18 | 300 tokens (production's) |
+| `full` | The whole job: classify the baseline severity from the physics rules `classify_severity` uses (stated in the prompt), decide the escalation from production's operational rules (verbatim), then derive the final severity and the recommended action | six physics profiles (low, medium-volatile, medium, high-volatile, high-decel, high-abs) × three scenarios × n = 36 | 450 tokens (Phi's full card ran 187-300 in the smoke test, one truncated at 300) |
+
+- **Answer key:** `classify_severity`, `apply_escalation` and `recommended_action_for` for the physics and the derived fields. For the escalation, `ESCALATION_SCENARIOS`' documented expected directions (the production eval's hypothesis, with the same caveat).
+- **Scores per call:** `format_ok` and `escalation_ok`. The full task adds `baseline_ok`; `consistent` (severity and action follow from the model's *own* baseline and escalation by the stated rules: the contradiction the narrowing removed); `severity_ok`; and `action_ok`. `all_ok` = all of them. An unparsed card fails every score.
+
+**Modes** (how the prompt reaches the model):
+- `raw`: exactly as production, the bare prompt on `llama-server /completion` with no chat template. Qwen3-family models can't think in this mode.
+- `chat-off`: the Qwen chat format (user turn, assistant turn pre-filled with the empty `<think>\n\n</think>\n\n` block, as both models' own templates do for `enable_thinking=false`).
+- `chat-on`: the assistant turn pre-filled with `<think>\n`; the grammar admits free reasoning up to `</think>`, then the same card. `n_predict` = card budget + think budget (2,048).
+- `chat-budget` (added 2026-10-04 after Qwen3.5-9B's runaway, below): budget forcing in two calls. Phase 1 reasons with no grammar and `stop: ["</think>"]`, at most the budget. If the budget runs out, `</think>` is appended for the model (`think_forced` records it). Phase 2 generates the card under the usual grammar.
+
+Everything else (prompt text, temperature, scenarios) is identical across modes. Timeout per call = max(the harness default, 60 s + 0.25 s × `n_predict`). `llama-server` startup timeout 600 s (the 27B model on the MacBook).
+
+**Session machinery:** as test C. Each model × task × mode is its own pytest session and energy window in `windows.log`, mapped to its artifact in `artifacts.txt`, with `idle-pre`, a 20 s `idle-gap_*` after each session, and `idle-post`. On the M4 Max every session also waits for 60 s of Nominal thermal pressure first (`cool-wait_*` windows), as in `-gated-reverse`. The order is part 1 (every model, both tasks, raw), then part 2 (the Qwen models, chat-off and chat-on, both tasks), so a cut-short run still answers the core question.
+
+**Runs:**
+
+| Label | Platform | Run dir (`eval-results/phone-proxies/…`) | What | Status (2026-10-04 19:30) |
+|---|---|---|---|---|
+| R3 | m4max-macbook | `m4max-macbook/20261004T153710Z-round3` | `bench_round3_m4max.sh`, 10 models (part 1: Phi-3.5-mini, Gemma-3-4B, Llama-3.1-8B, GLM-4-9B, Qwen3-8B, Gemma-3-12B, Gemma-4-12B, Qwen3-14B, Qwen3.5-9B, Qwen3.8-27B; part 2: the four Qwen models). n = 2; Qwen3.8-27B n = 1. 36 sessions | done 15:37-19:00, 110 windows, all exit 0. **Ran at the default context (incident 23): accuracy valid; latency and energy carry the memory-pressure confound** |
+| R3 | mac2 | `iphone-older/round3-20261004T152604Z` | `bench_round3.sh … 2`: the same minus Qwen3.8-27B (doesn't fit 16 GB); Qwen3.5-9B chat-on skipped (below). 28 sessions (30 less the 2 skipped) | running: session 26 of 28. Own `powermetrics.txt` |
+| R3 | mac-m4 | `iphone-flagship/round3-20261004T164536Z` | as mac2. Started by `oneoff/round3_after_qconfirm.sh` when the Q4_0 confirmation ended | running: session 26 of 28. Harness updated mid-run (below) |
+| R3 think 4096 | m4max-macbook | `m4max-macbook/20261004T191021Z-thinkbudget4096`; first attempt `…190719Z-thinkbudget4096-ABORTED` (incident 23) | Qwen3.5-9B chat-on, both tasks, at a 4,096-token think budget, n = 2: runaway or a tight budget? Queued by another Claude session at the user's request (`oneoff/thinkbudget_after_ablation.sh`); this session owns it since 19:14 | running, `LLAMA_ARG_CTX_SIZE=8192` (`CONTEXT-SIZE.txt`). **Narrow done 19:33: all_ok 61% [39-80] (33% at 2,048), 2 of 18 truncated (12 of 18 at 2,048); thinking took 1,405-3,507 tokens where it closed; p50 64 s.** So on the narrow task it is mostly a tight budget, not endless reasoning, and still below chat-off's 72% |
+| ctx8192-check | m4max-macbook | `m4max-macbook/<ts>-ctx8192-check` | `bench_workload_m4max.sh`: Phi-3.5-mini and Llama-3.1-8B on the Edge Triage Pipeline, 3 reps, gated, at an 8k context. Against `-gated-reverse` it sizes incident 23's confound | queued (`oneoff/m4max_chain_after_thinkbudget.sh`) |
+| R3 ablation | m4max-macbook | `m4max-macbook/<ts>-ablation`; first attempt `20261004T190116Z-ablation-ABORTED` (1 cell, incident 23) | `bench_ablation_m4max.sh … 2`: Phi-3.5-mini, Gemma-3-4B, Llama-3.1-8B (the full task's weakest) and Qwen3-14B (a ceiling) × 7 variants (below), full task, n = 2. 28 sessions | queued after the ctx check, at 8k |
+| R3 budget | m4max-macbook | `m4max-macbook/<ts>-round3-budget` | `bench_budget_m4max.sh … 2 1024`: the four Qwen models, both tasks, chat-budget at 1,024 thinking tokens (Qwen3.8-27B n = 1) | queued after the ablation, at 8k |
+| R3 budget | mac-m4 | `iphone-flagship/round3-budget-<ts>` | `bench_budget.sh … 2 1024`: Qwen3-8B, Qwen3-14B, Qwen3.5-9B, both tasks, chat-budget at 1,024 | queued behind round 3 (`oneoff/budget_after_round3.sh`) |
+
+How each run was started (waiters, hand-offs, the skip) is in `deploy/aws-phone-proxies/scripts/oneoff/` and its README. Two harness smoke tests on the MacBook before the local run belong to no run dir: `eval-results/compare-round3-COMP-J2D9D71YNJ-20261004T152216Z.json` (Phi-3.5-mini, full, raw, n = 1) and `…152349Z.json` (Qwen3-8B, narrow, chat-on, n = 1). They are kept, not analysed.
+
+**Prompt ablation variants** (`tests/model/round3_ablation.py`, `test_round3_ablation.py`, 7 pure tests in `test_round3_ablation_scoring.py`). They are cumulative and were fixed before any ablation result was seen, so there is no per-variant tuning on the test set. Artifact `compare-round3-ablation-<host>-<ts>.json`.
+
+| Variant | Adds |
+|---|---|
+| `base` | round 3's full prompt and grammar, exactly |
+| `facts` | the grammar makes the model write three physics facts first (`abs_engaged`, `deceleration_band`, `severe_stop_and_go`), and the prompt asks for them; scored as `facts_ok` |
+| `tables` | the severity rules, the final-severity shift and the actions as lookup tables |
+| `template` | each model's own chat template (`/apply-template`); for the Qwen models the empty think block is pre-filled (thinking off) |
+| `examples` | three worked examples whose values and contexts differ from every test cell (one example's dispatch note was reworded so it couldn't leak a scenario's wording) |
+| `temp0` | temperature 0 (production uses 0.2) |
+| `grammar` | a separate tier on top of `examples`: the grammar computes severity and action from the model's own baseline and escalation ("the model judges, the grammar computes"), so the contradiction class is removed by construction |
+
+**Decisions and changes during round 3:**
+- **Qwen3.5-9B chat-on skipped on both hosts** (user decision, ~18:55). On the M4 Max its reasoning ran past the 2,048-token budget without closing `</think>`, and the hosts would only repeat that more slowly. `oneoff/skip_qwen35_chaton.sh` set the GGUF aside after the chat-off sessions, so `bench_round3.sh` logged `skip … missing` for those two sessions, then restored the file when the run ended. Each run dir gets `SKIPPED-qwen3.5-9b-chat-on.txt`. Capped thinking is measured instead by the budget runs.
+- **The mac-m4's harness was updated during its round 3** (18:56 UTC, by copy-then-rename): `round3_eval.py`, `test_round3_tasks.py` and `conftest.py` gained `chat-budget` for the queued budget run. A diff against mac2's copy (pushed 15:25, never updated) shows additions only: the new mode, its option choice and a `think_forced` field (default false). `raw`, `chat-off` and `chat-on` are byte-for-byte the same code, so sessions before and after the update are comparable.
+- **The thinkbudget4096 run** was written by the user's other Claude session (by mistake in the wrong window), then relaunched by this session unchanged except for the context size (user decision, "option b").
+
+**First results: M4 Max, accuracy** (`scripts/round3_report.py` on `20261004T153710Z-round3`; `all_ok` with 95% Wilson intervals):
+
+| Model | narrow, raw (n = 18) | full, raw (n = 36) | full, chat-off | full, chat-on (2,048) |
+|---|---|---|---|---|
+| Phi-3.5-mini | 100% [82-100] | 11% [4-25] | | |
+| Gemma-3-4B | 100% [82-100] | 22% [12-38] | | |
+| Llama-3.1-8B | 94% [74-99] | 14% [6-29] | | |
+| GLM-4-9B | 89% [67-97] | 39% [25-55] | | |
+| Gemma-3-12B | 72% [49-88] | 58% [42-73] | | |
+| Gemma-4-12B | 67% [44-84] | 50% [34-66] | | |
+| Qwen3-8B | 100% [82-100] | 36% [22-52] | 44% [30-60] | 47% [32-63] |
+| Qwen3-14B | 33% [16-56] | 42% [27-58] | 72% [56-84] | 78% [62-88] |
+| Qwen3.5-9B | 56% [34-75] | 22% [12-38] | 72% [56-84] | 0% [0-10], 36/36 truncated |
+| Qwen3.8-27B (n = 9 / 18) | 78% [45-94] | 33% [16-56] | 67% [44-84] | 67% [44-84] |
+
+- **The narrowing was justified.** On the full task in production's raw mode, no model exceeds 58% end to end, and the small models (Phi, Gemma-3-4B, Llama) fall to 11-22%, against 94-100% on the narrow task. Every component drops for them: `baseline_ok` 53-78%, `consistent` 47-53% (the contradiction class the narrowing removed), and even `escalation_ok` 53-58%.
+- **The chat format is a large lever for the Qwen models.** Thinking off, it lifts the full task from 42% to 72% (Qwen3-14B) and from 22% to 72% (Qwen3.5-9B). That is a prompt-path change, not a model change.
+- **Thinking adds little for its cost.** Full task: Qwen3-14B 72% → 78%, Qwen3-8B 44% → 47%, Qwen3.8-27B 67% → 67%, at 4-11× the median latency (Qwen3-14B 5.0 s → 20.3 s; Qwen3-8B 1.45 s → 15.9 s). The exception is Qwen3-14B on the narrow task, 67% → 94%.
+- **Qwen3.5-9B's thinking runs away.** It hit the 2,048-token budget on every full-task call and 12 of 18 narrow ones. The thinkbudget4096 run tells runaway from a tight budget; budget forcing measures it capped.
+- Latency and energy from this run are not reported yet: incident 23's memory-pressure confound applies until the ctx8192-check sizes it. Within this run, chat-on vs chat-off ratios on one model share the confound.
+
+**Analysis:** `scripts/round3_report.py [--trace <powermetrics>] <run-dir>…` aggregates every round-3-family run dir (round 3, budget, thinkbudget, ablation) across platforms. It gives:
+- per platform × model × task × mode: rates with Wilson intervals, latency, tokens, think tokens, truncations, forced closes, and J/call above idle (session window / calls, an upper bound that includes server start);
+- narrow-vs-full, thinking-mode and ablation tables;
+- a cross-platform agreement table that flags cells whose intervals don't overlap.
+
+Host runs carry their own trace. The MacBook runs share `/tmp/m4max-powermetrics-4.txt` (pass `--trace`; a snapshot is copied into the run dirs afterwards).
+
 ## 6. Incident log
 
 Every problem, its effect on the data, and the fix. "No data impact" means no measurement was affected.
@@ -431,6 +521,7 @@ Every problem, its effect on the data, and the fix. "No data impact" means no me
 | 20 | 10-04 04:22-04:32 | `sudo powermetrics` for the gated M4 Max run sat at its password prompt twice, unnoticed | none; the gate waited for the trace file to appear | `sudo -v && sudo powermetrics …` |
 | 21 | 10-04 04:22-04:33 | The first gated M4 Max run never left its first cool-wait. The gate read the trace's last 400 KB, but a sample with the thermal sampler is ~8 KB, so the window held ~49 samples against the 120 Nominal it requires | none; only idle-pre ran. Directory kept as `…-gated-reverse-ABORTED` with `ABORTED.txt` | gate reads 4 MB (~480 samples); verified on the live trace before relaunch |
 | 22 | 10-04 05:12 (found) | **Analysis bug:** `summarize.py: load_powermetrics` fitted one time offset per trace, assuming no pauses. powermetrics stops while a Mac sleeps, so traces spanning a sleep (M4 Max: `20261003T230334Z`, 23:30-00:30; `-caffeinated` once re-copied in full, 01:34-04:10) were misaligned by over an hour | raw data intact. No reported number was affected: the caffeinated energies came from a pre-sleep snapshot, and the first run's per-session stats used header times. mac2 traces have no gaps | offset fitted per gap-free segment; mac2's Phase 1 energy table is byte-identical before and after |
+| 23 | 10-04 19:03 (found; reported by the user's other session) | **M4 Max: `llama-server` at the model's full training context.** With no context size, Phi-3.5's server sized its KV cache to 128,256 tokens: 51.2 GB resident, 58 of 64 GB wired, swap 6.5 of 8.2 GB (checked via `/props` and `ps`). Same root cause as incident 14, but the 64 GB machine lets the allocation succeed and swaps instead of being OOM-killed. The Mac proxies were unaffected (llama.cpp fit the context to memory: mac2 17,408 and mac-m4 40,960 tokens for Qwen3-14B; swap under 0.5 GB) | accuracy: none. **M4 Max latency and energy in every M4 Max run before 19:05 (C reruns, caffeinated, gated-reverse, round 3) carry a memory-pressure confound**; size to be measured by the `-ctx8192-check` run. The first ablation (1 cell) and the other session's first thinkbudget4096 run are kept as `-ABORTED` | `LLAMA_ARG_CTX_SIZE=8192` for every later M4 Max run (`CONTEXT-SIZE.txt` in each run dir); the other session's run relaunched with it by user decision, script unchanged |
 | 16 | 22:50 | The default `enabled_proxies` was still the smoke test's `["android-flagship"]`, so a plain `terraform apply` would have destroyed c7g and mac2 mid-run | none (caught) | default = the deployed set; plain plan = no changes |
 
 **Guards added along the way:**
@@ -458,7 +549,11 @@ Every problem, its effect on the data, and the fix. "No data impact" means no me
    - The gated reverse-order run shows the cost: cool-start sessions are 24-77% faster but use 30-60% more energy per call than throttled ones. Report both regimes, labelled.
    - A laptop throttling within minutes is itself evidence for the phone-thermals question.
    - mac2 (actively cooled Mac mini, headless) never left Nominal: F's 10,593 samples, drift ≤ 0.6%. Its numbers are single-regime.
-5. **The 09-26 five-model numbers are invalid as per-model latencies** (§5): a multi-model session roughly doubles Phi's latency on the M4 Max. Re-check any impact-track row that used them.
+5. **The 09-26 five-model numbers are invalid as per-model latencies** (§5): a multi-model session roughly doubles Phi's latency on the M4 Max. Where the impact track uses them (listed 2026-10-04; the impact track is not edited here, the user decides):
+   - **Row 15** (M4 → Pi ratio table, "38-200x"): its M4 p50s back out to 0.75 s (Phi), 2.05 s (Gemma-3-4B) and 1.25 s (Llama), the 09-26 values; its p95 ratios come from the same session. With single-model p50s (0.36, 1.24-1.70, 1.03-1.20 s) the p50 ratios become ~99×, ~45-62× and ~62-73×. Recompute after the ctx8192-check (incident 23), which may shift the single-model numbers too.
+   - **Row 24's detail section** ends "the Mac's per-call latency today (0.36 s Phi, 0.51 s Gemma p50) is about twice as fast as the published M4 figures (0.75 s, 0.63 s); not yet diagnosed". The Phi half is now diagnosed (the multi-model session). The Gemma Tier 2 0.63 s also came from a multi-model session, likely the same effect but not re-tested.
+   - Copies of row 15 outside the impact track: `TALK2-SLIDE-PLAN.md` (the ratio table), `TALK2-SLIDE-PLAN-ALT-CHARTS.md`, `TALK2-POWER-MEASUREMENT-PLAN.md`, `TALK2-GREENEST-TOKEN-REPORT.html` (the 38-200× stat and the 47.5× bar), and the Talk 1 handoff note in the other session's untracked slides.
+   - Not affected: row 8 (accuracy only), row 23 (word counts = tokens/s × latency from the same calls, so the inflation cancels), row 24's energy and ratio (10-02 single-model runs).
 6. **Q4_0 accuracy** on the Talk 2 tasks is untested. See `TODO-Q4_0-ACCURACY-CHECK.md`.
 7. **The x1 build is faster than native on c7g:** +3-12% tg, up to 2.5× pp. Native's SVE paths underperform, so the server-only ISA didn't inflate c7g. The mechanism (NEON or llamafile kernels vs SVE-256) is unverified.
 8. **D and L5 (context depth):** speed only. D's energy includes the untimed re-fill.
@@ -469,7 +564,7 @@ Every problem, its effect on the data, and the fix. "No data impact" means no me
 
 **Reproducing:**
 - `deploy/aws-phone-proxies/REPRODUCE.md` is the step-by-step runbook, with every pinned version: llama.cpp commit, harness commit, AMIs, toolchains, Terraform providers.
-- `deploy/aws-phone-proxies/MODELS.lock.tsv` pins 104 model files with repo revision and SHA-256 (`scripts/models_lock.py`).
+- `deploy/aws-phone-proxies/MODELS.lock.tsv` pins 105 model files with repo revision and SHA-256 (`scripts/models_lock.py`; Qwen3.5-9B appended by hand for round 3).
 
 
 | What | Where |
@@ -477,10 +572,10 @@ Every problem, its effect on the data, and the fix. "No data impact" means no me
 | Raw results | `eval-results/phone-proxies/<platform>/<run>/` |
 | Preliminary tables | `eval-results/phone-proxies/PRELIMINARY-20261003.md` (`scripts/prelim_report.py`) |
 | Per-run tables | `python3 deploy/aws-phone-proxies/scripts/summarize.py eval-results/phone-proxies/<platform> [<run>]` |
+| Round 3 tables (accuracy, thinking, ablation, cross-platform) | `python3 deploy/aws-phone-proxies/scripts/round3_report.py [--trace <powermetrics>] <run-dir>…` |
+| How each run was started (waiters, hand-offs) | `deploy/aws-phone-proxies/scripts/oneoff/` and its README |
 | Earlier measurements (Pi 4 meter, M4 Max contrast) | `docs/TALK2-DATA-ENGINEERING-IMPACT-TRACK.md`, rows 22-28 and their detail sections |
 | Plan and status | `docs/TALK2-HARDWARE-SPECTRUM-TEST-CATALOG.md` |
 | Deferred work | `talks/talk2-greenest-token/TODO-REAL-PHONE-BENCHMARKS.md`, `TODO-RAM-CAPACITY-TEST.md`, `TODO-Q4_0-ACCURACY-CHECK.md` |
 
-**Not yet in the repo:**
-- `deploy/aws-phone-proxies/` and `eval-results/phone-proxies/` are uncommitted.
-- Exclude `.terraform/`, the state files, `.ssh/` and `.bench-*.log` (`.gitignore` covers them).
+**Committing:** rounds 1-2 are committed (8512294, bca0e0d). Round 3 is committed when its runs end. Never commit `.terraform/`, the state files, `.ssh/` or `.bench-*.log` (`.gitignore` covers them), nor other sessions' files (`docs/TODO-OTHER-SESSION-FILES.md`).
