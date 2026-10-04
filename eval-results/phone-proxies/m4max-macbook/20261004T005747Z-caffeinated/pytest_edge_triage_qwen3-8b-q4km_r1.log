@@ -1,0 +1,30 @@
+
+=== Tier 3 Edge Triage Pipeline model COMPARISON ===
+artifact: /Users/david.kjerrumgaard/clone-zone/davidkj-datadog/fleet-trilogy/eval-results/compare-edge-triage-COMP-J2D9D71YNJ-20261004T012301Z.json
+host: COMP-J2D9D71YNJ (arm64, macOS-26.7.1-arm64-arm-64bit-Mach-O)
+decision_grade: quality-only (non-target hardware)
+axis                      Qwen3-8B (Q4_K_M)
+------------------------  -----------------
+format_parse_rate         1.000            
+escalation_mismatch_rate  0.000            
+latency_p50_seconds       1.964            
+latency_p95_seconds       2.603            
+tokens_per_sec_approx     34.529           
+load_time_seconds         3.610            
+resident_ram_mb_after     28158.781        
+
+--- recommendation (does not auto-pick — human decides) ---
+format_parse_rate: Qwen3-8B (Q4_K_M) leads (1.000)
+escalation_mismatch_rate: Qwen3-8B (Q4_K_M) leads (0.000)
+[informational — non-target hardware] latency_p50_seconds: Qwen3-8B (Q4_K_M) leads (1.964)
+[informational — non-target hardware] latency_p95_seconds: Qwen3-8B (Q4_K_M) leads (2.603)
+[informational — non-target hardware] tokens_per_sec_approx: Qwen3-8B (Q4_K_M) leads (34.529)
+[informational — non-target hardware] load_time_seconds: Qwen3-8B (Q4_K_M) leads (3.610)
+[informational — non-target hardware] resident_ram_mb_after: Qwen3-8B (Q4_K_M) leads (28158.781)
+This note does not pick a stage model. Quality axes above are decision-relevant on any host; speed/RAM axes only count when measured on the Pi 4 target.
+
+--- production candidates (format_parse_rate>=80%, gate-2-confirmed escalation_mismatch_rate<=50%) ---
+  PASS   Qwen3-8B (Q4_K_M): escalation_mismatch=0.0% (n=45, gate-2 confirmed)
+Evidence for/against production use on THIS task — not a final pick. Pi 4 latency/RAM footprint still applies to any PASS entry before it ships.
+.
+1 passed in 128.26s (0:02:08)

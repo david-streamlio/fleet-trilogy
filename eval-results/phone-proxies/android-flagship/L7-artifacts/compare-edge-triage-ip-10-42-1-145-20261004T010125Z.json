@@ -1,0 +1,147 @@
+{
+  "host": "ip-10-42-1-145",
+  "arch": "aarch64",
+  "platform": "Linux-7.0.0-1014-aws-aarch64-with-glibc2.43",
+  "decision_grade": "full (Pi 4 target)",
+  "timestamp": "2026-10-04T01:01:25Z",
+  "seed_config": {
+    "model_eval_runs": 15,
+    "model_timeout_seconds": 180.0
+  },
+  "models": {
+    "qwen3-8b-q4km": {
+      "id": "qwen3-8b-q4km",
+      "display_name": "Qwen3-8B (Q4_K_M)",
+      "available": true,
+      "binary_path": "/opt/phoneproxy/llama.cpp/build/bin/llama-completion",
+      "model_path": "/opt/phoneproxy/models/qwen3-8b-q4_k_m.gguf",
+      "extra_args": [
+        "-no-cnv"
+      ],
+      "format_reliability": {
+        "total": 15,
+        "parsed": 15,
+        "rate": 1.0,
+        "sample_failures": []
+      },
+      "escalation_calibration": {
+        "per_scenario": {
+          "escalate-worthy": {
+            "expected_direction": "raise",
+            "escalation_tally": {
+              "raise": 15
+            },
+            "total": 15,
+            "matched": 15,
+            "match_rate": 1.0
+          },
+          "benign": {
+            "expected_direction": "hold",
+            "escalation_tally": {
+              "hold": 15
+            },
+            "total": 15,
+            "matched": 15,
+            "match_rate": 1.0
+          },
+          "de-escalate-worthy": {
+            "expected_direction": "lower_or_hold",
+            "escalation_tally": {
+              "hold": 7,
+              "lower": 8
+            },
+            "total": 15,
+            "matched": 15,
+            "match_rate": 1.0
+          }
+        },
+        "total": 45,
+        "matched": 45,
+        "mismatches": 0,
+        "mismatch_rate": 0.0,
+        "sample_mismatches": [],
+        "gate2_confirmed": true,
+        "gate2_per_scenario_n": 15,
+        "gate2_format_threshold": 0.8
+      },
+      "latency": {
+        "p50_seconds": 4.058689700999821,
+        "p95_seconds": 5.7354468530511316,
+        "n": 60
+      },
+      "tokens_per_sec_approx": 17.629400799984847,
+      "tokens_per_sec_note": "approximate \u2014 whitespace word count / latency over parsed trials, not an exact tokenizer count",
+      "load_time_seconds": 39.17339928100046,
+      "resident_ram_mb_before": 0.0,
+      "resident_ram_mb_after": 9808.0546875,
+      "resident_ram_mb_note": "RUSAGE_CHILDREN ru_maxrss is a cumulative max for the whole test session and isn't resettable per model; this is exact for the first model in a run (or when a model is run alone) and otherwise a floor \u2014 not a true peak \u2014 for models measured later in the same run."
+    }
+  },
+  "comparison": {
+    "format_parse_rate": {
+      "direction": "higher",
+      "values": {
+        "qwen3-8b-q4km": 1.0
+      },
+      "best": "qwen3-8b-q4km"
+    },
+    "escalation_mismatch_rate": {
+      "direction": "lower",
+      "values": {
+        "qwen3-8b-q4km": 0.0
+      },
+      "best": "qwen3-8b-q4km"
+    },
+    "latency_p50_seconds": {
+      "direction": "lower",
+      "values": {
+        "qwen3-8b-q4km": 4.058689700999821
+      },
+      "best": "qwen3-8b-q4km"
+    },
+    "latency_p95_seconds": {
+      "direction": "lower",
+      "values": {
+        "qwen3-8b-q4km": 5.7354468530511316
+      },
+      "best": "qwen3-8b-q4km"
+    },
+    "tokens_per_sec_approx": {
+      "direction": "higher",
+      "values": {
+        "qwen3-8b-q4km": 17.629400799984847
+      },
+      "best": "qwen3-8b-q4km"
+    },
+    "load_time_seconds": {
+      "direction": "lower",
+      "values": {
+        "qwen3-8b-q4km": 39.17339928100046
+      },
+      "best": "qwen3-8b-q4km"
+    },
+    "resident_ram_mb_after": {
+      "direction": "lower",
+      "values": {
+        "qwen3-8b-q4km": 9808.0546875
+      },
+      "best": "qwen3-8b-q4km"
+    }
+  },
+  "recommendation": "format_parse_rate: Qwen3-8B (Q4_K_M) leads (1.000)\nescalation_mismatch_rate: Qwen3-8B (Q4_K_M) leads (0.000)\nlatency_p50_seconds: Qwen3-8B (Q4_K_M) leads (4.059)\nlatency_p95_seconds: Qwen3-8B (Q4_K_M) leads (5.735)\ntokens_per_sec_approx: Qwen3-8B (Q4_K_M) leads (17.629)\nload_time_seconds: Qwen3-8B (Q4_K_M) leads (39.173)\nresident_ram_mb_after: Qwen3-8B (Q4_K_M) leads (9808.055)\nThis note does not pick a stage model. Quality axes above are decision-relevant on any host; speed/RAM axes only count when measured on the Pi 4 target.",
+  "production_candidates": {
+    "format_threshold": 0.8,
+    "escalation_threshold": 0.5,
+    "passed": [
+      {
+        "id": "qwen3-8b-q4km",
+        "display_name": "Qwen3-8B (Q4_K_M)",
+        "format_parse_rate": 1.0,
+        "gate2_confirmed": true,
+        "escalation_mismatch_rate": 0.0,
+        "escalation_sample_n": 45
+      }
+    ],
+    "rejected": []
+  }
+}

@@ -1,0 +1,53 @@
+#!/bin/bash
+# First-boot provisioning for a macOS (Apple silicon) proxy: grow the APFS container to the
+# full EBS volume, Command Line Tools if missing, cmake, llama.cpp at a pinned tag (Metal
+# build + a CPU-only build), the Phase 1 models. Writes $BASE/READY when done; the full log
+# is /var/log/phone-proxy-setup.log. Runs once via ec2-macos-init.
+set -euxo pipefail
+exec > >(tee -a /var/log/phone-proxy-setup.log) 2>&1
+
+USERNAME=ec2-user
+BASE=/Users/$USERNAME/phoneproxy
+BREW=/opt/homebrew/bin/brew
+as_user() { if [ "$(id -u)" = 0 ]; then sudo -u $USERNAME -H "$@"; else "$@"; fi; }
+as_root() { if [ "$(id -u)" = 0 ]; then "$@"; else sudo "$@"; fi; }
+
+# Use the whole EBS root volume (the AMI's APFS container is smaller than 200 GB).
+PDISK=$(diskutil list physical external | head -n1 | cut -d" " -f1)
+APFSCONT=$(diskutil list physical external | grep "Apple_APFS" | tr -s " " | cut -d" " -f8)
+yes | as_root diskutil repairDisk "$PDISK" || true
+as_root diskutil apfs resizeContainer "$APFSCONT" 0 || true
+
+# Command Line Tools (clang + Metal toolchain), if the AMI doesn't already ship them.
+if ! xcode-select -p >/dev/null 2>&1; then
+  as_root touch /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress
+  CLT=$(softwareupdate -l 2>/dev/null | grep -E '^\s*\* Label: Command Line Tools' | tail -n1 | sed -E 's/^.*Label: //')
+  as_root softwareupdate -i "$CLT" --verbose
+  as_root rm -f /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress
+fi
+
+as_user $BREW install cmake jq
+
+as_user mkdir -p $BASE/models $BASE/results
+as_user git clone --depth 1 --branch ${llama_cpp_ref} https://github.com/ggml-org/llama.cpp $BASE/llama.cpp
+cd $BASE/llama.cpp
+# Metal is the default on macOS: the GPU path llama.cpp-based iPhone apps use.
+as_user /opt/homebrew/bin/cmake -B build -DCMAKE_BUILD_TYPE=Release
+as_user /opt/homebrew/bin/cmake --build build --config Release -j"$(sysctl -n hw.ncpu)"
+# CPU-only build, for a like-for-like comparison with the Graviton proxies.
+as_user /opt/homebrew/bin/cmake -B build-cpu -DCMAKE_BUILD_TYPE=Release -DGGML_METAL=OFF
+as_user /opt/homebrew/bin/cmake --build build-cpu --config Release -j"$(sysctl -n hw.ncpu)"
+as_user git rev-parse HEAD > /tmp/llama_cpp_commit.txt
+as_user cp /tmp/llama_cpp_commit.txt $BASE/llama_cpp_commit.txt
+
+cat > /tmp/models.txt <<'MODELS'
+${models_list}
+MODELS
+as_user cp /tmp/models.txt $BASE/models.txt
+while read -r repo file; do
+  [ -z "$repo" ] && continue
+  as_user curl -fL --retry 5 --retry-delay 5 -o "$BASE/models/$file" "https://huggingface.co/$repo/resolve/main/$file"
+done < $BASE/models.txt
+
+date -u +%Y-%m-%dT%H:%M:%SZ > /tmp/READY
+as_user cp /tmp/READY $BASE/READY

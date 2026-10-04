@@ -1,0 +1,4 @@
+build: CPU : NEON = 1 | ARM_FMA = 1 | FP16_VA = 1 | MATMUL_INT8 = 1 | SVE = 1 | DOTPROD = 1 | SVE_CNT = 32 | OPENMP = 1 | REPACK = 1 | 
+build-x1: CPU : NEON = 1 | ARM_FMA = 1 | FP16_VA = 1 | DOTPROD = 1 | LLAMAFILE = 1 | OPENMP = 1 | REPACK = 1 | 
+WARNING: the x1 build still reports SVE or MATMUL_INT8; results are not X1-faithful
+CORRECTION (2026-10-03 22:45 UTC): the WARNING above is a false alarm. llama.cpp lists only enabled features; build-x1 lists neither SVE nor MATMUL_INT8, so it is X1-faithful. The check looked for "SVE = 0", which is never printed.

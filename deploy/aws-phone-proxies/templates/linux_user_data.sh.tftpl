@@ -1,0 +1,43 @@
+#!/bin/bash
+# First-boot provisioning for a Linux (Graviton) proxy: build tools, llama.cpp at a pinned
+# tag (native ARM build), STREAM, the Phase 1 models. Writes $BASE/READY when done; the
+# full log is /var/log/phone-proxy-setup.log. Benchmarks are pushed and run separately
+# (scripts/proxyctl.sh) so they can change without re-creating the instance.
+set -euxo pipefail
+exec > >(tee -a /var/log/phone-proxy-setup.log) 2>&1
+
+BASE=/opt/phoneproxy
+USERNAME=ubuntu
+
+# Safety net: power off (stop, not terminate) after the configured hours.
+shutdown -h +$(( ${auto_stop_hours} * 60 )) "phone-proxy auto-stop" || true
+
+export DEBIAN_FRONTEND=noninteractive
+apt-get update -y
+apt-get install -y build-essential cmake git curl jq rsync python3 libcurl4-openssl-dev libssl-dev
+
+install -d -o $USERNAME -g $USERNAME $BASE $BASE/models $BASE/results
+
+# llama.cpp, pinned, native build (-mcpu=native picks up this core's i8mm/SVE2/dotprod).
+sudo -u $USERNAME git clone --depth 1 --branch ${llama_cpp_ref} https://github.com/ggml-org/llama.cpp $BASE/llama.cpp
+cd $BASE/llama.cpp
+sudo -u $USERNAME cmake -B build -DCMAKE_BUILD_TYPE=Release -DGGML_NATIVE=ON
+sudo -u $USERNAME cmake --build build --config Release -j"$(nproc)"
+sudo -u $USERNAME git rev-parse HEAD > $BASE/llama_cpp_commit.txt
+
+# STREAM: the memory-bandwidth calibration for the phone-bandwidth correction.
+# 200M doubles x 3 arrays = 4.8 GB, far beyond any of these chips' caches.
+sudo -u $USERNAME curl -fsSL --retry 5 -o $BASE/stream.c https://raw.githubusercontent.com/jeffhammond/STREAM/master/stream.c
+sudo -u $USERNAME gcc -O3 -march=native -fopenmp -DSTREAM_ARRAY_SIZE=200000000 -DNTIMES=20 $BASE/stream.c -o $BASE/stream
+
+# Models (Phase 1: identical on every platform).
+cat > $BASE/models.txt <<'MODELS'
+${models_list}
+MODELS
+while read -r repo file; do
+  [ -z "$repo" ] && continue
+  sudo -u $USERNAME curl -fL --retry 5 --retry-delay 5 -o "$BASE/models/$file" "https://huggingface.co/$repo/resolve/main/$file"
+done < $BASE/models.txt
+
+date -u +%Y-%m-%dT%H:%M:%SZ > $BASE/READY
+chown $USERNAME:$USERNAME $BASE/READY
