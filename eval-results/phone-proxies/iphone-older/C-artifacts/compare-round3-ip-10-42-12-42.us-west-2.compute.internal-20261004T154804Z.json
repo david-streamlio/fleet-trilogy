@@ -1,0 +1,443 @@
+{
+ "host": "ip-10-42-12-42.us-west-2.compute.internal",
+ "arch": "arm64",
+ "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+ "timestamp": "2026-10-04T15:48:04Z",
+ "config": {
+  "task": "narrow",
+  "mode": "raw",
+  "n_per_cell": 2,
+  "gguf": "/Users/ec2-user/phoneproxy/models/Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "server": "/Users/ec2-user/phoneproxy/llama.cpp/build/bin/llama-server",
+  "threads": 4,
+  "temperature": 0.2,
+  "n_predict": 300,
+  "think_budget": 0,
+  "timeout_seconds": 180.0
+ },
+ "summary": {
+  "n": 18,
+  "rates": {
+   "all_ok": 0.9444444444444444,
+   "escalation_ok": 0.9444444444444444,
+   "format_ok": 1.0
+  },
+  "latency_p50_seconds": 5.054075874999398,
+  "latency_p95_seconds": 9.35949408399756,
+  "tokens_predicted_mean": 51.388888888888886,
+  "think_tokens_mean": 0.0,
+  "truncated": 0,
+  "errors": 0,
+  "by_scenario": {
+   "escalate-worthy": {
+    "n": 6,
+    "escalations": {
+     "raise": 5,
+     "hold": 1
+    },
+    "all_ok": 5
+   },
+   "benign": {
+    "n": 6,
+    "escalations": {
+     "hold": 6
+    },
+    "all_ok": 6
+   },
+   "de-escalate-worthy": {
+    "n": 6,
+    "escalations": {
+     "lower": 6
+    },
+    "all_ok": 6
+   }
+  },
+  "by_profile": {
+   "canonical": {
+    "n": 18,
+    "baseline_ok": 0,
+    "all_ok": 17
+   }
+  }
+ },
+ "calls": [
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 9.35949408399756,
+   "content": "{\n  \"risk_synthesis\": \"The driver is behind schedule in heavy rain, which degrades traction and visibility, and is transporting hazardous cargo. This combination of factors is a strong indication that the risk of an accident is higher than the baseline severity.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 71,
+   "tokens_evaluated": 424,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "The driver is behind schedule in heavy rain, which degrades traction and visibility, and is transporting hazardous cargo. This combination of factors is a strong indication that the risk of an accident is higher than the baseline severity.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 5.320281291002175,
+   "content": "{\n  \"risk_synthesis\": \"hold\",\n  \"escalation\": \"hold\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 30,
+   "tokens_evaluated": 419,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "hold",
+    "escalation": "hold",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 6.755031916996813,
+   "content": "{\n  \"risk_synthesis\": \"None of the fields are risk multipliers, and at least one positively indicates safe, controlled conditions.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 48,
+   "tokens_evaluated": 433,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "None of the fields are risk multipliers, and at least one positively indicates safe, controlled conditions.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 6.037714874997619,
+   "content": "{\n  \"risk_synthesis\": \"The driver is running behind schedule, which is a risk factor. The heavy rain and wet asphalt are degrading traction, which is another risk factor. These two factors together are strong enough evidence to move away from the baseline severity.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 74,
+   "tokens_evaluated": 424,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "The driver is running behind schedule, which is a risk factor. The heavy rain and wet asphalt are degrading traction, which is another risk factor. These two factors together are strong enough evidence to move away from the baseline severity.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 2.55091641699255,
+   "content": "{\n  \"risk_synthesis\": \"hold\",\n  \"escalation\": \"hold\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 30,
+   "tokens_evaluated": 419,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "hold",
+    "escalation": "hold",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 5.470744166988879,
+   "content": "{\n  \"risk_synthesis\": \"None of the fields are risk multipliers, and at least one positively indicates safe, controlled conditions. The driver executed a documented defensive maneuver for a merging vehicle, indicating they are in control.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 67,
+   "tokens_evaluated": 433,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "None of the fields are risk multipliers, and at least one positively indicates safe, controlled conditions. The driver executed a documented defensive maneuver for a merging vehicle, indicating they are in control.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 5.054075874999398,
+   "content": "{\n  \"risk_synthesis\": \"Heavy rain, wet asphalt is a risk multiplier for weather, and being 20 minutes behind schedule is a risk factor for dispatch status. The baseline severity should be raised.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 62,
+   "tokens_evaluated": 424,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Heavy rain, wet asphalt is a risk multiplier for weather, and being 20 minutes behind schedule is a risk factor for dispatch status. The baseline severity should be raised.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 2.526056333008455,
+   "content": "{\n  \"risk_synthesis\": \"hold\",\n  \"escalation\": \"hold\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 30,
+   "tokens_evaluated": 419,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "hold",
+    "escalation": "hold",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 3.922169790996122,
+   "content": "{\n  \"risk_synthesis\": \"none of the fields are risk multipliers, and at least one positively indicates safe, controlled conditions\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 48,
+   "tokens_evaluated": 433,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "none of the fields are risk multipliers, and at least one positively indicates safe, controlled conditions",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 5.740875542003778,
+   "content": "{\n  \"risk_synthesis\": \"The driver is behind schedule under pressure, which is a genuine risk factor. The heavy rain and wet asphalt also degrade traction, making it a risk multiplier. Therefore, the baseline severity should be raised.\",\n  \"escalation\": \"hold\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 70,
+   "tokens_evaluated": 424,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "The driver is behind schedule under pressure, which is a genuine risk factor. The heavy rain and wet asphalt also degrade traction, making it a risk multiplier. Therefore, the baseline severity should be raised.",
+    "escalation": "hold",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 2.6249786249973113,
+   "content": "{\n  \"risk_synthesis\": \"hold\",\n  \"escalation\": \"hold\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 31,
+   "tokens_evaluated": 419,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "hold",
+    "escalation": "hold",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 3.9206607089872705,
+   "content": "{\n  \"risk_synthesis\": \"none of the fields are risk multipliers, and at least one positively indicates safe, controlled conditions\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 48,
+   "tokens_evaluated": 433,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "none of the fields are risk multipliers, and at least one positively indicates safe, controlled conditions",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 6.882578166987514,
+   "content": "{\n  \"risk_synthesis\": \"The driver is running 20 minutes behind schedule, which is a genuine risk factor. The weather is heavy rain, which degrades traction. The cargo is liquids/chemical tanker, which is hazardous if spilled or shifted. These three fields together indicate a higher risk than the baseline severity.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 85,
+   "tokens_evaluated": 424,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "The driver is running 20 minutes behind schedule, which is a genuine risk factor. The weather is heavy rain, which degrades traction. The cargo is liquids/chemical tanker, which is hazardous if spilled or shifted. These three fields together indicate a higher risk than the baseline severity.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 2.5305929589958396,
+   "content": "{\n  \"risk_synthesis\": \"hold\",\n  \"escalation\": \"hold\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 30,
+   "tokens_evaluated": 419,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "hold",
+    "escalation": "hold",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 3.922989917002269,
+   "content": "{\n  \"risk_synthesis\": \"None of the fields are risk multipliers, and at least one positively indicates safe, controlled conditions.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 48,
+   "tokens_evaluated": 433,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "None of the fields are risk multipliers, and at least one positively indicates safe, controlled conditions.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 5.993102666994673,
+   "content": "{\n  \"risk_synthesis\": \"The driver is running behind schedule, which is a genuine risk factor. The weather is also a risk multiplier because it degrades traction on the wet asphalt. The cargo is a risk multiplier because it is a liquid/chemical tanker.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 74,
+   "tokens_evaluated": 424,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "The driver is running behind schedule, which is a genuine risk factor. The weather is also a risk multiplier because it degrades traction on the wet asphalt. The cargo is a risk multiplier because it is a liquid/chemical tanker.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 2.6380892919987673,
+   "content": "{\n  \"risk_synthesis\": \"hold\",\n  \"escalation\": \"hold\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 31,
+   "tokens_evaluated": 419,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "hold",
+    "escalation": "hold",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 3.95072095800424,
+   "content": "{\n  \"risk_synthesis\": \"None of the fields are risk multipliers, and at least one positively indicates safe, controlled conditions.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 48,
+   "tokens_evaluated": 433,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "None of the fields are risk multipliers, and at least one positively indicates safe, controlled conditions.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  }
+ ]
+}

@@ -1,6 +1,6 @@
 # TODO: record the end-to-end demo (Talk 1, "See It Running")
 
-**Status:** not recorded. The slide has a placeholder and a NEEDS flag.
+**Status:** recorded (the user, 2026-10-04). If the slide still shows the placeholder and NEEDS flag, swap in the recording. The notes below are the original plan.
 
 ## What the slide shows
 - The Pi console running the Tier-1 triage function.

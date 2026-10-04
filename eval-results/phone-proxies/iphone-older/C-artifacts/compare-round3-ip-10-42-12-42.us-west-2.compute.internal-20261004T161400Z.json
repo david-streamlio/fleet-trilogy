@@ -1,0 +1,1102 @@
+{
+ "host": "ip-10-42-12-42.us-west-2.compute.internal",
+ "arch": "arm64",
+ "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+ "timestamp": "2026-10-04T16:14:00Z",
+ "config": {
+  "task": "full",
+  "mode": "raw",
+  "n_per_cell": 2,
+  "gguf": "/Users/ec2-user/phoneproxy/models/qwen3-8b-q4_k_m.gguf",
+  "server": "/Users/ec2-user/phoneproxy/llama.cpp/build/bin/llama-server",
+  "threads": 4,
+  "temperature": 0.2,
+  "n_predict": 450,
+  "think_budget": 0,
+  "timeout_seconds": 180.0
+ },
+ "summary": {
+  "n": 36,
+  "rates": {
+   "action_ok": 0.8888888888888888,
+   "all_ok": 0.3888888888888889,
+   "baseline_ok": 0.5,
+   "consistent": 0.8888888888888888,
+   "escalation_ok": 1.0,
+   "format_ok": 1.0,
+   "severity_ok": 0.75
+  },
+  "latency_p50_seconds": 9.609987666000961,
+  "latency_p95_seconds": 13.272520957994857,
+  "tokens_predicted_mean": 94.5,
+  "think_tokens_mean": 0.0,
+  "truncated": 0,
+  "errors": 0,
+  "by_scenario": {
+   "escalate-worthy": {
+    "n": 12,
+    "escalations": {
+     "raise": 12
+    },
+    "all_ok": 6
+   },
+   "benign": {
+    "n": 12,
+    "escalations": {
+     "hold": 12
+    },
+    "all_ok": 4
+   },
+   "de-escalate-worthy": {
+    "n": 12,
+    "escalations": {
+     "hold": 11,
+     "lower": 1
+    },
+    "all_ok": 4
+   }
+  },
+  "by_profile": {
+   "low": {
+    "n": 6,
+    "baseline_ok": 0,
+    "all_ok": 0
+   },
+   "medium-volatile": {
+    "n": 6,
+    "baseline_ok": 6,
+    "all_ok": 6
+   },
+   "medium": {
+    "n": 6,
+    "baseline_ok": 6,
+    "all_ok": 6
+   },
+   "high-volatile": {
+    "n": 6,
+    "baseline_ok": 0,
+    "all_ok": 0
+   },
+   "high-decel": {
+    "n": 6,
+    "baseline_ok": 6,
+    "all_ok": 2
+   },
+   "high-abs": {
+    "n": 6,
+    "baseline_ok": 0,
+    "all_ok": 0
+   }
+  }
+ },
+ "calls": [
+  {
+   "scenario": "escalate-worthy",
+   "profile": "low",
+   "latency_seconds": 12.73975416700705,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Weather is a risk multiplier due to heavy rain degrading traction. Dispatch status is a genuine risk factor due to being 20 minutes behind schedule.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 93,
+   "tokens_evaluated": 592,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Weather is a risk multiplier due to heavy rain degrading traction. Dispatch status is a genuine risk factor due to being 20 minutes behind schedule.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "low",
+   "latency_seconds": 12.440807041988592,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The operational context does not introduce any risk multipliers. Weather is clear and dry, cargo is general freight, and dispatch status is on schedule. None of these fields are risk multipliers, and the dispatch status does not indicate any unsafe conditions.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 109,
+   "tokens_evaluated": 586,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The operational context does not introduce any risk multipliers. Weather is clear and dry, cargo is general freight, and dispatch status is on schedule. None of these fields are risk multipliers, and the dispatch status does not indicate any unsafe conditions.",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "low",
+   "latency_seconds": 10.789080959002604,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The traffic pattern is elevated velocity variance (frequent speed cycling), which is not severe stop-and-go compaction. Therefore, the baseline severity is medium.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 89,
+   "tokens_evaluated": 600,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The traffic pattern is elevated velocity variance (frequent speed cycling), which is not severe stop-and-go compaction. Therefore, the baseline severity is medium.",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "medium-volatile",
+   "latency_seconds": 12.342436040999019,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The operational context includes hazardous cargo (chemical tanker) and heavy rain, both of which are risk multipliers. The chemical tanker's cargo is dangerous if spilled, and heavy rain degrades traction and visibility.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 104,
+   "tokens_evaluated": 595,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The operational context includes hazardous cargo (chemical tanker) and heavy rain, both of which are risk multipliers. The chemical tanker's cargo is dangerous if spilled, and heavy rain degrades traction and visibility.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "medium-volatile",
+   "latency_seconds": 8.774368458005483,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"traffic pattern\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 63,
+   "tokens_evaluated": 589,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "traffic pattern",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "medium-volatile",
+   "latency_seconds": 8.72948845900828,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"traffic pattern\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 63,
+   "tokens_evaluated": 603,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "traffic pattern",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "medium",
+   "latency_seconds": 12.168110457991133,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Weather is a risk multiplier because heavy rain degrades traction and visibility. Dispatch status is a risk multiplier because being 20 minutes behind schedule under pressure is a genuine risk factor.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 99,
+   "tokens_evaluated": 591,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Weather is a risk multiplier because heavy rain degrades traction and visibility. Dispatch status is a risk multiplier because being 20 minutes behind schedule under pressure is a genuine risk factor.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "medium",
+   "latency_seconds": 12.450504708001972,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The operational context does not include any risk multipliers. Weather is clear and dry, cargo is general freight, and dispatch status is on schedule. None of these fields are risk multipliers, and the dispatch status does not indicate any unsafe conditions.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 109,
+   "tokens_evaluated": 585,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The operational context does not include any risk multipliers. Weather is clear and dry, cargo is general freight, and dispatch status is on schedule. None of these fields are risk multipliers, and the dispatch status does not indicate any unsafe conditions.",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "medium",
+   "latency_seconds": 11.824673291004729,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The operational context does not introduce any risk multipliers. The weather is clear, cargo is empty, and the driver executed a documented defensive maneuver, indicating safe handling. These factors do not elevate the risk.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 101,
+   "tokens_evaluated": 599,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The operational context does not introduce any risk multipliers. The weather is clear, cargo is empty, and the driver executed a documented defensive maneuver, indicating safe handling. These factors do not elevate the risk.",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-volatile",
+   "latency_seconds": 13.272520957994857,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Weather is a risk multiplier due to heavy rain degrading traction and visibility. Cargo is a risk multiplier as it is a chemical tanker, which is hazardous if spilled or shifted. Dispatch status is a risk factor as being 20 minutes behind schedule under pressure.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 115,
+   "tokens_evaluated": 594,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Weather is a risk multiplier due to heavy rain degrading traction and visibility. Cargo is a risk multiplier as it is a chemical tanker, which is hazardous if spilled or shifted. Dispatch status is a risk factor as being 20 minutes behind schedule under pressure.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-volatile",
+   "latency_seconds": 8.722202707998804,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"traffic pattern\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 63,
+   "tokens_evaluated": 588,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "traffic pattern",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-volatile",
+   "latency_seconds": 8.719969958998263,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"traffic pattern\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 63,
+   "tokens_evaluated": 602,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "traffic pattern",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-decel",
+   "latency_seconds": 11.650283709008363,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Weather is a risk multiplier due to heavy rain degrading traction, and dispatch status is a risk factor due to being 20 minutes behind schedule.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 93,
+   "tokens_evaluated": 591,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Weather is a risk multiplier due to heavy rain degrading traction, and dispatch status is a risk factor due to being 20 minutes behind schedule.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-decel",
+   "latency_seconds": 11.293664625001838,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"The baseline severity is high due to peak deceleration exceeding 0.45 g, which is a direct indicator of high severity regardless of other factors.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 95,
+   "tokens_evaluated": 585,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "The baseline severity is high due to peak deceleration exceeding 0.45 g, which is a direct indicator of high severity regardless of other factors.",
+    "escalation": "hold",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-decel",
+   "latency_seconds": 11.42567704099929,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"The baseline severity is high due to the peak deceleration exceeding 0.45 g, which is a direct trigger for high severity regardless of other factors.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 96,
+   "tokens_evaluated": 599,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "The baseline severity is high due to the peak deceleration exceeding 0.45 g, which is a direct trigger for high severity regardless of other factors.",
+    "escalation": "hold",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-abs",
+   "latency_seconds": 15.100415417007753,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The baseline severity is medium because the peak deceleration is 0.15 g, which is below 0.22 g, and the traffic pattern is not severe stop-and-go compaction. The ABS engaged status is yes, but the peak deceleration is below 0.22 g, so the baseline severity remains medium.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 134,
+   "tokens_evaluated": 592,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The baseline severity is medium because the peak deceleration is 0.15 g, which is below 0.22 g, and the traffic pattern is not severe stop-and-go compaction. The ABS engaged status is yes, but the peak deceleration is below 0.22 g, so the baseline severity remains medium.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-abs",
+   "latency_seconds": 8.849052250006935,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"ABS engaged is yes\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 65,
+   "tokens_evaluated": 586,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "ABS engaged is yes",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-abs",
+   "latency_seconds": 12.158399959007511,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"ABS engaged is yes, which is a risk multiplier for high severity, but the traffic pattern is elevated velocity variance (frequent speed cycling), which is not severe stop-and-go compaction. Therefore, the baseline is medium.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 105,
+   "tokens_evaluated": 600,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "ABS engaged is yes, which is a risk multiplier for high severity, but the traffic pattern is elevated velocity variance (frequent speed cycling), which is not severe stop-and-go compaction. Therefore, the baseline is medium.",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "low",
+   "latency_seconds": 7.688046707989997,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Weather is a risk multiplier due to heavy rain degrading traction and visibility. Dispatch status is a genuine risk factor as being behind schedule under pressure.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 92,
+   "tokens_evaluated": 592,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Weather is a risk multiplier due to heavy rain degrading traction and visibility. Dispatch status is a genuine risk factor as being behind schedule under pressure.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "low",
+   "latency_seconds": 8.48732916598965,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The operational context does not introduce any risk multipliers. Weather is clear and dry, cargo is general freight, and dispatch status is on schedule. None of these fields are risk factors that would raise the severity.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 102,
+   "tokens_evaluated": 586,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The operational context does not introduce any risk multipliers. Weather is clear and dry, cargo is general freight, and dispatch status is on schedule. None of these fields are risk factors that would raise the severity.",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "low",
+   "latency_seconds": 7.838006707999739,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The operational context does not include any risk multipliers, and the dispatch status indicates the driver handled a hazard safely, which is a reason to lower the severity.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 94,
+   "tokens_evaluated": 600,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The operational context does not include any risk multipliers, and the dispatch status indicates the driver handled a hazard safely, which is a reason to lower the severity.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "medium-volatile",
+   "latency_seconds": 9.609987666000961,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Weather is a risk multiplier due to heavy rain degrading traction and visibility. Cargo is a risk multiplier as it's a chemical tanker with hazardous materials. Dispatch status is a risk factor as being 20 minutes behind schedule increases the likelihood of unsafe driving conditions.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 115,
+   "tokens_evaluated": 595,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Weather is a risk multiplier due to heavy rain degrading traction and visibility. Cargo is a risk multiplier as it's a chemical tanker with hazardous materials. Dispatch status is a risk factor as being 20 minutes behind schedule increases the likelihood of unsafe driving conditions.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "medium-volatile",
+   "latency_seconds": 5.3458274159929715,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"traffic pattern\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 63,
+   "tokens_evaluated": 589,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "traffic pattern",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "medium-volatile",
+   "latency_seconds": 5.295341791003011,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"traffic pattern\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 63,
+   "tokens_evaluated": 603,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "traffic pattern",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "medium",
+   "latency_seconds": 8.243554790999042,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Weather is a risk multiplier because heavy rain degrades traction and visibility. Dispatch status is a risk multiplier because being 20 minutes behind schedule under pressure is a genuine risk factor.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 99,
+   "tokens_evaluated": 591,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Weather is a risk multiplier because heavy rain degrades traction and visibility. Dispatch status is a risk multiplier because being 20 minutes behind schedule under pressure is a genuine risk factor.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "medium",
+   "latency_seconds": 10.406035791995237,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The operational context does not introduce any risk multipliers. Weather is clear and dry, cargo is general freight, and dispatch status is on schedule. None of these fields are risk factors. The traffic pattern is elevated velocity variance (frequent speed cycling), which is not severe stop-and-go compaction, so baseline remains medium.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 125,
+   "tokens_evaluated": 585,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The operational context does not introduce any risk multipliers. Weather is clear and dry, cargo is general freight, and dispatch status is on schedule. None of these fields are risk factors. The traffic pattern is elevated velocity variance (frequent speed cycling), which is not severe stop-and-go compaction, so baseline remains medium.",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "medium",
+   "latency_seconds": 8.4386599999998,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The operational context does not introduce any risk multipliers. The weather is clear, cargo is empty, and the driver executed a documented defensive maneuver, indicating safe handling. These factors do not raise the severity.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 101,
+   "tokens_evaluated": 599,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The operational context does not introduce any risk multipliers. The weather is clear, cargo is empty, and the driver executed a documented defensive maneuver, indicating safe handling. These factors do not raise the severity.",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-volatile",
+   "latency_seconds": 9.891154166005435,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Weather is a risk multiplier because heavy rain degrades traction and visibility. Cargo is a risk multiplier because it is a chemical tanker, which is hazardous if spilled or shifted. Dispatch status is a risk factor because being 20 minutes behind schedule under pressure is a genuine risk factor.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 119,
+   "tokens_evaluated": 594,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Weather is a risk multiplier because heavy rain degrades traction and visibility. Cargo is a risk multiplier because it is a chemical tanker, which is hazardous if spilled or shifted. Dispatch status is a risk factor because being 20 minutes behind schedule under pressure is a genuine risk factor.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-volatile",
+   "latency_seconds": 5.400365708002937,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"traffic pattern\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 63,
+   "tokens_evaluated": 588,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "traffic pattern",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-volatile",
+   "latency_seconds": 5.355794458009768,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"traffic pattern\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 63,
+   "tokens_evaluated": 602,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "traffic pattern",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-decel",
+   "latency_seconds": 7.8532574999990175,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Weather is a risk multiplier due to heavy rain degrading traction and visibility, and cargo is a risk multiplier due to being a chemical tanker with hazardous materials.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 94,
+   "tokens_evaluated": 591,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Weather is a risk multiplier due to heavy rain degrading traction and visibility, and cargo is a risk multiplier due to being a chemical tanker with hazardous materials.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-decel",
+   "latency_seconds": 8.010090667012264,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"The baseline severity is high due to the peak deceleration exceeding 0.45 g, which is a direct trigger for high severity regardless of other factors.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 96,
+   "tokens_evaluated": 585,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "The baseline severity is high due to the peak deceleration exceeding 0.45 g, which is a direct trigger for high severity regardless of other factors.",
+    "escalation": "hold",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-decel",
+   "latency_seconds": 9.319497125005,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"The baseline severity is high due to peak deceleration exceeding 0.45 g. The traffic pattern of elevated velocity variance (frequent speed cycling) does not affect the severity classification as it is not severe stop-and-go compaction.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 112,
+   "tokens_evaluated": 599,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "The baseline severity is high due to peak deceleration exceeding 0.45 g. The traffic pattern of elevated velocity variance (frequent speed cycling) does not affect the severity classification as it is not severe stop-and-go compaction.",
+    "escalation": "hold",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-abs",
+   "latency_seconds": 12.490470625009038,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The baseline severity is medium because the peak deceleration is 0.15 g, which is below 0.22 g, and the traffic pattern is not severe stop-and-go compaction. The ABS engaged is yes, but the rules state that if the peak deceleration is below 0.22 g, the severity is medium unless the traffic pattern is severe stop-and-go compaction.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 147,
+   "tokens_evaluated": 592,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The baseline severity is medium because the peak deceleration is 0.15 g, which is below 0.22 g, and the traffic pattern is not severe stop-and-go compaction. The ABS engaged is yes, but the rules state that if the peak deceleration is below 0.22 g, the severity is medium unless the traffic pattern is severe stop-and-go compaction.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-abs",
+   "latency_seconds": 5.508430084009888,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"ABS engaged is yes\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 65,
+   "tokens_evaluated": 586,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "ABS engaged is yes",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-abs",
+   "latency_seconds": 10.805963209000765,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The baseline severity is medium because the peak deceleration is 0.15 g, which is below 0.22 g, and the traffic pattern is not severe stop-and-go compaction. The ABS engaged is yes, but the peak deceleration is below 0.22 g, so the baseline severity is medium.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 130,
+   "tokens_evaluated": 600,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The baseline severity is medium because the peak deceleration is 0.15 g, which is below 0.22 g, and the traffic pattern is not severe stop-and-go compaction. The ABS engaged is yes, but the peak deceleration is below 0.22 g, so the baseline severity is medium.",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  }
+ ]
+}

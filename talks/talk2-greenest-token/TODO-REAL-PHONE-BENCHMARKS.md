@@ -1,6 +1,6 @@
 # TODO: benchmark on real phones (AWS Device Farm)
 
-**Status:** not started. Waiting on Phase 1 proxy results (`deploy/aws-phone-proxies/`, 2026-10-03). Review those first, then decide.
+**Status:** not this round. The user time-boxed the study on 2026-10-04: no real phones, no Pi 5, no Phase 2, no round 3b. The proxy results stand in, with their caveats (test log §8). Kept as the plan for a later round.
 
 ## Why
 The EC2 proxies share the phones' core lineage but not their memory system or thermals:

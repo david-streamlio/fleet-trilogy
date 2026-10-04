@@ -1,0 +1,1104 @@
+{
+ "host": "ip-10-42-12-42.us-west-2.compute.internal",
+ "arch": "arm64",
+ "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+ "timestamp": "2026-10-04T17:08:55Z",
+ "config": {
+  "task": "full",
+  "mode": "raw",
+  "n_per_cell": 2,
+  "gguf": "/Users/ec2-user/phoneproxy/models-phase2/Qwen3-14B-Q4_K_M.gguf",
+  "server": "/Users/ec2-user/phoneproxy/llama.cpp/build/bin/llama-server",
+  "threads": 4,
+  "temperature": 0.2,
+  "n_predict": 450,
+  "think_budget": 0,
+  "timeout_seconds": 180.0
+ },
+ "summary": {
+  "n": 36,
+  "rates": {
+   "action_ok": 0.75,
+   "all_ok": 0.3333333333333333,
+   "baseline_ok": 0.6388888888888888,
+   "consistent": 0.6111111111111112,
+   "escalation_ok": 0.7777777777777778,
+   "format_ok": 1.0,
+   "severity_ok": 0.8333333333333334
+  },
+  "latency_p50_seconds": 23.4613207920047,
+  "latency_p95_seconds": 33.99075604099198,
+  "tokens_predicted_mean": 130.25,
+  "think_tokens_mean": 0.0,
+  "truncated": 0,
+  "errors": 0,
+  "by_scenario": {
+   "escalate-worthy": {
+    "n": 12,
+    "escalations": {
+     "raise": 11,
+     "hold": 1
+    },
+    "all_ok": 7
+   },
+   "benign": {
+    "n": 12,
+    "escalations": {
+     "lower": 7,
+     "hold": 5
+    },
+    "all_ok": 1
+   },
+   "de-escalate-worthy": {
+    "n": 12,
+    "escalations": {
+     "lower": 9,
+     "hold": 3
+    },
+    "all_ok": 4
+   }
+  },
+  "by_profile": {
+   "low": {
+    "n": 6,
+    "baseline_ok": 6,
+    "all_ok": 5
+   },
+   "medium-volatile": {
+    "n": 6,
+    "baseline_ok": 0,
+    "all_ok": 0
+   },
+   "medium": {
+    "n": 6,
+    "baseline_ok": 6,
+    "all_ok": 3
+   },
+   "high-volatile": {
+    "n": 6,
+    "baseline_ok": 0,
+    "all_ok": 0
+   },
+   "high-decel": {
+    "n": 6,
+    "baseline_ok": 6,
+    "all_ok": 3
+   },
+   "high-abs": {
+    "n": 6,
+    "baseline_ok": 5,
+    "all_ok": 1
+   }
+  }
+ },
+ "calls": [
+  {
+   "scenario": "escalate-worthy",
+   "profile": "low",
+   "latency_seconds": 25.111019083007704,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"Heavy rain (weather) and liquids/chemical tanker (cargo) are risk multipliers. The dispatch status of being 20 minutes behind schedule adds pressure, increasing the risk of unsafe driving behaviors.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 102,
+   "tokens_evaluated": 592,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "Heavy rain (weather) and liquids/chemical tanker (cargo) are risk multipliers. The dispatch status of being 20 minutes behind schedule adds pressure, increasing the risk of unsafe driving behaviors.",
+    "escalation": "raise",
+    "severity": "medium",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "low",
+   "latency_seconds": 22.871077874995535,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"The peak deceleration is 0.15 g, which is below 0.22 g. The traffic pattern is elevated velocity variance, which is not classified as severe stop-and-go compaction. Therefore, the baseline severity is low.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 111,
+   "tokens_evaluated": 586,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "The peak deceleration is 0.15 g, which is below 0.22 g. The traffic pattern is elevated velocity variance, which is not classified as severe stop-and-go compaction. Therefore, the baseline severity is low.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "low",
+   "latency_seconds": 22.75384849999682,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"The operational context includes clear conditions and a documented defensive maneuver, indicating safe, controlled conditions. The cargo is non-hazardous and the dispatch status is ahead of schedule, which does not introduce risk multipliers. These factors support a lower escalation.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 109,
+   "tokens_evaluated": 600,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "The operational context includes clear conditions and a documented defensive maneuver, indicating safe, controlled conditions. The cargo is non-hazardous and the dispatch status is ahead of schedule, which does not introduce risk multipliers. These factors support a lower escalation.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "medium-volatile",
+   "latency_seconds": 21.478729791997466,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"Heavy rain (reduces traction) and hazardous cargo (liquids/chemical tanker) are risk multipliers. Being behind schedule adds pressure, which is a risk factor.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 97,
+   "tokens_evaluated": 595,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "Heavy rain (reduces traction) and hazardous cargo (liquids/chemical tanker) are risk multipliers. Being behind schedule adds pressure, which is a risk factor.",
+    "escalation": "raise",
+    "severity": "medium",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "medium-volatile",
+   "latency_seconds": 20.38561650000338,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"None of the operational context fields are risk multipliers. Weather is clear and dry, cargo is general freight, and dispatch is on schedule, indicating safe and controlled conditions.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 94,
+   "tokens_evaluated": 589,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "None of the operational context fields are risk multipliers. Weather is clear and dry, cargo is general freight, and dispatch is on schedule, indicating safe and controlled conditions.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "medium-volatile",
+   "latency_seconds": 39.67080070798693,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"The peak deceleration is 0.15 g, which is below the 0.22 g threshold, and ABS was not engaged. However, the traffic pattern is severe stop-and-go compaction. According to the rules, this would classify the baseline severity as medium. Wait, there's a contradiction here. Let me recheck the rules. The rules state: if peak deceleration is 0.22 g or below, then severity is medium if traffic pattern is severe stop-and-go compaction, else low. Since peak deceleration is 0.15 g (below 0.22 g) and traffic pattern is severe stop-and-go compaction, baseline severity should be medium. But the initial answer said low. That's an error. Let me correct that.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 224,
+   "tokens_evaluated": 603,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "The peak deceleration is 0.15 g, which is below the 0.22 g threshold, and ABS was not engaged. However, the traffic pattern is severe stop-and-go compaction. According to the rules, this would classify the baseline severity as medium. Wait, there's a contradiction here. Let me recheck the rules. The rules state: if peak deceleration is 0.22 g or below, then severity is medium if traffic pattern is severe stop-and-go compaction, else low. Since peak deceleration is 0.15 g (below 0.22 g) and traffic pattern is severe stop-and-go compaction, baseline severity should be medium. But the initial answer said low. That's an error. Let me correct that.",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "medium",
+   "latency_seconds": 24.57375716601382,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Heavy rain (weather) and liquids/chemical tanker (cargo) are risk multipliers. Heavy rain degrades traction and visibility, and liquids/chemical tanker can be dangerous if spilled or shifted. Dispatch status being behind schedule adds pressure, which is a risk factor.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 115,
+   "tokens_evaluated": 591,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Heavy rain (weather) and liquids/chemical tanker (cargo) are risk multipliers. Heavy rain degrades traction and visibility, and liquids/chemical tanker can be dangerous if spilled or shifted. Dispatch status being behind schedule adds pressure, which is a risk factor.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "medium",
+   "latency_seconds": 33.99075604099198,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The peak deceleration of 0.3 g falls within the range of 0.22 g to 0.45 g, and the traffic pattern is elevated velocity variance (frequent speed cycling), which is not classified as severe stop-and-go compaction. Therefore, the baseline severity is medium. Operational context factors (weather, cargo, dispatch status) do not act as risk multipliers. Clear skies and dry pavement do not degrade traction or visibility, and general freight is not a risk factor. The dispatch status is on schedule, indicating no added pressure or hazards. Thus, there is no escalation.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 186,
+   "tokens_evaluated": 585,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The peak deceleration of 0.3 g falls within the range of 0.22 g to 0.45 g, and the traffic pattern is elevated velocity variance (frequent speed cycling), which is not classified as severe stop-and-go compaction. Therefore, the baseline severity is medium. Operational context factors (weather, cargo, dispatch status) do not act as risk multipliers. Clear skies and dry pavement do not degrade traction or visibility, and general freight is not a risk factor. The dispatch status is on schedule, indicating no added pressure or hazards. Thus, there is no escalation.",
+    "escalation": "lower",
+    "severity": "medium",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "medium",
+   "latency_seconds": 28.28685200000473,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The peak deceleration is 0.3 g, which falls between 0.22 g and 0.45 g. The traffic pattern is elevated velocity variance (frequent speed cycling), which is not classified as severe stop-and-go compaction. Since the peak deceleration is above 0.22 g and the traffic pattern is not severe stop-and-go compaction, the baseline severity is medium.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 147,
+   "tokens_evaluated": 599,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The peak deceleration is 0.3 g, which falls between 0.22 g and 0.45 g. The traffic pattern is elevated velocity variance (frequent speed cycling), which is not classified as severe stop-and-go compaction. Since the peak deceleration is above 0.22 g and the traffic pattern is not severe stop-and-go compaction, the baseline severity is medium.",
+    "escalation": "lower",
+    "severity": "medium",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-volatile",
+   "latency_seconds": 21.4098597500124,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Heavy rain (degrades traction) and hazardous cargo (liquids/chemical tanker) are risk multipliers. Being behind schedule is a risk factor. No evidence of driver control.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 97,
+   "tokens_evaluated": 594,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Heavy rain (degrades traction) and hazardous cargo (liquids/chemical tanker) are risk multipliers. Being behind schedule is a risk factor. No evidence of driver control.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-volatile",
+   "latency_seconds": 23.4613207920047,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The peak deceleration of 0.3 g falls within the range of 0.22 g to 0.45 g, and the traffic pattern is severe stop-and-go compaction. According to the rules, this combination results in a baseline severity of medium.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 115,
+   "tokens_evaluated": 588,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The peak deceleration of 0.3 g falls within the range of 0.22 g to 0.45 g, and the traffic pattern is severe stop-and-go compaction. According to the rules, this combination results in a baseline severity of medium.",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-volatile",
+   "latency_seconds": 30.746014875010587,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The peak deceleration of 0.3 g falls within the range of 0.22 g to 0.45 g, and the traffic pattern is severe stop-and-go compaction. According to the rules, this combination results in a medium baseline severity. The operational context includes clear weather, non-hazardous cargo, and a documented defensive maneuver by the driver, which indicates safe and controlled conditions. These factors do not act as risk multipliers and suggest a reason to lower the severity.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 163,
+   "tokens_evaluated": 602,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The peak deceleration of 0.3 g falls within the range of 0.22 g to 0.45 g, and the traffic pattern is severe stop-and-go compaction. According to the rules, this combination results in a medium baseline severity. The operational context includes clear weather, non-hazardous cargo, and a documented defensive maneuver by the driver, which indicates safe and controlled conditions. These factors do not act as risk multipliers and suggest a reason to lower the severity.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-decel",
+   "latency_seconds": 28.51009658300609,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"The peak deceleration of 0.5 g exceeds the 0.45 g threshold, leading to a high baseline severity. Weather conditions (heavy rain) degrade traction, and the cargo (liquids/chemical tanker) poses a risk of spillage or shifting, both of which are risk multipliers. The dispatch status being 20 minutes behind schedule adds pressure, further increasing risk.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 142,
+   "tokens_evaluated": 591,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "The peak deceleration of 0.5 g exceeds the 0.45 g threshold, leading to a high baseline severity. Weather conditions (heavy rain) degrade traction, and the cargo (liquids/chemical tanker) poses a risk of spillage or shifting, both of which are risk multipliers. The dispatch status being 20 minutes behind schedule adds pressure, further increasing risk.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-decel",
+   "latency_seconds": 25.903183625006932,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"The peak deceleration of 0.5 g exceeds the 0.45 g threshold, leading to a high baseline severity. Operational context factors (clear weather, dry pavement, on-schedule status) do not introduce additional risk multipliers, and the cargo type (dry goods) is not a risk factor. No escalation is warranted.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 131,
+   "tokens_evaluated": 585,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "The peak deceleration of 0.5 g exceeds the 0.45 g threshold, leading to a high baseline severity. Operational context factors (clear weather, dry pavement, on-schedule status) do not introduce additional risk multipliers, and the cargo type (dry goods) is not a risk factor. No escalation is warranted.",
+    "escalation": "lower",
+    "severity": "high",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-decel",
+   "latency_seconds": 27.245444749991293,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"The peak deceleration of 0.5 g exceeds the 0.45 g threshold, triggering a high baseline severity. Operational context includes clear weather and a documented defensive maneuver, which are not risk multipliers. The dispatch status being ahead of schedule and the non-hazardous cargo further support a controlled scenario, but the initial severity remains high due to the deceleration level.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 140,
+   "tokens_evaluated": 599,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "The peak deceleration of 0.5 g exceeds the 0.45 g threshold, triggering a high baseline severity. Operational context includes clear weather and a documented defensive maneuver, which are not risk multipliers. The dispatch status being ahead of schedule and the non-hazardous cargo further support a controlled scenario, but the initial severity remains high due to the deceleration level.",
+    "escalation": "lower",
+    "severity": "medium",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-abs",
+   "latency_seconds": 25.291526458007866,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"ABS engaged is yes, which directly triggers high severity under baseline rules. Weather (heavy rain) and cargo (liquids/chemical tanker) are risk multipliers, but baseline severity is already high due to ABS engagement. Dispatch status being behind schedule adds pressure but does not change baseline severity.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 120,
+   "tokens_evaluated": 592,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "ABS engaged is yes, which directly triggers high severity under baseline rules. Weather (heavy rain) and cargo (liquids/chemical tanker) are risk multipliers, but baseline severity is already high due to ABS engagement. Dispatch status being behind schedule adds pressure but does not change baseline severity.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-abs",
+   "latency_seconds": 24.83845791699423,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"ABS engaged is yes, which directly triggers high severity under the baseline rules. The peak deceleration of 0.15 g is below the 0.22 g threshold, but the ABS engagement overrides this. The traffic pattern of elevated velocity variance does not affect the baseline severity in this case.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 124,
+   "tokens_evaluated": 586,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "ABS engaged is yes, which directly triggers high severity under the baseline rules. The peak deceleration of 0.15 g is below the 0.22 g threshold, but the ABS engagement overrides this. The traffic pattern of elevated velocity variance does not affect the baseline severity in this case.",
+    "escalation": "hold",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-abs",
+   "latency_seconds": 26.110216582994326,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"ABS engaged is yes, which directly triggers high severity under the baseline rules. The peak deceleration of 0.15 g is below the 0.22 g threshold, but the presence of ABS engagement overrides this, resulting in a high severity classification. The traffic pattern of elevated velocity variance does not affect the baseline severity in this case.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 132,
+   "tokens_evaluated": 600,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "ABS engaged is yes, which directly triggers high severity under the baseline rules. The peak deceleration of 0.15 g is below the 0.22 g threshold, but the presence of ABS engagement overrides this, resulting in a high severity classification. The traffic pattern of elevated velocity variance does not affect the baseline severity in this case.",
+    "escalation": "lower",
+    "severity": "high",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "low",
+   "latency_seconds": 17.558684292002,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"Heavy rain degrades traction, increasing the risk of hydroplaning or loss of control. The cargo being liquids/chemical tanker adds risk due to potential spillage or shifting during sudden deceleration. Being 20 minutes behind schedule introduces pressure that may affect driver decision-making.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 118,
+   "tokens_evaluated": 592,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "Heavy rain degrades traction, increasing the risk of hydroplaning or loss of control. The cargo being liquids/chemical tanker adds risk due to potential spillage or shifting during sudden deceleration. Being 20 minutes behind schedule introduces pressure that may affect driver decision-making.",
+    "escalation": "raise",
+    "severity": "medium",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "low",
+   "latency_seconds": 16.411938834004104,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"The peak deceleration is 0.15 g, which is below 0.22 g. The traffic pattern is elevated velocity variance, which is not classified as severe stop-and-go compaction. Therefore, the baseline severity is low.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 110,
+   "tokens_evaluated": 586,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "The peak deceleration is 0.15 g, which is below 0.22 g. The traffic pattern is elevated velocity variance, which is not classified as severe stop-and-go compaction. Therefore, the baseline severity is low.",
+    "escalation": "hold",
+    "severity": "low",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "low",
+   "latency_seconds": 16.786034459000803,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"The peak deceleration is 0.15 g, which is below the 0.22 g threshold. The traffic pattern is elevated velocity variance, which is not classified as severe stop-and-go compaction. Therefore, the baseline severity is low.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 113,
+   "tokens_evaluated": 600,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "The peak deceleration is 0.15 g, which is below the 0.22 g threshold. The traffic pattern is elevated velocity variance, which is not classified as severe stop-and-go compaction. Therefore, the baseline severity is low.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "medium-volatile",
+   "latency_seconds": 14.530140457995003,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"Heavy rain (reduces traction) and hazardous cargo (liquids/chemicals) are risk multipliers. Being behind schedule adds pressure, which is a risk factor.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 97,
+   "tokens_evaluated": 595,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "Heavy rain (reduces traction) and hazardous cargo (liquids/chemicals) are risk multipliers. Being behind schedule adds pressure, which is a risk factor.",
+    "escalation": "raise",
+    "severity": "medium",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "medium-volatile",
+   "latency_seconds": 30.50982020799711,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"The peak deceleration is 0.15 g, which is below 0.22 g, and the traffic pattern is severe stop-and-go compaction. According to the rules, this would be classified as medium severity. However, the traffic pattern being severe stop-and-go compaction would elevate the severity to medium. Wait, the initial rules say: if peak deceleration is 0.22 g or below, then medium if traffic pattern is severe stop-and-go compaction, else low. So with peak deceleration 0.15 g and traffic pattern severe stop-and-go, it should be medium. But the initial answer said low. That's a mistake. Let me correct that.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 206,
+   "tokens_evaluated": 589,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "The peak deceleration is 0.15 g, which is below 0.22 g, and the traffic pattern is severe stop-and-go compaction. According to the rules, this would be classified as medium severity. However, the traffic pattern being severe stop-and-go compaction would elevate the severity to medium. Wait, the initial rules say: if peak deceleration is 0.22 g or below, then medium if traffic pattern is severe stop-and-go compaction, else low. So with peak deceleration 0.15 g and traffic pattern severe stop-and-go, it should be medium. But the initial answer said low. That's a mistake. Let me correct that.",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "medium-volatile",
+   "latency_seconds": 21.343828957993537,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"The peak deceleration is 0.15 g, which is below 0.22 g, and the traffic pattern is severe stop-and-go compaction. According to the rules, this would be classified as medium severity. However, the traffic pattern being severe stop-and-go compaction and the peak deceleration being below 0.22 g leads to a baseline severity of low.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 142,
+   "tokens_evaluated": 603,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "The peak deceleration is 0.15 g, which is below 0.22 g, and the traffic pattern is severe stop-and-go compaction. According to the rules, this would be classified as medium severity. However, the traffic pattern being severe stop-and-go compaction and the peak deceleration being below 0.22 g leads to a baseline severity of low.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "medium",
+   "latency_seconds": 14.043509792012628,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Heavy rain (weather) and liquids/chemical tanker (cargo) are risk multipliers. The dispatch status being behind schedule adds pressure, increasing the likelihood of risk.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 94,
+   "tokens_evaluated": 591,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Heavy rain (weather) and liquids/chemical tanker (cargo) are risk multipliers. The dispatch status being behind schedule adds pressure, increasing the likelihood of risk.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "medium",
+   "latency_seconds": 24.793313041998772,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The peak deceleration of 0.3 g falls within the range of 0.22 g to 0.45 g, and the traffic pattern is elevated velocity variance (frequent speed cycling), which is not classified as severe stop-and-go compaction. Therefore, the baseline severity is medium. The operational context includes clear skies, dry pavement, and general freight, which are not risk multipliers. The dispatch status is on schedule, indicating controlled conditions. There are no factors that necessitate an escalation.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 167,
+   "tokens_evaluated": 585,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The peak deceleration of 0.3 g falls within the range of 0.22 g to 0.45 g, and the traffic pattern is elevated velocity variance (frequent speed cycling), which is not classified as severe stop-and-go compaction. Therefore, the baseline severity is medium. The operational context includes clear skies, dry pavement, and general freight, which are not risk multipliers. The dispatch status is on schedule, indicating controlled conditions. There are no factors that necessitate an escalation.",
+    "escalation": "lower",
+    "severity": "medium",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "medium",
+   "latency_seconds": 26.294988415989792,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The peak deceleration of 0.3 g falls within the range of 0.22 g to 0.45 g, and the traffic pattern is elevated velocity variance (frequent speed cycling), which is not classified as severe stop-and-go compaction. Therefore, the baseline severity is medium. Operational context indicates clear conditions and light traffic, which are not risk multipliers. The cargo is an empty trailer, which is not a risk factor. The dispatch status shows the driver executed a documented defensive maneuver, indicating safe control. These factors support holding the baseline severity.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 177,
+   "tokens_evaluated": 599,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The peak deceleration of 0.3 g falls within the range of 0.22 g to 0.45 g, and the traffic pattern is elevated velocity variance (frequent speed cycling), which is not classified as severe stop-and-go compaction. Therefore, the baseline severity is medium. Operational context indicates clear conditions and light traffic, which are not risk multipliers. The cargo is an empty trailer, which is not a risk factor. The dispatch status shows the driver executed a documented defensive maneuver, indicating safe control. These factors support holding the baseline severity.",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-volatile",
+   "latency_seconds": 14.330271124999854,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Heavy rain (reduces traction) and hazardous cargo (liquids/chemical tanker) are risk multipliers. Being behind schedule adds pressure, which is a risk factor.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 96,
+   "tokens_evaluated": 594,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Heavy rain (reduces traction) and hazardous cargo (liquids/chemical tanker) are risk multipliers. Being behind schedule adds pressure, which is a risk factor.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-volatile",
+   "latency_seconds": 24.240517957994598,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The peak deceleration of 0.3 g falls within the range of 0.22 g to 0.45 g, and the traffic pattern is severe stop-and-go compaction. According to the rules, this combination results in a medium baseline severity. The operational context includes clear weather, dry pavement, and on-schedule dispatch status, which do not act as risk multipliers. The cargo is general freight, which is not a risk factor. Therefore, there is no escalation.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 163,
+   "tokens_evaluated": 588,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The peak deceleration of 0.3 g falls within the range of 0.22 g to 0.45 g, and the traffic pattern is severe stop-and-go compaction. According to the rules, this combination results in a medium baseline severity. The operational context includes clear weather, dry pavement, and on-schedule dispatch status, which do not act as risk multipliers. The cargo is general freight, which is not a risk factor. Therefore, there is no escalation.",
+    "escalation": "lower",
+    "severity": "medium",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": false,
+    "consistent": false,
+    "severity_ok": false,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-volatile",
+   "latency_seconds": 25.226042834008695,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The peak deceleration of 0.3 g falls within the 0.22 g to 0.45 g range, and the traffic pattern is severe stop-and-go compaction, which according to the rules, classifies the baseline severity as medium. The operational context includes clear weather and non-hazardous cargo, which are not risk multipliers. The dispatch status indicates the driver executed a documented defensive maneuver, suggesting controlled conditions. Therefore, there is no strong evidence to raise the severity, and the baseline severity is held.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 168,
+   "tokens_evaluated": 602,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The peak deceleration of 0.3 g falls within the 0.22 g to 0.45 g range, and the traffic pattern is severe stop-and-go compaction, which according to the rules, classifies the baseline severity as medium. The operational context includes clear weather and non-hazardous cargo, which are not risk multipliers. The dispatch status indicates the driver executed a documented defensive maneuver, suggesting controlled conditions. Therefore, there is no strong evidence to raise the severity, and the baseline severity is held.",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-decel",
+   "latency_seconds": 19.607143332992564,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Heavy rain (weather) and liquids/chemical tanker (cargo) are risk multipliers. Heavy rain reduces traction and visibility, and liquids/chemical tanker can be dangerous if spilled or shifted. The dispatch status being behind schedule adds pressure, which is a risk factor.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 114,
+   "tokens_evaluated": 591,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Heavy rain (weather) and liquids/chemical tanker (cargo) are risk multipliers. Heavy rain reduces traction and visibility, and liquids/chemical tanker can be dangerous if spilled or shifted. The dispatch status being behind schedule adds pressure, which is a risk factor.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-decel",
+   "latency_seconds": 17.200391500009573,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"The peak deceleration of 0.5 g exceeds the 0.45 g threshold, leading to a high baseline severity. Operational context fields do not include risk multipliers (weather is clear, cargo is general freight, and dispatch is on schedule).\",\n  \"escalation\": \"lower\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 115,
+   "tokens_evaluated": 585,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "The peak deceleration of 0.5 g exceeds the 0.45 g threshold, leading to a high baseline severity. Operational context fields do not include risk multipliers (weather is clear, cargo is general freight, and dispatch is on schedule).",
+    "escalation": "lower",
+    "severity": "high",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-decel",
+   "latency_seconds": 16.947794958992745,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"The peak deceleration of 0.5 g exceeds the 0.45 g threshold, leading to a high baseline severity. The traffic pattern of elevated velocity variance does not affect this determination since the peak deceleration already triggers the high severity.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 113,
+   "tokens_evaluated": 599,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "The peak deceleration of 0.5 g exceeds the 0.45 g threshold, leading to a high baseline severity. The traffic pattern of elevated velocity variance does not affect this determination since the peak deceleration already triggers the high severity.",
+    "escalation": "lower",
+    "severity": "high",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-abs",
+   "latency_seconds": 16.402191916000447,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"ABS engaged is yes, which directly triggers high severity under baseline rules. Weather (heavy rain) and cargo (liquids/chemical tanker) are risk multipliers, but baseline severity is already high, so they do not further escalate it.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 110,
+   "tokens_evaluated": 592,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "ABS engaged is yes, which directly triggers high severity under baseline rules. Weather (heavy rain) and cargo (liquids/chemical tanker) are risk multipliers, but baseline severity is already high, so they do not further escalate it.",
+    "escalation": "hold",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-abs",
+   "latency_seconds": 19.241478709009243,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"ABS engaged is yes, which directly triggers high severity under the baseline rules. The traffic pattern of elevated velocity variance does not affect the baseline severity in this case because the peak deceleration is below 0.22 g. Weather and cargo are not risk multipliers here, and dispatch status is on schedule, indicating controlled conditions.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 129,
+   "tokens_evaluated": 586,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "ABS engaged is yes, which directly triggers high severity under the baseline rules. The traffic pattern of elevated velocity variance does not affect the baseline severity in this case because the peak deceleration is below 0.22 g. Weather and cargo are not risk multipliers here, and dispatch status is on schedule, indicating controlled conditions.",
+    "escalation": "hold",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-abs",
+   "latency_seconds": 16.093745459002093,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The baseline severity is medium. The operational context includes clear conditions (no risk multiplier) and a documented defensive maneuver (safe condition indicator). Since there are no risk multipliers and a safe condition is indicated, the escalation is 'lower'.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 108,
+   "tokens_evaluated": 600,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The baseline severity is medium. The operational context includes clear conditions (no risk multiplier) and a documented defensive maneuver (safe condition indicator). Since there are no risk multipliers and a safe condition is indicated, the escalation is 'lower'.",
+    "escalation": "lower",
+    "severity": "medium",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  }
+ ]
+}

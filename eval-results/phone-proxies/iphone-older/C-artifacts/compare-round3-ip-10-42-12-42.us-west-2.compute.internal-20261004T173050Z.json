@@ -1,0 +1,1101 @@
+{
+ "host": "ip-10-42-12-42.us-west-2.compute.internal",
+ "arch": "arm64",
+ "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+ "timestamp": "2026-10-04T17:30:50Z",
+ "config": {
+  "task": "full",
+  "mode": "chat-off",
+  "n_per_cell": 2,
+  "gguf": "/Users/ec2-user/phoneproxy/models/qwen3-8b-q4_k_m.gguf",
+  "server": "/Users/ec2-user/phoneproxy/llama.cpp/build/bin/llama-server",
+  "threads": 4,
+  "temperature": 0.2,
+  "n_predict": 450,
+  "think_budget": 0,
+  "timeout_seconds": 180.0
+ },
+ "summary": {
+  "n": 36,
+  "rates": {
+   "action_ok": 0.7777777777777778,
+   "all_ok": 0.4444444444444444,
+   "baseline_ok": 0.6666666666666666,
+   "consistent": 0.6666666666666666,
+   "escalation_ok": 1.0,
+   "format_ok": 1.0,
+   "severity_ok": 0.7777777777777778
+  },
+  "latency_p50_seconds": 8.456300124991685,
+  "latency_p95_seconds": 12.285300791001646,
+  "tokens_predicted_mean": 73.0,
+  "think_tokens_mean": 0.0,
+  "truncated": 0,
+  "errors": 0,
+  "by_scenario": {
+   "escalate-worthy": {
+    "n": 12,
+    "escalations": {
+     "raise": 12
+    },
+    "all_ok": 8
+   },
+   "benign": {
+    "n": 12,
+    "escalations": {
+     "hold": 12
+    },
+    "all_ok": 4
+   },
+   "de-escalate-worthy": {
+    "n": 12,
+    "escalations": {
+     "hold": 12
+    },
+    "all_ok": 4
+   }
+  },
+  "by_profile": {
+   "low": {
+    "n": 6,
+    "baseline_ok": 6,
+    "all_ok": 2
+   },
+   "medium-volatile": {
+    "n": 6,
+    "baseline_ok": 6,
+    "all_ok": 6
+   },
+   "medium": {
+    "n": 6,
+    "baseline_ok": 6,
+    "all_ok": 6
+   },
+   "high-volatile": {
+    "n": 6,
+    "baseline_ok": 0,
+    "all_ok": 0
+   },
+   "high-decel": {
+    "n": 6,
+    "baseline_ok": 6,
+    "all_ok": 2
+   },
+   "high-abs": {
+    "n": 6,
+    "baseline_ok": 0,
+    "all_ok": 0
+   }
+  }
+ },
+ "calls": [
+  {
+   "scenario": "escalate-worthy",
+   "profile": "low",
+   "latency_seconds": 12.65145154199854,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"Weather is a risk multiplier due to heavy rain degrading traction. Dispatch status is a genuine risk factor due to being 20 minutes behind schedule under pressure.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 93,
+   "tokens_evaluated": 604,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "Weather is a risk multiplier due to heavy rain degrading traction. Dispatch status is a genuine risk factor due to being 20 minutes behind schedule under pressure.",
+    "escalation": "raise",
+    "severity": "medium",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "low",
+   "latency_seconds": 10.499199541998678,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"Traffic pattern: elevated velocity variance (frequent speed cycling) is not severe stop-and-go compaction, so baseline remains low.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 86,
+   "tokens_evaluated": 598,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "Traffic pattern: elevated velocity variance (frequent speed cycling) is not severe stop-and-go compaction, so baseline remains low.",
+    "escalation": "hold",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "low",
+   "latency_seconds": 11.255433000013,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"traffic pattern: elevated velocity variance (frequent speed cycling) is not severe stop-and-go compaction, and peak deceleration is below 0.22 g\",\n  \"escalation\": \"hold\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 95,
+   "tokens_evaluated": 612,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "traffic pattern: elevated velocity variance (frequent speed cycling) is not severe stop-and-go compaction, and peak deceleration is below 0.22 g",
+    "escalation": "hold",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "medium-volatile",
+   "latency_seconds": 9.91299108399835,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Traffic pattern: severe stop-and-go compaction\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 72,
+   "tokens_evaluated": 607,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Traffic pattern: severe stop-and-go compaction",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "medium-volatile",
+   "latency_seconds": 8.456300124991685,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"traffic pattern\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 61,
+   "tokens_evaluated": 601,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "traffic pattern",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "medium-volatile",
+   "latency_seconds": 8.636875374999363,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"traffic pattern\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 62,
+   "tokens_evaluated": 615,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "traffic pattern",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "medium",
+   "latency_seconds": 12.285300791001646,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Weather is a risk multiplier due to heavy rain degrading traction and visibility. Dispatch status is a genuine risk factor as being 20 minutes behind schedule under pressure increases the likelihood of unsafe driving behavior.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 101,
+   "tokens_evaluated": 603,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Weather is a risk multiplier due to heavy rain degrading traction and visibility. Dispatch status is a genuine risk factor as being 20 minutes behind schedule under pressure increases the likelihood of unsafe driving behavior.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "medium",
+   "latency_seconds": 8.46845408299123,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"traffic pattern\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 61,
+   "tokens_evaluated": 597,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "traffic pattern",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "medium",
+   "latency_seconds": 8.57699779199902,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"traffic pattern\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 62,
+   "tokens_evaluated": 611,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "traffic pattern",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-volatile",
+   "latency_seconds": 9.795246249996126,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Traffic pattern: severe stop-and-go compaction\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 71,
+   "tokens_evaluated": 606,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Traffic pattern: severe stop-and-go compaction",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-volatile",
+   "latency_seconds": 8.56914904199948,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"traffic pattern\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 62,
+   "tokens_evaluated": 600,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "traffic pattern",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-volatile",
+   "latency_seconds": 8.612246040996979,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"traffic_pattern\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 62,
+   "tokens_evaluated": 614,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "traffic_pattern",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-decel",
+   "latency_seconds": 10.18658283300465,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"peak deceleration is above 0.45 g\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 75,
+   "tokens_evaluated": 603,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "peak deceleration is above 0.45 g",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-decel",
+   "latency_seconds": 9.541859000004479,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"peak deceleration is above 0.45 g\",\n  \"escalation\": \"hold\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 74,
+   "tokens_evaluated": 597,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "peak deceleration is above 0.45 g",
+    "escalation": "hold",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-decel",
+   "latency_seconds": 9.549568375005038,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"peak deceleration is above 0.45 g\",\n  \"escalation\": \"hold\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 74,
+   "tokens_evaluated": 611,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "peak deceleration is above 0.45 g",
+    "escalation": "hold",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-abs",
+   "latency_seconds": 9.532193709004787,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"ABS engaged is yes\",\n  \"escalation\": \"raise\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 67,
+   "tokens_evaluated": 604,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "ABS engaged is yes",
+    "escalation": "raise",
+    "severity": "medium",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-abs",
+   "latency_seconds": 8.828158874996006,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"ABS engaged is yes\",\n  \"escalation\": \"hold\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 65,
+   "tokens_evaluated": 598,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "ABS engaged is yes",
+    "escalation": "hold",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": false,
+    "severity_ok": false,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-abs",
+   "latency_seconds": 8.809742875004304,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"ABS engaged is yes\",\n  \"escalation\": \"hold\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 65,
+   "tokens_evaluated": 612,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "ABS engaged is yes",
+    "escalation": "hold",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": false,
+    "severity_ok": false,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "low",
+   "latency_seconds": 7.74797666700033,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"Weather is a risk multiplier due to heavy rain degrading traction. Dispatch status is a genuine risk factor due to being 20 minutes behind schedule under pressure.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 93,
+   "tokens_evaluated": 604,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "Weather is a risk multiplier due to heavy rain degrading traction. Dispatch status is a genuine risk factor due to being 20 minutes behind schedule under pressure.",
+    "escalation": "raise",
+    "severity": "medium",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "low",
+   "latency_seconds": 8.343102417013142,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"Traffic pattern: elevated velocity variance (frequent speed cycling) is not severe stop-and-go compaction, and peak deceleration is below 0.22 g. No risk multipliers identified.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 101,
+   "tokens_evaluated": 598,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "Traffic pattern: elevated velocity variance (frequent speed cycling) is not severe stop-and-go compaction, and peak deceleration is below 0.22 g. No risk multipliers identified.",
+    "escalation": "hold",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "low",
+   "latency_seconds": 5.744366208993597,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"no risk multipliers; safe driver maneuver\",\n  \"escalation\": \"hold\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 69,
+   "tokens_evaluated": 612,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "no risk multipliers; safe driver maneuver",
+    "escalation": "hold",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "medium-volatile",
+   "latency_seconds": 5.894608000002336,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Traffic pattern: severe stop-and-go compaction\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 71,
+   "tokens_evaluated": 607,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Traffic pattern: severe stop-and-go compaction",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "medium-volatile",
+   "latency_seconds": 5.066731750004692,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"traffic pattern\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 61,
+   "tokens_evaluated": 601,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "traffic pattern",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "medium-volatile",
+   "latency_seconds": 5.177373208003701,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"traffic_pattern\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 62,
+   "tokens_evaluated": 615,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "traffic_pattern",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "medium",
+   "latency_seconds": 8.343019666004693,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Weather is a risk multiplier due to heavy rain degrading traction and visibility. Dispatch status is a genuine risk factor as being 20 minutes behind schedule under pressure increases the likelihood of unsafe driving behavior.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 101,
+   "tokens_evaluated": 603,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Weather is a risk multiplier due to heavy rain degrading traction and visibility. Dispatch status is a genuine risk factor as being 20 minutes behind schedule under pressure increases the likelihood of unsafe driving behavior.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "medium",
+   "latency_seconds": 6.407011415998568,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Traffic pattern: elevated velocity variance (frequent speed cycling) drove the baseline to medium\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 77,
+   "tokens_evaluated": 597,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Traffic pattern: elevated velocity variance (frequent speed cycling) drove the baseline to medium",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "medium",
+   "latency_seconds": 5.182671583999763,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"traffic pattern\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 62,
+   "tokens_evaluated": 611,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "traffic pattern",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-volatile",
+   "latency_seconds": 6.0359087090037065,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Traffic pattern: severe stop-and-go compaction\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 72,
+   "tokens_evaluated": 606,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Traffic pattern: severe stop-and-go compaction",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-volatile",
+   "latency_seconds": 5.7598224579996895,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Traffic pattern: severe stop-and-go compaction\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 69,
+   "tokens_evaluated": 600,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Traffic pattern: severe stop-and-go compaction",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-volatile",
+   "latency_seconds": 5.183017165996716,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"traffic pattern\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 62,
+   "tokens_evaluated": 614,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "traffic pattern",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-decel",
+   "latency_seconds": 6.2502870409953175,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"peak deceleration is above 0.45 g\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 75,
+   "tokens_evaluated": 603,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "peak deceleration is above 0.45 g",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-decel",
+   "latency_seconds": 6.1429934589978075,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"peak deceleration is above 0.45 g\",\n  \"escalation\": \"hold\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 74,
+   "tokens_evaluated": 597,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "peak deceleration is above 0.45 g",
+    "escalation": "hold",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-decel",
+   "latency_seconds": 6.1439494590013055,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"peak deceleration is above 0.45 g\",\n  \"escalation\": \"hold\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 74,
+   "tokens_evaluated": 611,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "peak deceleration is above 0.45 g",
+    "escalation": "hold",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-abs",
+   "latency_seconds": 5.5907543749926845,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"ABS engaged is yes\",\n  \"escalation\": \"raise\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 67,
+   "tokens_evaluated": 604,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "ABS engaged is yes",
+    "escalation": "raise",
+    "severity": "medium",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-abs",
+   "latency_seconds": 5.411679416996776,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"ABS engaged is yes\",\n  \"escalation\": \"hold\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 65,
+   "tokens_evaluated": 598,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "ABS engaged is yes",
+    "escalation": "hold",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": false,
+    "severity_ok": false,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-abs",
+   "latency_seconds": 5.4014574169996195,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"ABS engaged is yes\",\n  \"escalation\": \"hold\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 65,
+   "tokens_evaluated": 612,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "ABS engaged is yes",
+    "escalation": "hold",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": false,
+    "severity_ok": false,
+    "action_ok": true,
+    "all_ok": false
+   }
+  }
+ ]
+}

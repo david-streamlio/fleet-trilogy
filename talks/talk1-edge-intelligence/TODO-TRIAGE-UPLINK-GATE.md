@@ -1,6 +1,11 @@
 # TODO: add the LLM uplink gate (triage → cellular)
 
-**Status:** not implemented. The Talk 1 deck presents it as the design (slides 20–21: "What the LLM Decides", "The LLM Decides What Crosses the Cellular Link").
+**Status:** done in `afffd91` (2026-09-30), but this file was never updated. Checked against the code 2026-10-04:
+- `LlmTriageFunction.process()` builds the card with `build_card()`, then returns it only if its final severity meets `uplink_min_severity` (user config, default `"high"`). Otherwise it publishes the card to `LOCAL_TRIAGE_TOPIC` (`persistent://public/default/triage-local-only`) and returns `None`.
+- `tests/model/eval_lib.py` scores the ungated `build_card()`, so the gate can't turn a low or medium card into a measured failure.
+- `talks/talk1-edge-intelligence/tests/test_triage_function.py` covers it, including the config override (13 tests pass).
+
+The deck presents it on slides 20–21 ("What the LLM Decides", "The LLM Decides What Crosses the Cellular Link"). The sections below are the original plan, kept as the record.
 
 ## What the deck says
 - The co-processor (`TelemetryCoprocessorFunction`) gates what reaches the LLM: `is_probable_slowdown()` plus the `eta_slip_min` magnitude gate [3.0, 60.0].

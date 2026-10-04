@@ -1,0 +1,443 @@
+{
+ "host": "ip-10-42-12-42.us-west-2.compute.internal",
+ "arch": "arm64",
+ "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+ "timestamp": "2026-10-04T16:17:44Z",
+ "config": {
+  "task": "narrow",
+  "mode": "raw",
+  "n_per_cell": 2,
+  "gguf": "/Users/ec2-user/phoneproxy/models-phase2/gemma-3-12b-it-Q4_K_M.gguf",
+  "server": "/Users/ec2-user/phoneproxy/llama.cpp/build/bin/llama-server",
+  "threads": 4,
+  "temperature": 0.2,
+  "n_predict": 300,
+  "think_budget": 0,
+  "timeout_seconds": 180.0
+ },
+ "summary": {
+  "n": 18,
+  "rates": {
+   "all_ok": 0.7777777777777778,
+   "escalation_ok": 0.7777777777777778,
+   "format_ok": 1.0
+  },
+  "latency_p50_seconds": 9.307017375002033,
+  "latency_p95_seconds": 16.72551425000711,
+  "tokens_predicted_mean": 68.5,
+  "think_tokens_mean": 0.0,
+  "truncated": 0,
+  "errors": 0,
+  "by_scenario": {
+   "escalate-worthy": {
+    "n": 6,
+    "escalations": {
+     "raise": 6
+    },
+    "all_ok": 6
+   },
+   "benign": {
+    "n": 6,
+    "escalations": {
+     "hold": 2,
+     "lower": 4
+    },
+    "all_ok": 2
+   },
+   "de-escalate-worthy": {
+    "n": 6,
+    "escalations": {
+     "lower": 6
+    },
+    "all_ok": 6
+   }
+  },
+  "by_profile": {
+   "canonical": {
+    "n": 18,
+    "baseline_ok": 0,
+    "all_ok": 14
+   }
+  }
+ },
+ "calls": [
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 16.72551425000711,
+   "content": "{\n  \"risk_synthesis\": \"Heavy rain and wet asphalt degrade traction, and the cargo is a liquid tanker, which presents a spill hazard. Being behind schedule adds pressure and reduces driver reaction time. All three factors increase the risk of an incident.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 79,
+   "tokens_evaluated": 437,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Heavy rain and wet asphalt degrade traction, and the cargo is a liquid tanker, which presents a spill hazard. Being behind schedule adds pressure and reduces driver reaction time. All three factors increase the risk of an incident.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 14.485655208001845,
+   "content": "{\n  \"risk_synthesis\": \"Dispatch status: On schedule indicates the driver is not under pressure and is proceeding normally. Therefore, no adjustment to the baseline severity is warranted.\",\n  \"escalation\": \"hold\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 64,
+   "tokens_evaluated": 432,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Dispatch status: On schedule indicates the driver is not under pressure and is proceeding normally. Therefore, no adjustment to the baseline severity is warranted.",
+    "escalation": "hold",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 14.940967709000688,
+   "content": "{\n  \"risk_synthesis\": \"The dispatch status indicates the driver executed a documented defensive maneuver, demonstrating safe handling of a potential hazard. This is evidence of driver control and reduces the risk.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 67,
+   "tokens_evaluated": 445,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "The dispatch status indicates the driver executed a documented defensive maneuver, demonstrating safe handling of a potential hazard. This is evidence of driver control and reduces the risk.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 9.032432374995551,
+   "content": "{\n  \"risk_synthesis\": \"Heavy rain and wet asphalt degrade traction, and the cargo is a liquid tanker, which could spill. Being behind schedule adds pressure on the driver.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 65,
+   "tokens_evaluated": 437,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Heavy rain and wet asphalt degrade traction, and the cargo is a liquid tanker, which could spill. Being behind schedule adds pressure on the driver.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 7.563087083006394,
+   "content": "{\n  \"risk_synthesis\": \"Dispatch status: On schedule indicates the driver is not under undue pressure and is operating normally.\",\n  \"escalation\": \"hold\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 54,
+   "tokens_evaluated": 432,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Dispatch status: On schedule indicates the driver is not under undue pressure and is operating normally.",
+    "escalation": "hold",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 9.096894333008095,
+   "content": "{\n  \"risk_synthesis\": \"Dispatch status: The driver executed a documented defensive maneuver, indicating they were proactively managing a potential hazard. This demonstrates driver control and mitigates the risk.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 66,
+   "tokens_evaluated": 445,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Dispatch status: The driver executed a documented defensive maneuver, indicating they were proactively managing a potential hazard. This demonstrates driver control and mitigates the risk.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 9.307017375002033,
+   "content": "{\n  \"risk_synthesis\": \"Heavy rain and wet asphalt degrade traction, and the cargo is a liquid tanker, which presents a spill hazard. Being behind schedule adds pressure on the driver.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 67,
+   "tokens_evaluated": 437,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Heavy rain and wet asphalt degrade traction, and the cargo is a liquid tanker, which presents a spill hazard. Being behind schedule adds pressure on the driver.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 8.4922172499937,
+   "content": "{\n  \"risk_synthesis\": \"Dispatch status: On schedule indicates the driver is not under pressure and is proceeding normally. Therefore, the severity should be lowered.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 61,
+   "tokens_evaluated": 432,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Dispatch status: On schedule indicates the driver is not under pressure and is proceeding normally. Therefore, the severity should be lowered.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 9.753875458991388,
+   "content": "{\n  \"risk_synthesis\": \"Dispatch status: The driver executed a documented defensive maneuver for a merging vehicle, indicating they were proactively managing a hazard and maintaining control. This is evidence of safe, controlled conditions.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 71,
+   "tokens_evaluated": 445,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Dispatch status: The driver executed a documented defensive maneuver for a merging vehicle, indicating they were proactively managing a hazard and maintaining control. This is evidence of safe, controlled conditions.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 10.43784012501419,
+   "content": "{\n  \"risk_synthesis\": \"Heavy rain and wet asphalt degrade traction, and the cargo is a liquid tanker, increasing the risk of a spill. Being 20 minutes behind schedule adds pressure that could lead to unsafe driving decisions.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 76,
+   "tokens_evaluated": 437,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Heavy rain and wet asphalt degrade traction, and the cargo is a liquid tanker, increasing the risk of a spill. Being 20 minutes behind schedule adds pressure that could lead to unsafe driving decisions.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 8.738521082996158,
+   "content": "{\n  \"risk_synthesis\": \"Dispatch status: On schedule indicates the driver is not under pressure and is handling the situation safely. Therefore, the severity should be lowered.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 63,
+   "tokens_evaluated": 432,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Dispatch status: On schedule indicates the driver is not under pressure and is handling the situation safely. Therefore, the severity should be lowered.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 10.1384474170045,
+   "content": "{\n  \"risk_synthesis\": \"Dispatch status: The driver executed a documented defensive maneuver, indicating proactive hazard mitigation and driver control. This suggests the driver responded appropriately to a potential threat, reducing the likelihood of a severe incident.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 74,
+   "tokens_evaluated": 445,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Dispatch status: The driver executed a documented defensive maneuver, indicating proactive hazard mitigation and driver control. This suggests the driver responded appropriately to a potential threat, reducing the likelihood of a severe incident.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 11.842489959002705,
+   "content": "{\n  \"risk_synthesis\": \"Heavy rain and wet asphalt degrade traction, and the cargo is a liquid tanker. Being 20 minutes behind schedule adds pressure and increases the likelihood of risky maneuvers. These factors combined significantly increase the potential for loss of control and a more severe incident.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 86,
+   "tokens_evaluated": 437,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Heavy rain and wet asphalt degrade traction, and the cargo is a liquid tanker. Being 20 minutes behind schedule adds pressure and increases the likelihood of risky maneuvers. These factors combined significantly increase the potential for loss of control and a more severe incident.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 8.7499831669993,
+   "content": "{\n  \"risk_synthesis\": \"Dispatch status: On schedule indicates the driver is not under pressure and is maintaining safe conditions. Therefore, the severity should be lowered.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 62,
+   "tokens_evaluated": 432,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Dispatch status: On schedule indicates the driver is not under pressure and is maintaining safe conditions. Therefore, the severity should be lowered.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 9.193621207989054,
+   "content": "{\n  \"risk_synthesis\": \"The dispatch status indicates the driver executed a documented defensive maneuver, which is evidence of safe, controlled conditions. This is a reason to lower the severity.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 66,
+   "tokens_evaluated": 445,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "The dispatch status indicates the driver executed a documented defensive maneuver, which is evidence of safe, controlled conditions. This is a reason to lower the severity.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 11.382006583007751,
+   "content": "{\n  \"risk_synthesis\": \"Heavy rain and wet asphalt degrade traction, and the cargo is a liquid tanker, which presents a spill hazard. Being 20 minutes behind schedule adds pressure and increases the likelihood of driver error. All three factors combine to increase risk.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 83,
+   "tokens_evaluated": 437,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Heavy rain and wet asphalt degrade traction, and the cargo is a liquid tanker, which presents a spill hazard. Being 20 minutes behind schedule adds pressure and increases the likelihood of driver error. All three factors combine to increase risk.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 8.763426124991383,
+   "content": "{\n  \"risk_synthesis\": \"Dispatch status: On schedule indicates the driver is not under pressure and is handling the situation safely. Therefore, the severity should be lowered.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 63,
+   "tokens_evaluated": 432,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Dispatch status: On schedule indicates the driver is not under pressure and is handling the situation safely. Therefore, the severity should be lowered.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 9.096900000004098,
+   "content": "{\n  \"risk_synthesis\": \"Dispatch status indicates the driver executed a documented defensive maneuver, suggesting they were proactively managing a potential hazard. This indicates driver control and reduces the overall risk.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 66,
+   "tokens_evaluated": 445,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Dispatch status indicates the driver executed a documented defensive maneuver, suggesting they were proactively managing a potential hazard. This indicates driver control and reduces the overall risk.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  }
+ ]
+}

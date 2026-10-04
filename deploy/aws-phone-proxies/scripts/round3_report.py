@@ -13,9 +13,17 @@ hot sessions) / calls. It needs a powermetrics trace covering the window: the ru
 powermetrics.txt(.gz) (hosts), or --trace (the MacBook runs, recorded to /tmp by the operator).
 A session the trace covers for less than 90% of its window gets no energy figure.
 
+Intervals are clustered by cell (scenario x event profile; test log caveat 6). Repeats of a cell
+mostly reach the same verdict, so the calls are not independent samples. Each session's all_ok
+interval is a Wilson interval at the effective sample size n_eff = n / (1 + (m - 1) * ICC), with m
+the mean calls per cell and ICC the within-cell correlation of all_ok (one-way ANOVA estimator,
+clipped to [0, 1]). With no variation at all, ICC is taken as 1 (conservative: n_eff = cells).
+n_eff runs from the number of cells (ICC 1) to the number of calls (ICC 0). `--naive` gives the
+plain per-call Wilson interval instead.
+
 Sections: per-platform detail; narrow vs full (raw); thinking modes; the prompt ablation; and
-cross-platform agreement, flagging cells whose 95% Wilson intervals don't overlap (accuracy
-should not depend on hardware).
+cross-platform agreement, flagging cells whose 95% intervals don't overlap (accuracy should not
+depend on hardware).
 """
 from __future__ import annotations
 
@@ -39,7 +47,10 @@ TASK_KEYS = {
 MODE_ORDER = ("raw", "chat-off", "chat-on", "chat-budget")
 
 
-def wilson(k: int, n: int, z: float = 1.96) -> tuple[float, float]:
+NAIVE = False  # --naive: per-call Wilson intervals, ignoring the clustering
+
+
+def wilson(k: float, n: float, z: float = 1.96) -> tuple[float, float]:
     if not n:
         return (0.0, 0.0)
     p = k / n
@@ -47,6 +58,23 @@ def wilson(k: int, n: int, z: float = 1.96) -> tuple[float, float]:
     c = (p + z * z / (2 * n)) / d
     h = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / d
     return (max(0.0, c - h), min(1.0, c + h))
+
+
+def cluster_stats(calls: list[dict], key: str = "all_ok") -> tuple[int, float, float | None]:
+    """(cells, n_eff, ICC) for `key` over the calls, grouped by (profile, scenario)."""
+    cells: dict[tuple[str, str], list[int]] = {}
+    for c in calls:
+        cells.setdefault((c["profile"], c["scenario"]), []).append(1 if c["scores"].get(key) else 0)
+    n, k = len(calls), sum(sum(v) for v in cells.values())
+    if len(cells) < 2 or n <= len(cells):  # one cell, or one call per cell: nothing to correct
+        return len(cells), float(n), None
+    p = k / n
+    msb = sum(len(v) * (sum(v) / len(v) - p) ** 2 for v in cells.values()) / (len(cells) - 1)
+    msw = sum(sum((y - sum(v) / len(v)) ** 2 for y in v) for v in cells.values()) / (n - len(cells))
+    n0 = (n - sum(len(v) ** 2 for v in cells.values()) / n) / (len(cells) - 1)
+    den = msb + (n0 - 1) * msw
+    icc = 1.0 if den == 0 else min(1.0, max(0.0, (msb - msw) / den))
+    return len(cells), n / (1 + (n / len(cells) - 1) * icc), icc
 
 
 def windows(run: Path) -> dict[str, tuple[float, float, str]]:
@@ -115,6 +143,7 @@ def rows_for(run: Path, trace: Path | None) -> list[dict]:
         keys = TASK_KEYS[row["task"]] + (("facts_ok",) if any("facts_ok" in c["scores"] for c in calls) else ())
         for k in keys:
             row[k] = sum(1 for c in calls if c["scores"].get(k))
+        row["cells"], row["n_eff"], row["icc"] = cluster_stats(calls)
         row["joules_per_call"] = None
         if lab in win and samples and idle_mw is not None and n:
             a, b, _ = win[lab]
@@ -129,11 +158,22 @@ def pct(r: dict, k: str) -> str:
     return "–" if k not in r else f"{100 * r[k] / r['n']:.0f}%"
 
 
+def interval(r: dict, k: str = "all_ok") -> tuple[float, float]:
+    """95% interval for rate k: clustered by cell (n_eff) for all_ok unless --naive."""
+    n = r["n"] if NAIVE or k != "all_ok" else r["n_eff"]
+    return wilson(r[k] / r["n"] * n, n)
+
+
 def ci(r: dict, k: str = "all_ok") -> str:
     if k not in r:
         return "–"
-    lo, hi = wilson(r[k], r["n"])
+    lo, hi = interval(r, k)
     return f"{100 * r[k] / r['n']:.0f}% [{100 * lo:.0f}-{100 * hi:.0f}]"
+
+
+def neff(r: dict) -> str:
+    icc = "–" if r["icc"] is None else f"{r['icc']:.2f}"
+    return f"{r['cells']} / {r['n_eff']:.0f} / {icc}"
 
 
 def f(v, fmt: str = "{:.2f}") -> str:
@@ -152,7 +192,10 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("runs", nargs="+", type=Path)
     ap.add_argument("--trace", type=Path, default=None, help="powermetrics trace for runs without their own (MacBook)")
+    ap.add_argument("--naive", action="store_true", help="per-call Wilson intervals, ignoring the clustering by cell")
     a = ap.parse_args()
+    global NAIVE
+    NAIVE = a.naive
     rows = [r for run in a.runs for r in rows_for(run, a.trace)]
     r3 = [r for r in rows if r["kind"] == "round3"]
     ab = [r for r in rows if r["kind"] == "ablation"]
@@ -160,15 +203,23 @@ def main() -> None:
     print("# Round 3 report\n")
     print("Runs: " + ", ".join(f"`{p.parent.name}/{p.name}`" + (" (**ABORTED**)" if (p / "ABORTED.txt").exists() else "")
                                for p in a.runs) + "\n")
-    print("Rates are per call; `all_ok` carries a 95% Wilson interval. J/call is energy above idle per call, the session window included (an upper bound). `–` = not applicable or no trace.\n")
+    if NAIVE:
+        print("Rates are per call; `all_ok` carries a **per-call** 95% Wilson interval (`--naive`: treats repeats of a cell as independent, which overstates precision).", end=" ")
+    else:
+        print("Rates are per call; `all_ok` carries a 95% Wilson interval **clustered by cell** (effective sample size from the within-cell correlation; see the script's docstring). `cells / n_eff / ICC` shows the correction.", end=" ")
+        for t in ("narrow", "full"):
+            iccs = [r["icc"] for r in rows if r["task"] == t and r["icc"] is not None]
+            if iccs:
+                print(f"Median ICC, {t}: {st.median(iccs):.2f} over {len(iccs)} sessions.", end=" ")
+    print("J/call is energy above idle per call, the session window included (an upper bound). `–` = not applicable or no trace.\n")
 
     print("## 1. Per platform\n")
     for plat in sorted({r["platform"] for r in r3}):
         print(f"### {plat}\n")
-        print("| Model | Task | Mode | n | all_ok [95% CI] | baseline | consistent | escalation | format | p50 s | p95 s | out tok | think tok | trunc | J/call |")
-        print("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|")
+        print("| Model | Task | Mode | n | cells / n_eff / ICC | all_ok [95% CI] | baseline | consistent | escalation | format | p50 s | p95 s | out tok | think tok | trunc | J/call |")
+        print("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|")
         for r in sorted((r for r in r3 if r["platform"] == plat), key=lambda r: (r["model"], r["task"], mode_key(r))):
-            print(f"| {r['model']} | {r['task']} | {mode_label(r)} | {r['n']} | {ci(r)} | {pct(r, 'baseline_ok')} | {pct(r, 'consistent')} | "
+            print(f"| {r['model']} | {r['task']} | {mode_label(r)} | {r['n']} | {neff(r)} | {ci(r)} | {pct(r, 'baseline_ok')} | {pct(r, 'consistent')} | "
                   f"{pct(r, 'escalation_ok')} | {pct(r, 'format_ok')} | {f(r['p50'])} | {f(r['p95'])} | {f(r['tokens'], '{:.0f}')} | "
                   f"{f(r['think'], '{:.0f}')} | {r['truncated']} | {f(r['joules_per_call'], '{:.1f}')} |")
         print()
@@ -196,11 +247,11 @@ def main() -> None:
 
     if ab:
         print("## 4. Prompt ablation (full task)\n")
-        print("| Platform | Model | Variant | all_ok [95% CI] | facts | baseline | consistent | escalation | prompt tok | p50 s | J/call |")
-        print("|---|---|---|---|---|---|---|---|---|---|---|")
+        print("| Platform | Model | Variant | cells / n_eff / ICC | all_ok [95% CI] | facts | baseline | consistent | escalation | prompt tok | p50 s | J/call |")
+        print("|---|---|---|---|---|---|---|---|---|---|---|---|")
         order = ["base", "facts", "tables", "template", "examples", "temp0", "grammar"]
         for r in sorted(ab, key=lambda r: (r["platform"], r["model"], order.index(r["mode"]) if r["mode"] in order else 99)):
-            print(f"| {r['platform']} | {r['model']} | {r['mode']} | {ci(r)} | {pct(r, 'facts_ok')} | {pct(r, 'baseline_ok')} | "
+            print(f"| {r['platform']} | {r['model']} | {r['mode']} | {neff(r)} | {ci(r)} | {pct(r, 'facts_ok')} | {pct(r, 'baseline_ok')} | "
                   f"{pct(r, 'consistent')} | {pct(r, 'escalation_ok')} | {f(r['prompt_tokens'], '{:.0f}')} | {f(r['p50'])} | "
                   f"{f(r['joules_per_call'], '{:.1f}')} |")
         print()
@@ -217,7 +268,7 @@ def main() -> None:
         for key, by in sorted(cells.items(), key=lambda kv: (kv[0][0], kv[0][1], mode_key(next(iter(kv[1].values()))))):
             if len(by) < 2:
                 continue
-            ivs = [wilson(r["all_ok"], r["n"]) for r in by.values()]
+            ivs = [interval(r) for r in by.values()]
             overlap = max(lo for lo, _ in ivs) <= min(hi for _, hi in ivs)
             print(f"| {key[0]} | {key[1]} | {key[2]} | " + " | ".join(ci(by[p]) if p in by else "–" for p in plats)
                   + f" | {'yes' if overlap else '**no**'} |")

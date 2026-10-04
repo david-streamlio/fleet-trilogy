@@ -43,8 +43,9 @@ Caveat: the published runtime and measurement method aren't verified to match ou
 - **Task:** undo the Pi-era narrowing. The LLM classifies the baseline severity, decides the escalation, and derives the final severity and action, scored exactly against the deterministic code. The production (narrow) task runs alongside as the baseline.
 - **Modes:** raw (production), Qwen chat format with thinking off, on (2,048-token budget), and budget-forced (1,024).
 - **Done:** M4 Max, 10 models, 15:37-19:00 UTC. Accuracy valid; latency and energy wait on the context-size check (test log incident 23).
-- **Running:** mac2 and the mac-m4, 26 of 28 sessions at 19:30 (Qwen3.5-9B chat-on skipped by user decision); the M4 Max 4,096-token think-budget re-run.
-- **Queued:** M4 Max context-size check → prompt ablation (4 models × 7 variants) → budget forcing; mac-m4 budget forcing after its round 3.
+- **Done:** mac2 (20:13, collected 20:15) and the mac-m4 (19:40), 28 sessions each (Qwen3.5-9B chat-on skipped by user decision).
+- **Running:** the M4 Max 4,096-token think-budget re-run; on the mac-m4, the follow-ups (the same ablation and think-budget re-run; queued by the other session, now owned here).
+- **Queued:** M4 Max context-size check → prompt ablation (4 models × 7 variants) → budget forcing. mac-m4 budget forcing re-run after its follow-ups (the first attempt failed: test log incident 24).
 - **First finding:** the narrowing was justified (raw full task ≤ 58% end to end; the small models 11-22%). The chat format lifts Qwen3-14B and Qwen3.5-9B to 72%; thinking adds little for 4-11× the latency; Qwen3.5-9B's thinking runs away.
 
 **Phase 1 full suite on the Linux proxies:** 17 models, 3 reps, a thread sweep, and STREAM bandwidth at each thread count. Each is collected automatically when it finishes.
@@ -97,9 +98,10 @@ Partial results (generation tok/s at full threads; c9g/c7g at t=8):
 ## Awaiting a decision
 
 - ~~**mac-m4 Phase 1.**~~ Decided 2026-10-04: allocated as iphone-flagship; its full suite ran in round 2.
-- **Phase 2 (larger models).** "Decide after Phase 1."
+- **Time box (user, 2026-10-04):** this round ends with the runs now queued. No Phase 2 (larger models), no round 3b (more distinct cells), no real phones, no Pi 5.
+- ~~**Phase 2 (larger models).**~~ Not this round (time box). Test I, L4 and round 3 partly cover it (12-14B models and the 27B).
 - **Paper (IEEE-quality, Markdown for now).** A separate artifact from the talk. **Outline started 2026-10-04: `docs/TALK2-PAPER-OUTLINE.md`** (research questions, methods, figure/table → data plan, threats to validity, open items).
-- **Files from other Claude sessions** (Talk 1 slide plan, images and slides, the Talk 2 deck-build prompt; the misconceptions and Talk 3 docs are referenced but not on disk): commit, keep local, move or delete? See `docs/TODO-OTHER-SESSION-FILES.md` (2026-10-04).
+- ~~**Files from other Claude sessions**~~ The user will recreate or handle them (2026-10-04); this session takes no action and never commits them. (Talk 1 slide plan, images and slides, the Talk 2 deck-build prompt; the misconceptions and Talk 3 docs are referenced but not on disk): commit, keep local, move or delete? See `docs/TODO-OTHER-SESSION-FILES.md` (2026-10-04).
 - ~~**Round 3 (harder LLM task on newer hardware).**~~ Decided 2026-10-04: items 1 (undo the narrowing) and 2 (thinking on/off) built and running (above), plus the prompt ablation and budget forcing. The other proposals (root cause, fleet correlation, uplink gate) stay in the paper outline §VII.
 
 ### mac2 extra-test menu (all nine selected 2026-10-03)
@@ -163,14 +165,14 @@ Not proposed: sustained load (servers don't throttle, so it says nothing about p
 
 ## Deferred (TODO files)
 
-- **Real phones on AWS Device Farm:** S26 Ultra, S21, Galaxy A36 and Galaxy A17; iPhones if signing is possible. See `talks/talk2-greenest-token/TODO-REAL-PHONE-BENCHMARKS.md`. Waiting on the proxy results review.
+- **Real phones on AWS Device Farm: not this round (time box, 2026-10-04).** S26 Ultra, S21, Galaxy A36 and Galaxy A17; iPhones if signing is possible. See `talks/talk2-greenest-token/TODO-REAL-PHONE-BENCHMARKS.md`. Waiting on the proxy results review.
   - **Open:** an Apple Developer account for iOS.
-- **Q4_0 accuracy check:** L3 found Q4_0 1.4-1.7x faster than Q4_K_M on ARM CPUs. Does accuracy hold on the Edge Triage Pipeline and Tier 2? See `talks/talk2-greenest-token/TODO-Q4_0-ACCURACY-CHECK.md` (added 2026-10-03).
-- **RAM capacity test:** which models fit in 4, 6, 8 and 12 GB, using a cgroup cap on a Linux proxy. See `talks/talk2-greenest-token/TODO-RAM-CAPACITY-TEST.md`. Runs after the Phase 1 Linux runs finish.
+- ~~**Q4_0 accuracy check.**~~ Answered 2026-10-04 (C-q4_0 on both Mac minis, Q-confirm n=45): it depends on the model. Gemma-3-4B regresses 0% → 30.4%, Llama 6.3% → 14.4%, and the others hold. Still open: Q4_0's ARM-CPU latency on the real workload (the Android proxies are gone). See `talks/talk2-greenest-token/TODO-Q4_0-ACCURACY-CHECK.md`.
+- ~~**RAM capacity test.**~~ Done as L1 (c9g, 2026-10-03): 20 models × 4/6/8/12 GB caps in `fits.csv`. A cgroup ceiling, not a phone's per-app budget. See `talks/talk2-greenest-token/TODO-RAM-CAPACITY-TEST.md`.
 
 ## Ideas not yet discussed
 
-- **A real Raspberry Pi 5** (~$80-120). The c6g "pi5" proxy has ~5× a Pi 5's bandwidth (89 vs 17.1 GB/s). A real board with the inline meter would give measured energy like the Pi 4 rows.
+- **A real Raspberry Pi 5:** not this round (time box, 2026-10-04). (~$80-120.) The c6g "pi5" proxy has ~5× a Pi 5's bandwidth (89 vs 17.1 GB/s). A real board with the inline meter would give measured energy like the Pi 4 rows.
 - **Apple Neural Engine via Core ML** (e.g. the ANEMLL project). Possibly the most energy-efficient iPhone path, but model conversion is significant work.
 
 ## Rejected or fallback only
@@ -187,5 +189,10 @@ Not proposed: sustained load (servers don't throttle, so it says nothing about p
   - Later applies must keep pi5 out of `enabled_proxies`, or it is recreated.
 
 - **mac2 host:** ~$0.65/h until released. AWS allows release from **2026-10-04 18:46 UTC** (11:46 PDT). Then run `terraform destroy` with `iphone-older` removed from `enabled_proxies`, or a full destroy.
-- **Linux proxies:** ~$0.91/h together while running. They stop themselves 24 h after boot (≈ 2026-10-04 18:20 UTC). Stopped instances still bill for 3 × 80 GB of disk (~$19/month) until `terraform destroy`.
+  - Its round 3 ended 20:13 UTC and was collected 20:15 (28 sessions, 36/36 model hashes).
+  - **No teardown is scheduled:** the user cancelled the scheduled one 2026-10-04 ~20:25 UTC ("don't delete … until we have collected all of the logs"). Tear down only on the user's word.
+- **mac-m4 host (iphone-flagship):** ≥ $29.52 per 24 h; releasable from 2026-10-05 04:29 UTC.
+  - Still running the other session's follow-ups (ablation, think budget 4096), then the budget-forcing re-run, until ~03:30 UTC.
+  - **No teardown is scheduled:** the user cancelled the 04:37 UTC one at ~20:30 UTC. Collect everything first; tear down only on the user's word.
+- **Linux proxies:** destroyed 2026-10-04 04:26 UTC after collection.
 - **AWS SSO:** sessions last about 1 h. Run `aws sso login --profile advocacy-dev` before any `terraform` command. Monitoring and collecting don't need it.

@@ -1,6 +1,8 @@
 # TODO: RAM capacity test (which models fit which phone)
 
-**Status:** not started. Run it after the Phase 1 proxy runs finish (`deploy/aws-phone-proxies/`, 2026-10-03). It must not overlap them, because a concurrent load steals CPU and memory bandwidth and spoils their timings.
+**Status:** done as test **L1** on android-flagship (c9g), 2026-10-03: `eval-results/phone-proxies/android-flagship/L1-ram-capacity-20261003T205135Z/fits.csv`, 20 models × 4 / 6 / 8 / 12 GB cgroup caps (status corrected 2026-10-04; the file wasn't updated when L1 ran).
+- **Caveat (test log §8):** a cgroup ceiling at a tiny context, not an Android or iOS per-app budget. Real phones (Device Farm) remain the ground truth.
+- The plan below is kept as the method record.
 
 ## Why
 Speed is only half of "can a phone run it". The other half is whether the model fits in the memory a phone gives one app. llama.cpp has no flag that caps its own RAM:

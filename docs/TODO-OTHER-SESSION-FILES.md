@@ -1,6 +1,6 @@
 # TODO: decide what to do with files from other Claude sessions
 
-**Status:** waiting on the user. Listed 2026-10-04.
+**Status:** handed back to the user (2026-10-04): "I will recreate those, so don't worry about those." This session takes no action on these files and never commits them. Listed 2026-10-04.
 
 These came from the user's other Claude sessions, not the Talk 2 hardware-spectrum session. None is committed, and that session's commits exclude them on purpose (each is staged path by path and checked against this list). For each one, decide: **commit**, **keep local only**, **move out of the repo**, or **delete**.
 
@@ -8,7 +8,7 @@ These came from the user's other Claude sessions, not the Talk 2 hardware-spectr
 
 | File | What it is | Size, last changed | Decision needed | Considerations |
 |---|---|---|---|---|
-| `docs/TALK1-SLIDE-PLAN.md` | Talk 1 slide plan, synced from the built deck (`Talk 1 Edge Intelligence.dc.html`). 26 slides in five acts; "the deck is the source of truth" | 615 lines, 2026-09-30 14:41 | commit or keep local | It documents the deck the way `TALK2-SLIDE-PLAN.md` (committed) does for Talk 2. Its slides 20-21 present the LLM uplink gate, which is still unimplemented (`talks/talk1-edge-intelligence/TODO-TRIAGE-UPLINK-GATE.md`) |
+| `docs/TALK1-SLIDE-PLAN.md` | Talk 1 slide plan, synced from the built deck (`Talk 1 Edge Intelligence.dc.html`). 26 slides in five acts; "the deck is the source of truth" | 615 lines, 2026-09-30 14:41 | commit or keep local | It documents the deck the way `TALK2-SLIDE-PLAN.md` (committed) does for Talk 2. Its slides 20-21 present the LLM uplink gate, which is implemented (`afffd91`; checked 2026-10-04) |
 | `docs/TALK2-DECK-BUILD-PROMPT.md` | Prompt for Claude design to (re)generate the Talk 2 deck from `TALK2-SLIDE-PLAN.md`. Written after a first pass shipped planning artifacts onto slides | 99 lines, 2026-10-01 08:01 | commit or keep local | Its sections 1-5 say they are reusable for Talk 1 and Talk 3; section 6 is tied to the 2026-09-30 plan version |
 | `talks/talk1-edge-intelligence/images/` | 3 Gemini-generated JPEGs (`Gemini_Generated_Image_*.jpeg`) | 7.3 MB, 2026-09-30 13:49 | commit, move out of the repo, or delete | Binary weight in git history; record their AI-generated provenance wherever they're used |
 | `talks/talk1-edge-intelligence/slides/` | The Talk 1 deck: `Talk1-Edge-Intelligence.html`, `.pptx`, `README.md`, `source/` (27 files) | 15 MB, 2026-09-30 13:44 | commit all, commit only `README.md` + `source/`, or keep outside the repo | 15 MB of binaries; Git LFS is not set up in this repo. The rendered HTML/PPTX can be rebuilt from the source |
@@ -25,3 +25,4 @@ Searched 2026-10-04: no file by these names under the repo, and none in git hist
 ## Handled already (no decision needed)
 
 - `/tmp/thinkbudget_after_ablation.sh` and its run, `eval-results/phone-proxies/m4max-macbook/*-thinkbudget4096`. Queued by another session at the user's request. The user stopped that session on 2026-10-04 at 19:14 UTC, so this session owns the run: it was relaunched at an 8k context by user decision, and it will be documented and committed with the Talk 2 study.
+- `~/phoneproxy/followups_after_round3.sh` on the mac-m4 (iphone-flagship) and its run `results/followups-20261004T194055Z`: queued by the same session at 18:53, started on its own at 19:40. Found 20:17; the user handed it to this session at 20:25. The script is kept verbatim in `deploy/aws-phone-proxies/scripts/oneoff/`, and the run is documented and committed with the study (test log §5 Round 3, incident 24).

@@ -1,0 +1,442 @@
+{
+ "host": "ip-10-42-12-42.us-west-2.compute.internal",
+ "arch": "arm64",
+ "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+ "timestamp": "2026-10-04T15:40:46Z",
+ "config": {
+  "task": "narrow",
+  "mode": "raw",
+  "n_per_cell": 2,
+  "gguf": "/Users/ec2-user/phoneproxy/models/gemma-3-4b-it-Q4_K_M.gguf",
+  "server": "/Users/ec2-user/phoneproxy/llama.cpp/build/bin/llama-server",
+  "threads": 4,
+  "temperature": 0.2,
+  "n_predict": 300,
+  "think_budget": 0,
+  "timeout_seconds": 180.0
+ },
+ "summary": {
+  "n": 18,
+  "rates": {
+   "all_ok": 1.0,
+   "escalation_ok": 1.0,
+   "format_ok": 1.0
+  },
+  "latency_p50_seconds": 4.963895499997307,
+  "latency_p95_seconds": 7.052544542006217,
+  "tokens_predicted_mean": 99.61111111111111,
+  "think_tokens_mean": 0.0,
+  "truncated": 0,
+  "errors": 0,
+  "by_scenario": {
+   "escalate-worthy": {
+    "n": 6,
+    "escalations": {
+     "raise": 6
+    },
+    "all_ok": 6
+   },
+   "benign": {
+    "n": 6,
+    "escalations": {
+     "hold": 6
+    },
+    "all_ok": 6
+   },
+   "de-escalate-worthy": {
+    "n": 6,
+    "escalations": {
+     "lower": 6
+    },
+    "all_ok": 6
+   }
+  },
+  "by_profile": {
+   "canonical": {
+    "n": 18,
+    "baseline_ok": 0,
+    "all_ok": 18
+   }
+  }
+ },
+ "calls": [
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 7.052544542006217,
+   "content": "{\n  \"risk_synthesis\": \"The cargo type (Liquids/Chemical Tanker) combined with the weather (Heavy rain, wet asphalt) is a significant risk multiplier. Hazardous liquids pose a higher risk of spills and potential damage in wet conditions, increasing the severity of a potential incident. The dispatch status (Running 20 minutes behind schedule) adds to the risk due to increased pressure on the driver.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 112,
+   "tokens_evaluated": 437,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "The cargo type (Liquids/Chemical Tanker) combined with the weather (Heavy rain, wet asphalt) is a significant risk multiplier. Hazardous liquids pose a higher risk of spills and potential damage in wet conditions, increasing the severity of a potential incident. The dispatch status (Running 20 minutes behind schedule) adds to the risk due to increased pressure on the driver.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 6.624774292009533,
+   "content": "{\n  \"risk_synthesis\": \"Cargo: The cargo is dry goods/general freight, which is not a risk multiplier. Weather: The weather is clear skies and dry pavement, which is not a risk multiplier. Dispatch status: The dispatch status is 'on schedule', which is not a risk multiplier. Therefore, the baseline severity of 'medium' is appropriate.\",\n  \"escalation\": \"hold\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 103,
+   "tokens_evaluated": 432,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Cargo: The cargo is dry goods/general freight, which is not a risk multiplier. Weather: The weather is clear skies and dry pavement, which is not a risk multiplier. Dispatch status: The dispatch status is 'on schedule', which is not a risk multiplier. Therefore, the baseline severity of 'medium' is appropriate.",
+    "escalation": "hold",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 5.579560625003069,
+   "content": "{\n  \"risk_synthesis\": \"The documented defensive maneuver for a merging vehicle is a positive indicator of driver control and reduces the risk. The other fields (clear conditions and empty trailer) are not risk multipliers. Therefore, the baseline severity should be lowered.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 80,
+   "tokens_evaluated": 445,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "The documented defensive maneuver for a merging vehicle is a positive indicator of driver control and reduces the risk. The other fields (clear conditions and empty trailer) are not risk multipliers. Therefore, the baseline severity should be lowered.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 6.345468499988783,
+   "content": "{\n  \"risk_synthesis\": \"The cargo type (Liquids / Chemical Tanker) combined with the weather (Heavy rain, wet asphalt) is a significant risk multiplier. Hazardous liquids, especially in wet conditions, dramatically increase the potential for a serious incident if a loss of control occurs. The dispatch status of 'Running 20 minutes behind schedule' also contributes to the risk, as it indicates increased pressure on the driver and a potential for reduced adherence to safety protocols. Therefore, the baseline severity should be raised.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 134,
+   "tokens_evaluated": 437,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "The cargo type (Liquids / Chemical Tanker) combined with the weather (Heavy rain, wet asphalt) is a significant risk multiplier. Hazardous liquids, especially in wet conditions, dramatically increase the potential for a serious incident if a loss of control occurs. The dispatch status of 'Running 20 minutes behind schedule' also contributes to the risk, as it indicates increased pressure on the driver and a potential for reduced adherence to safety protocols. Therefore, the baseline severity should be raised.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 4.748399125004653,
+   "content": "{\n  \"risk_synthesis\": \"Cargo: The cargo is dry goods/general freight, which is not a risk multiplier. Weather: The weather is clear skies and dry pavement, which is not a risk multiplier. Dispatch status: The dispatch status is 'on schedule', which is not a risk multiplier. Therefore, the baseline severity remains at medium.\",\n  \"escalation\": \"hold\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 99,
+   "tokens_evaluated": 432,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Cargo: The cargo is dry goods/general freight, which is not a risk multiplier. Weather: The weather is clear skies and dry pavement, which is not a risk multiplier. Dispatch status: The dispatch status is 'on schedule', which is not a risk multiplier. Therefore, the baseline severity remains at medium.",
+    "escalation": "hold",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 4.189992084007827,
+   "content": "{\n  \"risk_synthesis\": \"The dispatch status 'Ahead of schedule; driver executed a documented defensive maneuver for a merging vehicle' is a positive indicator of safe, controlled conditions. The other fields (weather and cargo) are not risk multipliers. Therefore, the baseline severity should be lowered.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 87,
+   "tokens_evaluated": 445,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "The dispatch status 'Ahead of schedule; driver executed a documented defensive maneuver for a merging vehicle' is a positive indicator of safe, controlled conditions. The other fields (weather and cargo) are not risk multipliers. Therefore, the baseline severity should be lowered.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 5.458150999998907,
+   "content": "{\n  \"risk_synthesis\": \"The cargo type (Liquids/Chemical Tanker) combined with the weather (Heavy rain, wet asphalt) is a significant risk multiplier. Liquids and chemicals pose a hazard if spilled, and heavy rain significantly degrades traction and visibility, increasing the risk of loss of control. Being 20 minutes behind schedule adds pressure and could contribute to unsafe driving behavior. Therefore, I am escalating the severity.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 115,
+   "tokens_evaluated": 437,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "The cargo type (Liquids/Chemical Tanker) combined with the weather (Heavy rain, wet asphalt) is a significant risk multiplier. Liquids and chemicals pose a hazard if spilled, and heavy rain significantly degrades traction and visibility, increasing the risk of loss of control. Being 20 minutes behind schedule adds pressure and could contribute to unsafe driving behavior. Therefore, I am escalating the severity.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 4.928641542006517,
+   "content": "{\n  \"risk_synthesis\": \"Cargo: The cargo is dry goods/general freight, which is not a risk multiplier. Weather: The weather is clear skies and dry pavement, which is not a risk multiplier. Dispatch status: The dispatch status is 'on schedule', which is not a risk multiplier. Therefore, the baseline severity of 'medium' is appropriate.\",\n  \"escalation\": \"hold\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 103,
+   "tokens_evaluated": 432,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Cargo: The cargo is dry goods/general freight, which is not a risk multiplier. Weather: The weather is clear skies and dry pavement, which is not a risk multiplier. Dispatch status: The dispatch status is 'on schedule', which is not a risk multiplier. Therefore, the baseline severity of 'medium' is appropriate.",
+    "escalation": "hold",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 3.733654083989677,
+   "content": "{\n  \"risk_synthesis\": \"The dispatch status 'Ahead of schedule; driver executed a documented defensive maneuver for a merging vehicle' indicates the driver is in control and mitigating a potential hazard. Therefore, the baseline severity should be lowered.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 76,
+   "tokens_evaluated": 445,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "The dispatch status 'Ahead of schedule; driver executed a documented defensive maneuver for a merging vehicle' indicates the driver is in control and mitigating a potential hazard. Therefore, the baseline severity should be lowered.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 5.057487291996949,
+   "content": "{\n  \"risk_synthesis\": \"The cargo type (Liquids / Chemical Tanker) and the weather conditions (Heavy rain, wet asphalt) are both risk multipliers. Liquids and chemicals pose a significant hazard if spilled, and heavy rain significantly degrades traction and visibility. The dispatch status of being 20 minutes behind schedule adds to the risk due to increased pressure on the driver.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 106,
+   "tokens_evaluated": 437,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "The cargo type (Liquids / Chemical Tanker) and the weather conditions (Heavy rain, wet asphalt) are both risk multipliers. Liquids and chemicals pose a significant hazard if spilled, and heavy rain significantly degrades traction and visibility. The dispatch status of being 20 minutes behind schedule adds to the risk due to increased pressure on the driver.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 4.725445415999275,
+   "content": "{\n  \"risk_synthesis\": \"Cargo: The cargo is dry goods/general freight, which is not a risk multiplier. Weather: The weather is clear skies and dry pavement, which is not a risk multiplier. Dispatch status: The dispatch status is 'on schedule', which is not a risk multiplier. Therefore, the baseline severity remains at medium.\",\n  \"escalation\": \"hold\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 99,
+   "tokens_evaluated": 432,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Cargo: The cargo is dry goods/general freight, which is not a risk multiplier. Weather: The weather is clear skies and dry pavement, which is not a risk multiplier. Dispatch status: The dispatch status is 'on schedule', which is not a risk multiplier. Therefore, the baseline severity remains at medium.",
+    "escalation": "hold",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 3.86257262500294,
+   "content": "{\n  \"risk_synthesis\": \"The dispatch status 'Ahead of schedule; driver executed a documented defensive maneuver for a merging vehicle' indicates the driver is in control and mitigating a potential hazard. This overrides the baseline severity, leading to a lower risk assessment.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 80,
+   "tokens_evaluated": 445,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "The dispatch status 'Ahead of schedule; driver executed a documented defensive maneuver for a merging vehicle' indicates the driver is in control and mitigating a potential hazard. This overrides the baseline severity, leading to a lower risk assessment.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 5.059028332994785,
+   "content": "{\n  \"risk_synthesis\": \"The cargo type (Liquids/Chemical Tanker) combined with the weather (Heavy rain, wet asphalt) creates a significant risk multiplier due to the potential for a hazardous spill if an accident occurs. Being 20 minutes behind schedule adds to the pressure on the driver, which can exacerbate the risk. Therefore, the baseline severity should be raised.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 106,
+   "tokens_evaluated": 437,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "The cargo type (Liquids/Chemical Tanker) combined with the weather (Heavy rain, wet asphalt) creates a significant risk multiplier due to the potential for a hazardous spill if an accident occurs. Being 20 minutes behind schedule adds to the pressure on the driver, which can exacerbate the risk. Therefore, the baseline severity should be raised.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 4.78751262500009,
+   "content": "{\n  \"risk_synthesis\": \"Cargo: The cargo is dry goods/general freight, which is not a risk multiplier. Weather: The weather is clear skies and dry pavement, which is not a risk multiplier. Dispatch status: The dispatch status is on schedule, which is not a risk multiplier. Therefore, the baseline severity of medium is appropriate.\",\n  \"escalation\": \"hold\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 100,
+   "tokens_evaluated": 432,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Cargo: The cargo is dry goods/general freight, which is not a risk multiplier. Weather: The weather is clear skies and dry pavement, which is not a risk multiplier. Dispatch status: The dispatch status is on schedule, which is not a risk multiplier. Therefore, the baseline severity of medium is appropriate.",
+    "escalation": "hold",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 3.904113166994648,
+   "content": "{\n  \"risk_synthesis\": \"The dispatch status 'Ahead of schedule; driver executed a documented defensive maneuver for a merging vehicle' is a mitigating factor. The other fields (weather and cargo) are not risk multipliers. Therefore, we should lower the severity.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 81,
+   "tokens_evaluated": 445,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "The dispatch status 'Ahead of schedule; driver executed a documented defensive maneuver for a merging vehicle' is a mitigating factor. The other fields (weather and cargo) are not risk multipliers. Therefore, we should lower the severity.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 5.956874749987037,
+   "content": "{\n  \"risk_synthesis\": \"The cargo type (Liquids/Chemical Tanker) combined with the weather conditions (Heavy rain, wet asphalt) is a significant risk multiplier. Liquids and chemicals pose a hazard if spilled, and heavy rain significantly degrades traction and visibility, increasing the risk of a loss-event. The dispatch status of being 20 minutes behind schedule adds to the pressure on the driver, which is a risk factor. Therefore, the baseline severity should be raised.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 126,
+   "tokens_evaluated": 437,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "The cargo type (Liquids/Chemical Tanker) combined with the weather conditions (Heavy rain, wet asphalt) is a significant risk multiplier. Liquids and chemicals pose a hazard if spilled, and heavy rain significantly degrades traction and visibility, increasing the risk of a loss-event. The dispatch status of being 20 minutes behind schedule adds to the pressure on the driver, which is a risk factor. Therefore, the baseline severity should be raised.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 4.963895499997307,
+   "content": "{\n  \"risk_synthesis\": \"Cargo: The cargo is dry goods/general freight, which is not a risk multiplier. Weather: The weather is clear skies and dry pavement, which is not a risk multiplier. Dispatch status: The dispatch status is 'on schedule', which is not a risk multiplier. Therefore, the baseline severity of 'medium' should be held.\",\n  \"escalation\": \"hold\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 104,
+   "tokens_evaluated": 432,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "Cargo: The cargo is dry goods/general freight, which is not a risk multiplier. Weather: The weather is clear skies and dry pavement, which is not a risk multiplier. Dispatch status: The dispatch status is 'on schedule', which is not a risk multiplier. Therefore, the baseline severity of 'medium' should be held.",
+    "escalation": "hold",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 3.963338917004876,
+   "content": "{\n  \"risk_synthesis\": \"The dispatch status 'Ahead of schedule; driver executed a documented defensive maneuver for a merging vehicle' is a mitigating factor. The other fields (weather and cargo) are not risk multipliers. Therefore, the baseline severity should be lowered.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 82,
+   "tokens_evaluated": 445,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "risk_synthesis": "The dispatch status 'Ahead of schedule; driver executed a documented defensive maneuver for a merging vehicle' is a mitigating factor. The other fields (weather and cargo) are not risk multipliers. Therefore, the baseline severity should be lowered.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  }
+ ]
+}
