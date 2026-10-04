@@ -30,7 +30,14 @@ Caveat: the published runtime and measurement method aren't verified to match ou
 
 ## Running
 
-**Nothing.** Every run had finished by 2026-10-04 03:53 UTC (§ below kept as the run record). Collection: c9g 01:17, c7g and mac2 ~04:20 UTC.
+**Round 1 is complete.** Every run had finished by 2026-10-04 03:53 UTC (§ below kept as the run record). Collection: c9g 01:17, c7g and mac2 ~04:20 UTC.
+
+**Round 2 (2026-10-04, second test suites): complete.** mac2 collected 07:20, the mac-m4 14:55 UTC (all checks pass; results in the test log §5 Round 2). These are additions; round-1 data is kept unchanged. Labels and the retention rule are in the test log §5 "Round 2".
+- **C-reverse** (mac2): order-effect check.
+- **C-q4_0** (mac2): the Q4_0 accuracy check, with energy.
+- **M4 Max gated-reverse:** thermal-gated, reverse order.
+- **iphone-flagship full suite** (mac-m4.metal, us-west-2b, ≥ $29.52, releasable 2026-10-05 04:29 UTC).
+- Android proxies destroyed 04:26 UTC after collection.
 
 **Phase 1 full suite on the Linux proxies:** 17 models, 3 reps, a thread sweep, and STREAM bandwidth at each thread count. Each is collected automatically when it finishes.
 All three finished 2026-10-03 and are collected.

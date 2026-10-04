@@ -1,0 +1,34 @@
+
+=== Tier 3 Tier-2-synthesis model COMPARISON ===
+artifact: /Users/ec2-user/fleet-trilogy/eval-results/compare-tier2-ip-10-42-11-136.us-west-2.compute.internal-20261004T121011Z.json
+host: ip-10-42-11-136.us-west-2.compute.internal (arm64, macOS-26.7-arm64-arm-64bit-Mach-O)
+decision_grade: quality-only (non-target hardware)
+axis                          Gemma-3-4B-it (Q4_K_M)
+----------------------------  ----------------------
+nonempty_rate                 1.000                 
+structured_rate               1.000                 
+speakability_violation_rate   0.000                 
+max_grounding_violation_rate  0.000                 
+latency_p50_seconds           1.616                 
+latency_p95_seconds           2.175                 
+tokens_per_sec_approx         20.106                
+load_time_seconds             1.554                 
+resident_ram_mb_after         13587.891             
+
+--- recommendation (does not auto-pick — human decides) ---
+nonempty_rate: Gemma-3-4B-it (Q4_K_M) leads (1.000)
+structured_rate: Gemma-3-4B-it (Q4_K_M) leads (1.000)
+speakability_violation_rate: Gemma-3-4B-it (Q4_K_M) leads (0.000)
+max_grounding_violation_rate: Gemma-3-4B-it (Q4_K_M) leads (0.000)
+[informational — non-target hardware] latency_p50_seconds: Gemma-3-4B-it (Q4_K_M) leads (1.616)
+[informational — non-target hardware] latency_p95_seconds: Gemma-3-4B-it (Q4_K_M) leads (2.175)
+[informational — non-target hardware] tokens_per_sec_approx: Gemma-3-4B-it (Q4_K_M) leads (20.106)
+[informational — non-target hardware] load_time_seconds: Gemma-3-4B-it (Q4_K_M) leads (1.554)
+[informational — non-target hardware] resident_ram_mb_after: Gemma-3-4B-it (Q4_K_M) leads (13587.891)
+This note does not pick a stage model. Quality axes above are decision-relevant on any host; speed/RAM axes only count when measured on the Pi 4 target.
+
+--- production candidates (nonempty_rate>=80%, speakability & grounding violation rate<=20%) ---
+  PASS   Gemma-3-4B-it (Q4_K_M): nonempty=100.0%, speakability_viol=0.0%, grounding_viol=0.0% (n=30)
+Evidence for/against production use on THIS task — not a final pick. Pi 4 latency/RAM footprint still applies to any PASS entry before it ships.
+.
+1 passed in 51.50s

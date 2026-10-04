@@ -6,7 +6,7 @@
 #
 # "Done" = no benchmark process running on the host and every queue log (extras-*.log,
 # queue-gh-*.log) has its .finished marker. Then, once per host:
-#   1. sha256 of the model files still on the host -> results/model-sha256.txt, to check
+#   1. sha256 of the model files still on the host -> results/model-sha256-<ts>.txt, to check
 #      against MODELS.lock.tsv (runs after the queues, so it can't disturb a measurement);
 #   2. proxyctl.sh collect (rsync + gzip of power traces);
 #   3. the eval artifacts in ~/fleet-trilogy/eval-results/ (tests C and L7), if any, into
@@ -32,9 +32,10 @@ while :; do
     base=$(field "$n" base); user=$(field "$n" user); ip=$(field "$n" ip)
     if ! "$CTL" ssh "$n" "${done_check//BASE/$base}" 2>/dev/null; then pending=$((pending + 1)); continue; fi
     echo "$(date -u +%H:%M:%SZ) $n: all queues finished, collecting"
-    "$CTL" ssh "$n" "cd $base && if command -v sha256sum >/dev/null; then H=sha256sum; else H='shasum -a 256'; fi; for f in models/*.gguf models-*/*.gguf; do [ -f \"\$f\" ] && \$H \"\$f\"; done > results/model-sha256.txt; wc -l < results/model-sha256.txt" 2>/dev/null | sed "s/^/  model hashes: /"
+    "$CTL" ssh "$n" "cd $base && if command -v sha256sum >/dev/null; then H=sha256sum; else H='shasum -a 256'; fi; for f in models/*.gguf models-*/*.gguf; do [ -f \"\$f\" ] && \$H \"\$f\"; done > results/model-sha256-\$(date -u +%Y%m%dT%H%M%SZ).txt; wc -l < \$(ls -1t results/model-sha256-*.txt | head -1)" 2>/dev/null | sed "s/^/  model hashes: /"
     "$CTL" collect "$n" 2>/dev/null | tail -1
-    case "$n" in iphone-older) sub=C-artifacts ;; android-flagship) sub=L7-artifacts ;; *) sub="" ;; esac
+    # rsync without --delete: artifacts from earlier runs are kept; each run's artifacts.txt maps its own.
+    case "$n" in iphone-older|iphone-flagship) sub=C-artifacts ;; android-flagship) sub=L7-artifacts ;; *) sub="" ;; esac
     if [ -n "$sub" ] && "$CTL" ssh "$n" "test -d ~/fleet-trilogy/eval-results" 2>/dev/null; then
       mkdir -p "$REPO_ROOT/eval-results/phone-proxies/$n/$sub"
       rsync -az -e "ssh -i $KEY -o UserKnownHostsFile=$HERE/.ssh/known_hosts" "$user@$ip:fleet-trilogy/eval-results/" "$REPO_ROOT/eval-results/phone-proxies/$n/$sub/"

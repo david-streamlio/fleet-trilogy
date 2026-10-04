@@ -1,0 +1,175 @@
+{
+  "host": "ip-10-42-12-42.us-west-2.compute.internal",
+  "arch": "arm64",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "decision_grade": "quality-only (non-target hardware)",
+  "timestamp": "2026-10-04T05:01:26Z",
+  "seed_config": {
+    "model_eval_runs": 15,
+    "model_timeout_seconds": 180.0
+  },
+  "models": {
+    "glm-4-9b-0414-q4km": {
+      "id": "glm-4-9b-0414-q4km",
+      "display_name": "GLM-4-9B-0414 (Q4_K_M)",
+      "available": true,
+      "binary_path": "/Users/ec2-user/phoneproxy/llama.cpp/build/bin/llama-completion",
+      "model_path": "/Users/ec2-user/phoneproxy/models/GLM-4-9B-0414-Q4_K_M.gguf",
+      "extra_args": [
+        "-no-cnv"
+      ],
+      "format_reliability": {
+        "total": 15,
+        "parsed": 15,
+        "rate": 1.0,
+        "sample_failures": []
+      },
+      "escalation_calibration": {
+        "per_scenario": {
+          "escalate-worthy": {
+            "expected_direction": "raise",
+            "escalation_tally": {
+              "raise": 15
+            },
+            "total": 15,
+            "matched": 15,
+            "match_rate": 1.0
+          },
+          "benign": {
+            "expected_direction": "hold",
+            "escalation_tally": {
+              "raise": 6,
+              "hold": 8,
+              "lower": 1
+            },
+            "total": 15,
+            "matched": 8,
+            "match_rate": 0.5333333333333333
+          },
+          "de-escalate-worthy": {
+            "expected_direction": "lower_or_hold",
+            "escalation_tally": {
+              "lower": 7,
+              "hold": 8
+            },
+            "total": 15,
+            "matched": 15,
+            "match_rate": 1.0
+          }
+        },
+        "total": 45,
+        "matched": 38,
+        "mismatches": 7,
+        "mismatch_rate": 0.15555555555555556,
+        "sample_mismatches": [
+          {
+            "scenario": "benign",
+            "expected_direction": "hold",
+            "escalation": "raise"
+          },
+          {
+            "scenario": "benign",
+            "expected_direction": "hold",
+            "escalation": "lower"
+          },
+          {
+            "scenario": "benign",
+            "expected_direction": "hold",
+            "escalation": "raise"
+          },
+          {
+            "scenario": "benign",
+            "expected_direction": "hold",
+            "escalation": "raise"
+          },
+          {
+            "scenario": "benign",
+            "expected_direction": "hold",
+            "escalation": "raise"
+          }
+        ],
+        "gate2_confirmed": true,
+        "gate2_per_scenario_n": 15,
+        "gate2_format_threshold": 0.8
+      },
+      "latency": {
+        "p50_seconds": 5.311670334001974,
+        "p95_seconds": 9.512767418450675,
+        "n": 60
+      },
+      "tokens_per_sec_approx": 8.143017178826888,
+      "tokens_per_sec_note": "approximate \u2014 whitespace word count / latency over parsed trials, not an exact tokenizer count",
+      "load_time_seconds": 2.446977166997385,
+      "resident_ram_mb_before": 0.0,
+      "resident_ram_mb_after": 11229.296875,
+      "resident_ram_mb_note": "RUSAGE_CHILDREN ru_maxrss is a cumulative max for the whole test session and isn't resettable per model; this is exact for the first model in a run (or when a model is run alone) and otherwise a floor \u2014 not a true peak \u2014 for models measured later in the same run."
+    }
+  },
+  "comparison": {
+    "format_parse_rate": {
+      "direction": "higher",
+      "values": {
+        "glm-4-9b-0414-q4km": 1.0
+      },
+      "best": "glm-4-9b-0414-q4km"
+    },
+    "escalation_mismatch_rate": {
+      "direction": "lower",
+      "values": {
+        "glm-4-9b-0414-q4km": 0.15555555555555556
+      },
+      "best": "glm-4-9b-0414-q4km"
+    },
+    "latency_p50_seconds": {
+      "direction": "lower",
+      "values": {
+        "glm-4-9b-0414-q4km": 5.311670334001974
+      },
+      "best": "glm-4-9b-0414-q4km"
+    },
+    "latency_p95_seconds": {
+      "direction": "lower",
+      "values": {
+        "glm-4-9b-0414-q4km": 9.512767418450675
+      },
+      "best": "glm-4-9b-0414-q4km"
+    },
+    "tokens_per_sec_approx": {
+      "direction": "higher",
+      "values": {
+        "glm-4-9b-0414-q4km": 8.143017178826888
+      },
+      "best": "glm-4-9b-0414-q4km"
+    },
+    "load_time_seconds": {
+      "direction": "lower",
+      "values": {
+        "glm-4-9b-0414-q4km": 2.446977166997385
+      },
+      "best": "glm-4-9b-0414-q4km"
+    },
+    "resident_ram_mb_after": {
+      "direction": "lower",
+      "values": {
+        "glm-4-9b-0414-q4km": 11229.296875
+      },
+      "best": "glm-4-9b-0414-q4km"
+    }
+  },
+  "recommendation": "format_parse_rate: GLM-4-9B-0414 (Q4_K_M) leads (1.000)\nescalation_mismatch_rate: GLM-4-9B-0414 (Q4_K_M) leads (0.156)\n[informational \u2014 non-target hardware] latency_p50_seconds: GLM-4-9B-0414 (Q4_K_M) leads (5.312)\n[informational \u2014 non-target hardware] latency_p95_seconds: GLM-4-9B-0414 (Q4_K_M) leads (9.513)\n[informational \u2014 non-target hardware] tokens_per_sec_approx: GLM-4-9B-0414 (Q4_K_M) leads (8.143)\n[informational \u2014 non-target hardware] load_time_seconds: GLM-4-9B-0414 (Q4_K_M) leads (2.447)\n[informational \u2014 non-target hardware] resident_ram_mb_after: GLM-4-9B-0414 (Q4_K_M) leads (11229.297)\nThis note does not pick a stage model. Quality axes above are decision-relevant on any host; speed/RAM axes only count when measured on the Pi 4 target.",
+  "production_candidates": {
+    "format_threshold": 0.8,
+    "escalation_threshold": 0.5,
+    "passed": [
+      {
+        "id": "glm-4-9b-0414-q4km",
+        "display_name": "GLM-4-9B-0414 (Q4_K_M)",
+        "format_parse_rate": 1.0,
+        "gate2_confirmed": true,
+        "escalation_mismatch_rate": 0.15555555555555556,
+        "escalation_sample_n": 45
+      }
+    ],
+    "rejected": []
+  }
+}

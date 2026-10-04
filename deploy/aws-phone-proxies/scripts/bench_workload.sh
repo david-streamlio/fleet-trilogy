@@ -11,7 +11,12 @@
 # results/C-workload-<ts>/ holds powermetrics.txt, windows.log and artifacts.txt (which
 # artifact each window wrote).
 #
-#   bench_workload.sh <base> <repo> [--quick]   (--quick: Phi only, 1 eval run, 1 rep)
+#   [ORDER=reverse] [QUANT=q4_0] bench_workload.sh <base> <repo> [--quick]
+#   (--quick: Phi only, 1 eval run, 1 rep)
+#
+# ORDER=reverse runs the pairs last-to-first (an order-effect check; mac2 doesn't throttle).
+# QUANT=q4_0 points the five candidates at their Q4_0 files in models-quant/, downloaded first
+# if missing (TODO-Q4_0-ACCURACY-CHECK.md: accuracy, latency and energy of Q4_0 vs Q4_K_M).
 set -uo pipefail
 
 BASE="$1"
@@ -21,10 +26,25 @@ BIN="$BASE/llama.cpp/build/bin/llama-completion"  # Metal; the harness finds lla
 REPS=3
 [ "$QUICK" = "--quick" ] && REPS=1
 
+# The Q4_0 files (repos as in MODELS.lock.tsv), fetched before any measurement window.
+Q4_0="PHI35_MINI bartowski/Phi-3.5-mini-instruct-GGUF Phi-3.5-mini-instruct-Q4_0.gguf
+GEMMA3_4B unsloth/gemma-3-4b-it-GGUF gemma-3-4b-it-Q4_0.gguf
+LLAMA31_8B unsloth/Llama-3.1-8B-Instruct-GGUF Llama-3.1-8B-Instruct-Q4_0.gguf
+GLM4_9B unsloth/GLM-4-9B-0414-GGUF GLM-4-9B-0414-Q4_0.gguf
+QWEN3_8B bartowski/Qwen_Qwen3-8B-GGUF Qwen_Qwen3-8B-Q4_0.gguf"
+if [ "${QUANT:-}" = q4_0 ]; then
+  mkdir -p "$BASE/models-quant"
+  echo "$Q4_0" | while read -r _var repo file; do
+    [ -f "$BASE/models-quant/$file" ] && continue
+    curl -fL --retry 5 --retry-delay 5 -sS -o "$BASE/models-quant/$file.part" "https://huggingface.co/$repo/resolve/main/$file" \
+      && mv "$BASE/models-quant/$file.part" "$BASE/models-quant/$file"
+  done
+fi
+
 touch "$BASE/PAUSE"
 until ! pgrep -x powermetrics >/dev/null && ! pgrep -f "$BASE/[b]ench.sh" >/dev/null; do sleep 15; done
 
-OUT="$BASE/results/C-workload-$(date -u +%Y%m%dT%H%M%SZ)${QUICK:+-quick}"
+OUT="$BASE/results/C-workload-$(date -u +%Y%m%dT%H%M%SZ)${QUICK:+-quick}${QUANT:+-$QUANT}${ORDER:+-$ORDER}"
 mkdir -p "$OUT"
 exec > >(tee -a "$OUT/bench.log") 2>&1
 echo "C workload run $(basename "$OUT"), reps=$REPS"
@@ -55,6 +75,11 @@ test_compare_edge_triage_models.py llama-3.1-8b-instruct-q4km 15
 test_compare_edge_triage_models.py glm-4-9b-0414-q4km 15
 test_compare_edge_triage_models.py qwen3-8b-q4km 15"
 [ "$QUICK" = "--quick" ] && PAIRS="test_compare_edge_triage_models.py phi-3.5-mini-instruct-q4km 1"
+[ "${ORDER:-}" = reverse ] && PAIRS=$(echo "$PAIRS" | awk '{ l[NR] = $0 } END { for (i = NR; i > 0; i--) print l[i] }')
+if [ "${QUANT:-}" = q4_0 ]; then  # same models.toml ids, Q4_0 weights
+  while read -r var _repo file; do export "LLM_MODEL_PATH_$var=$BASE/models-quant/$file"; done <<< "$Q4_0"
+fi
+{ echo "order: ${ORDER:-forward}"; echo "quant: ${QUANT:-q4_k_m}"; env | grep '^LLM_MODEL_PATH_'; } >> "$OUT/system.txt"
 
 cd "$REPO"
 sudo powermetrics --samplers cpu_power,gpu_power -i 500 -o "$OUT/powermetrics.txt" &

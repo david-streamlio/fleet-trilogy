@@ -1,0 +1,30 @@
+
+=== Tier 3 Edge Triage Pipeline model COMPARISON ===
+artifact: /Users/ec2-user/fleet-trilogy/eval-results/compare-edge-triage-ip-10-42-11-136.us-west-2.compute.internal-20261004T053946Z.json
+host: ip-10-42-11-136.us-west-2.compute.internal (arm64, macOS-26.7-arm64-arm-64bit-Mach-O)
+decision_grade: quality-only (non-target hardware)
+axis                      Llama-3.1-8B-Instruct (Q4_K_M)
+------------------------  ------------------------------
+format_parse_rate         1.000                         
+escalation_mismatch_rate  0.089                         
+latency_p50_seconds       2.390                         
+latency_p95_seconds       4.468                         
+tokens_per_sec_approx     17.299                        
+load_time_seconds         10.078                        
+resident_ram_mb_after     17198.266                     
+
+--- recommendation (does not auto-pick — human decides) ---
+format_parse_rate: Llama-3.1-8B-Instruct (Q4_K_M) leads (1.000)
+escalation_mismatch_rate: Llama-3.1-8B-Instruct (Q4_K_M) leads (0.089)
+[informational — non-target hardware] latency_p50_seconds: Llama-3.1-8B-Instruct (Q4_K_M) leads (2.390)
+[informational — non-target hardware] latency_p95_seconds: Llama-3.1-8B-Instruct (Q4_K_M) leads (4.468)
+[informational — non-target hardware] tokens_per_sec_approx: Llama-3.1-8B-Instruct (Q4_K_M) leads (17.299)
+[informational — non-target hardware] load_time_seconds: Llama-3.1-8B-Instruct (Q4_K_M) leads (10.078)
+[informational — non-target hardware] resident_ram_mb_after: Llama-3.1-8B-Instruct (Q4_K_M) leads (17198.266)
+This note does not pick a stage model. Quality axes above are decision-relevant on any host; speed/RAM axes only count when measured on the Pi 4 target.
+
+--- production candidates (format_parse_rate>=80%, gate-2-confirmed escalation_mismatch_rate<=50%) ---
+  PASS   Llama-3.1-8B-Instruct (Q4_K_M): escalation_mismatch=8.9% (n=45, gate-2 confirmed)
+Evidence for/against production use on THIS task — not a final pick. Pi 4 latency/RAM footprint still applies to any PASS entry before it ships.
+.
+1 passed in 181.05s (0:03:01)

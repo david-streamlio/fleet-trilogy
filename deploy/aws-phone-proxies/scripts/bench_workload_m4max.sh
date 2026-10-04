@@ -9,10 +9,15 @@
 # powermetrics runs separately, started by the user (it needs sudo):
 #   sudo powermetrics --samplers cpu_power,gpu_power -i 500 -o /tmp/m4max-powermetrics.txt
 #
-#   bench_workload_m4max.sh <repo> <out-dir> [<label regex> [<reps>]]
+#   [GATE_PM=<powermetrics file>] [ORDER=reverse] bench_workload_m4max.sh <repo> <out-dir> [<label regex> [<reps>]]
 #
 # The optional regex runs only the matching sessions (e.g. to resume an interrupted run);
 # <reps> is the repetition list, default "1 2 3".
+# GATE_PM: before every session, wait until that live trace (powermetrics with the thermal
+# sampler) shows 60 s of Nominal thermal pressure; the wait is logged as a cool-wait window.
+# A MacBook reaches Heavy pressure within ~12 min of this workload, so without the gate a
+# fixed pair order measures the later models warmer (test log, M4 Max caffeinated rerun).
+# ORDER=reverse runs the pairs last-to-first, as a check that order no longer matters.
 set -uo pipefail
 
 # An idle MacBook sleeps after 10 minutes (the first run lost its last two sessions that
@@ -53,9 +58,17 @@ test_compare_edge_triage_models.py glm-4-9b-0414-q4km 15
 test_compare_edge_triage_models.py qwen3-8b-q4km 15"
 FIVE="phi-3.5-mini-instruct-q4km,gemma-3-4b-it-q4km,llama-3.1-8b-instruct-q4km,glm-4-9b-0414-q4km,qwen3-8b-q4km"
 
+wait_cool() {  # wait_cool <label>: block until GATE_PM's last 120 samples (60 s) are all Nominal
+  [ -n "${GATE_PM:-}" ] || return 0
+  until [ -f "$GATE_PM" ] && [ "$(tail -c 4000000 "$GATE_PM" | grep 'Current pressure level' | tail -n 120 | grep -c 'Nominal')" -ge 120 ]; do
+    sleep 5
+  done
+}
+
 run() {  # run <label> <pytest file> <ids> <eval runs>: one pytest session in its own window
   local label="$1" test="$2" ids="$3" runs="$4" before
   echo "$label" | grep -qE "$ONLY" || return 0
+  window "cool-wait_$label" wait_cool "$label"
   echo "== $label"
   before=$(ls -1 eval-results/ | sort)
   # No --model-threads: the default (12, tuned for this machine) is what the 2026-10-02 runs used.
@@ -67,6 +80,8 @@ run() {  # run <label> <pytest file> <ids> <eval runs>: one pytest session in it
 }
 
 cd "$REPO" || exit 1
+[ "${ORDER:-}" = reverse ] && PAIRS=$(echo "$PAIRS" | awk '{ l[NR] = $0 } END { for (i = NR; i > 0; i--) print l[i] }')
+{ echo "order: ${ORDER:-forward}"; echo "gate: ${GATE_PM:-none}"; } >> "$OUT/system.txt"
 window idle-pre sleep 60
 echo "$PAIRS" | while read -r test id runs; do
   task=$(echo "$test" | sed -E 's/test_compare_(.*)_models\.py/\1/')

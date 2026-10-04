@@ -35,7 +35,7 @@ variable "enabled_proxies" {
     (and can't destroy a proxy mid-run); keep it in step when enabling or removing one.
   EOT
   type        = list(string)
-  default     = ["android-flagship", "android-mainstream", "iphone-older"] # pi5 removed 2026-10-03
+  default     = ["iphone-older", "iphone-flagship"] # pi5 removed 2026-10-03; Android proxies removed and mac-m4 added 2026-10-04
 }
 
 variable "proxies" {
@@ -79,6 +79,8 @@ variable "proxies" {
       bench_threads = "4"
       # 16.5 GB: no phone or 16 GiB proxy can hold it; a laptop-class reference point only.
       extra_models = [{ repo = "unsloth/Qwen3.8-27B-GGUF", file = "Qwen3.8-27B-UD-Q4_K_M.gguf" }]
+      # 2026-10-04: no mac-m4.metal host capacity in us-west-2a; AWS pointed at us-west-2b/2d.
+      availability_zone = "us-west-2b"
     }
     "iphone-older" = {
       instance_type = "mac2.metal"

@@ -1,6 +1,28 @@
 # TODO: check Q4_0 accuracy on the Talk 2 tasks
 
-**Status:** not started. Raised 2026-10-03 from the L3 results (`docs/TALK2-HARDWARE-SPECTRUM-TEST-CATALOG.md`).
+**Status:** first answer in, 2026-10-04: **accuracy depends on the model.**
+- Measured on M1 Metal (mac2, run `C-workload-20261004T055729Z-q4_0`), against Q4_K_M's forward and reverse C runs. Same pairs and flags, 3 reps.
+- **Reproduced on M4 Metal** (mac-m4, `C-workload-20261004T120252Z-q4_0`): Gemma-3-4B Edge Triage mismatch 0/135 → 43/135; Llama 11 → 16/135; GLM 10 → 4/135; Qwen3 0 → 2/135; Phi 0 → 0. J/call -10 to -36%.
+- Still open: ARM-CPU latency for Q4_0 on the real workload, and confirming Gemma's regression at higher n.
+
+Raised 2026-10-03 from the L3 results (`docs/TALK2-HARDWARE-SPECTRUM-TEST-CATALOG.md`).
+
+## Result (M1, 2026-10-04)
+
+| Pair | Escalation mismatch Q4_K_M → Q4_0 | Format | p50 s Q4_K_M → Q4_0 | J/call Q4_K_M → Q4_0 |
+|---|---|---|---|---|
+| Phi-3.5-mini, Edge Triage | 0/270 → 0/135 | 100% → 100% | 1.92 → 1.75 | 20.0 → 13.8 |
+| Gemma-3-4B, Tier 2 | (structured 30/30, speakability 0/30, grounding 0.00 in all 9 runs) | 100% → 100% | 2.68 → 2.40 | 27.2 → 21.3 |
+| **Gemma-3-4B, Edge Triage** | **0/270 → 41/135 (30%)** | 100% → 100% | 5.0 → 4.7 | 46.9 → 33.6 |
+| Llama-3.1-8B, Edge Triage | 14/270 (5.2%) → 7/135 (5.2%) | 100% → 100% | 4.2 → 3.6 | 42.3 → 24.9 |
+| GLM-4-9B, Edge Triage | 23/270 (8.5%) → 2/135 (1.5%) | 100% → 100% | 5.7 → 5.5 | 51.6 → 39.4 |
+| Qwen3-8B, Edge Triage | 0/270 → 1/135 (0.7%) | 100% → 100% | 7.4 → 7.9 | 66.8 → 57.2 |
+
+**What it shows:**
+- On Metal, Q4_0 cuts energy per call by 14-41%, with latency within -17%/+8%.
+- Quality holds or improves for four of five models. **Gemma-3-4B's escalation calibration on the Edge Triage Pipeline degrades badly**, though its Tier 2 quality is untouched. So "ship Q4_0" is a per-model, per-task decision.
+- The Q4_K_M column pools 6 runs (forward + reverse, 270 escalation calls); Q4_0 is 3 runs (135).
+
 
 ## Why
 On the flagship-Android proxy (c9g, 8 threads), Q4_0 beat the Q4_K_M files we've used everywhere. This is consistent with llama.cpp repacking Q4_0 into interleaved ARM layouts at load time:

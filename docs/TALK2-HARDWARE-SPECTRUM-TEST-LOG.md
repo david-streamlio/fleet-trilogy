@@ -17,10 +17,11 @@ Times are UTC unless marked PDT. Started 2026-10-03; update it whenever a test r
 
 | Key | Hardware | CPU | Cores | RAM | OS / kernel | Where | Stands in for |
 |---|---|---|---|---|---|---|---|
-| `android-flagship` | EC2 c9g.2xlarge | Graviton5, Neoverse-V3 | 8 vCPU, 1 thread/core | 15 GiB | Ubuntu 26.04.1, 7.0.0-1014-aws | us-west-2a, i-01c317884b61a1a55 | 2025-26 flagship Android (Snapdragon 8 Elite Gen 5 / Dimensity 9500): an upper bound |
-| `android-mainstream` | EC2 c7g.2xlarge | Graviton3, Neoverse-V1 | 8 vCPU | 15 GiB | same | us-west-2a, i-06c21408e356914eb | mainstream / older Android (Cortex-X1 class) |
+| `android-flagship` | EC2 c9g.2xlarge | Graviton5, Neoverse-V3 | 8 vCPU, 1 thread/core | 15 GiB | Ubuntu 26.04.1, 7.0.0-1014-aws | us-west-2a, i-01c317884b61a1a55, **terminated 2026-10-04 04:26** | 2025-26 flagship Android (Snapdragon 8 Elite Gen 5 / Dimensity 9500): an upper bound |
+| `android-mainstream` | EC2 c7g.2xlarge | Graviton3, Neoverse-V1 | 8 vCPU | 15 GiB | same | us-west-2a, i-06c21408e356914eb, **terminated 2026-10-04 04:26** | mainstream / older Android (Cortex-X1 class) |
 | `pi5` | EC2 c6g.2xlarge | Graviton2, Neoverse-N1 | 8 vCPU (sweeps use 1/2/4) | 15 GiB | same | us-west-2a, i-01ee531f56d4e1372, **terminated 2026-10-03 ~22:50** | Raspberry Pi 5 (Cortex-A76 = N1's sibling) |
 | `iphone-older` (mac2) | EC2 mac2.metal = Mac mini Macmini9,1 | Apple M1 | 4 performance + 4 efficiency | 16 GB | macOS 26.7 (AMI `ami-0b2ea1252252f73c3`, `amzn-ec2-macos-26.7*`), Darwin 25.6.0 | us-west-2c; host `h-0cd7883f65df1cc96`, allocated 2026-10-03 18:46:02, release ≥ 2026-10-04 18:46:02; instance i-0672a644dd3476d85 | iPhone 12 (A14) by lineage. Its generation speed actually tracks the iPhone 17 Pro (§9) |
+| `iphone-flagship` (mac-m4) | EC2 mac-m4.metal = M4 Mac mini | Apple M4 | (recorded in its `system.txt`) | 24 GB | macOS 26.7 (same AMI as mac2) | us-west-2b (2a had no capacity); host `h-0ef56a222e2ebe7fb`, allocated 2026-10-04 04:29:17, release ≥ 2026-10-05 04:29:17; instance i-0ee6011fbe606903f | iPhone 17 Pro / 18 Pro (A19 Pro / A20 Pro); M4 is the A18 generation. Added for round 2 |
 | `m4max-macbook` | the user's MacBook Pro | Apple M4 Max | 12 performance + 4 efficiency | 64 GB | macOS 26.7.1 (25G241), Darwin 25.6.0 | local | laptop-class GPU reference |
 | Pi 4 (real) | Raspberry Pi 4 | Cortex-A72 | 4 | 8 GB | Pi OS (earlier Talk 2 work) | the user's bench, inline KWS-2303C meter | the 2021 baseline (impact-track rows 22-26) |
 
@@ -314,9 +315,30 @@ Per-run files:
 - The resume's faster reps (GLM r4 1.02 s, Qwen r3 1.50 s) ran on a machine that had cooled during an hour of sleep.
 - The pair order is fixed, so **later models are measured warmer**. A fair per-model M4 Max comparison needs a cooldown to Nominal before each model.
 
-**Energy per call is stable under throttling** (power falls about as fast as time stretches). Phi's 15.1-15.8 J reproduces the 2026-10-02 contrast (15.3 J, b10931), and Gemma Tier 2's 23.5-24.3 J the 22.7 J.
+~~**Energy per call is stable under throttling.**~~ **Superseded by the gated run below:** this was inferred from Phi and Tier 2 alone, which always ran cool. Phi's 15.1-15.8 J does reproduce the 2026-10-02 contrast (15.3 J, b10931), and Gemma Tier 2's 23.5-24.3 J the 22.7 J.
 
 **Gemma-3-4B Edge Triage varies** (1.24-2.01 s p50 across 6 reps at Nominal pressure, 11-25 W). That's unexplained; candidates are output-length variance or host-side work. Its per-call energy is steadier (22-24 J).
+
+**Gated reverse-order rerun** (`m4max-macbook/20261004T043341Z-gated-reverse`, 04:33-05:11; 56 windows, all exit 0):
+- Same 18 sessions, last pair first.
+- Each session started only after 60 s of Nominal thermal pressure. The `cool-wait_*` windows waited 0-134 s.
+- Trace `/tmp/m4max-powermetrics-3.txt` (snapshot in the run dir). Idle 241 mW.
+- **"Cool" means starting at Nominal.** Pressure still often rose to Moderate or Heavy within a 90-130 s session.
+
+| Session (Edge Triage unless noted) | Cool p50 s (r1, r2, r3) | Warm p50 s (caffeinated forward run) | Cool J/call | Warm J/call |
+|---|---|---|---|---|
+| Qwen3-8B (ran first) | 1.37, 1.44, 1.37 | 1.96, 2.07, 1.99 | 40.1, 41.2, 39.8 | 27.8, 27.6, 28.0 |
+| GLM-4-9B | 1.13, 1.00, 1.12 | 1.41, 1.41, 1.52 | 29.8, 30.6, 32.4 | 22.0, 22.4, 22.2 |
+| Llama-3.1-8B | 0.78, 0.87, 0.79 | 1.14, 1.07, 1.12 | 25.4, 25.6, 25.4 | 18.6, 19.1, 19.7 |
+| Gemma-3-4B | 1.14, 1.08, 1.16 | 2.01, 1.79, 1.71 | 36.2, 36.0, 35.4 | 22.0, 24.3, 24.3 |
+| Gemma-3-4B, Tier 2 | 0.51, 0.52, 0.53 | 0.50, 0.51, 0.53 | 23.3, 22.9, 23.0 | 23.5, 24.3, 23.6 |
+| Phi-3.5-mini (ran last) | 0.37, 0.38, **0.72** | 0.36, 0.37, 0.37 | 14.6, 15.7, **10.2** | 15.1, 15.3, 15.8 |
+
+**Finding: on the M4 Max, thermal state trades speed for energy.**
+- Starting cool, the 8-9B models and Gemma's Edge Triage task run 24-77% faster per call, but use 30-60% more energy per call.
+- Throttled (lower clocks, lower voltage) the same work is slower and cheaper: the usual DVFS tradeoff.
+- For the talk and paper: **report both regimes, labelled** (cool burst vs sustained), never one number per model. The pairs that always ran cool (Phi, Tier 2) agree across every run and with 2026-10-02.
+- **Phi r3 is an outlier:** Heavy pressure mid-session, latency doubled, lower J/call. It's consistent with the same tradeoff. Kept, not dropped.
 
 ### Android-proxy extras (`bench_linux_extras.sh`)
 
@@ -343,6 +365,45 @@ Per-run files:
 
 L7 artifacts live on c9g at `~/fleet-trilogy/eval-results/`. Collect them into `android-flagship/L7-artifacts/` (as `C-artifacts/` for mac2) before the instance stops.
 
+### Round 2 (2026-10-04): second test suites
+
+Round 2 adds runs; it replaces nothing. **Data-retention rule:** no run directory is ever overwritten or deleted. Each re-run gets a new timestamped directory, labelled by suffix and in its `system.txt`. `proxyctl.sh collect` and `collect_when_done.sh` use rsync without `--delete`, so earlier runs and eval artifacts stay. Each run's `artifacts.txt` names its own eval artifacts, which share `C-artifacts/` with earlier runs. Model-hash files are timestamped (`model-sha256-<ts>.txt`); the round-1 collection's are `model-sha256.txt`.
+
+| Label | Platform | Run dir | Purpose | Status |
+|---|---|---|---|---|
+| **C-reverse** | mac2 | `iphone-older/C-workload-20261004T042350Z-reverse` (`order: reverse, quant: q4_k_m`) | Order-effect check of test C. mac2 never throttled (F: 10,593 samples, all Nominal; drift ≤ 0.6%), so no cooldown | done 04:23-05:57. **No order effect:** p50 within ~4%, J/call within 2% of the forward run |
+| **C-q4_0** | mac2 | `iphone-older/C-workload-20261004T055729Z-q4_0` (`quant: q4_0`; `LLM_MODEL_PATH_*` recorded) | Q4_0 accuracy, latency and energy for the five candidates (`TODO-Q4_0-ACCURACY-CHECK.md`). Phi and Gemma-3-4B Q4_0 from G; Llama, GLM, Qwen3 downloaded first. Same pairs and flags as C | done 05:57-07:20; collected 07:20 (35/35 model hashes match). Results in `TODO-Q4_0-ACCURACY-CHECK.md`: J/call -14 to -41%; Gemma-3-4B Edge Triage mismatch 0% → 30%, the others hold |
+| **M4 Max gated-reverse** | m4max-macbook | `m4max-macbook/20261004T043341Z-gated-reverse` (`order: reverse`, `gate: /tmp/m4max-powermetrics-3.txt`). The first attempt is kept as `20261004T042254Z-gated-reverse-ABORTED` (incident 21, no sessions ran) | The 18 single-model sessions last-to-first, each started only after 60 s of Nominal thermal pressure (`GATE_PM`; waits logged as `cool-wait_*` windows). Gives cool per-model numbers to compare with the warm caffeinated rerun | done 04:33-05:11 (results above) |
+| **iphone-flagship full suite** | mac-m4 | `iphone-flagship/…` | `scripts/bench_mac_all.sh`, unattended: `bench.sh --quick` smoke → Phase 1 (17 + Qwen3.8-27B) → C smoke → C → extras queue (E A B D E F I E) → G/H → C-reverse → C-q4_0. The same scripts as mac2; repo copied for C | **done 12:56; collected 14:55.** Provisioned in 19 min. Driver log `results/all-20261004T045017Z.log`. Runs:
+- Phase 1 `20261004T045158Z` (04:52-05:15)
+- C `C-workload-20261004T051713Z` (05:17-06:13)
+- extras queue 06:13-10:36: A `…064452Z`, B `…080512Z`, D `…080625Z`, F `…090309Z`, I `…100414Z`, E `20261004T062205Z` / `…084020Z` / `…101410Z`
+- G `G-quant-variants-20261004T104633Z`, H `H-mlx-20261004T105726Z`
+- C-reverse `C-workload-20261004T110245Z-reverse`, C-q4_0 `C-workload-20261004T120252Z-q4_0`
+
+Checks: 36/36 model hashes match, 502/502 llama-bench JSONs valid, 759/759 windows exit 0, no host identifiers |
+
+**mac-m4 (M4, 24 GB) headline results** (`scripts/summarize.py` on the runs above):
+
+| | M1 (mac2) | M4 (mac-m4) | iPhone 17 Pro (published) |
+|---|---|---|---|
+| Metal tg128, Qwen3.5-2B | 39.7 tok/s | 67.3 | 39.1 |
+| Metal tg128, Gemma-4-E2B | 35.4 | 59.1 | 38.8 |
+| Metal tg128, Llama-3.1-8B | 12.7 | 21.7 | — |
+| Metal tg128, Qwen3.8-27B (only the M4 holds it) | — | 6.3 | — |
+| Test C, Phi Edge Triage: p50 / J per call | 1.91 s / 20.0 J | 1.18 s / 15.2 J | — |
+| Test C, Gemma-3-4B Tier 2 | 2.67 s / 27.1 J | 1.66 s / 21.5 J | — |
+| C-q4_0, Gemma-3-4B Edge Triage mismatch (Q4_K_M → Q4_0) | 0/270 → 41/135 | 0/135 → 43/135 | — |
+
+- **The M4 overshoots the iPhone 17 Pro's generation speed about 1.5-1.7×** (bandwidth 120 vs 76.8 GB/s), so M1 remains the closer stand-in.
+- **On the real workload the M4 is 1.6-1.8× faster than M1, at 10-25% less energy per call.** Its Phi 15.2 J matches the M4 Max laptop running cool.
+- **The Gemma-3-4B Q4_0 regression reproduces on a second machine.** Q4_0's J/call drops 10-36% on the M4, against 14-41% on M1.
+- **The mac-m4 never throttled:** F's 7,179 thermal samples were all Nominal, so both Mac minis are single-regime. Only the MacBook (M4 Max) throttles.
+
+**Round-2 infrastructure:**
+- Both Android proxies destroyed 04:26, after collection and hash checks (17/17 each).
+- `enabled_proxies` default = `["iphone-older", "iphone-flagship"]`.
+
 ## 6. Incident log
 
 Every problem, its effect on the data, and the fix. "No data impact" means no measurement was affected.
@@ -366,6 +427,10 @@ Every problem, its effect on the data, and the fix. "No data impact" means no me
 | 15 | various | AWS SSO sessions expire after ~1 h | none; only Terraform needs credentials | `aws sso login` before plan/apply |
 | 17 | 10-04 01:33 | The first commit attempt failed on SSH commit signing ("communication with agent failed"): the operator was away, and the agent needs them present | none; staged files unstaged so no other session would commit them | committed on the operator's return |
 | 18 | 01:34:47 → ~04:10 | **The MacBook idle-slept again** once the caffeinated run ended, which froze the local collection watcher (`collect_when_done.sh`). It was killed at the tool's 2 h limit | none on data: every AWS queue had finished by 03:53, and collection ran on wake | collection now runs under `caffeinate -i` |
+| 19 | 10-04 04:26 | mac-m4 AllocateHosts: `InsufficientHostCapacity` in us-west-2a (AWS: capacity in us-west-2b, us-west-2d). The provider retried silently | none; the apply was interrupted after both Android teardowns completed, nothing allocated | `iphone-flagship.availability_zone = "us-west-2b"` |
+| 20 | 10-04 04:22-04:32 | `sudo powermetrics` for the gated M4 Max run sat at its password prompt twice, unnoticed | none; the gate waited for the trace file to appear | `sudo -v && sudo powermetrics …` |
+| 21 | 10-04 04:22-04:33 | The first gated M4 Max run never left its first cool-wait. The gate read the trace's last 400 KB, but a sample with the thermal sampler is ~8 KB, so the window held ~49 samples against the 120 Nominal it requires | none; only idle-pre ran. Directory kept as `…-gated-reverse-ABORTED` with `ABORTED.txt` | gate reads 4 MB (~480 samples); verified on the live trace before relaunch |
+| 22 | 10-04 05:12 (found) | **Analysis bug:** `summarize.py: load_powermetrics` fitted one time offset per trace, assuming no pauses. powermetrics stops while a Mac sleeps, so traces spanning a sleep (M4 Max: `20261003T230334Z`, 23:30-00:30; `-caffeinated` once re-copied in full, 01:34-04:10) were misaligned by over an hour | raw data intact. No reported number was affected: the caffeinated energies came from a pre-sleep snapshot, and the first run's per-session stats used header times. mac2 traces have no gaps | offset fitted per gap-free segment; mac2's Phase 1 energy table is byte-identical before and after |
 | 16 | 22:50 | The default `enabled_proxies` was still the smoke test's `["android-flagship"]`, so a plain `terraform apply` would have destroyed c7g and mac2 mid-run | none (caught) | default = the deployed set; plain plan = no changes |
 
 **Guards added along the way:**
@@ -388,7 +453,11 @@ Every problem, its effect on the data, and the fix. "No data impact" means no me
    - The user prefers hardware-real measurements to bandwidth "corrections". Show any correction side by side with the raw number, labeled.
 2. **Energy coverage differs.** Mac figures are chip-only (powermetrics) while the Pi 4 is whole-board at the wall. The Android proxies have no energy data at all.
 3. **Thermals.** Servers and the Mac mini don't throttle like phones, so F is a steady-state baseline, not phone thermals.
-4. **The M4 Max slowdown is thermal (resolved, §5 caffeinated rerun).** Sustained load takes the MacBook to Heavy thermal pressure in ~12 min. With a fixed pair order, later models are measured warmer, so a fair per-model comparison needs cooldown-to-Nominal gating before each model (proposed, not run). Energy per call is insensitive to it. A laptop throttling within minutes is itself evidence for the phone-thermals question. mac2 (actively cooled Mac mini, headless) kept a ±2% rep spread; F records its thermal pressure.
+4. **The M4 Max slowdown is thermal (resolved, §5).**
+   - Sustained load takes the MacBook to Heavy thermal pressure in ~12 min.
+   - The gated reverse-order run shows the cost: cool-start sessions are 24-77% faster but use 30-60% more energy per call than throttled ones. Report both regimes, labelled.
+   - A laptop throttling within minutes is itself evidence for the phone-thermals question.
+   - mac2 (actively cooled Mac mini, headless) never left Nominal: F's 10,593 samples, drift ≤ 0.6%. Its numbers are single-regime.
 5. **The 09-26 five-model numbers are invalid as per-model latencies** (§5): a multi-model session roughly doubles Phi's latency on the M4 Max. Re-check any impact-track row that used them.
 6. **Q4_0 accuracy** on the Talk 2 tasks is untested. See `TODO-Q4_0-ACCURACY-CHECK.md`.
 7. **The x1 build is faster than native on c7g:** +3-12% tg, up to 2.5× pp. Native's SVE paths underperform, so the server-only ISA didn't inflate c7g. The mechanism (NEON or llamafile kernels vs SVE-256) is unverified.

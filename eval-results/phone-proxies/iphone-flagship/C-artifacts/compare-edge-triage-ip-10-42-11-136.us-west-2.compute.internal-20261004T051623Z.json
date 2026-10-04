@@ -1,0 +1,147 @@
+{
+  "host": "ip-10-42-11-136.us-west-2.compute.internal",
+  "arch": "arm64",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "decision_grade": "quality-only (non-target hardware)",
+  "timestamp": "2026-10-04T05:16:23Z",
+  "seed_config": {
+    "model_eval_runs": 1,
+    "model_timeout_seconds": 180.0
+  },
+  "models": {
+    "phi-3.5-mini-instruct-q4km": {
+      "id": "phi-3.5-mini-instruct-q4km",
+      "display_name": "Phi-3.5-mini-instruct (Q4_K_M)",
+      "available": true,
+      "binary_path": "/Users/ec2-user/phoneproxy/llama.cpp/build/bin/llama-completion",
+      "model_path": "/Users/ec2-user/phoneproxy/models/Phi-3.5-mini-instruct-Q4_K_M.gguf",
+      "extra_args": [
+        "-no-cnv"
+      ],
+      "format_reliability": {
+        "total": 1,
+        "parsed": 1,
+        "rate": 1.0,
+        "sample_failures": []
+      },
+      "escalation_calibration": {
+        "per_scenario": {
+          "escalate-worthy": {
+            "expected_direction": "raise",
+            "escalation_tally": {
+              "raise": 3
+            },
+            "total": 3,
+            "matched": 3,
+            "match_rate": 1.0
+          },
+          "benign": {
+            "expected_direction": "hold",
+            "escalation_tally": {
+              "hold": 3
+            },
+            "total": 3,
+            "matched": 3,
+            "match_rate": 1.0
+          },
+          "de-escalate-worthy": {
+            "expected_direction": "lower_or_hold",
+            "escalation_tally": {
+              "hold": 2,
+              "lower": 1
+            },
+            "total": 3,
+            "matched": 3,
+            "match_rate": 1.0
+          }
+        },
+        "total": 9,
+        "matched": 9,
+        "mismatches": 0,
+        "mismatch_rate": 0.0,
+        "sample_mismatches": [],
+        "gate2_confirmed": true,
+        "gate2_per_scenario_n": 3,
+        "gate2_format_threshold": 0.8
+      },
+      "latency": {
+        "p50_seconds": 1.1812917079998897,
+        "p95_seconds": 3.1748506747002,
+        "n": 10
+      },
+      "tokens_per_sec_approx": 18.482474535600893,
+      "tokens_per_sec_note": "approximate \u2014 whitespace word count / latency over parsed trials, not an exact tokenizer count",
+      "load_time_seconds": 7.642236749999938,
+      "resident_ram_mb_before": 0.0,
+      "resident_ram_mb_after": 17139.6875,
+      "resident_ram_mb_note": "RUSAGE_CHILDREN ru_maxrss is a cumulative max for the whole test session and isn't resettable per model; this is exact for the first model in a run (or when a model is run alone) and otherwise a floor \u2014 not a true peak \u2014 for models measured later in the same run."
+    }
+  },
+  "comparison": {
+    "format_parse_rate": {
+      "direction": "higher",
+      "values": {
+        "phi-3.5-mini-instruct-q4km": 1.0
+      },
+      "best": "phi-3.5-mini-instruct-q4km"
+    },
+    "escalation_mismatch_rate": {
+      "direction": "lower",
+      "values": {
+        "phi-3.5-mini-instruct-q4km": 0.0
+      },
+      "best": "phi-3.5-mini-instruct-q4km"
+    },
+    "latency_p50_seconds": {
+      "direction": "lower",
+      "values": {
+        "phi-3.5-mini-instruct-q4km": 1.1812917079998897
+      },
+      "best": "phi-3.5-mini-instruct-q4km"
+    },
+    "latency_p95_seconds": {
+      "direction": "lower",
+      "values": {
+        "phi-3.5-mini-instruct-q4km": 3.1748506747002
+      },
+      "best": "phi-3.5-mini-instruct-q4km"
+    },
+    "tokens_per_sec_approx": {
+      "direction": "higher",
+      "values": {
+        "phi-3.5-mini-instruct-q4km": 18.482474535600893
+      },
+      "best": "phi-3.5-mini-instruct-q4km"
+    },
+    "load_time_seconds": {
+      "direction": "lower",
+      "values": {
+        "phi-3.5-mini-instruct-q4km": 7.642236749999938
+      },
+      "best": "phi-3.5-mini-instruct-q4km"
+    },
+    "resident_ram_mb_after": {
+      "direction": "lower",
+      "values": {
+        "phi-3.5-mini-instruct-q4km": 17139.6875
+      },
+      "best": "phi-3.5-mini-instruct-q4km"
+    }
+  },
+  "recommendation": "format_parse_rate: Phi-3.5-mini-instruct (Q4_K_M) leads (1.000)\nescalation_mismatch_rate: Phi-3.5-mini-instruct (Q4_K_M) leads (0.000)\n[informational \u2014 non-target hardware] latency_p50_seconds: Phi-3.5-mini-instruct (Q4_K_M) leads (1.181)\n[informational \u2014 non-target hardware] latency_p95_seconds: Phi-3.5-mini-instruct (Q4_K_M) leads (3.175)\n[informational \u2014 non-target hardware] tokens_per_sec_approx: Phi-3.5-mini-instruct (Q4_K_M) leads (18.482)\n[informational \u2014 non-target hardware] load_time_seconds: Phi-3.5-mini-instruct (Q4_K_M) leads (7.642)\n[informational \u2014 non-target hardware] resident_ram_mb_after: Phi-3.5-mini-instruct (Q4_K_M) leads (17139.688)\nThis note does not pick a stage model. Quality axes above are decision-relevant on any host; speed/RAM axes only count when measured on the Pi 4 target.",
+  "production_candidates": {
+    "format_threshold": 0.8,
+    "escalation_threshold": 0.5,
+    "passed": [
+      {
+        "id": "phi-3.5-mini-instruct-q4km",
+        "display_name": "Phi-3.5-mini-instruct (Q4_K_M)",
+        "format_parse_rate": 1.0,
+        "gate2_confirmed": true,
+        "escalation_mismatch_rate": 0.0,
+        "escalation_sample_n": 9
+      }
+    ],
+    "rejected": []
+  }
+}

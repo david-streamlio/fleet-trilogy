@@ -57,16 +57,34 @@ def load_powermetrics(path):
         m = re.match(r"^Combined Power \(CPU \+ GPU \+ ANE\): (\d+) mW", line)
         if m and combined:
             combined[-1] = int(m.group(1))
-    # Header times have 1 s resolution and mark the end of each sample. Find the offset that
-    # puts every cumulative end time inside its header's second, and take the middle.
-    cum, ends = 0.0, []
-    for _, dt in heads:
-        cum += dt
-        ends.append(cum)
-    lo = max(t - e for (t, _), e in zip(heads, ends))
-    hi = min(t + 1 - e for (t, _), e in zip(heads, ends))
-    off = (lo + hi) / 2
-    return [(off + e - dt, off + e, mw) for (_, dt), e, mw in zip(heads, ends, combined) if mw is not None]
+    # Header times have 1 s resolution and mark the end of each sample. Within a run of
+    # back-to-back samples, find the offset that puts every cumulative end time inside its
+    # header's second, and take the middle. powermetrics stops while a Mac sleeps, so a header
+    # jump much larger than its sample's elapsed time starts a new run with its own offset (a
+    # single offset across a sleep misaligned a whole trace by over an hour).
+    out, seg = [], []
+
+    def flush():
+        if not seg:
+            return
+        cum, ends = 0.0, []
+        for _, dt, _ in seg:
+            cum += dt
+            ends.append(cum)
+        lo = max(t - e for (t, _, _), e in zip(seg, ends))
+        hi = min(t + 1 - e for (t, _, _), e in zip(seg, ends))
+        off = (lo + hi) / 2
+        out.extend((off + e - dt, off + e, mw) for (_, dt, mw), e in zip(seg, ends) if mw is not None)
+        seg.clear()
+
+    prev = None
+    for (t, dt), mw in zip(heads, combined):
+        if prev is not None and t - prev > dt + 2:
+            flush()
+        seg.append((t, dt, mw))
+        prev = t
+    flush()
+    return out
 
 
 def energy_j(samples, t0, t1, idle_mw):
