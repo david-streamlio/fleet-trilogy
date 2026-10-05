@@ -1,0 +1,10 @@
+Same prompt (render_synthesis_prompt over deploy/talk3-demo-cards.jsonl, 361 tokens),
+the Pi's own llama.cpp build (/mnt/data/tools/llama.cpp, commit 8212c78, 2026-09-24),
+`llama-completion -m gemma-3-4b-it-Q4_K_M.gguf -f prompt -n 256 -t 4 --temp 0.7 -no-cnv`,
+started at 45.7'C, 2026-10-05 ~04:35 BST. Wall time not captured (no `bc` on the Pi);
+llama.cpp's own phase timings:
+
+call 1: load 5515.85 ms | prompt eval 98713.51 ms / 361 tok (3.66 tok/s) | eval 47708.98 ms / 66 tok (1.38 tok/s)  => ~152 s
+call 2: load 5479.57 ms | prompt eval 98712.05 ms / 361 tok (3.66 tok/s) | eval 41052.09 ms / 57 tok (1.39 tok/s)  => ~145 s
+
+Ended at 70.1'C, throttled=0x80000 (soft temperature limit reached at some point).

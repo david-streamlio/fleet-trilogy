@@ -18,8 +18,8 @@ The spine: *"hey, that's cool — and here's how little it took."* Cheap math
 gates the events, a **Pulsar Function** aggregates them, **plain code**
 decides, a **small quantized LLM loaded inside the Function** words the
 decision on one CPU core, and **Piper** speaks it. The resource profile and the
-honest admissions (first attempt 29 s, Pi not yet run, ~1 in 4 warnings with a
-factual slip) are part of the plot, not footnotes: the abstract promised them.
+honest admissions (first attempt 29 s, six minutes a warning on one Pi 4 core,
+~1 in 4 warnings with a factual slip) are part of the plot, not footnotes: the abstract promised them.
 
 Standalone, but rewards Talks 1 and 2. 40-minute slot: 25 narrative slides at
 38 minutes plus 2 minutes of slack for the live demo; untimed Waitroom, Title
@@ -92,10 +92,12 @@ call). Backing: `gating_counts.txt`; `docs/TALK1-SLIDE-PLAN.md` 19–21.
 - **The resource profile** (M4 Max, model kept in the Function): GPU 0.7 s;
   4 CPU threads 3.5 s; **1 CPU thread 12.0 s, cores busy 1.00, 5.3 GB**.
   Piper: 11 s of audio in 0.16 s (measured earlier, on an M4).
-- **What one core buys you**: ~5 warnings a minute — enough because the gates
-  keep the LLM rare. Honest numbers: the first one-core attempt (subprocess per
-  call, Homebrew build) took 29 s; a Pi 5-class core is predicted at ~1 min, not
-  yet run. Replace the prediction with the real result, slow or failed.
+- **What one core buys you**: ~5 warnings a minute on the laptop — enough
+  because the gates keep the LLM rare. Honest numbers: the first one-core
+  attempt took 29 s; and on the Raspberry Pi 4, measured: **6 min 17 s per
+  warning on one core** (1 min 54 s on all four). With the default 60 s timeout
+  every one-core call would have failed. Backing:
+  `eval-results/talk3-single-core-pi4-20261004/`.
 
 ## Act 5 — Giving it a voice (~3 min, 2 slides)
 
@@ -138,8 +140,6 @@ call). Backing: `gating_counts.txt`; `docs/TALK1-SLIDE-PLAN.md` 19–21.
 - **Sign off on take 5** (`deploy/recordings/talk3-demo-20261004-182716.mp4`,
   recorded on the M4 Max with the current defaults), or re-take it on the
   external-display machine.
-- **Pi run**: in-process, one thread, `LLM_TIMEOUT_SECONDS=600`, so slide 22
-  can say "I tried it" with the real result.
 - **Real gating ratio** from a live Edge Triage run, to replace the simulator's
   28–33%.
 - **"Before" audio clips** for the I-95N/ETA slide (raw Piper, normalization

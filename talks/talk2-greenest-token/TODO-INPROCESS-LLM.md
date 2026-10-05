@@ -4,7 +4,7 @@
 `docs/INPROCESS-LLM.md`.
 
 ## Why
-Talk 2 measures what it costs to run a small LLM inside the pipeline. Two things
+Talk 2 measures what it costs to run a small LLM inside the pipeline. Three things
 learned on Talk 3 may change what those measurements mean:
 
 1. **Per-call model loads.** The eval harness (`tests/model/conftest.py`) builds a
@@ -14,14 +14,24 @@ learned on Talk 3 may change what those measurements mean:
    reading a 2.5 GB model it may be a larger share. (The Edge Triage Pipeline's
    `LlmTriageFunction` uses `LlmServerBackend`, which keeps the model loaded —
    check which backend each published number came from.)
-2. **GPU vs. CPU.** A Metal build of llama.cpp uses the Mac's GPU unless run with
+2. **Repeated prompts through a prefix cache.** The Tier 2 comparison
+   (`tests/model/test_compare_tier2_models.py`) used `LlmServerBackend`, and
+   repeated each scenario's identical prompt n times, so after the first trial
+   `llama-server` served almost the whole prompt from its cache. The Pi 4 Tier 2
+   median (43.7 s, 4 threads) is therefore close to generation time alone. Talk 3
+   measured the same model on the same Pi with different incidents each call
+   (only the fixed instructions shared): 1 min 54 s on 4 threads, ~99 s of it
+   reading the prompt (`eval-results/talk3-single-core-pi4-20261004/`). Fine for
+   ranking models by output length; not a per-call cost for a real stream.
+3. **GPU vs. CPU.** A Metal build of llama.cpp uses the Mac's GPU unless run with
    `-dev none -ngl 0`; the harness passes no such flags. Mac numbers presented as
    CPU need checking. Pi numbers are CPU regardless.
 
 ## What to review
 1. For each published per-call number (the Tier 2 table's Pi p50/p95, the J/call
-   figures, the Edge Triage numbers), record which backend produced it and
-   whether it includes a model load.
+   figures, the Edge Triage numbers), record which backend produced it, whether
+   it includes a model load, and whether repeated prompts were served from a
+   prefix cache.
 2. Decide whether the deployment Talk 2 recommends is "model kept in the
    Function". If so, re-measure the headline numbers that way —
    `InProcessLlmBackend`, same llama.cpp build as before — and present per-call

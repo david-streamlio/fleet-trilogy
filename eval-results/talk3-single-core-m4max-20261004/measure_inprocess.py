@@ -88,5 +88,8 @@ with open(out, "a") as f:
         if not cfg["keep"]:
             backend._llama.close(); backend = None
 peak = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+# ru_maxrss is bytes on macOS but kilobytes on Linux (the Pi run's first record
+# divided kilobytes by 2**20, so its "3" means ~3 GB).
+peak_bytes = peak if sys.platform == "darwin" else peak * 1024
 with open(out, "a") as f:
-    f.write(json.dumps({"setup": setup, "peak_rss_mb": round(peak / 2**20)}) + "\n")
+    f.write(json.dumps({"setup": setup, "peak_rss_mb": round(peak_bytes / 2**20)}) + "\n")

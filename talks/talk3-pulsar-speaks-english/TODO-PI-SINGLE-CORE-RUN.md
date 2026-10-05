@@ -1,7 +1,8 @@
 # TODO: run Tier 2 on one Pi core
 
-**Status:** open (2026-10-04). Couldn't be run from the M4 Max session: the Pi
-(`edge-node00` in earlier artifacts) isn't reachable by name from that machine.
+**Status:** done (2026-10-05) — `eval-results/talk3-single-core-pi4-20261004/`.
+One Pi 4 core: 6 min 17 s per warning (model kept); four cores: 1 min 54 s. Slide
+22 reports it. The steps below are kept for a re-run.
 
 ## Why
 Slide 22 (`docs/TALK3-SLIDE-PLAN.md`) shows "~1 min per warning on a Pi 5-class
@@ -16,10 +17,12 @@ slow to be useful".
 1. `git pull` the `talk3-wip` branch, then `uv sync` at the repo root. This
    compiles llama-cpp-python for ARM (the `inprocess` dependency group) and may
    take a long time on a Pi; do it before the run, with the fan on.
-2. Point at the model on the SSD (download it there first if it's missing,
-   unsloth `gemma-3-4b-it-Q4_K_M.gguf`, sha256 `04a43a22…7d19`):
+2. Point at the model on the data drive — `/mnt/data`, per the Pi's earlier
+   results (`eval-results/compare-edge-node00-*.json`), not the runbook's
+   `/mnt/ssd`. Download it there first if it's missing (unsloth
+   `gemma-3-4b-it-Q4_K_M.gguf`, sha256 `04a43a22…7d19`):
    ```bash
-   export LLM_MODEL_PATH=/mnt/ssd/models/gemma-3-4b-it-GGUF/gemma-3-4b-it-Q4_K_M.gguf
+   export LLM_MODEL_PATH=/mnt/data/models/gemma-3-4b-it-GGUF/gemma-3-4b-it-Q4_K_M.gguf
    ```
 3. Run the same measurement as the M4 Max, fewer calls (each may take minutes;
    the script's timeout is 600 s per call):

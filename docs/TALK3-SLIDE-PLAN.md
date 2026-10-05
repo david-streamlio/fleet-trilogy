@@ -83,9 +83,10 @@ minutes of slack for the live demo, plus untimed Waitroom, Title and Thank You.
   `talks/talk3-pulsar-speaks-english/TODO-DEMO-RECORDING.md`. Recordings are
   gitignored, so the file is only on the M4 Max. [NEEDS: your review of take 5,
   or a re-take on the external-display machine]
-- **Pi run.** Slide 22's Pi-class number is a prediction from benchmarks. A
-  real run on a Pi, in-process on one thread, turns it into "I tried it" —
-  whatever it shows. [NEEDS: Pi run, `LLM_TIMEOUT_SECONDS=600`]
+- **Pi run: done** (2026-10-05). One Pi 4 core: 6 min 17 s a warning; four
+  cores: 1 min 54 s. Slide 22 now reports it. Slide 17's Talk 2 Pi numbers
+  (43.7 s) are a best case: the same prompt repeated through `llama-server`'s
+  prefix cache, so nearly no prompt reading — see slide 17's notes.
 - **"Before" audio clips** for slide 24 (raw Piper, normalization off).
 - **Fact check in the take.** If the new take's log shows a retry or the
   plain-code fallback, slide 25's narration should say so.
@@ -567,7 +568,10 @@ task. Both passed its accuracy checks. The difference is speed, and it
 isn't the hardware or the model's raw throughput — Phi-3.5-mini pads a
 "2–3 sentence" answer to about 115 words, Gemma writes about 33. Same Pi,
 same quantization, and the ranking flips with the task. That's pattern
-four from the last slide, measured. Those accuracy checks were string
+four from the last slide, measured. (Don't set these Pi times next to Act 4's:
+Talk 2 repeated each prompt through a server that caches it, so these are
+almost pure writing time — the case where output length is all that
+matters.) Those accuracy checks were string
 matches, though; the next two slides are what they missed. Backing:
 `docs/TALK2-OUTLINE.md` "Final model recommendation";
 `docs/TALK2-DATA-ENGINEERING-IMPACT-TRACK.md` "Cross-task latency
@@ -706,37 +710,36 @@ M4, not in this run, so read it as an order of magnitude. Backing:
 ### Slide 22 — What One Core Buys You
 **Label:** The Honest Version
 **Suggested Layout:** Stats — three stat tiles.
-**Core Message:** One core is about five warnings a minute: enough because
-the gates in front keep the LLM rare. My first one-core attempt was slower
-than this, and a Pi-class core will be slower still.
+**Core Message:** One laptop core is about five warnings a minute: enough
+because the gates keep the LLM rare. On a Raspberry Pi 4, one core takes six
+minutes a warning: I tried it, and on the edge, one core isn't enough.
 **Visual Manifest:**
 - Type: `Typography_Only`
-- Spec: three tiles: `~5 / min` (warnings per core, M4 Max); `29 s` (first
-  attempt: subprocess per call, Homebrew build); `~1 min` (Pi 5-class core,
-  predicted — not run). [NEEDS: Pi run result to replace the prediction]
+- Spec: three tiles: `12 s` (one M4 Max core, model kept); `6 min 17 s` (one
+  Raspberry Pi 4 core, model kept — measured); `1 min 54 s` (all four Pi 4
+  cores). Small footer: "first attempt on the laptop: 29 s".
 
 **On-screen text:**
 ```
-~5 / min    warnings per CPU core (12 s each)
-29 s        my first one-core attempt
-~1 min      predicted on a Pi 5-class core (not yet run)
+12 s         one laptop core (M4 Max)
+6 min 17 s   one Raspberry Pi 4 core
+1 min 54 s   all four Pi 4 cores
 ```
 
-**Speaker notes:** Twelve seconds a warning is about five warnings a minute
-per core. That's why slide 5 mattered: fire the model on every reading and
-one core drowns; fire it once per incident and one core keeps up. Two
-honest numbers. My first single-core attempt — a new llama.cpp process per
-message, with Homebrew's generic build — took 29 seconds a warning. Moving
-the model into the Function and building llama.cpp for this machine got it
-to 12. And the edge: benchmarks put a Pi 5-class core about four to five
-times slower than this one, so about a minute a warning, close to the
-backend's 60-second default timeout. I haven't run that yet; if you're
-watching a recording, check the repo. [If the Pi run happens, replace this
-with what it showed — slow or failed, say so.] Backing:
-`eval-results/talk3-single-core-m4max-20261004/README.md` (headline table;
-round 1); `eval-results/phone-proxies/pi5/20261003T184429Z/` and
-`iphone-flagship/A-cpu-threads-20261004T064452Z/` llama-bench `-t 1`
-(Gemma-3-4B-it: prompt 7.4 vs. 35.3 tok/s, output 3.3 vs. 15.1 tok/s).
+**Speaker notes:** Twelve seconds a warning on one laptop core is about five
+warnings a minute. That's why slide 5 mattered: fire the model on every
+reading and one core drowns; fire it once per incident and one core keeps
+up. Now the honest part. I predicted about a minute on a Pi-class core. Then
+I ran it on the Raspberry Pi 4 from Talk 1: six minutes and seventeen
+seconds per warning, on one core. With the default 60-second timeout every
+call would have failed. All four cores bring it to just under two minutes —
+fine for a corridor warning that only fires on an incident, not for anything
+chattier. And it's a 4-billion-parameter model; on a Pi 4 the "tiny" in the
+abstract has to mean smaller than this. One more admission: my first
+one-core attempt on the laptop took 29 seconds, before moving the model into
+the Function and building llama.cpp for the machine. Backing:
+`eval-results/talk3-single-core-pi4-20261004/README.md`;
+`eval-results/talk3-single-core-m4max-20261004/README.md` (headline table).
 
 **Time:** Act 4, ~2 min.
 
