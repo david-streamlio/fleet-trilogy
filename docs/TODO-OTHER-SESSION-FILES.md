@@ -1,6 +1,8 @@
 # TODO: decide what to do with files from other Claude sessions
 
-**Status:** handed back to the user (2026-10-04): "I will recreate those, so don't worry about those." This session takes no action on these files and never commits them to `main`. Listed 2026-10-04.
+**Status: resolved 2026-10-05.** At the user's request, `talk3-wip` was merged into `main` (`f4765fb`). `main` now tracks the Talk 3 outline and slide plan, the Talk 1 slide plan, the Talk 2 deck-build prompt and the three Talk 1 images. Only the Talk 1 deck (`talks/talk1-edge-intelligence/slides/`) stays untracked, by the user's choice. The stash "Talk 3 outline + slide plan (WIP, revisit)" is now redundant; drop it when convenient.
+
+Earlier status: handed back to the user (2026-10-04): "I will recreate those, so don't worry about those." This session takes no action on these files and never commits them to `main`. Listed 2026-10-04.
 
 **Update 2026-10-04 (user request):** for safe keeping, `TALK1-SLIDE-PLAN.md`, `TALK2-DECK-BUILD-PROMPT.md` and the Talk 1 images were committed unchanged to branch `talk3-wip` (`ad2ae76`, pushed; the repo is private). The Talk 1 deck (`slides/`, with its DRUIDS design-system export) was in the first version of that commit (`00602fe`), then removed at the user's request by rewriting the commit and force-pushing; it is not on any branch. The two Talk 3 docs went there earlier (`10ca5cc`). `main` has none of them, and the copies here stay untracked on `main`.
 
