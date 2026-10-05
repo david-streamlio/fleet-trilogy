@@ -17,7 +17,7 @@ Paste-ready prompts that turn the slide plan into the deck. The talk is on 2026-
 
 **Order:** Prompt 0, then 1, 2 and 3 (one batch each), then 4 (QA). Prompt 5 is for later, when the pending data arrives.
 
-**Updated 2026-10-05:** the plan gained slide 19 (assumption 10, prompt order and caching), so slides 19-27 became 20-28. If you already built the deck from the 27-slide plan, send Prompt 6 instead of rebuilding.
+**Updated 2026-10-05:** the plan gained slide 19 (assumption 10, prompt order and caching), so slides 19-27 became 20-28. If you already built the deck from the 27-slide plan, send Prompt 6 instead of rebuilding. If you sent Prompt 6 before the evening of 2026-10-05, re-send it: slide 19's text and slides 18 and 20 changed since.
 
 **Why these rules exist:**
 - **Planning tags reached the slides last time.** The previous Talk 2 build put planning-doc tags and file names on slides (`docs/TALK2-DECK-BUILD-PROMPT.md`). This time pending data must be *visible*, but as a designed chip, never as raw bracket syntax.
@@ -162,7 +162,8 @@ The attached plan has changed: it now has 28 slides. Update the existing deck wi
 2. Change every assumption eyebrow to "ASSUMPTION N OF 10" (slides 10-19), and slide 9's subtitle to "Ten assumptions, and what the data said".
 3. Renumber the slides after it (the old 19-27 become 20-28).
 4. On slide 21 ("Do this, not that: every LLM"), use the plan's four items per column: add "Fixed instructions first, per-request data last" to Do and "Benchmark one repeated input" to Don't, in the positions the plan gives.
-5. Update the presenter notes of slides 10 and 24 to the plan's new versions (a caveat about repeated prompts on each).
+5. Update the presenter notes of slides 10 and 24 to the plan's new versions (a caveat about repeated prompts on each), and of slides 18 and 20 (a note that the runtime can change answers).
+6. On slide 20 ("Do this, not that: small LLMs"), change the Don't item "A quantization you haven't re-tested" to "A quantization or runtime you haven't re-tested".
 Change nothing else. Then list what you changed.
 ```
 

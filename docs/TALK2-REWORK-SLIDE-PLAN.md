@@ -299,6 +299,7 @@
 - **Speaker Notes:**
   - Same model file, runtime and decoding means the same answers. In 83% of cases every call on both machines scored the same.
   - The laptop ran 14 models in 25 minutes; a Pi 4 run took ~2 hours per model.
+  - The limit: "same runtime" matters. The same model file and settings through llama-cpp-python instead of llama-server moved borderline escalations from hold to lower, every call, on the laptop and the Pi alike. Iterate on the fast machine, but with the runtime you'll ship.
   - Forward: the last one, about what my per-call numbers actually measured.
 - **Time:** Section 3, ~1.25 min.
 
@@ -327,9 +328,9 @@
 - **Suggested Layout:** `Comparison`.
 - **On-Screen Text:**
   - Do column: "One bounded judgment" · "Thinking off (cap it if needed)" · "The model's own chat template"
-  - Don't column: "The whole job in one call" · "A quantization you haven't re-tested" · "The server's default context size"
+  - Don't column: "The whole job in one call" · "A quantization or runtime you haven't re-tested" · "The server's default context size"
 - **Speaker Notes:**
-  - The checklist to photograph. One more: below ~1B parameters, expect echoing and loops, not answers.
+  - The checklist to photograph. A runtime counts like a quantization: switching from llama-server to llama-cpp-python changed borderline answers. One more: below ~1B parameters, expect echoing and loops, not answers.
   - Forward: the rules that apply to any LLM, small or not.
 - **Time:** Section 4, ~1.5 min.
 

@@ -151,7 +151,8 @@ Every slide has the same four parts: **I assumed**, **what happened** (one numbe
 **A9. "I need to test accuracy on the target device." I didn't.**
 - **What happened:** the iPhone-class M1 and the M4 Max laptop agreed on all 28 round-3 test cells, within their ranges; in 83% of cases every call on both machines scored the same. The Pi 4 matched the laptop within 6 points on three models.
 - **Why:** same model file, same runtime, same decoding: hardware changes speed, not answers.
-- **Do this:** iterate on accuracy on the fastest machine you have (the laptop ran 14 models in 25 minutes; a Pi 4 run took ~2 hours per model), then measure speed and energy on the target.
+- **The limit (2026-10-05):** "same runtime" matters. The same model file and sampling settings through llama-cpp-python instead of llama-server moved Phi-3.5's borderline escalations from hold to lower, every call, on the M4 Max and the Pi 4 alike. So iterate on the fast machine, but with the runtime you'll ship.
+- **Do this:** iterate on accuracy on the fastest machine you have (the laptop ran 14 models in 25 minutes; a Pi 4 run took ~2 hours per model), using the runtime you'll ship, then measure speed and energy on the target.
 
 **A10. "My benchmark measured the cost of a call." It measured the cost of a repeat.** (Added 2026-10-05; data: paper Table IV, `docs/TALK2-HARDWARE-SPECTRUM-TEST-LOG.md` § "Real-stream re-measure".)
 - **What happened:** the benchmark sent the same event again, so the server read **1 of 514** prompt tokens per call; the rest came from its cache. A new event re-read **~400**, because my prompt put the event's fields before the rules. Moving them after the rules, same wording otherwise: **148**, with accuracy unchanged on llama-server (100% format, 0% wrong escalations), but not through llama-cpp-python, where the benign case tipped from hold to lower on every call. On the Pi 4 a new event cost **160 s and 772 J** with my original order, 5× the repeated 31.7 s and 154 J: reading 400 prompt tokens took 129 s, four times as long as writing the answer (31 s). Fields last: **82 s and 416 J**, about half. On the laptop GPU, 25.0 J → 18.5 J per new event (−26%), against ~15 J repeated.
@@ -168,7 +169,7 @@ Speaker-note material, not slides: below ~1B parameters models echo the prompt o
 - Give it one bounded judgment, not the whole job.
 - Thinking off for short tasks; cap it if you need it.
 - Use the model's chat template.
-- Check every quantization, per model.
+- Check every quantization and every runtime, per model.
 - Set the context size for the device.
 - Below ~1B parameters, expect echoing and loops, not answers.
 
