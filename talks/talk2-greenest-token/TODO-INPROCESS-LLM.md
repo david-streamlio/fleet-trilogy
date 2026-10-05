@@ -1,7 +1,34 @@
 # TODO: review Talk 2's numbers and harness against the in-process LLM
 
-**Status:** flagged for review (2026-10-04). Background and Talk 3's numbers:
-`docs/INPROCESS-LLM.md`.
+**Status:** reviewed 2026-10-05; the real-stream re-measure is done (Pi 4 and M4 Max,
+`docs/TALK2-HARDWARE-SPECTRUM-TEST-LOG.md` § "Real-stream re-measure"). Background and
+Talk 3's numbers: `docs/INPROCESS-LLM.md`.
+
+## Findings and decisions (2026-10-05)
+- **Backend of every published number:** `LlmServerBackend` (llama-server), model
+  loaded once per session, no per-call reload. The `SubprocessLlmBackend` in
+  `conftest.py` (point 1 below) only gates the single-model tests on a real model
+  being present; the comparison harnesses never used it.
+- **Mac "CPU" numbers are CPU:** `build-cpu` was compiled with `-DGGML_METAL=OFF`.
+- **Prompt cache (point 2) is real for the Edge Triage numbers too:** the harness
+  repeats one payload n times, so the Pi's published 31.7 s / 154 J per call is
+  generation with the prompt cached, a lower bound for a stream of different
+  events. Round 3 interleaves cells, so it's closer to a stream.
+- **Decision:** in-process is the default everywhere (Functions and harnesses).
+  The study's runner scripts pin `--model-backend server` so published runs
+  reproduce. New harness options: `--model-backend`, `--model-gpu-layers`,
+  `--vary-events`.
+- **Re-measured as a stream (2026-10-05).** Each device kept its published row's
+  backend and build (llama-server), so only the event variation and the prompt order
+  changed. The prompt became the cache-friendly `event-last` variant (event fields after
+  the rules; same accuracy). Pi 4: **416 J, p50 82 s per call** against the best case's
+  154 J, 31.7 s. M4 Max GPU: published prompt 25.0 J / 0.70 s, event-last 18.5 J /
+  0.49 s, against ~15 J / 0.36 s. In-process wasn't used for these: on the Pi it is a
+  different llama.cpp build, which would have confounded the comparison with the
+  published row.
+- **Next:** the paper (Table II labelled as a best case, the stream result, Fig. 4's
+  text) and the talk (a new assumption slide A10 on prompt order and caching; A1's
+  caveat).
 
 ## Why
 Talk 2 measures what it costs to run a small LLM inside the pipeline. Three things

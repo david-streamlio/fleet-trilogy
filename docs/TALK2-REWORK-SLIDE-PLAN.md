@@ -4,7 +4,7 @@
 
 **Profile:** `DATADOG_MARKETING_DECK` (the outline's default; not DRUIDS).
 
-**Talk:** 40 minutes, 2026-10-08, audience data practitioners. 27 slides: a title, 25 content slides (including 2 section plates), and a closing plate.
+**Talk:** 40 minutes, 2026-10-08, audience data practitioners. 28 slides: a title, 26 content slides (including 2 section plates), and a closing plate.
 
 **Voice:** first person ("I assumed…"), per the user, overriding template voice rules that prefer "you/we".
 
@@ -145,14 +145,14 @@
   - Forward: now the part I came to share, the assumptions that didn't survive.
 - **Time:** Section 2, ~1.5 min.
 
-## Phase: Section 3, I assumed… it didn't (17 min, 10 slides)
+## Phase: Section 3, I assumed… it didn't (17.75 min, 11 slides)
 
 ### Slide 9 — I assumed… it didn't
-- **Core Message:** nine assumptions, and what the data said about each.
+- **Core Message:** ten assumptions, and what the data said about each.
 - **Visual Manifest:** Type `Typography_Only`. Spec: section title and subtitle.
 - **Suggested Layout:** `Section` (plate).
-- **On-Screen Text:** "I assumed… it didn't" / "Nine assumptions, and what the data said"
-- **Speaker Notes:** each of the next nine slides has the same shape: what I assumed, what happened, why, and what to do instead. Forward: start with the one that undercut my own abstract.
+- **On-Screen Text:** "I assumed… it didn't" / "Ten assumptions, and what the data said"
+- **Speaker Notes:** each of the next ten slides has the same shape: what I assumed, what happened, why, and what to do instead. Forward: start with the one that undercut my own abstract.
 - **Time:** Section 3, ~0.25 min.
 
 ### Slide 10 — I assumed a small device would use less energy. It used more.
@@ -171,6 +171,7 @@
   - Why: energy is power × time. The Pi draws ~7 W but takes 17-90× longer, so it pays for every second.
   - On the same chip the CPU loses most when reading the prompt (~4× the GPU's energy per token) and still loses when writing the answer (1.4-1.6×).
   - Pi 4 measured at the wall, the Macs at the chip; even doubling the Mac figures leaves the Pi several times higher.
+  - These are repeated-prompt numbers: the benchmark sent the same event again, so the prompt was cached. Slide 19 shows what a changed prompt costs (on the Pi, 2.7× more).
   - Forward: if the hardware choice cost energy, what about the model's settings?
 - **Time:** Section 3, ~2.25 min.
 
@@ -190,7 +191,7 @@
   - Capped at 1,024 tokens, on all three machines: no call truncated, and Qwen3.5-9B hit the cap every time but still answered. Accuracy stayed within range of thinking off (Qwen3-14B 72-83% vs 72%), at 3-10× the energy and 3.5-17× the time.
   - On the iPhone-class M1: Qwen3-14B 202 → 768 J per call; Qwen3.5-9B 99 → 960 J at 105 s per call.
   - Why: a short, bounded judgment doesn't need multi-step reasoning, and some models don't know when to stop. Forward: what if the model gets more of the job?
-- **Time:** Section 3, ~2.5 min.
+- **Time:** Section 3, ~2.25 min.
 
 ### Slide 12 — I assumed a capable model could do the whole job in one call. It couldn't.
 - **Core Message:** small models handle one bounded judgment, not a multi-step job; thresholds belong in code.
@@ -205,7 +206,7 @@
   - Every part got worse: severity 53-78% right, consistency 47-53%, even the escalation 53-58%. Small models lose multi-step consistency first; a threshold is exact in code and approximate in a model.
   - (Production's prompt mode; the chat format raised the best to 72%, which is the next slide.)
   - Forward: the prompt format turned out to matter more than model size.
-- **Time:** Section 3, ~2.0 min.
+- **Time:** Section 3, ~1.75 min.
 
 ### Slide 13 — I assumed raw completion was the neutral default. The chat format mattered more than model size.
 - **Core Message:** the same prompt in the model's own chat format tripled one model's accuracy at no extra compute.
@@ -242,7 +243,7 @@
   - The production check's 3 cases × 6 repeats is nearly 3 data points.
   - Why: at low temperature a model is nearly deterministic for a given input, so repeats measure that one input.
   - Forward: a setting I assumed was free.
-- **Time:** Section 3, ~2.0 min.
+- **Time:** Section 3, ~1.5 min.
 
 ### Slide 15 — I assumed a cheaper quantization was a free win. It broke one model.
 - **Core Message:** a cheaper 4-bit format saved energy and silently broke one model, so validate every model × quantization.
@@ -298,12 +299,29 @@
 - **Speaker Notes:**
   - Same model file, runtime and decoding means the same answers. In 83% of cases every call on both machines scored the same.
   - The laptop ran 14 models in 25 minutes; a Pi 4 run took ~2 hours per model.
-  - Forward: those nine, as a checklist.
+  - Forward: the last one, about what my per-call numbers actually measured.
 - **Time:** Section 3, ~1.25 min.
+
+### Slide 19 — I assumed my benchmark measured the cost of a call. It measured the cost of a repeat.
+- **Core Message:** a prompt cache reuses only what hasn't changed, so put the fixed instructions first and the per-request data last, and benchmark with inputs that change.
+- **Visual Manifest:** Type `Bar_Comparison`. Spec: before ("my benchmark repeated one event: the server read 1 of 514 prompt tokens per call") vs after (a changed event re-reads ~400 tokens with the event fields before the rules, 148 with them last; Pi 4 82 s / 416 J per changed call against 31.7 s / 154 J repeated; M4 Max GPU 25.0 → 18.5 J with the fields last).
+- **Suggested Layout:** `Comparison`.
+- **On-Screen Text:**
+  - Before column: "My benchmark sent the same event again: the server re-read 1 of 514 prompt tokens"
+  - After column: "A new event re-read ~400. Rules first, event last: 148. Pi 4: 82 s and 416 J per new event, vs 31.7 s and 154 J repeated"
+  - Footer: "Do this: fixed instructions first, per-request data last; benchmark with inputs that change"
+- **Speaker Notes:**
+  - Found while preparing this talk. A server's prompt cache reuses a prompt up to the first token that changed since the last call.
+  - During one incident, one truck's calls repeat the prompt (it carries the trip context, not the sensor readings), so the earlier numbers are right for those calls. A new incident, a changed field, or one device serving several trucks pays the full read.
+  - My prompt put the event's fields before the rules, so a new event re-read ~400 of 514 tokens. Moving them after the rules, same words otherwise: 148. Accuracy unchanged, 100% format and 0% wrong escalations.
+  - On the Pi's CPU, reading even 148 tokens took 50 s, longer than writing the answer (31 s). The original order would need ~170 s per new event (estimated from that rate). On the laptop GPU, reordering saved 26% of the energy per new event: a small lever on a GPU, a big one on a CPU.
+  - And check what your benchmark server caches: llama-server's memory cache of earlier prompts served my recurring test events whole until I turned it off.
+  - Forward: those ten, as a checklist.
+- **Time:** Section 3, ~1.75 min.
 
 ## Phase: Section 4, do this, not that (3 min, 2 slides)
 
-### Slide 19 — Do this, not that: small LLMs
+### Slide 20 — Do this, not that: small LLMs
 - **Core Message:** give small models one bounded judgment, in their own format, with limits you've set and checked.
 - **Visual Manifest:** Type `Bar_Comparison`. Spec: two columns, Do vs Don't, three items each.
 - **Suggested Layout:** `Comparison`.
@@ -315,21 +333,21 @@
   - Forward: the rules that apply to any LLM, small or not.
 - **Time:** Section 4, ~1.5 min.
 
-### Slide 20 — Do this, not that: every LLM
+### Slide 21 — Do this, not that: every LLM
 - **Core Message:** use LLMs for judgment, code for everything else, and measure joules per job.
-- **Visual Manifest:** Type `Bar_Comparison`. Spec: two columns, Do vs Don't, three items each.
+- **Visual Manifest:** Type `Bar_Comparison`. Spec: two columns, Do vs Don't, four items each.
 - **Suggested Layout:** `Comparison`.
 - **On-Screen Text:**
-  - Do column: "Language judgment in the model; classification in code" · "Constrain the output with a grammar" · "Many different test cases"
-  - Don't column: "Make the LLM a classifier" · "Call it on every event" · "Compare watts (compare joules per job)"
+  - Do column: "Language judgment in the model; classification in code" · "Constrain the output with a grammar" · "Fixed instructions first, per-request data last" · "Many different test cases"
+  - Don't column: "Make the LLM a classifier" · "Call it on every event" · "Benchmark one repeated input" · "Compare watts (compare joules per job)"
 - **Speaker Notes:**
   - Cheap math first: filter, classify and compute in code; call the model only when it adds judgment.
   - A grammar made format failures disappear. Forward: so, was my thesis right?
 - **Time:** Section 4, ~1.5 min.
 
-## Phase: Section 5, does the thesis hold? (8 min, 6 slides)
+## Phase: Section 5, does the thesis hold? (7.25 min, 6 slides)
 
-### Slide 21 — Does the thesis hold?
+### Slide 22 — Does the thesis hold?
 - **Core Message:** time to grade the thesis and the abstract.
 - **Visual Manifest:** Type `Typography_Only`. Spec: section title and subtitle.
 - **Suggested Layout:** `Section` (plate).
@@ -337,7 +355,7 @@
 - **Speaker Notes:** restate the thesis. Forward: start with the uncomfortable part.
 - **Time:** Section 5, ~0.25 min.
 
-### Slide 22 — On a CPU, the same task used more energy
+### Slide 23 — On a CPU, the same task used more energy
 - **Core Message:** the CPU result undercuts the naive thesis; the accelerators phones already have don't.
 - **Visual Manifest:** Type `Typography_Only`. Spec: three cards, one per framing.
 - **Suggested Layout:** `Three-up`.
@@ -351,9 +369,9 @@
   - But the iPhone-class GPU did a triage decision for ~20 J (chip-level), and phones ship GPUs and NPUs.
   - The cloud figure is a big model on general prompts, not my task; a small model batched on data-center GPUs would be cheaper still. Context, not a verdict.
   - Forward: so where did the savings come from?
-- **Time:** Section 5, ~1.75 min.
+- **Time:** Section 5, ~1.5 min.
 
-### Slide 23 — Where the energy savings actually came from
+### Slide 24 — Where the energy savings actually came from
 - **Core Message:** how often you call the model moved daily energy by orders of magnitude; the device moved it by about one.
 - **Visual Manifest:** Type `Bar_Comparison`, overridden to a content slide with the chart. Spec: the paper's Fig. 4: LLM energy per truck-day (kJ, log) for three invocation policies (every event 17,280 calls/day; gated, 1 incident/day, 23 calls; once per incident, 1 call) × three devices (Pi 4 154 J, M1 20 J, M4 Max 15.3 J per call), with reference lines for Pi 4 idle (294 kJ), 2012 LTE streaming (92 kJ) and LTE-M streaming (2.5 kJ). File: `slides/charts/slide_fig4_energy_per_day.png`.
 - **Suggested Layout:** `Content`.
@@ -363,13 +381,13 @@
   - "Energy = calls × joules per call"
 - **Speaker Notes:**
   - The invocation policy moved the total by 3-4 orders of magnitude, the device by about one.
-  - Calling once per incident instead of every 5 s would cut another ~20×.
+  - Calling once per incident instead of every 5 s would cut another ~20×. The bars use the repeated-prompt cost per call; a once-per-incident call always meets a new prompt, so on the Pi it costs up to 2.7× more (slide 19). That bar is still ~8× below the gated one.
   - How much not transmitting saves depends on the radio: an old LTE radio streaming every 5 s stays on all day (~92 kJ); a modern low-power modem uses ~2.5 kJ.
   - Hardware that's already on: the Pi's 3.4 W idle is 294 kJ a day, more than everything else. A phone that's on anyway only adds marginal energy, the strongest argument for phones.
   - Forward: how you'd watch for all of this in production.
-- **Time:** Section 5, ~2.0 min.
+- **Time:** Section 5, ~1.75 min.
 
-### Slide 24 — What I'd watch: signals latency alone misses
+### Slide 25 — What I'd watch: signals latency alone misses
 - **Core Message:** most of these failures were invisible to latency monitoring; watch energy, completion, memory, heat, correctness and call rate.
 - **Visual Manifest:** Type `[NEEDS: new visual type not yet in the supported list]`. Spec: a 6-row table (Signal | Failure it caught | Effect), from the paper's Table VI:
   - energy per decision | thinking on | 202 → 817 J per call, accuracy unchanged
@@ -384,9 +402,9 @@
   - Each row is something I'd put on a dashboard. Carbon per decision is energy × the grid's carbon intensity where and when it ran.
   - (The dashboard demo is planned; until then this table is the slide.)
   - Forward: time to grade the abstract.
-- **Time:** Section 5, ~1.5 min.
+- **Time:** Section 5, ~1.25 min.
 
-### Slide 25 — What I promised vs. what I measured
+### Slide 26 — What I promised vs. what I measured
 - **Core Message:** the abstract's second lever, conditional invocation, turned out to be the whole story.
 - **Visual Manifest:** Type `Bar_Comparison`. Spec: left column, the abstract's three claims; right column, what was measured, each with a verdict chip.
 - **Suggested Layout:** `Comparison`.
@@ -403,7 +421,7 @@
   - Forward: the answer.
 - **Time:** Section 5, ~1.5 min.
 
-### Slide 26 — The answer
+### Slide 27 — The answer
 - **Core Message:** the energy savings came from not calling the model, not from making each call cheaper.
 - **Visual Manifest:** Type `Typography_Only`. Spec: three short lines and a large closing line.
 - **Suggested Layout:** `Content`. A plate is ruled out because the closing plate follows (no two plates in a row).
@@ -418,7 +436,7 @@
   - Forward: thank you and where to find the paper.
 - **Time:** Section 5, ~1.0 min.
 
-### Slide 27 — Thank you
+### Slide 28 — Thank you
 - **Core Message:** the paper and what's next.
 - **Visual Manifest:** Type `Typography_Only`. Spec: title and one subtitle line.
 - **Suggested Layout:** `Closing` (plate).
@@ -430,9 +448,9 @@
 
 ## Checks
 
-**Deck rhythm** (plates: `Title`, `Section`, `Quote`, `Product`, `Statement`, `Closing`): the sequence is 1 Title (P) · 2 Stats · 3 Quote (P) · 4 Content · 5 Three-up · 6 Metric · 7 Content · 8 Content · 9 Section (P) · 10-12 Content · 13-20 Comparison · 21 Section (P) · 22 Three-up · 23 Content · 24 Content · 25 Comparison · 26 Content · 27 Closing (P).
+**Deck rhythm** (plates: `Title`, `Section`, `Quote`, `Product`, `Statement`, `Closing`): the sequence is 1 Title (P) · 2 Stats · 3 Quote (P) · 4 Content · 5 Three-up · 6 Metric · 7 Content · 8 Content · 9 Section (P) · 10-12 Content · 13-21 Comparison · 22 Section (P) · 23 Three-up · 24 Content · 25 Content · 26 Comparison · 27 Content · 28 Closing (P).
 - No two plates are adjacent. Every plate carries `Typography_Only`.
-- Slides 13-20 are eight Comparison slides in a row. That's deliberate, so the "I assumed / what happened" series reads as one pattern. Vary the accent color per slide to keep it lively.
+- Slides 13-21 are nine Comparison slides in a row. That's deliberate, so the "I assumed / what happened" series reads as one pattern. Vary the accent color per slide to keep it lively.
 
 **Placeholders** (render as "data pending" chips):
 
@@ -440,9 +458,9 @@
 |---|---|
 | 2 | IEA data-center electricity figures |
 | 4 | smartphones in use |
-| 24 | dashboard screenshot |
-| 27 | paper link |
+| 25 | dashboard screenshot |
+| 28 | paper link |
 
-**Sources to confirm before the talk:** IEA (slide 2), BitNet b1.58 (slide 4), Google's 0.24 Wh (slide 22), the BitNet b1.58 2B4T table values (slide 25 notes).
+**Sources to confirm before the talk:** IEA (slide 2), BitNet b1.58 (slide 4), Google's 0.24 Wh (slide 23), the BitNet b1.58 2B4T table values (slide 26 notes).
 
-**Total: 40.0 min across 26 timed slides (target: 40 min).** Opening 5.0, Section 1 2.0, Section 2 5.0, Section 3 17.0, Section 4 3.0, Section 5 8.0. The closing slide sits in Q&A. Per content slide, that averages ~1.6 min.
+**Total: 40.0 min across 27 timed slides (target: 40 min).** Opening 5.0, Section 1 2.0, Section 2 5.0, Section 3 17.75, Section 4 3.0, Section 5 7.25. The closing slide sits in Q&A. Per content slide, that averages ~1.5 min.

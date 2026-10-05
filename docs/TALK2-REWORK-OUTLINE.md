@@ -40,16 +40,16 @@
 | 13 | Voice | First person ("I assumed…"), per the user's direction, even where a deck template's voice rules prefer "you/we" |
 | 14 | Deck design system | `DATADOG_MARKETING_DECK`: it has a Code + KPI slide for the telemetry JSON, Comparison for "promised vs measured", Stats for big numbers. Not DRUIDS, which is product UI |
 
-## Shape: 40 minutes, 23 content slides (~1.7 min each), plus title and closing
+## Shape: 40 minutes, 24 content slides (~1.7 min each), plus title and closing
 
 | Section | Minutes | Slides |
 |---|---|---|
 | Opening: the problem, the promise, the question | 5 | 3 |
 | 1. The study behind this talk | 2 | 1 |
 | 2. The test at a glance | 5 | 3 |
-| 3. I assumed… it didn't | 17 | 9 |
+| 3. I assumed… it didn't | 17.75 | 10 |
 | 4. Do this, not that | 3 | 2 |
-| 5. Does the thesis hold? | 8 | 5 |
+| 5. Does the thesis hold? | 7.25 | 5 |
 
 Not counted: a title slide, a closing/resources slide, and an optional pre-show holding slide.
 
@@ -100,7 +100,7 @@ Not counted: a title slide, a closing/resources slide, and an optional pre-show 
 
 ---
 
-## Section 3: I assumed… it didn't (9 slides)
+## Section 3: I assumed… it didn't (10 slides)
 
 Every slide has the same four parts: **I assumed**, **what happened** (one number, or a chart), **why**, **so do this**.
 
@@ -108,6 +108,7 @@ Every slide has the same four parts: **I assumed**, **what happened** (one numbe
 - **What happened:** per triage decision, the Pi 4 used ~154 J above idle (288 J at the wall); iPhone-class and newer Apple GPUs 15-20 J. On the same M1 chip, the CPU used ~4× the energy per token reading the prompt and 1.4-1.6× generating, for 3-9B models.
 - **Why:** energy is power × time, and the slow device burns power for longer. On the same chip the CPU loses most when reading the prompt (~4× the GPU's energy per token) and still loses when writing the answer (1.4-1.6×).
 - **Do this:** run on the accelerator (GPU/NPU), not the CPU. Compare joules per job, not watts.
+- **Caveat (2026-10-05):** these per-call numbers repeat one event, so the prompt was cached. A changed prompt costs more: on the Pi 2.7× (A10).
 
 **A2. "Thinking mode will make it more accurate." It didn't, and sometimes it never answered.** Chart: **Fig. 3** (correctness vs latency by prompt mode).
 - **What happened:** thinking on vs off made no measurable accuracy difference: Qwen3-14B 72% → 78%, Qwen3-8B 44% → 47%, Qwen3.8-27B 67% → 67%, all within each other's ranges. It cost 4-11× the time per call and, on the iPhone-class M1, 4-7× the energy (Qwen3-14B 202 → 817 J). Qwen3.5-9B on the hard task never finished thinking: 36 of 36 calls truncated at 2,048 tokens, and 35 of 36 at 4,096 (128 s each, 0% correct). On the easy task, 4,096 was enough for most calls (61%).
@@ -152,6 +153,11 @@ Every slide has the same four parts: **I assumed**, **what happened** (one numbe
 - **Why:** same model file, same runtime, same decoding: hardware changes speed, not answers.
 - **Do this:** iterate on accuracy on the fastest machine you have (the laptop ran 14 models in 25 minutes; a Pi 4 run took ~2 hours per model), then measure speed and energy on the target.
 
+**A10. "My benchmark measured the cost of a call." It measured the cost of a repeat.** (Added 2026-10-05; data: paper Table IV, `docs/TALK2-HARDWARE-SPECTRUM-TEST-LOG.md` § "Real-stream re-measure".)
+- **What happened:** the benchmark sent the same event again, so the server read **1 of 514** prompt tokens per call; the rest came from its cache. A new event re-read **~400**, because my prompt put the event's fields before the rules. Moving them after the rules, same wording otherwise: **148**, with accuracy unchanged (100% format, 0% wrong escalations). On the Pi 4 a new event cost **82 s and 416 J** against 31.7 s and 154 J repeated: reading 148 tokens took 50 s, longer than writing the answer (31 s). The original order would need ~170 s per new event (estimated from that rate, not measured). On the laptop GPU, 25.0 J → 18.5 J per new event (−26%), against ~15 J repeated.
+- **Why:** a prompt cache reuses a prompt only up to the first token that changed since the last call. Within one incident a truck's calls repeat the prompt (it carries the trip context, not the sensor readings), so the earlier numbers hold for those calls; a new incident, a changed field, or one device serving several trucks pays the full read. On a CPU, reading the prompt is the slow part; on a GPU, generation is.
+- **Do this:** put the fixed instructions first and the per-request data last. Benchmark with inputs that change, and check what your server caches (llama-server's memory cache of earlier prompts served my recurring test events whole until I turned it off).
+
 Speaker-note material, not slides: below ~1B parameters models echo the prompt or loop instead of answering; the same evaluation picked different models for two adjacent tasks (Phi-3.5-mini for triage, Gemma-3-4B for the spoken summary); things that didn't surprise me (faster hardware is faster; small models can't do multi-step work; generation speed roughly follows memory bandwidth).
 
 ---
@@ -170,7 +176,8 @@ Speaker-note material, not slides: below ~1B parameters models echo the prompt o
 - Use them for what they're good at (language judgment); don't force them to be classifiers.
 - Cheap math first: filter, classify and compute in code; call the model only when it adds judgment.
 - Constrain the output with a grammar.
-- Test many different cases, not many repeats.
+- Test many different cases, not many repeats (a benchmark that repeats one input measures only the cached-prompt cost).
+- Put the fixed instructions first and the per-request data last, so the prompt cache can reuse them.
 - Compare joules per job, on the accelerator, on the target device.
 
 ---
@@ -190,6 +197,7 @@ Speaker-note material, not slides: below ~1B parameters models echo the prompt o
 - **Call once per incident,** not every 5 s: ~20× fewer calls.
 - **Hardware that's already on:** a dedicated box's idle outweighs everything (the Pi 4's 3.4 W idle is 294 kJ a day). A phone that's on anyway only adds the marginal energy, which is the strongest argument *for* phones.
 - **The math line:** energy = calls × joules per call. The invocation policy moved the total by 3-4 orders of magnitude; the device moved it by about one.
+- Speaker note: the bars use the repeated-prompt cost per call. A once-per-incident call always meets a new prompt, so on the Pi it costs up to 2.7× more (A10); that bar is still ~8× below the gated one.
 
 **C3. What to watch** (the paper's §VI, Table VI). Most of these failures were invisible to latency monitoring:
 

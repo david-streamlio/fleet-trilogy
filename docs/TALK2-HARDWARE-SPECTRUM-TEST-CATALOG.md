@@ -2,7 +2,7 @@
 
 **The question:** can phones democratize edge intelligence? Measure the same models across the consumer computing spectrum (Pi → phones → laptops), 5 years on from the Pi 4 baseline.
 
-This is the index of every test: done, running, proposed, deferred and rejected. Results live in `eval-results/`. Measured rows go into `TALK2-DATA-ENGINEERING-IMPACT-TRACK.md`. Last updated 2026-10-04 19:45 UTC.
+This is the index of every test: done, running, proposed, deferred and rejected. Results live in `eval-results/`. Measured rows go into `TALK2-DATA-ENGINEERING-IMPACT-TRACK.md`. Last updated 2026-10-05 17:45 UTC.
 
 ## Done
 
@@ -14,6 +14,8 @@ This is the index of every test: done, running, proposed, deferred and rejected.
 | Proxy smoke test, c9g (1 model, 1 rep) | android-flagship | `eval-results/phone-proxies/android-flagship/20261003T180853Z/` |
 | mac2 smoke test; it caught 3 bugs, all fixed | iphone-older | `eval-results/phone-proxies/iphone-older/20261003T190533Z/` |
 | **Phase 1 full suite, mac2 (M1)**: 17 models, 3 reps, Metal + CPU (t=4), energy per token | iphone-older | `eval-results/phone-proxies/iphone-older/20261003T191829Z/`; `scripts/summarize.py` |
+| **Real-stream re-measure, Pi 4** (2026-10-05): Phi-3.5 on the Edge Triage Pipeline, a different event per call (`--vary-events`), the event-last prompt, llama-server as published, inline meter, 18 calls | Pi 4 | **416 J/call above idle, p50 82 s** (published best case: 154 J, 31.7 s); 148 of 514 prompt tokens read per call, 50 s reading vs 31 s writing; 100% / 0%. `eval-results/edge-triage-event-last-pi4-20261005/` |
+| **Real-stream re-measure, M4 Max** (2026-10-05): same, both prompt orders, 3 reps × 60 calls, `powermetrics`, llama-server with one slot and no RAM prompt cache (`-np 1 --cache-ram 0`) | the user's M4 Max laptop | **published prompt 25.0 J, p50 0.70 s (400 tokens read); event-last 18.5 J, 0.49 s (148)**; best case ~15 J, 0.36 s. A first run with server defaults restored the recurring events from llama-server's RAM cache (1 token read): kept as evidence. `eval-results/edge-triage-event-last-m4max-20261005/` |
 
 **mac2 headline:** on the two calibration models, M1's Metal generation matches published iPhone 17 Pro figures:
 
