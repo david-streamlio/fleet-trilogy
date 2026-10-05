@@ -17,7 +17,11 @@ package = false
 # `functions` is in the default set so a plain `uv sync` keeps the Pulsar Functions
 # Python runtime's imports installed -- without it, every deploy/*localrun*.sh fails
 # with "No module named 'google'" (see the group's own comment below).
-default-groups = ["dev", "functions"]
+# `inprocess` too: GlobalSynthesisFunction's llm_backend=inprocess (the Talk 3 demo)
+# imports llama-cpp-python inside the localrun instance, and a plain `uv sync` would
+# otherwise remove it. It's built from source (PyPI ships only an sdist): the first
+# sync compiles llama.cpp, with Metal on a Mac; uv caches the build after that.
+default-groups = ["dev", "functions", "inprocess"]
 
 [tool.uv.sources]
 fleet-telemetry-model = { workspace = true }
@@ -57,6 +61,11 @@ rag = [
     # (tests/model/rag_retrieval.py) -- not a dependency of any shipped talk
     # package, kept out of the default `dev` group so `uv sync` stays lean.
     "sentence-transformers>=3.0",
+]
+inprocess = [
+    # llama.cpp inside the Python process (llm_inference.InProcessLlmBackend), so a
+    # Pulsar Function loads its model once and keeps it -- see docs/CANON.md.
+    "llama-cpp-python>=0.3.36",
 ]
 
 [tool.pytest.ini_options]

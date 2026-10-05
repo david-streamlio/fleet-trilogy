@@ -84,12 +84,21 @@ math has already decided are worth interpreting.
 
 - **Python 3.11+** throughout, no exceptions.
 - Pulsar via the official `pulsar-client` package and Python Pulsar Functions.
-- Mainline **llama.cpp** is accessed by **subprocess** for now (shell out to the
-  compiled `llama-completion`-style binary), via `shared/llm-inference` — a generic
+- Mainline **llama.cpp** is accessed through `shared/llm-inference` — a generic
   wrapper package, originally named `shared/bitnet-inference` before the BitNet-to-
-  llama.cpp pivot (`docs/BITNET-POSTMORTEM.md`). An in-process binding (e.g. via
-  `ctypes`/pybind) is a known future path — the code should leave that door open (an
-  abstract backend interface) but must **not** implement it yet.
+  llama.cpp pivot (`docs/BITNET-POSTMORTEM.md`) — behind the abstract `LlmBackend`
+  interface, two ways:
+  - **by subprocess** (`SubprocessLlmBackend`): shell out to the compiled
+    `llama-completion`-style binary, one process per call. The original path, and
+    still what the eval harness and Talk 1/2 use.
+  - **in-process** (`InProcessLlmBackend`, decided 2026-10-04): llama.cpp inside the
+    Python process via `llama-cpp-python` (MIT, the root `inprocess` dependency
+    group). A Pulsar Function holding it loads the model once and keeps it, and each
+    call reuses the prompt prefix the last one read. This is how Talk 3's
+    `GlobalSynthesisFunction` runs on stage (`llm_backend=inprocess`), because the
+    accepted abstract promises an LLM *embedded* in the stream processing function.
+    Measured against the subprocess path in
+    `eval-results/talk3-single-core-m4max-20261004/`.
 
 ## One shared codebase
 

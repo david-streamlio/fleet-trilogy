@@ -2,6 +2,7 @@ import json
 
 import pytest
 from fleet_telemetry_model import EnrichmentCard, IncidentSynthesis, from_json, to_json
+from llm_inference import InProcessLlmBackend, SubprocessLlmBackend
 from talk3_pulsar_speaks_english.function import GlobalSynthesisFunction
 from talk3_pulsar_speaks_english.synthesizer import SCOPE_CORRIDOR_WIDE
 
@@ -69,3 +70,47 @@ def test_user_config_is_valid_json_for_localrun():
     function = GlobalSynthesisFunction()
     for truck in ("truck-47", "truck-12"):
         assert function.process(_card(truck), _Context(config)) is None
+
+
+def test_user_config_threads_and_timeout_reach_the_generation_config():
+    function = GlobalSynthesisFunction()
+    function.process(
+        _card("truck-47"), _Context({"threads": "1", "timeout_seconds": "300"})
+    )
+    assert function._config.threads == 1
+    assert function._config.timeout_seconds == 300.0
+
+
+def test_no_threads_in_user_config_keeps_the_backend_defaults():
+    function = GlobalSynthesisFunction()
+    function.process(_card("truck-47"), _Context({}))
+    assert function._config is None
+
+
+def test_default_backend_is_a_subprocess_per_call():
+    function = GlobalSynthesisFunction()
+    function.process(_card("truck-47"), _Context({}))
+    assert isinstance(function._backend, SubprocessLlmBackend)
+
+
+def test_inprocess_backend_is_built_once_and_kept():
+    function = GlobalSynthesisFunction()
+    context = _Context(
+        {"llm_backend": "inprocess", "threads": "1", "corridor_threshold": "2"}
+    )
+    function.process(_card("truck-47"), context)
+    backend = function._backend
+    assert isinstance(backend, InProcessLlmBackend)
+    assert backend._threads == 1
+    assert backend._gpu_layers == 0
+    synthesis = from_json(
+        IncidentSynthesis, function.process(_card("truck-12"), context)
+    )
+    assert synthesis.spoken_warning
+    assert function._backend is backend
+
+
+def test_unknown_backend_is_rejected():
+    function = GlobalSynthesisFunction()
+    with pytest.raises(ValueError, match="llm_backend"):
+        function.process(_card("truck-47"), _Context({"llm_backend": "cloud"}))

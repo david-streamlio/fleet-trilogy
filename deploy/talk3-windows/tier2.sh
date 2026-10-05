@@ -7,10 +7,17 @@
 # Usage:
 #   ./deploy/talk3-windows/tier2.sh [broker-url] [admin-url]
 #
-# Defaults to this Mac's ~/tools paths (models.toml's dev-machine defaults);
-# override with LLM_BINARY_PATH / LLM_MODEL_PATH. LLM_EXTRA_ARGS defaults to
-# Gemma's models.toml flag (-no-cnv), and CORRIDOR_THRESHOLD to 3 -- one card per
-# truck in deploy/talk3-demo-cards.jsonl, so the three trucks become one incident.
+# Runs the model the way the talk's abstract promises: inside the Function
+# (LLM_BACKEND=inprocess, llama-cpp-python, loaded once) on one CPU thread
+# (LLM_THREADS=1, no GPU). ~12 s per warning on an M4 Max
+# (eval-results/talk3-single-core-m4max-20261004/). For the old subprocess path:
+# LLM_BACKEND=subprocess, which uses LLM_BINARY_PATH and LLM_EXTRA_ARGS (default
+# -no-cnv; add "-dev none -ngl 0" to keep it off the GPU too).
+#
+# Model path defaults to this Mac's ~/tools layout (models.toml's dev-machine
+# defaults); override with LLM_MODEL_PATH. CORRIDOR_THRESHOLD defaults to 3 -- one
+# card per truck in deploy/talk3-demo-cards.jsonl, so the three trucks become one
+# incident.
 set -uo pipefail
 
 WINDOWS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -25,5 +32,7 @@ export LLM_BINARY_PATH="${LLM_BINARY_PATH:-$HOME/tools/llama.cpp/build/bin/llama
 export LLM_MODEL_PATH="${LLM_MODEL_PATH:-$HOME/tools/models/gemma-3-4b-it-GGUF/gemma-3-4b-it-Q4_K_M.gguf}"
 export LLM_EXTRA_ARGS="${LLM_EXTRA_ARGS:--no-cnv}"
 export CORRIDOR_THRESHOLD="${CORRIDOR_THRESHOLD:-3}"
+export LLM_BACKEND="${LLM_BACKEND:-inprocess}"
+export LLM_THREADS="${LLM_THREADS:-1}"
 
 exec "${DEPLOY_DIR}/run_tier2_localrun.sh" "$BROKER_URL" "$ADMIN_URL"

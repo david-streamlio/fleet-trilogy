@@ -19,6 +19,9 @@
 #   cards (left, full height) | decision (top right) / spoken (bottom right)
 # and 2 never recorded, on the main display -- the Tier 2 Function's log and the
 # card replay that drives the take (deploy/talk3-windows/replay.sh).
+# With only one display, the 3 recorded windows take the right 70% of it and the
+# 2 unrecorded ones stack in the left 30%; only the recorded windows' content areas
+# are cropped into the video either way.
 #
 # Usage:
 #   ./deploy/record-talk3-demo.sh [broker-url] [options]
@@ -31,7 +34,7 @@
 #   --tail SEC          seconds recorded after the last warning finishes playing (default: 4)
 #   --teardown          kill everything this script started and close its windows afterwards
 #
-# Requires: the external display, Docker (local broker) or a reachable broker,
+# Requires: Docker (local broker) or a reachable broker,
 # pulsar-admin/pulsar-client, uv, jq, ffmpeg/ffprobe, Piper + the norman voice
 # (talks/talk3-pulsar-speaks-english/README.md), Gemma-3-4B-it under ~/tools
 # (or LLM_BINARY_PATH / LLM_MODEL_PATH). Needs Screen Recording + Automation
@@ -123,11 +126,24 @@ r
 JXA
 )
 EOF
-[[ -n "${EXT_W:-}" ]] || { echo "[record-talk3] only one display detected -- the recording needs the external display" >&2; exit 1; }
-log "external display: origin (${EXT_X},${EXT_Y}) size ${EXT_W}x${EXT_H}"
-
 MARGIN=15
 GAP=15
+if [[ -n "${EXT_W:-}" ]]; then
+  SINGLE_DISPLAY=""
+  log "external display: origin (${EXT_X},${EXT_Y}) size ${EXT_W}x${EXT_H}"
+  # The captured screen is the external display; the layout fills it.
+  CAP_X="$EXT_X"; CAP_Y="$EXT_Y"; CAP_W="$EXT_W"; CAP_H="$EXT_H"
+else
+  SINGLE_DISPLAY="1"
+  read -r MAIN_W MAIN_H <<< "$(osascript -l JavaScript -e 'ObjC.import("AppKit"); var f = $.NSScreen.mainScreen.frame; [f.size.width, f.size.height].join(" ")')"
+  # Below the menu bar and above the Dock (sizes in points).
+  MENU_BAR=40
+  DOCK=90
+  CAP_X=0; CAP_Y=0; CAP_W="$MAIN_W"; CAP_H="$MAIN_H"
+  EXT_X=$(( MAIN_W * 3 / 10 )); EXT_Y="$MENU_BAR"
+  EXT_W=$(( MAIN_W - EXT_X )); EXT_H=$(( MAIN_H - MENU_BAR - DOCK ))
+  log "one display (${MAIN_W}x${MAIN_H}): recorded windows on its right 70%, the rest on its left 30%"
+fi
 LEFT_W=$(( (EXT_W - 3 * MARGIN) * 2 / 5 ))
 RIGHT_W=$(( EXT_W - 3 * MARGIN - LEFT_W ))
 LEFT_X=$(( EXT_X + MARGIN ))
@@ -136,9 +152,20 @@ TOP_Y=$(( EXT_Y + MARGIN ))
 BOTTOM_Y=$(( EXT_Y + EXT_H - MARGIN ))
 DECISION_H=$(( (EXT_H - 3 * MARGIN) * 11 / 20 ))
 
-EXCL_Y=$(( MAIN_H / 10 ))
-EXCL_H=$(( MAIN_H / 2 ))
-EXCL_W=$(( (MAIN_W - 3 * MARGIN) / 2 ))
+if [[ -z "$SINGLE_DISPLAY" ]]; then
+  # Side by side on the main display.
+  EXCL_Y=$(( MAIN_H / 10 ))
+  EXCL_H=$(( MAIN_H / 2 ))
+  EXCL_W=$(( (MAIN_W - 3 * MARGIN) / 2 ))
+  TIER2_BOUNDS=("$MARGIN" "$EXCL_Y" "$(( MARGIN + EXCL_W ))" "$(( EXCL_Y + EXCL_H ))")
+  REPLAY_BOUNDS=("$(( MARGIN + EXCL_W + GAP ))" "$EXCL_Y" "$(( 2 * MARGIN + 2 * EXCL_W ))" "$(( EXCL_Y + EXCL_H ))")
+else
+  # Stacked in the left column, clear of the recorded area.
+  EXCL_W=$(( EXT_X - 2 * MARGIN ))
+  EXCL_H=$(( (EXT_H - 3 * MARGIN) / 2 ))
+  TIER2_BOUNDS=("$MARGIN" "$(( EXT_Y + MARGIN ))" "$(( MARGIN + EXCL_W ))" "$(( EXT_Y + MARGIN + EXCL_H ))")
+  REPLAY_BOUNDS=("$MARGIN" "$(( EXT_Y + 2 * MARGIN + EXCL_H ))" "$(( MARGIN + EXCL_W ))" "$(( EXT_Y + 2 * MARGIN + 2 * EXCL_H ))")
+fi
 
 RECORD_PIDS=()
 WINDOW_IDS=()
@@ -192,7 +219,7 @@ done
 log "opening the Tier 2 Function window (not recorded)..."
 TIER2_WID="$(open_window "cd '${REPO_ROOT}' && bash deploy/talk3-windows/tier2.sh '${BROKER_URL}' '${ADMIN_URL}'")"
 WINDOW_IDS+=("$TIER2_WID")
-place_window "$TIER2_WID" "$EXCLUDED_FONT_SIZE" "$MARGIN" "$EXCL_Y" "$(( MARGIN + EXCL_W ))" "$(( EXCL_Y + EXCL_H ))"
+place_window "$TIER2_WID" "$EXCLUDED_FONT_SIZE" "${TIER2_BOUNDS[@]}"
 wait_for_consumer enrichment-cards public/default/GlobalSynthesisFunction "Tier 2 Function" 120
 
 log "opening the 3 recorded windows..."
@@ -216,7 +243,7 @@ wait_for_consumer incidents talk3-demo-speaker "speaker" 60
 log "opening the replay window (not recorded, started after the lead-in)..."
 REPLAY_WID="$(open_window "cd '${REPO_ROOT}'")"
 WINDOW_IDS+=("$REPLAY_WID")
-place_window "$REPLAY_WID" "$EXCLUDED_FONT_SIZE" "$(( MARGIN + EXCL_W + GAP ))" "$EXCL_Y" "$(( 2 * MARGIN + 2 * EXCL_W ))" "$(( EXCL_Y + EXCL_H ))"
+place_window "$REPLAY_WID" "$EXCLUDED_FONT_SIZE" "${REPLAY_BOUNDS[@]}"
 
 # Capture: ONE ffmpeg avfoundation recording of the whole external display -- a
 # single clock for all three windows, true constant 30 fps (static stretches are
@@ -238,16 +265,16 @@ for dev in $(ffmpeg -hide_banner -f avfoundation -list_devices true -i "" 2>&1 \
                | sed -n 's/.*\[\([0-9]*\)\] Capture screen [0-9]*.*/\1/p'); do
   read -r fw fh <<< "$(probe_screen "$dev")"
   [[ -z "${fw:-}" ]] && continue
-  # Match the external display by aspect ratio (capture pixels may be 2x its pt
+  # Match the captured display by aspect ratio (capture pixels may be 2x its pt
   # size on Retina, so size alone can't). SCALE = capture px per pt.
-  if python3 -c "import sys; sys.exit(0 if abs(${fw}/${fh} - ${EXT_W}/${EXT_H}) < 0.01 else 1)"; then
-    SCREEN_DEV="$dev"; SCALE="$(python3 -c "print(round(${fw}/${EXT_W}, 4))")"
-    log "external display = avfoundation screen device ${dev} (${fw}x${fh}, scale ${SCALE})"
+  if python3 -c "import sys; sys.exit(0 if abs(${fw}/${fh} - ${CAP_W}/${CAP_H}) < 0.01 else 1)"; then
+    SCREEN_DEV="$dev"; SCALE="$(python3 -c "print(round(${fw}/${CAP_W}, 4))")"
+    log "captured display = avfoundation screen device ${dev} (${fw}x${fh}, scale ${SCALE})"
     break
   fi
 done
-[[ -n "$SCREEN_DEV" ]] || { echo "[record-talk3] couldn't identify the external display's capture device" >&2; exit 1; }
-if python3 -c "import sys; sys.exit(0 if abs(${MAIN_W}/${MAIN_H} - ${EXT_W}/${EXT_H}) < 0.01 else 1)"; then
+[[ -n "$SCREEN_DEV" ]] || { echo "[record-talk3] couldn't identify the captured display's capture device" >&2; exit 1; }
+if [[ -z "$SINGLE_DISPLAY" ]] && python3 -c "import sys; sys.exit(0 if abs(${MAIN_W}/${MAIN_H} - ${EXT_W}/${EXT_H}) < 0.01 else 1)"; then
   echo "[record-talk3] both displays have the same aspect ratio -- can't tell them apart safely" >&2; exit 1
 fi
 
@@ -273,19 +300,21 @@ CROP_X=(); CROP_Y=(); CROP_W=(); CROP_H=()
 for i in 0 1 2; do
   top=$(( BY1[$i] + TITLE_BAR )); bottom=$(( BY2[$i] - BOTTOM_INSET ))
   if [[ "$i" == 1 ]] && (( bottom > BY1[2] - 2 )); then bottom=$(( BY1[2] - 2 )); fi
-  # crop in capture pixels (x SCALE), relative to the external display; even sizes for yuv420p
+  # crop in capture pixels (x SCALE), relative to the captured display; even sizes for yuv420p
   read -r cx cy cw ch <<< "$(python3 -c "
 s=${SCALE}; ev=lambda v: int(v)//2*2
-print(ev((${BX1[$i]} - ${EXT_X})*s), ev((${top} - ${EXT_Y})*s), ev((${BX2[$i]} - ${BX1[$i]})*s), ev((${bottom} - ${top})*s))")"
+print(ev((${BX1[$i]} - ${CAP_X})*s), ev((${top} - ${CAP_Y})*s), ev((${BX2[$i]} - ${BX1[$i]})*s), ev((${bottom} - ${top})*s))")"
   CROP_X+=("$cx"); CROP_Y+=("$cy"); CROP_W+=("$cw"); CROP_H+=("$ch")
   log "${ROLES[$i]} crop: ${cw}x${ch} at ${cx},${cy}"
 done
 
 # Park the mouse pointer on the main display: avfoundation's -capture_cursor 0 is
 # not honoured on this macOS (take 3 showed the pointer in the spoken window).
-osascript -l JavaScript -e "ObjC.import('CoreGraphics'); $.CGWarpMouseCursorPosition($.CGPointMake($(( MAIN_W / 2 )), $(( MAIN_H / 2 ))))" >/dev/null 2>&1 || true
+# On one display, park it in the unrecorded left column instead.
+if [[ -z "$SINGLE_DISPLAY" ]]; then PARK_X=$(( MAIN_W / 2 )); else PARK_X=$(( EXT_X / 2 )); fi
+osascript -l JavaScript -e "ObjC.import('CoreGraphics'); $.CGWarpMouseCursorPosition($.CGPointMake(${PARK_X}, $(( MAIN_H / 2 ))))" >/dev/null 2>&1 || true
 RAW_MP4="${RECORDINGS_DIR}/.raw-talk3-${TIMESTAMP}.mp4"
-log "recording external display -> ${RAW_MP4}"
+log "recording the captured display -> ${RAW_MP4}"
 ffmpeg -hide_banner -v error -f avfoundation -capture_cursor 0 -framerate 30 -pixel_format nv12 \
   -i "${SCREEN_DEV}:none" -fps_mode cfr -r 30 -c:v libx264 -preset ultrafast -crf 16 -pix_fmt yuv420p \
   -y "$RAW_MP4" < /dev/null > "${RECORDINGS_DIR}/.ffmpeg-capture-talk3-${TIMESTAMP}.log" 2>&1 &
