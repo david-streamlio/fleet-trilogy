@@ -246,6 +246,18 @@ def peak_child_rss_mb() -> float | None:
     return usage_kb_or_bytes / 1024 if platform.system() == "Linux" else usage_kb_or_bytes / (1024 * 1024)
 
 
+def peak_self_rss_mb() -> float | None:
+    """Like peak_child_rss_mb, for this process itself: where the model lives when
+    the LLM runs in-process (InProcessLlmBackend)."""
+    try:
+        import resource
+
+        usage_kb_or_bytes = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    except (ImportError, AttributeError):
+        return None
+    return usage_kb_or_bytes / 1024 if platform.system() == "Linux" else usage_kb_or_bytes / (1024 * 1024)
+
+
 def _percentile(ordered: list[float], fraction: float) -> float:
     if len(ordered) == 1:
         return ordered[0]
@@ -356,6 +368,9 @@ class EdgeTriageTrial:
     latency_seconds: float
     parsed: dict | None
     error: str | None = None
+    # The backend's last_timings for this call (prompt tokens evaluated vs. served
+    # from cache, prompt vs. generation ms); None if the backend reported none.
+    timings: dict | None = None
 
 
 def run_edge_triage_trials(
@@ -390,10 +405,53 @@ def run_edge_triage_trials(
     this harness scores every card the model actually produces, independent of
     whether that card would be uplinked.
     """
-    payload = coprocessor.process(to_json(event), context)
-    trials: list[EdgeTriageTrial] = []
+    payload = _edge_triage_payload(
+        coprocessor, context, event, contextual_trigger_overrides, baseline_severity_override
+    )
     if payload is None:
-        return trials
+        return []
+    return [_run_edge_triage_call(triage, context, payload) for _ in range(n)]
+
+
+def run_edge_triage_trials_interleaved(coprocessor, triage, context, variants: list[dict], n: int) -> list[list[EdgeTriageTrial]]:
+    """Like run_edge_triage_trials, but for several distinct events at once, called
+    round-robin (variant 1, 2, 3, 1, 2, 3, ...) n times each, so no two consecutive
+    calls send the same prompt. Each variant is a dict of run_edge_triage_trials'
+    keyword arguments: `event`, and optionally `contextual_trigger_overrides` and
+    `baseline_severity_override`. Returns one trial list per variant, in order.
+
+    Exists for --vary-events: run_edge_triage_trials repeats one payload n times, so
+    every call after the first finds its whole prompt already in the backend's KV
+    cache (both llama-server and llama-cpp-python reuse the previous call's prefix),
+    and its latency is generation alone. A real stream sends a different event each
+    time; the prompt is only cached up to the first field that differs, which in
+    DEFAULT_PROMPT_TEMPLATE is near the top. A variant the coprocessor gates out
+    gets an empty list, the same as run_edge_triage_trials.
+    """
+    payloads = [
+        _edge_triage_payload(
+            coprocessor,
+            context,
+            variant["event"],
+            variant.get("contextual_trigger_overrides"),
+            variant.get("baseline_severity_override"),
+        )
+        for variant in variants
+    ]
+    trials: list[list[EdgeTriageTrial]] = [[] for _ in variants]
+    for _ in range(n):
+        for index, payload in enumerate(payloads):
+            if payload is not None:
+                trials[index].append(_run_edge_triage_call(triage, context, payload))
+    return trials
+
+
+def _edge_triage_payload(
+    coprocessor, context, event: TelemetryEvent, contextual_trigger_overrides: dict | None, baseline_severity_override: str | None
+) -> str | None:
+    payload = coprocessor.process(to_json(event), context)
+    if payload is None:
+        return None
     if contextual_trigger_overrides or baseline_severity_override:
         payload_dict = json.loads(payload)
         if contextual_trigger_overrides:
@@ -401,31 +459,32 @@ def run_edge_triage_trials(
         if baseline_severity_override:
             payload_dict["baseline_severity"] = baseline_severity_override
         payload = json.dumps(payload_dict)
-    for _ in range(n):
-        start = time.monotonic()
-        try:
-            # Deliberately blind, same as Flow A's run_enrichment_trials: a real
-            # subprocess call can fail beyond LlmInferenceError, and a failure
-            # here is a measurement (a format-reliability miss), not a bug.
-            raw = triage.build_card(payload, context)
-        except Exception as exc:  # noqa: BLE001
-            trials.append(
-                EdgeTriageTrial(raw_output="", latency_seconds=time.monotonic() - start, parsed=None, error=str(exc))
-            )
-            continue
-        latency = time.monotonic() - start
-        if raw is None:
-            trials.append(
-                EdgeTriageTrial(raw_output="", latency_seconds=latency, parsed=None, error="process() returned None")
-            )
-            continue
-        try:
-            parsed = json.loads(raw)
-        except Exception as exc:  # noqa: BLE001
-            trials.append(EdgeTriageTrial(raw_output=raw, latency_seconds=latency, parsed=None, error=str(exc)))
-            continue
-        trials.append(EdgeTriageTrial(raw_output=raw, latency_seconds=latency, parsed=parsed, error=None))
-    return trials
+    return payload
+
+
+def _run_edge_triage_call(triage, context, payload: str) -> EdgeTriageTrial:
+    backend = getattr(triage, "_backend", None)
+    if hasattr(backend, "last_timings"):
+        backend.last_timings = None  # so a call that fails before generating reports none, not the last call's
+    start = time.monotonic()
+    try:
+        # Deliberately blind, same as Flow A's run_enrichment_trials: a real
+        # subprocess call can fail beyond LlmInferenceError, and a failure
+        # here is a measurement (a format-reliability miss), not a bug.
+        raw = triage.build_card(payload, context)
+    except Exception as exc:  # noqa: BLE001
+        return EdgeTriageTrial(raw_output="", latency_seconds=time.monotonic() - start, parsed=None, error=str(exc))
+    latency = time.monotonic() - start
+    timings = getattr(getattr(triage, "_backend", None), "last_timings", None)
+    if raw is None:
+        return EdgeTriageTrial(
+            raw_output="", latency_seconds=latency, parsed=None, error="process() returned None", timings=timings
+        )
+    try:
+        parsed = json.loads(raw)
+    except Exception as exc:  # noqa: BLE001
+        return EdgeTriageTrial(raw_output=raw, latency_seconds=latency, parsed=None, error=str(exc), timings=timings)
+    return EdgeTriageTrial(raw_output=raw, latency_seconds=latency, parsed=parsed, error=None, timings=timings)
 
 
 def edge_triage_format_reliability(event: TelemetryEvent, trials: list[EdgeTriageTrial]) -> dict:

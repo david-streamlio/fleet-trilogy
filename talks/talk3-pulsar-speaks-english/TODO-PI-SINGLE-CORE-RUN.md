@@ -14,7 +14,7 @@ a Pi 5's. The talk should say what really happens, including "it failed" or "too
 slow to be useful".
 
 ## Steps (on the Pi)
-1. `git pull` the `talk3-wip` branch, then `uv sync` at the repo root. This
+1. `git pull` on `main` (`talk3-wip` was merged into it on 2026-10-05), then `uv sync` at the repo root. This
    compiles llama-cpp-python for ARM (the `inprocess` dependency group) and may
    take a long time on a Pi; do it before the run, with the fan on.
 2. Point at the model on the data drive — `/mnt/data`, per the Pi's earlier

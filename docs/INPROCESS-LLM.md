@@ -51,6 +51,42 @@ the code ran the model next to the Function instead, two ways:
 2. **Build differences can be bigger than design differences.** Compare backends
    on the same llama.cpp build, or the comparison measures the build.
 
+## Default everywhere (2026-10-05)
+After the review, `InProcessLlmBackend` became the default for every Function and
+eval harness; the old backends stay available as options:
+
+| Where | Default now | Option for the old backend |
+|---|---|---|
+| Talk 1 `LlmTriageFunction` (Edge Triage Pipeline) | in-process, CPU only, 12 threads, 4096 context | user config `llm_backend=server` (`LLM_BACKEND=server`) |
+| Talk 1 `EdgeEnrichmentFunction` | in-process, CPU only, 4 threads | `llm_backend=subprocess` |
+| Talk 3 `GlobalSynthesisFunction` | in-process, CPU only, 4 threads | `llm_backend=subprocess` |
+| Eval harnesses (Edge Triage, Tier 2) | `--model-backend inprocess` | `--model-backend server` |
+| Round 3 harness | llama-server, always | none: it calls llama-server's HTTP API directly |
+
+- `InProcessLlmBackend` gained `start()`/`close()`, the same lifecycle as
+  `LlmServerBackend`, so callers can hold either.
+- After each call, `last_timings` records how many prompt tokens llama.cpp
+  actually evaluated (the rest came from the previous call's KV cache) and the
+  milliseconds spent reading the prompt vs. generating.
+- **Mac GPU:** llama-server with no GPU flags ran on a Mac's Metal GPU, while
+  in-process defaults to CPU only. For the old speed on a Mac, set
+  `llm_gpu_layers=99` (`LLM_GPU_LAYERS=99`, harness `--model-gpu-layers 99`).
+- **Reproducing published numbers:** every Talk 2 hardware-spectrum run before
+  2026-10-05 used llama-server. The study's runner scripts
+  (`deploy/aws-phone-proxies/scripts/bench_*.sh`) now pass
+  `--model-backend server`.
+- **Harness `--vary-events`:** the Edge Triage evals repeated one payload n
+  times, so after the first call the whole prompt came from the cache and latency
+  was generation alone. With `--vary-events`, consecutive calls carry different
+  operational contexts (`eval_lib.run_edge_triage_trials_interleaved`). In
+  `DEFAULT_PROMPT_TEMPLATE` the event's fields come *before* the long rules block,
+  so a different event re-reads nearly the whole prompt (~400 of 514 tokens);
+  `--triage-prompt event-last` (`EVENT_LAST_PROMPT_TEMPLATE`) moves them after the
+  rules (148). With `--model-backend server`, also pass `--model-server-args "-np 1
+  --cache-ram 0"`: llama-server's slots and host-RAM prompt cache otherwise restore
+  each of the three recurring test events whole (1 token read). Results: the test
+  log's "Real-stream re-measure" section and the paper's Table IV.
+
 ## To review in Talks 1 and 2
 - Talk 1: `talks/talk1-edge-intelligence/TODO-INPROCESS-LLM.md`
 - Talk 2: `talks/talk2-greenest-token/TODO-INPROCESS-LLM.md`

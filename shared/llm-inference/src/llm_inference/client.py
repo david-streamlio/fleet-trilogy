@@ -296,6 +296,9 @@ class LlmServerBackend(LlmBackend):
         self._mock = mock if mock is not None else _mock_enabled_via_env()
         self._extra_args = extra_args
         self._process: subprocess.Popen | None = None
+        # The last call's prompt/generation split, from llama-server's own `timings`
+        # (same keys as InProcessLlmBackend.last_timings); None if it sent none.
+        self.last_timings: dict | None = None
 
     @property
     def base_url(self) -> str:
@@ -392,6 +395,7 @@ class LlmServerBackend(LlmBackend):
         except TimeoutError as exc:
             raise LlmInferenceError(f"llama-server did not respond within {config.timeout_seconds}s") from exc
 
+        self.last_timings = _server_timings(body)
         try:
             return body["content"].strip()
         except KeyError as exc:
@@ -411,6 +415,22 @@ class LlmServerBackend(LlmBackend):
                 "weights file, or construct with mock=True / set LLM_MOCK=1 to develop "
                 "without it."
             )
+
+
+def _server_timings(body: dict) -> dict | None:
+    """llama-server's /completion `timings` (prompt_n is the prompt tokens it actually
+    evaluated, i.e. not reused from its cache) in InProcessLlmBackend.last_timings'
+    shape, plus the prompt's full length (`tokens_evaluated`, despite the name)."""
+    timings = body.get("timings")
+    if not isinstance(timings, dict):
+        return None
+    return {
+        "prompt_tokens": body.get("tokens_evaluated"),
+        "prompt_tokens_evaluated": timings.get("prompt_n"),
+        "prompt_ms": timings.get("prompt_ms"),
+        "generated_tokens": timings.get("predicted_n"),
+        "generation_ms": timings.get("predicted_ms"),
+    }
 
 
 def _find_free_port() -> int:
@@ -446,7 +466,9 @@ class InProcessLlmBackend(LlmBackend):
     evaluation can't be interrupted in-process, so a call can overrun the timeout by
     up to one prompt evaluation before it's stopped. `seed` pins sampling (the same
     prompts then give the same text in every process); the default is random, like
-    `llama-completion`.
+    `llama-completion`. After each call, `last_timings` holds how many prompt tokens
+    were actually evaluated (not served from the KV cache) and the milliseconds
+    spent reading the prompt vs. generating, or None if they're unavailable.
 
     llama-cpp-python is an optional dependency (the root `inprocess` dependency
     group): it's imported on first use, never at module import, so mock mode and
@@ -470,6 +492,7 @@ class InProcessLlmBackend(LlmBackend):
         self._context_size = context_size
         self._mock = mock if mock is not None else _mock_enabled_via_env()
         self._llama = None
+        self.last_timings: dict | None = None
 
     def load(self) -> Self:
         """Load the model now rather than on the first generate() call. Idempotent."""
@@ -534,15 +557,61 @@ class InProcessLlmBackend(LlmBackend):
             from llama_cpp import LlamaGrammar
 
             kwargs["grammar"] = LlamaGrammar.from_string(config.grammar, verbose=False)
+        self.last_timings = None
+        before = self._perf_counters()
         try:
             result = self._llama.create_completion(prompt, **kwargs)
         except Exception as exc:  # surface any llama.cpp runtime failure uniformly
             raise LlmInferenceError(f"in-process LLM call failed: {exc}") from exc
+        self.last_timings = self._timings_since(before, result)
         if timed_out:
             raise LlmInferenceError(
                 f"LLM runtime did not finish within {config.timeout_seconds}s"
             )
         return result["choices"][0]["text"].strip()
+
+    def _perf_counters(self):
+        """llama.cpp's cumulative per-context counters (prompt vs. generated tokens
+        and the milliseconds spent on each), or None if this llama-cpp-python build
+        doesn't expose them. Best effort: timings are a measurement aid, never a
+        reason for a call to fail."""
+        try:
+            import llama_cpp
+
+            return llama_cpp.llama_perf_context(self._llama._ctx.ctx)
+        except Exception:  # noqa: BLE001
+            return None
+
+    def _timings_since(self, before, result: dict) -> dict | None:
+        """The last call's split, from the counters' deltas: how many prompt tokens
+        llama.cpp actually evaluated (the rest came from the previous call's KV
+        cache) and how long that took, against the generated tokens. Prompt tokens
+        are counted from batches of more than one token and generated ones from
+        single-token batches, so a one-token prompt suffix counts as generated."""
+        after = self._perf_counters()
+        if before is None or after is None:
+            return None
+        return {
+            "prompt_tokens": result.get("usage", {}).get("prompt_tokens"),
+            "prompt_tokens_evaluated": after.n_p_eval - before.n_p_eval,
+            "prompt_ms": after.t_p_eval_ms - before.t_p_eval_ms,
+            "generated_tokens": after.n_eval - before.n_eval,
+            "generation_ms": after.t_eval_ms - before.t_eval_ms,
+        }
+
+    def start(self) -> Self:
+        """Same lifecycle as LlmServerBackend.start(), so a caller can hold either
+        backend and start/close it the same way: loads the model (idempotent)."""
+        return self.load()
+
+    def close(self) -> None:
+        """Releases the model. Safe to call multiple times, or before it was loaded;
+        the next generate() loads it again."""
+        if self._llama is not None:
+            release = getattr(self._llama, "close", None)  # Llama.close() frees the model and context
+            if release is not None:
+                release()
+            self._llama = None
 
 
 def _mock_enabled_via_env() -> bool:

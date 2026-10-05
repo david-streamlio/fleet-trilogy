@@ -1,8 +1,14 @@
 import json
 import logging
+from pathlib import Path
 
+import pytest
 from fleet_telemetry_model import LOCAL_TRIAGE_TOPIC, EnrichmentCard, from_json
+from llm_inference import InProcessLlmBackend, LlmServerBackend
 from talk1_edge_intelligence.triage_function import (
+    DEFAULT_CONTEXT_SIZE,
+    DEFAULT_PROMPT_TEMPLATE,
+    EVENT_LAST_PROMPT_TEMPLATE,
     RECOMMENDED_ACTIONS,
     LlmTriageFunction,
     _gbnf_quoted_literal,
@@ -132,27 +138,23 @@ def test_process_only_configures_once():
     assert function._backend is first_backend
 
 
-def test_process_returns_grammar_shaped_card_via_mock_backend(monkeypatch):
-    # LlmBackend.generate is stubbed directly rather than relying on
-    # LlmServerBackend's mock-mode content-sniffing heuristic, which keys off
-    # phrases our DEFAULT_PROMPT_TEMPLATE doesn't happen to contain. start() is
-    # also stubbed -- process() calls it unconditionally now (see triage_function
-    # module docstring on the SubprocessLlmBackend -> LlmServerBackend switch), and
-    # the real one would try to launch a real llama-server binary that doesn't
-    # exist at DEFAULT_BINARY_PATH on a generic test machine.
-    from llm_inference.client import LlmServerBackend
-
-    monkeypatch.setattr(LlmServerBackend, "start", lambda self: self)
-    monkeypatch.setattr(
-        LlmServerBackend,
-        "generate",
-        lambda self, prompt, config=None: (
-            '{"risk_synthesis": "wet roads plus liquid cargo raises real risk", '
-            '"escalation": "raise", "truck_id": "placeholder"}'
-        ),
+@pytest.mark.parametrize("llm_backend", [None, "server"])
+def test_process_returns_grammar_shaped_card_via_mock_backend(monkeypatch, llm_backend):
+    # LlmBackend.generate is stubbed directly rather than relying on a backend's
+    # mock-mode content-sniffing heuristic, which keys off phrases our
+    # DEFAULT_PROMPT_TEMPLATE doesn't happen to contain. start() is also stubbed --
+    # process() calls it unconditionally, and the real one would load a real model
+    # in-process (the default) or launch a real llama-server binary, neither of which
+    # exists at the DEFAULT_* paths on a generic test machine. Run for both backends:
+    # the card is the same whichever one produced the completion.
+    _stub_backend_completion(
+        monkeypatch,
+        '{"risk_synthesis": "wet roads plus liquid cargo raises real risk", '
+        '"escalation": "raise", "truck_id": "placeholder"}',
     )
     function = LlmTriageFunction()
-    context = _FakeContext()  # empty user config -> falls back to defaults
+    # empty user config -> falls back to defaults (the in-process backend)
+    context = _FakeContext({"llm_backend": llm_backend} if llm_backend else None)
     result = function.process(_payload(eta_slip_min=4.0, baseline_severity="medium"), context)
 
     assert result is not None
@@ -188,18 +190,22 @@ def test_uplinked_card_is_a_valid_tier2_enrichment_card(monkeypatch):
     assert card.truck_id == "truck-03"
 
 
+def _stub_backend_completion(monkeypatch, completion: str) -> None:
+    """Stubs start() and generate() on both backends LlmTriageFunction can build, so
+    a test gets `completion` back whichever one user config selects."""
+    for backend_class in (InProcessLlmBackend, LlmServerBackend):
+        monkeypatch.setattr(backend_class, "start", lambda self: self)
+        monkeypatch.setattr(backend_class, "generate", lambda self, prompt, config=None: completion)
+
+
 def _mock_backend_returning(monkeypatch, escalation: str) -> None:
-    """Stubs LlmServerBackend the same way test_process_returns_grammar_shaped_card_
+    """Stubs the backends the same way test_process_returns_grammar_shaped_card_
     via_mock_backend does, but parameterized on escalation so the uplink-gate tests
     below can drive process() to a specific final severity via apply_escalation.
     """
-    from llm_inference.client import LlmServerBackend
-
-    monkeypatch.setattr(LlmServerBackend, "start", lambda self: self)
-    monkeypatch.setattr(
-        LlmServerBackend,
-        "generate",
-        lambda self, prompt, config=None: json.dumps(
+    _stub_backend_completion(
+        monkeypatch,
+        json.dumps(
             {
                 "risk_synthesis": "scenario reasoning",
                 "escalation": escalation,
@@ -207,6 +213,47 @@ def _mock_backend_returning(monkeypatch, escalation: str) -> None:
             }
         ),
     )
+
+
+def test_default_backend_is_in_process_with_its_settings_from_user_config():
+    function = LlmTriageFunction()
+    function._configure(
+        _FakeContext({"llm_model_path": "/m.gguf", "threads": "4", "llm_gpu_layers": "99", "llm_context_size": "8192"})
+    )
+
+    backend = function._backend
+    assert isinstance(backend, InProcessLlmBackend)
+    assert backend._model_path == Path("/m.gguf")
+    assert backend._threads == 4
+    assert backend._gpu_layers == 99
+    assert backend._context_size == 8192
+
+
+def test_in_process_backend_defaults_to_cpu_only():
+    function = LlmTriageFunction()
+    function._configure(_FakeContext())
+
+    assert function._backend._gpu_layers == 0
+    assert function._backend._context_size == DEFAULT_CONTEXT_SIZE
+
+
+def test_server_backend_is_selectable_from_user_config():
+    function = LlmTriageFunction()
+    function._configure(_FakeContext({"llm_backend": "server", "llm_binary_path": "/bin/llama-server"}))
+
+    assert isinstance(function._backend, LlmServerBackend)
+
+
+def test_server_flags_come_from_user_config():
+    function = LlmTriageFunction()
+    function._configure(_FakeContext({"llm_backend": "server", "llm_extra_args": "-np 1  --cache-ram 0"}))
+    assert function._backend._extra_args == ("-np", "1", "--cache-ram", "0")
+
+
+def test_unknown_backend_is_rejected():
+    function = LlmTriageFunction()
+    with pytest.raises(ValueError, match="llm_backend"):
+        function._configure(_FakeContext({"llm_backend": "subprocess"}))
 
 
 def test_process_uplinks_a_card_raised_to_high(monkeypatch):
@@ -281,3 +328,30 @@ def test_build_card_is_ungated(monkeypatch):
     card = json.loads(result)
     assert card["severity"] == "low"
     assert context.published == []  # build_card never touches the local topic
+
+
+def test_event_last_template_only_moves_the_event_block_down():
+    # The real-stream A/B is only clean if the two prompts say the same thing: the
+    # event block (baseline + operational context) moves to just before Truck ID, and
+    # the raise rule's "field above" becomes "field below" to match. Nothing else.
+    block = DEFAULT_PROMPT_TEMPLATE[
+        DEFAULT_PROMPT_TEMPLATE.index("BASELINE SEVERITY") : DEFAULT_PROMPT_TEMPLATE.index("How to weigh")
+    ]
+    expected = (
+        DEFAULT_PROMPT_TEMPLATE.replace(block, "")
+        .replace("at least one field above", "at least one field below")
+        .replace("Truck ID:", block + "Truck ID:")
+    )
+    assert EVENT_LAST_PROMPT_TEMPLATE == expected
+
+
+def test_event_last_template_puts_every_event_field_after_the_rules():
+    rules_end = EVENT_LAST_PROMPT_TEMPLATE.index("- hold:")
+    for field in ("{baseline_severity}", "{weather_condition}", "{cargo_type}", "{dispatch_status}", "{truck_id}", "{corridor}"):
+        assert EVENT_LAST_PROMPT_TEMPLATE.index(field) > rules_end
+
+
+def test_prompt_template_comes_from_user_config():
+    function = LlmTriageFunction()
+    function._configure(_FakeContext({"prompt_template": EVENT_LAST_PROMPT_TEMPLATE}))
+    assert function._prompt_template == EVENT_LAST_PROMPT_TEMPLATE

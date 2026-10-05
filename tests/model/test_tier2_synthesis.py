@@ -11,7 +11,7 @@ reliability" and "grounding" mean for this task.
 from __future__ import annotations
 
 import pytest
-from llm_inference import LlmServerBackend, SubprocessLlmBackend
+from llm_inference import InProcessLlmBackend, LlmServerBackend, SubprocessLlmBackend
 
 from tests.model.tier2_eval_lib import (
     DEFAULT_THREADS,
@@ -32,20 +32,28 @@ def test_tier2_synthesis_format_speakability_and_grounding(
     # (same convention as edge_triage_context) -- Tier 2's synthesize()/
     # generate_spoken_warning() take a backend directly, no lazy-configure-
     # from-context layer to test the way LlmTriageFunction has, so this builds
-    # its own LlmServerBackend from tier2_context's already-resolved paths
-    # rather than using llm_backend's SubprocessLlmBackend, for the same
-    # per-trial-reload/prompt-cache reasons triage_function.py switched (see
-    # docs/TALK2-DATA-ENGINEERING-IMPACT-TRACK.md).
+    # its own backend (--model-backend: in-process, or LlmServerBackend) from
+    # tier2_context's already-resolved paths rather than using llm_backend's
+    # SubprocessLlmBackend, for the same per-trial-reload/prompt-cache reasons
+    # triage_function.py switched (see docs/TALK2-DATA-ENGINEERING-IMPACT-TRACK.md).
     total_n = request.config.getoption("--model-eval-runs")
     per_scenario_n = max(1, total_n // 3)
     format_threshold = request.config.getoption("--model-format-threshold")
     max_grounding_violation_rate = request.config.getoption("--model-grounding-max-violation-rate")
 
-    backend = LlmServerBackend(
-        binary_path=tier2_context.get_user_config_value("llm_binary_path"),
-        model_path=tier2_context.get_user_config_value("llm_model_path"),
-        threads=int(tier2_context.get_user_config_value("threads") or DEFAULT_THREADS),
-    )
+    threads = int(tier2_context.get_user_config_value("threads") or DEFAULT_THREADS)
+    if request.config.getoption("--model-backend") == "inprocess":
+        backend = InProcessLlmBackend(
+            tier2_context.get_user_config_value("llm_model_path"),
+            threads=threads,
+            gpu_layers=request.config.getoption("--model-gpu-layers"),
+        )
+    else:
+        backend = LlmServerBackend(
+            binary_path=tier2_context.get_user_config_value("llm_binary_path"),
+            model_path=tier2_context.get_user_config_value("llm_model_path"),
+            threads=threads,
+        )
     backend.start()
     try:
         all_trials = []

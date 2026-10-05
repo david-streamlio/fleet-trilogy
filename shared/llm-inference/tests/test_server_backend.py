@@ -72,6 +72,8 @@ def fake_server_binary(tmp_path):
                         "content": "echo:" + body.get("prompt", ""),
                         "_seen_grammar": body.get("grammar"),
                         "_seen_stop": body.get("stop"),
+                        "tokens_evaluated": 120,
+                        "timings": {"prompt_n": 40, "prompt_ms": 400.0, "predicted_n": 10, "predicted_ms": 500.0},
                     }
                     self.wfile.write(json.dumps(reply).encode())
 
@@ -139,3 +141,16 @@ def test_start_is_idempotent(fake_server_binary, tmp_path):
 def test_find_free_port_returns_a_usable_port():
     port = _find_free_port()
     assert 0 < port < 65536
+
+
+def test_last_timings_come_from_llama_servers_response(fake_server_binary, tmp_path):
+    with LlmServerBackend(binary_path=fake_server_binary, model_path=tmp_path, startup_timeout_seconds=10.0) as backend:
+        assert backend.last_timings is None
+        backend.generate("hi")
+        assert backend.last_timings == {
+            "prompt_tokens": 120,
+            "prompt_tokens_evaluated": 40,
+            "prompt_ms": 400.0,
+            "generated_tokens": 10,
+            "generation_ms": 500.0,
+        }

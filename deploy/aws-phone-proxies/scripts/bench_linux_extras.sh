@@ -186,8 +186,9 @@ test_compare_edge_triage_models.py qwen3-8b-q4km 15"
     task=$(echo "$test" | sed -E 's/test_compare_(.*)_models\.py/\1/')
     echo "== ${task}_$id" >> "$OUT/bench.log"; echo "-- $task $id"
     before=$(ls -1 eval-results/ 2>/dev/null | sort)
+    # --model-backend server: what the published runs used; the harness default is in-process since 2026-10-05.
     "$uv" run --no-sync pytest "tests/model/$test" -m model -s -q --only-model-ids "$id" \
-      --model-eval-runs "$runs" --model-threads 8 < /dev/null > "$OUT/pytest_${task}_$id.log" 2>&1
+      --model-eval-runs "$runs" --model-threads 8 --model-backend server < /dev/null > "$OUT/pytest_${task}_$id.log" 2>&1
     tail -n 3 "$OUT/pytest_${task}_$id.log"
     echo "${task}_$id $(comm -13 <(echo "$before") <(ls -1 eval-results/ | sort) | tr '\n' ' ')" >> "$OUT/artifacts.txt"
   done

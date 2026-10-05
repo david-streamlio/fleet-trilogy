@@ -96,9 +96,11 @@ On the Pi, pointed at a broker elsewhere:
 ./deploy/run_tier1_localrun.sh pulsar://<broker-host>:6650 http://<broker-host>:8080
 ```
 
-Set `LLM_BINARY_PATH` and `LLM_MODEL_PATH` to a built llama.cpp-family binary
-and a GGUF model's weights before running for real; leave them unset (or
-set `LLM_MOCK=1`) to run the function without an LLM runtime installed.
+Set `LLM_MODEL_PATH` to a GGUF model's weights before running for real; set
+`LLM_MOCK=1` to run the function without an LLM runtime installed. The model runs
+inside the Function (llama-cpp-python, loaded once, CPU only; `LLM_THREADS`
+default 4, `LLM_GPU_LAYERS` default 0) unless `LLM_BACKEND=subprocess`, which runs
+`LLM_BINARY_PATH` (`llama-completion`) once per call.
 
 ## Running the Tier 2 cloud function
 
@@ -121,11 +123,10 @@ docstring for exactly how that threshold works and why (Pulsar Functions are
 per-message, but Tier 2 needs multiple trucks' cards before it can decide
 anything). Optional settings pass through `--user-config`:
 
-- `LLM_BACKEND`: `subprocess` (default; a fresh `llama-completion` process per
-  call, reloading the model each time) or `inprocess` (llama-cpp-python inside the
-  Function: the model loads once and stays, and each call reuses the prompt prefix
-  the last one read). The Talk 3 demo (`deploy/talk3-windows/tier2.sh`) uses
-  `inprocess`.
+- `LLM_BACKEND`: `inprocess` (default since 2026-10-05; llama-cpp-python inside
+  the Function: the model loads once and stays, and each call reuses the prompt
+  prefix the last one read) or `subprocess` (a fresh `llama-completion` process per
+  call, reloading the model each time).
 - `LLM_THREADS` (default 4; `1` = one CPU core) and `LLM_TIMEOUT_SECONDS`
   (default 60).
 - `LLM_GPU_LAYERS` (`inprocess` only; default 0 = CPU only, with llama.cpp's
@@ -248,8 +249,12 @@ conventions:
 ./deploy/run_edge_triage_llm_localrun.sh pulsar://localhost:6650 http://localhost:8080
 ```
 
-`run_edge_triage_llm_localrun.sh` needs `LLM_BINARY_PATH` / `LLM_MODEL_PATH`
-the same way Tier 1 does, plus an optional `UPLINK_MIN_SEVERITY` override.
+`run_edge_triage_llm_localrun.sh` needs `LLM_MODEL_PATH`, plus an optional
+`UPLINK_MIN_SEVERITY` override. The model runs inside the Function by default
+(CPU only; `LLM_THREADS` default 12, set 4 on a Pi 4; `LLM_GPU_LAYERS=99` puts it
+on a Mac's GPU). `LLM_BACKEND=server` starts `llama-server` from
+`LLM_BINARY_PATH` instead: the backend the Talk 2 measurements used, which on a
+Metal build of llama.cpp runs on the GPU.
 `run_edge_triage_coprocessor_localrun.sh` takes optional
 `COPROCESSOR_MIN_ETA_SLIP_MIN` / `COPROCESSOR_MAX_ETA_SLIP_MIN` overrides.
 

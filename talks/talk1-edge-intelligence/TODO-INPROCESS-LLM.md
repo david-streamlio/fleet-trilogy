@@ -1,6 +1,9 @@
 # TODO: review moving Talk 1's Functions to the in-process LLM
 
-**Status:** flagged for review (2026-10-04). Background and Talk 3's numbers:
+**Status:** decided 2026-10-05: in-process is the default for both Functions
+(`llm_backend=server` / `subprocess` keep the old backends; see
+`docs/INPROCESS-LLM.md`, "Default everywhere"). Still open: the Pi measurement
+(item 2) and the slide check (item 4). Background and Talk 3's numbers:
 `docs/INPROCESS-LLM.md`.
 
 ## Why
@@ -33,6 +36,23 @@ same build.
 4. **Slides:** `docs/TALK1-SLIDE-PLAN.md` describes the Function hosting the model
    ("A Pulsar Function ... hosts the small LLM on a CPU runtime"). Keep that
    claim true, or reword it, whichever way the review goes.
+
+## Done so far (2026-10-05)
+- Item 1: both Functions default to `InProcessLlmBackend`, CPU only.
+  `LlmTriageFunction` keeps `llm_backend=server`; `EdgeEnrichmentFunction` keeps
+  `llm_backend=subprocess`. The localrun scripts pass `LLM_BACKEND`,
+  `LLM_THREADS` and `LLM_GPU_LAYERS` through.
+- On a Mac, the old llama-server default ran on the Metal GPU; in-process is CPU
+  only unless `LLM_GPU_LAYERS=99`. Check the demo's pacing on whichever one the
+  recording uses.
+- Item 3: llama-cpp-python 0.3.36 is already built on the Pi
+  (`/mnt/data/fleet-trilogy-talk3wip`, from Talk 3's Pi run).
+- Item 2 is still open. Talk 2's real-stream re-measure on the Pi (2026-10-05) ran
+  `LlmTriageFunction` through llama-server, not in-process, to match its published
+  row's build: 82 s and 416 J per changed-prompt call with the event-last prompt
+  (`eval-results/edge-triage-event-last-pi4-20261005/`). An in-process run on the
+  same Pi would compare the two backends; Talk 3's Tier 2 run there found
+  llama-cpp-python faster than the Pi's own llama.cpp build.
 
 ## Done when
 - Both Functions have been measured on the Pi with the current backend and

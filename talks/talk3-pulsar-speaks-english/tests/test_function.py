@@ -59,7 +59,8 @@ def test_user_config_threshold_waits_for_all_three_trucks():
 def test_user_config_extra_args_reach_the_backend():
     function = GlobalSynthesisFunction()
     function.process(
-        _card("truck-47"), _Context({"llm_extra_args": "-no-cnv  --top-k 1"})
+        _card("truck-47"),
+        _Context({"llm_backend": "subprocess", "llm_extra_args": "-no-cnv  --top-k 1"}),
     )
     assert function._backend._extra_args == ("-no-cnv", "--top-k", "1")
 
@@ -87,17 +88,15 @@ def test_no_threads_in_user_config_keeps_the_backend_defaults():
     assert function._config is None
 
 
-def test_default_backend_is_a_subprocess_per_call():
+def test_subprocess_backend_is_selectable():
     function = GlobalSynthesisFunction()
-    function.process(_card("truck-47"), _Context({}))
+    function.process(_card("truck-47"), _Context({"llm_backend": "subprocess"}))
     assert isinstance(function._backend, SubprocessLlmBackend)
 
 
-def test_inprocess_backend_is_built_once_and_kept():
+def test_default_backend_is_in_process_built_once_and_kept():
     function = GlobalSynthesisFunction()
-    context = _Context(
-        {"llm_backend": "inprocess", "threads": "1", "corridor_threshold": "2"}
-    )
+    context = _Context({"threads": "1", "corridor_threshold": "2"})
     function.process(_card("truck-47"), context)
     backend = function._backend
     assert isinstance(backend, InProcessLlmBackend)

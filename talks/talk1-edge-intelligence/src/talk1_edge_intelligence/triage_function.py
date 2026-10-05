@@ -62,6 +62,15 @@ it running across every process() call instead — see its docstring in
 llm_inference/client.py for the measured before/after numbers, including the
 fact that this also fixes the file-based prompt cache (`--prompt-cache-ro`)
 having silently never worked at all, since nothing ever wrote that cache file.
+
+Default backend switched to InProcessLlmBackend (2026-10-05): llama.cpp inside
+this Function's own Python process via llama-cpp-python, the model loaded once
+and kept on `self` (docs/INPROCESS-LLM.md, talks/talk1-edge-intelligence/
+TODO-INPROCESS-LLM.md). That makes "a small LLM inside the Pulsar Function"
+literally true and drops the server's process lifecycle (ports, startup
+timeouts). `llm_backend=server` keeps the llama-server backend, which the Talk 2
+hardware-spectrum measurements used. In-process runs CPU only unless
+`llm_gpu_layers` says otherwise; llama-server uses a Metal GPU when it has one.
 """
 
 from __future__ import annotations
@@ -69,9 +78,21 @@ from __future__ import annotations
 import json
 
 from fleet_telemetry_model import LOCAL_TRIAGE_TOPIC
-from llm_inference import LlmGenerationConfig, LlmInferenceError, LlmServerBackend
+from llm_inference import (
+    InProcessLlmBackend,
+    LlmBackend,
+    LlmGenerationConfig,
+    LlmInferenceError,
+    LlmServerBackend,
+)
 from llm_inference.structured import extract_json_object
 
+# How the model runs (user config `llm_backend`): "inprocess" (default) keeps it inside
+# this Function via llama-cpp-python; "server" runs llama-server beside it.
+DEFAULT_LLM_BACKEND = "inprocess"
+# In-process context window: the prompt is ~700 tokens and the card at most
+# DEFAULT_MAX_TOKENS, so 4096 leaves room for a longer prompt_template.
+DEFAULT_CONTEXT_SIZE = 4096
 DEFAULT_BINARY_PATH = "~/tools/llama.cpp/build/bin/llama-server"
 DEFAULT_MODEL_PATH = "~/tools/models/Qwen2.5-3B-Instruct-GGUF/qwen2.5-3b-instruct-q4_k_m.gguf"
 # 150 was fine for the old severity/event_label/dispatch_action shape, but a real
@@ -138,6 +159,55 @@ DEFAULT_PROMPT_TEMPLATE = (
     "- lower: none of the fields are risk multipliers, and at least one positively "
     "indicates safe, controlled conditions.\n"
     "- hold: the fields are mixed, or none clearly point either way.\n\n"
+    "Truck ID: {truck_id}\n"
+    "Corridor: {corridor}\n\n"
+    "First write risk_synthesis: name the SPECIFIC field(s) that drove your decision "
+    "and why, using the rules above. Then set escalation to match what you just wrote "
+    "-- your escalation value and your risk_synthesis text must agree; never write "
+    "reasoning for one decision and then choose a different one. "
+    "Respond using the validated format template. DO NOT include markdown code boxes or introductory prose."
+)
+
+# DEFAULT_PROMPT_TEMPLATE with the event's fields moved down to sit with Truck ID and
+# Corridor, just before the closing instruction (2026-10-05, Talk 2's real-stream
+# re-measure). DEFAULT's comment above says its static rules sit first; they don't --
+# the baseline and the three operational-context fields come right after the intro,
+# so a different event shares only the intro with the previous call and re-reads the
+# rules every time. Here the intro, the weighing rules and the decision rules form
+# one fixed prefix the backend keeps in its KV cache, and only the event block and the
+# closing instruction are read per call. The one wording change: the raise rule's
+# "at least one field above" becomes "below", since the fields now follow it.
+# Opt-in (user config `prompt_template`), not the default: every published Talk 2
+# accuracy number used DEFAULT_PROMPT_TEMPLATE.
+EVENT_LAST_PROMPT_TEMPLATE = (
+    "You are a fleet dispatch operational-risk assessor.\n"
+    "A deterministic vehicle-physics system has already computed a baseline severity "
+    "for this event from sensor signals (deceleration, ABS, speed instability). Treat "
+    "that baseline as a correct starting point. Your only job is to decide whether the "
+    "three operational-context fields below, taken together, are strong enough "
+    "evidence to move away from it.\n\n"
+    "How to weigh each field:\n"
+    "- Cargo is a risk multiplier ONLY if it is hazardous, liquid, or otherwise "
+    "dangerous if spilled or shifted. Empty, dry, or general freight is NOT a risk "
+    "factor.\n"
+    "- Weather is a risk multiplier ONLY if it degrades traction or visibility (rain, "
+    "ice, snow, fog). Clear or dry conditions are NOT a risk factor.\n"
+    "- A dispatch status describing the driver handling a hazard safely (a documented "
+    "defensive or evasive maneuver, a completed safety check) is evidence the driver "
+    "is in control -- that is a reason to hold or lower, never a reason to raise. "
+    "Being behind schedule under pressure IS a genuine risk factor; being ahead of "
+    "schedule or on schedule is not.\n\n"
+    "Decision:\n"
+    "- raise: at least one field below is a genuine risk multiplier by the rules "
+    "above (e.g. hazardous cargo together with poor weather).\n"
+    "- lower: none of the fields are risk multipliers, and at least one positively "
+    "indicates safe, controlled conditions.\n"
+    "- hold: the fields are mixed, or none clearly point either way.\n\n"
+    "BASELINE SEVERITY (already computed from vehicle physics): {baseline_severity}\n\n"
+    "Operational context:\n"
+    "Weather: {weather_condition}\n"
+    "Cargo: {cargo_type}\n"
+    "Dispatch status: {dispatch_status}\n\n"
     "Truck ID: {truck_id}\n"
     "Corridor: {corridor}\n\n"
     "First write risk_synthesis: name the SPECIFIC field(s) that drove your decision "
@@ -226,7 +296,7 @@ class LlmTriageFunction:
 
     def __init__(self) -> None:
         self._configured = False
-        self._backend: LlmServerBackend | None = None
+        self._backend: LlmBackend | None = None
         self._prompt_template = DEFAULT_PROMPT_TEMPLATE
         self._max_tokens = DEFAULT_MAX_TOKENS
         self._temperature = DEFAULT_TEMPERATURE
@@ -274,10 +344,10 @@ class LlmTriageFunction:
             self._configure(context)
 
         try:
-            # Idempotent after the first successful call (see LlmServerBackend.start's
-            # docstring) -- cheap to call unconditionally, and doing it here rather than
-            # in _configure keeps a missing binary/model caught by this try/except
-            # instead of propagating out of process() uncaught.
+            # Idempotent after the first successful call for both backends (it loads the
+            # model in-process, or starts llama-server) -- cheap to call unconditionally,
+            # and doing it here rather than in _configure keeps a missing binary/model
+            # caught by this try/except instead of propagating out of process() uncaught.
             self._backend.start()
 
             payload = json.loads(input_item)
@@ -357,20 +427,37 @@ class LlmTriageFunction:
         self._threads = int(get("threads") or DEFAULT_THREADS)
         self._timeout_seconds = float(get("timeout_seconds") or DEFAULT_TIMEOUT_SECONDS)
         self._uplink_min_severity = get("uplink_min_severity") or DEFAULT_UPLINK_MIN_SEVERITY
-        self._backend = LlmServerBackend(
-            binary_path=get("llm_binary_path") or DEFAULT_BINARY_PATH,
-            model_path=get("llm_model_path") or DEFAULT_MODEL_PATH,
-            threads=self._threads,
-            startup_timeout_seconds=get("server_startup_timeout_seconds") or 60.0,
-        )
+        kind = get("llm_backend") or DEFAULT_LLM_BACKEND
+        model_path = get("llm_model_path") or DEFAULT_MODEL_PATH
+        if kind == "inprocess":
+            self._backend = InProcessLlmBackend(
+                model_path,
+                threads=self._threads,
+                gpu_layers=int(get("llm_gpu_layers") or 0),
+                context_size=int(get("llm_context_size") or DEFAULT_CONTEXT_SIZE),
+            )
+        elif kind == "server":
+            self._backend = LlmServerBackend(
+                binary_path=get("llm_binary_path") or DEFAULT_BINARY_PATH,
+                model_path=model_path,
+                threads=self._threads,
+                startup_timeout_seconds=get("server_startup_timeout_seconds") or 60.0,
+                # Extra llama-server flags, space-separated, e.g. "-np 1 --cache-ram 0" (one
+                # slot, no host-RAM prompt cache) so a recurring test event can't be served
+                # from a cached copy of itself.
+                extra_args=tuple((get("llm_extra_args") or "").split()),
+            )
+        else:
+            raise ValueError(f"llm_backend must be 'inprocess' or 'server', got {kind!r}")
         self._configured = True
 
     def close(self) -> None:
-        """Shuts down the backend's server process, if one was started. Not part of
-        the Pulsar Functions contract (that lifecycle has no explicit teardown hook;
-        a deployed function's server just runs for the process's lifetime) -- this
-        exists for callers that construct many short-lived instances back-to-back,
-        e.g. a multi-model eval harness, which must close model N's server before
-        starting model N+1's to avoid two servers competing for the GPU at once."""
+        """Releases the backend: frees the in-process model, or shuts down the
+        llama-server process, whichever was started. Not part of the Pulsar Functions
+        contract (that lifecycle has no explicit teardown hook; a deployed function's
+        model just lives for the process's lifetime) -- this exists for callers that
+        construct many short-lived instances back-to-back, e.g. a multi-model eval
+        harness, which must release model N before loading model N+1 so two models
+        never hold memory (or compete for the GPU) at once."""
         if self._backend is not None:
             self._backend.close()

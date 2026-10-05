@@ -92,20 +92,21 @@ class GlobalSynthesisFunction:
         single CPU core.
 
         `llm_backend` picks how the model runs:
-        - `subprocess` (default): a fresh llama.cpp process per call
-          (`llm_binary_path`, `llm_extra_args`), reloading the model every time.
-        - `inprocess`: llama-cpp-python inside this Function instance. The model
-          loads once and stays on `self` with the accumulator, and each call
-          reuses the prompt prefix the previous one already read. `llm_gpu_layers`
-          (default 0, CPU only) offloads layers to a GPU; the binary path and
-          extra args don't apply.
+        - `inprocess` (default since 2026-10-05): llama-cpp-python inside this
+          Function instance. The model loads once and stays on `self` with the
+          accumulator, and each call reuses the prompt prefix the previous one
+          already read. `llm_gpu_layers` (default 0, CPU only) offloads layers to a
+          GPU; the binary path and extra args don't apply.
+        - `subprocess`: a fresh llama.cpp process per call (`llm_binary_path`,
+          `llm_extra_args`), reloading the model every time. The Tier 2 gates in
+          tests/model measured this one.
         """
         user_config = context.get_user_config_map() if context is not None else {}
         model_path = user_config.get("llm_model_path") or os.environ.get(
             "LLM_MODEL_PATH"
         )
         threads = user_config.get("threads")
-        kind = user_config.get("llm_backend") or "subprocess"
+        kind = user_config.get("llm_backend") or "inprocess"
         if kind == "inprocess":
             backend = InProcessLlmBackend(
                 model_path,
@@ -124,7 +125,7 @@ class GlobalSynthesisFunction:
             )
         else:
             raise ValueError(
-                f"llm_backend must be 'subprocess' or 'inprocess', got {kind!r}"
+                f"llm_backend must be 'inprocess' or 'subprocess', got {kind!r}"
             )
         if user_config.get("corridor_threshold"):
             self._corridor_threshold = int(user_config["corridor_threshold"])

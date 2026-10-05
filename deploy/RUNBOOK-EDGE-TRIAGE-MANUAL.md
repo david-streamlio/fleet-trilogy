@@ -42,6 +42,11 @@ cd /Users/david.kjerrumgaard/clone-zone/davidkj-datadog/fleet-trilogy && export 
 present on this machine -- the exports are redundant but harmless; only
 change the two paths if your binary/model live somewhere else)
 
+Since 2026-10-05 the model runs inside the Function (llama-cpp-python, CPU
+only), so `LLM_BINARY_PATH` is unused unless you also `export
+LLM_BACKEND=server` (llama-server beside the Function, on the GPU with a Metal
+build). `export LLM_GPU_LAYERS=99` puts the in-process model on the GPU instead.
+
 ## Terminal 3 — raw telemetry (input)
 
 ```

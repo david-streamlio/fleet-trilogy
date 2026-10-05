@@ -57,6 +57,62 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         ),
     )
     group.addoption(
+        "--model-backend",
+        default="inprocess",
+        choices=("inprocess", "server"),
+        help=(
+            "Edge Triage Pipeline and Tier 2 evals: how the model runs -- `inprocess` "
+            "(llama-cpp-python inside the test process, the Functions' default since "
+            "2026-10-05) or `server` (llama-server beside it, which every Talk 2 "
+            "hardware-spectrum run before that date measured; pass it to reproduce "
+            "them). Round 3 always uses llama-server: it calls its HTTP API "
+            "(/completion, /apply-template) directly."
+        ),
+    )
+    group.addoption(
+        "--model-gpu-layers",
+        type=int,
+        default=0,
+        help=(
+            "--model-backend inprocess only: layers to offload to a GPU (default 0, CPU "
+            "only; 99 puts the whole model on a Mac's Metal GPU). The server backend "
+            "uses whatever its llama.cpp build defaults to."
+        ),
+    )
+    group.addoption(
+        "--model-server-args",
+        default="",
+        help=(
+            "--model-backend server only: extra llama-server flags, space-separated. "
+            "\"-np 1 --cache-ram 0\" (one slot, no host-RAM prompt cache) makes each call "
+            "reuse only the previous call's prompt prefix, like the in-process backend and "
+            "like a stream of events that never repeat; without it, --vary-events' recurring "
+            "events can be restored from llama-server's cache of earlier prompts."
+        ),
+    )
+    group.addoption(
+        "--triage-prompt",
+        default="default",
+        choices=("default", "event-last"),
+        help=(
+            "Edge Triage Pipeline evals only: LlmTriageFunction's prompt -- `default` "
+            "(DEFAULT_PROMPT_TEMPLATE, every published run) or `event-last` "
+            "(EVENT_LAST_PROMPT_TEMPLATE: the same text with the event's fields moved "
+            "after the rules, so a different event re-reads ~150 tokens instead of ~400)."
+        ),
+    )
+    group.addoption(
+        "--vary-events",
+        action="store_true",
+        help=(
+            "Edge Triage Pipeline evals only: send a different event on every call "
+            "instead of repeating one payload n times. Repeating it lets the backend "
+            "serve the whole prompt from its KV cache after the first call, so latency "
+            "(and energy per call) measures generation alone -- a lower bound for a "
+            "real stream. See eval_lib.run_edge_triage_trials_interleaved."
+        ),
+    )
+    group.addoption(
         "--model-format-threshold",
         type=float,
         default=0.8,
@@ -222,12 +278,26 @@ def edge_triage_context(request: pytest.FixtureRequest, llm_backend: SubprocessL
         "llm_binary_path": binary,
         "llm_model_path": model,
         "timeout_seconds": str(timeout_seconds),
+        "llm_backend": request.config.getoption("--model-backend"),
+        "llm_gpu_layers": str(request.config.getoption("--model-gpu-layers")),
+        "prompt_template": triage_prompt_template(request.config.getoption("--triage-prompt")),
+        "llm_extra_args": request.config.getoption("--model-server-args"),
     }
     if threads is not None:
         config["threads"] = str(threads)
     return _EdgeTriageEvalContext(
         config
     )
+
+
+def triage_prompt_template(name: str) -> str:
+    """--triage-prompt's value -> the LlmTriageFunction template it names."""
+    from talk1_edge_intelligence.triage_function import (
+        DEFAULT_PROMPT_TEMPLATE,
+        EVENT_LAST_PROMPT_TEMPLATE,
+    )
+
+    return {"default": DEFAULT_PROMPT_TEMPLATE, "event-last": EVENT_LAST_PROMPT_TEMPLATE}[name]
 
 
 @pytest.fixture(scope="session")

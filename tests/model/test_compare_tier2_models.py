@@ -13,6 +13,10 @@ confirmation depended on format_parse_rate).
 Opt-in (@pytest.mark.model), run via `make compare-tier2-models`. Auto-skips
 if the manifest has zero available models, same as the other comparison
 harnesses.
+
+`--model-backend` picks in-process (the default since 2026-10-05, what
+GlobalSynthesisFunction now runs) or llama-server, which every Talk 2
+hardware-spectrum run before that date used.
 """
 
 from __future__ import annotations
@@ -24,9 +28,18 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
-from llm_inference import LlmServerBackend
+from llm_inference import (
+    InProcessLlmBackend,
+    LlmBackend,
+    LlmGenerationConfig,
+    LlmServerBackend,
+)
 
-from tests.model.models_manifest import ModelEntry, load_models_manifest, parse_model_ids
+from tests.model.models_manifest import (
+    ModelEntry,
+    load_models_manifest,
+    parse_model_ids,
+)
 from tests.model.test_compare_edge_triage_models import _server_binary_path
 from tests.model.tier2_eval_lib import (
     DEFAULT_THREADS,
@@ -71,10 +84,34 @@ def _get_path(d: dict, path: tuple[str, ...]):
     return d
 
 
-def _peak_child_rss_mb() -> float | None:
-    from tests.model.eval_lib import peak_child_rss_mb
+def _peak_rss_mb(backend_kind: str) -> float | None:
+    from tests.model.eval_lib import peak_child_rss_mb, peak_self_rss_mb
 
-    return peak_child_rss_mb()
+    # In-process, the model lives in this test process, not in a llama-server child.
+    return peak_self_rss_mb() if backend_kind == "inprocess" else peak_child_rss_mb()
+
+
+def _build_backend(entry: ModelEntry, threads: int, backend_kind: str, gpu_layers: int) -> LlmBackend:
+    if backend_kind == "inprocess":
+        # GlobalSynthesisFunction's own in-process settings (its default context size).
+        return InProcessLlmBackend(entry.model_path, threads=threads, gpu_layers=gpu_layers)
+    return LlmServerBackend(
+        binary_path=_server_binary_path(entry.binary_path), model_path=entry.model_path, threads=threads
+    )
+
+
+def _start_and_time_in_process(backend: InProcessLlmBackend) -> float | None:
+    """Load time for the in-process backend, measured on the backend the trials then
+    use. Includes a one-token generation to match llama-server's load time, which
+    includes its start-up warm-up pass (see test_compare_edge_triage_models.py's
+    _measure_in_process_load_time_seconds)."""
+    start = time.monotonic()
+    try:
+        backend.start()
+        backend.generate("Hello", LlmGenerationConfig(max_tokens=1, timeout_seconds=1800.0))
+    except Exception:  # noqa: BLE001 - a failed load is "no reading"; the trials then record the error
+        return None
+    return time.monotonic() - start
 
 
 def _measure_load_time_seconds(entry: ModelEntry, threads: int) -> float | None:
@@ -106,13 +143,15 @@ def _run_one_model(entry: ModelEntry, request: pytest.FixtureRequest) -> dict:
     threads = request.config.getoption("--model-threads") or DEFAULT_THREADS
     timeout_seconds = request.config.getoption("--model-timeout-seconds")
     per_scenario_n = max(1, n // 3)
+    backend_kind = request.config.getoption("--model-backend")
+    gpu_layers = request.config.getoption("--model-gpu-layers")
 
-    ram_before_mb = _peak_child_rss_mb()
-    load_time_seconds = _measure_load_time_seconds(entry, threads)
-
-    backend = LlmServerBackend(
-        binary_path=_server_binary_path(entry.binary_path), model_path=entry.model_path, threads=threads
-    )
+    ram_before_mb = _peak_rss_mb(backend_kind)
+    backend = _build_backend(entry, threads, backend_kind, gpu_layers)
+    if backend_kind == "inprocess":
+        load_time_seconds = _start_and_time_in_process(backend)
+    else:
+        load_time_seconds = _measure_load_time_seconds(entry, threads)
     try:
         backend.start()
         all_trials = []
@@ -122,13 +161,13 @@ def _run_one_model(entry: ModelEntry, request: pytest.FixtureRequest) -> dict:
             all_trials.extend(trials)
             grounding_by_scenario[name] = check_tier2_grounding(trials, scenario)
     finally:
+        # Before close(): in-process, that frees the model this reading should include.
+        ram_after_mb = _peak_rss_mb(backend_kind)
         backend.close()
 
     format_result = check_tier2_format_reliability(all_trials)
     speakability_result = check_speakability(all_trials)
     max_grounding_violation_rate = max((gr["violation_rate"] for gr in grounding_by_scenario.values()), default=0.0)
-
-    ram_after_mb = _peak_child_rss_mb()
 
     ordered = sorted(t.latency_seconds for t in all_trials)
     latency = {
@@ -150,6 +189,8 @@ def _run_one_model(entry: ModelEntry, request: pytest.FixtureRequest) -> dict:
         "available": True,
         "binary_path": str(entry.binary_path),
         "model_path": str(entry.model_path),
+        "backend": backend_kind,
+        "gpu_layers": gpu_layers if backend_kind == "inprocess" else None,
         "format_reliability": format_result,
         "speakability": speakability_result,
         "grounding": {"by_scenario": grounding_by_scenario, "max_violation_rate": max_grounding_violation_rate},
@@ -163,10 +204,12 @@ def _run_one_model(entry: ModelEntry, request: pytest.FixtureRequest) -> dict:
         "resident_ram_mb_before": ram_before_mb,
         "resident_ram_mb_after": ram_after_mb,
         "resident_ram_mb_note": (
-            "RUSAGE_CHILDREN ru_maxrss is a cumulative max for the whole test session "
-            "and isn't resettable per model; this is exact for the first model in a "
-            "run (or when a model is run alone) and otherwise a floor — not a true "
-            "peak — for models measured later in the same run."
+            "ru_maxrss is a cumulative max for the whole test session and isn't "
+            "resettable per model; this is exact for the first model in a run (or "
+            "when a model is run alone) and otherwise a floor — not a true peak — for "
+            "models measured later in the same run. Server backend: RUSAGE_CHILDREN "
+            "(llama-server alone). In-process: RUSAGE_SELF, so it also counts the "
+            "test process's own Python heap."
         ),
         "_format_threshold_for_pass": format_threshold,
     }
@@ -360,6 +403,8 @@ def test_compare_tier2_models(request: pytest.FixtureRequest) -> None:
         "seed_config": {
             "model_eval_runs": request.config.getoption("--model-eval-runs"),
             "model_timeout_seconds": request.config.getoption("--model-timeout-seconds"),
+            "model_backend": request.config.getoption("--model-backend"),
+            "model_gpu_layers": request.config.getoption("--model-gpu-layers"),
         },
         "models": results,
         "comparison": comparison,

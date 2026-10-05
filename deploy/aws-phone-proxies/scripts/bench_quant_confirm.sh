@@ -57,9 +57,10 @@ echo "$VARIANTS" | while read -r id var label _repo file dir; do
     lab="edge_triage_${id}_${label}_r$r"
     echo "== $lab"
     before=$(ls -1 eval-results/ | sort)
+    # --model-backend server: what the published runs used; the harness default is in-process since 2026-10-05.
     window "$lab" env "LLM_BINARY_PATH_$var=$BIN" "LLM_MODEL_PATH_$var=$BASE/$dir/$file" \
       /opt/homebrew/bin/uv run --no-sync pytest tests/model/test_compare_edge_triage_models.py -m model -s -q \
-      --only-model-ids "$id" --model-eval-runs "$RUNS" --model-threads 4 < /dev/null > "$OUT/pytest_$lab.log" 2>&1
+      --only-model-ids "$id" --model-eval-runs "$RUNS" --model-threads 4 --model-backend server < /dev/null > "$OUT/pytest_$lab.log" 2>&1
     tail -n 2 "$OUT/pytest_$lab.log"
     echo "$lab $(comm -13 <(echo "$before") <(ls -1 eval-results/ | sort) | tr '\n' ' ')" >> "$OUT/artifacts.txt"
     window "idle-gap_$lab" sleep 20

@@ -16,9 +16,14 @@
 # (fleet_telemetry_model.topics.LOCAL_TRIAGE_TOPIC) instead, never leaving
 # this broker.
 #
-# Requires LLM_BINARY_PATH / LLM_MODEL_PATH pointing at a built llama.cpp-
-# family binary and model on this machine. Optional UPLINK_MIN_SEVERITY
-# overrides the gate threshold (default "high" -- one of low/medium/high).
+# Requires LLM_MODEL_PATH pointing at a GGUF model on this machine. The model
+# runs inside the Function (llama-cpp-python, CPU only) unless LLM_BACKEND=server,
+# which starts llama-server beside it from LLM_BINARY_PATH instead -- the backend
+# the Talk 2 measurements used, and on a Mac (Metal build) the GPU. Optional:
+# LLM_THREADS (default 12, tuned for the M4 Max; 4 on a Pi 4), LLM_GPU_LAYERS
+# (in-process only; default 0 = CPU only, 99 = the whole model on a Mac's GPU).
+# Optional UPLINK_MIN_SEVERITY overrides the gate threshold (default "high" --
+# one of low/medium/high).
 # Optional LOG_TOPIC publishes this function's logger output (including
 # build_card's LLM_INPUT_BEGIN/END prompt dump) to a Pulsar topic via
 # --log-topic, since Pulsar's python-instance logger otherwise writes only to
@@ -47,7 +52,7 @@ SERVICE_URL="${1:-pulsar://localhost:6650}"
 ADMIN_URL="${2:-http://localhost:8080}"
 
 USER_CONFIG=$(cat <<EOF
-{"llm_binary_path": "${LLM_BINARY_PATH:-}", "llm_model_path": "${LLM_MODEL_PATH:-}", "uplink_min_severity": "${UPLINK_MIN_SEVERITY:-}"}
+{"llm_backend": "${LLM_BACKEND:-}", "llm_binary_path": "${LLM_BINARY_PATH:-}", "llm_model_path": "${LLM_MODEL_PATH:-}", "threads": "${LLM_THREADS:-}", "llm_gpu_layers": "${LLM_GPU_LAYERS:-}", "uplink_min_severity": "${UPLINK_MIN_SEVERITY:-}"}
 EOF
 )
 

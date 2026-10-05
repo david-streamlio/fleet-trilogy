@@ -12,11 +12,30 @@ class _FakeLlama:
     def __init__(self, **kwargs) -> None:
         self.kwargs = kwargs
         self.calls: list[tuple[str, dict]] = []
+        self.closed = False
         _FakeLlama.instances.append(self)
+
+    def close(self) -> None:
+        self.closed = True
 
     def create_completion(self, prompt, **kwargs):
         self.calls.append((prompt, kwargs))
         return {"choices": [{"text": '  {"spoken_warning": "On I-95N, slow down."}\n'}]}
+
+
+class _FakePerfCounters:
+    """llama.cpp's cumulative perf counters, advancing like one call that reads
+    40 prompt tokens in 400 ms and generates 10 in 500 ms."""
+
+    def __init__(self) -> None:
+        self.reads = 0
+
+    def __call__(self, ctx):
+        self.reads += 1
+        calls = self.reads // 2  # one before/after pair per call
+        return types.SimpleNamespace(
+            n_p_eval=40 * calls, t_p_eval_ms=400.0 * calls, n_eval=10 * calls, t_eval_ms=500.0 * calls
+        )
 
 
 class _StoppingCriteriaList(list):
@@ -115,3 +134,43 @@ def test_seed_is_random_unless_pinned(fake_llama_cpp, model_path):
     seeds = [llama.kwargs["seed"] for llama in _FakeLlama.instances]
     assert seeds[0] != seeds[1]
     assert seeds[2] == 7
+
+
+def test_start_and_close_share_llm_server_backends_lifecycle(fake_llama_cpp, model_path):
+    backend = InProcessLlmBackend(model_path, mock=False)
+    backend.close()  # before it was loaded: a no-op
+    assert backend.start() is backend
+    backend.start()
+    assert len(_FakeLlama.instances) == 1
+
+    backend.close()
+    backend.close()
+    assert _FakeLlama.instances[0].closed
+    backend.generate("after close")  # loads the model again
+    assert len(_FakeLlama.instances) == 2
+
+
+def test_last_timings_split_prompt_reading_from_generation(fake_llama_cpp, model_path, monkeypatch):
+    fake_llama_cpp.llama_perf_context = _FakePerfCounters()
+    monkeypatch.setattr(
+        _FakeLlama,
+        "create_completion",
+        lambda self, prompt, **kwargs: {"choices": [{"text": "ok"}], "usage": {"prompt_tokens": 120}},
+    )
+    monkeypatch.setattr(_FakeLlama, "_ctx", types.SimpleNamespace(ctx=object()), raising=False)
+    backend = InProcessLlmBackend(model_path, mock=False)
+    assert backend.last_timings is None
+    backend.generate("hello")
+    assert backend.last_timings == {
+        "prompt_tokens": 120,
+        "prompt_tokens_evaluated": 40,
+        "prompt_ms": 400.0,
+        "generated_tokens": 10,
+        "generation_ms": 500.0,
+    }
+
+
+def test_last_timings_are_none_without_perf_counters(fake_llama_cpp, model_path):
+    backend = InProcessLlmBackend(model_path, mock=False)
+    assert backend.generate("hello")
+    assert backend.last_timings is None

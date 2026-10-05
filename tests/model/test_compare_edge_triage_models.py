@@ -15,31 +15,45 @@ duplicating a second detection path.
 
 Opt-in (@pytest.mark.model), run via `make compare-edge-triage-models`. Auto-skips
 if the manifest has zero available models, same as test_compare_models.py.
+
+`--model-backend` picks how LlmTriageFunction runs each model: in-process (the
+default since 2026-10-05) or llama-server, which every Talk 2 hardware-spectrum run
+before that date used. `--vary-events` sends a different event on every call (see
+eval_lib.run_edge_triage_trials_interleaved) so latency includes reading the prompt,
+not just generating the card. `--triage-prompt event-last` swaps in
+EVENT_LAST_PROMPT_TEMPLATE, which lets more of the prompt stay cached across events.
 """
 
 from __future__ import annotations
 
 import json
 import platform
+import statistics
 import time
 from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
-from llm_inference import LlmServerBackend
+from llm_inference import LlmGenerationConfig, LlmServerBackend
 from talk1_edge_intelligence.coprocessor import TelemetryCoprocessorFunction
 from talk1_edge_intelligence.triage_function import DEFAULT_THREADS, LlmTriageFunction
 
-from tests.model.conftest import _EdgeTriageEvalContext
+from tests.model.conftest import _EdgeTriageEvalContext, triage_prompt_template
 from tests.model.eval_lib import (
     ESCALATION_SCENARIOS,
     _percentile,
     check_escalation_direction,
     edge_triage_format_reliability,
     peak_child_rss_mb,
+    peak_self_rss_mb,
     run_edge_triage_trials,
+    run_edge_triage_trials_interleaved,
 )
-from tests.model.models_manifest import ModelEntry, load_models_manifest, parse_model_ids
+from tests.model.models_manifest import (
+    ModelEntry,
+    load_models_manifest,
+    parse_model_ids,
+)
 from tests.model.test_edge_triage import _canonical_event
 
 pytestmark = pytest.mark.model
@@ -94,7 +108,7 @@ def _server_binary_path(completion_binary_path: Path | None) -> Path | None:
     return completion_binary_path.parent / "llama-server"
 
 
-def _measure_load_time_seconds(entry: ModelEntry, threads: int) -> float | None:
+def _measure_load_time_seconds(entry: ModelEntry, threads: int, server_args: str = "") -> float | None:
     """Time to start a standalone LlmServerBackend and have it become healthy —
     a real, direct measurement now that the backend is a persistent server, not
     the old one-shot-completion warmup hack (that approach measured a single
@@ -110,7 +124,10 @@ def _measure_load_time_seconds(entry: ModelEntry, threads: int) -> float | None:
     LlmServerBackend.
     """
     backend = LlmServerBackend(
-        binary_path=_server_binary_path(entry.binary_path), model_path=entry.model_path, threads=threads
+        binary_path=_server_binary_path(entry.binary_path),
+        model_path=entry.model_path,
+        threads=threads,
+        extra_args=tuple(server_args.split()),
     )
     start = time.monotonic()
     try:
@@ -120,6 +137,45 @@ def _measure_load_time_seconds(entry: ModelEntry, threads: int) -> float | None:
     finally:
         backend.close()
     return time.monotonic() - start
+
+
+def _measure_in_process_load_time_seconds(triage: LlmTriageFunction, context: _EdgeTriageEvalContext) -> float | None:
+    """The in-process counterpart of _measure_load_time_seconds: loading the model
+    into the triage function's own backend IS the load, so this times that once,
+    up front, rather than loading a throwaway copy (which on a 4 GB Pi would mean
+    two copies' worth of page cache churn for one number). build_card's own start()
+    call is then a no-op.
+
+    Includes a one-token generation, to match what llama-server's load time
+    includes: llama-server runs a warm-up pass at startup that pulls every weight
+    page in from the memory-mapped file, and llama-cpp-python doesn't, so without
+    this the first trial would pay for reading the model from disk instead."""
+    triage._configure(context)
+    start = time.monotonic()
+    try:
+        triage._backend.start()
+        triage._backend.generate("Hello", LlmGenerationConfig(max_tokens=1, timeout_seconds=1800.0))
+    except Exception:  # noqa: BLE001 - a failed load is "no reading"; the trials then record the error
+        return None
+    return time.monotonic() - start
+
+
+def _timings_summary(trials: list) -> dict | None:
+    """Medians over the calls whose backend reported a prompt/generation split (both
+    backends' last_timings), plus totals. None if no call reported one."""
+    timed = [t.timings for t in trials if t.timings]
+    if not timed:
+        return None
+    keys = ("prompt_tokens", "prompt_tokens_evaluated", "prompt_ms", "generated_tokens", "generation_ms")
+    summary = {
+        f"median_{key}": statistics.median(t[key] for t in timed if t.get(key) is not None)
+        for key in keys
+        if any(t.get(key) is not None for t in timed)
+    }
+    summary["total_prompt_ms"] = sum(t.get("prompt_ms") or 0 for t in timed)
+    summary["total_generation_ms"] = sum(t.get("generation_ms") or 0 for t in timed)
+    summary["n"] = len(timed)
+    return summary
 
 
 def _run_one_model(entry: ModelEntry, request: pytest.FixtureRequest) -> dict:
@@ -137,26 +193,58 @@ def _run_one_model(entry: ModelEntry, request: pytest.FixtureRequest) -> dict:
     format_threshold = request.config.getoption("--model-format-threshold")
     confirm_multiplier = request.config.getoption("--model-confirm-multiplier")
     threads = request.config.getoption("--model-threads") or DEFAULT_THREADS
+    backend_kind = request.config.getoption("--model-backend")
+    gpu_layers = request.config.getoption("--model-gpu-layers")
+    vary_events = request.config.getoption("--vary-events")
+    triage_prompt = request.config.getoption("--triage-prompt")
+    server_args = request.config.getoption("--model-server-args")
+    # In-process, the model lives in this test process, not in a child.
+    peak_rss_mb = peak_self_rss_mb if backend_kind == "inprocess" else peak_child_rss_mb
 
-    ram_before_mb = peak_child_rss_mb()
-    load_time_seconds = _measure_load_time_seconds(entry, threads)
-
+    ram_before_mb = peak_rss_mb()
     context = _EdgeTriageEvalContext(
         {
+            "llm_backend": backend_kind,
             "llm_binary_path": str(_server_binary_path(entry.binary_path)),
             "llm_model_path": str(entry.model_path),
+            "llm_gpu_layers": str(gpu_layers),
+            "prompt_template": triage_prompt_template(triage_prompt),
+            "llm_extra_args": server_args,
             "timeout_seconds": str(timeout_seconds),
             "threads": str(threads),
         }
     )
     coprocessor = TelemetryCoprocessorFunction()
     triage = LlmTriageFunction()
+    if backend_kind == "inprocess":
+        load_time_seconds = _measure_in_process_load_time_seconds(triage, context)
+    else:
+        load_time_seconds = _measure_load_time_seconds(entry, threads, server_args)
+
+    trials_started_utc = datetime.now(tz=UTC)
+    trials_started = time.monotonic()
     try:
         # Gate 1: format reliability on one canonical event, full N — see
         # test_edge_triage.py's module docstring for why this is no longer
         # tier-based (severity is cheap math now, identical for every model).
+        # --vary-events cycles that event through the three scenarios'
+        # operational contexts instead (ceil(n/3) calls each), so consecutive
+        # prompts differ from the weather line on; format scoring doesn't depend
+        # on the context, only on the event's truck_id/eta_impact, which stay fixed.
         format_event = _canonical_event()
-        format_trials = run_edge_triage_trials(coprocessor, triage, context, format_event, n)
+        if vary_events:
+            per_variant_n = -(-n // len(ESCALATION_SCENARIOS))
+            variants = [
+                {"event": format_event, "contextual_trigger_overrides": scenario["contextual_triggers"]}
+                for scenario in ESCALATION_SCENARIOS.values()
+            ]
+            format_trials = [
+                t
+                for trials in run_edge_triage_trials_interleaved(coprocessor, triage, context, variants, per_variant_n)
+                for t in trials
+            ]
+        else:
+            format_trials = run_edge_triage_trials(coprocessor, triage, context, format_event, n)
         fr_result = edge_triage_format_reliability(format_event, format_trials)
 
         # GATE 2: same two-stage rationale as test_compare_models.py, retargeted at
@@ -169,18 +257,33 @@ def _run_one_model(entry: ModelEntry, request: pytest.FixtureRequest) -> dict:
         gate2_scenario_trials: dict[str, list] = {}
         if gate2_promoted:
             confirm_per_scenario_n = max(per_scenario_n, round(per_scenario_n * confirm_multiplier))
-            for scenario_name, scenario in ESCALATION_SCENARIOS.items():
-                scenario_event = _canonical_event()
-                trials = run_edge_triage_trials(
-                    coprocessor,
-                    triage,
-                    context,
-                    scenario_event,
-                    confirm_per_scenario_n,
-                    contextual_trigger_overrides=scenario["contextual_triggers"],
-                    baseline_severity_override="medium",
+            if vary_events:
+                # The same scenarios, called round-robin so no two consecutive calls repeat.
+                variants = [
+                    {
+                        "event": _canonical_event(),
+                        "contextual_trigger_overrides": scenario["contextual_triggers"],
+                        "baseline_severity_override": "medium",
+                    }
+                    for scenario in ESCALATION_SCENARIOS.values()
+                ]
+                interleaved = run_edge_triage_trials_interleaved(
+                    coprocessor, triage, context, variants, confirm_per_scenario_n
                 )
-                gate2_scenario_trials[scenario_name] = trials
+                gate2_scenario_trials = dict(zip(ESCALATION_SCENARIOS, interleaved, strict=True))
+            else:
+                for scenario_name, scenario in ESCALATION_SCENARIOS.items():
+                    scenario_event = _canonical_event()
+                    trials = run_edge_triage_trials(
+                        coprocessor,
+                        triage,
+                        context,
+                        scenario_event,
+                        confirm_per_scenario_n,
+                        contextual_trigger_overrides=scenario["contextual_triggers"],
+                        baseline_severity_override="medium",
+                    )
+                    gate2_scenario_trials[scenario_name] = trials
             ec_result = check_escalation_direction(gate2_scenario_trials)
             ec_result["gate2_confirmed"] = True
             ec_result["gate2_per_scenario_n"] = confirm_per_scenario_n
@@ -188,19 +291,24 @@ def _run_one_model(entry: ModelEntry, request: pytest.FixtureRequest) -> dict:
         else:
             ec_result = {"total": 0, "matched": 0, "mismatches": 0, "mismatch_rate": None, "gate2_confirmed": False}
     finally:
-        # Must close this model's server before the manifest loop moves on to the
-        # next model, or two llama-server processes end up competing for the GPU
-        # at once — the exact contention this session already hit once and
-        # corrupted two runs (see docs/TALK2-DATA-ENGINEERING-IMPACT-TRACK.md).
+        trials_seconds = time.monotonic() - trials_started
+        trials_ended_utc = datetime.now(tz=UTC)
+        # Before close(): in-process, that frees the model this reading should include.
+        ram_after_mb = peak_rss_mb()
+        # Must release this model before the manifest loop moves on to the next
+        # one, or two llama-server processes (or two in-process models) end up
+        # competing for the GPU and memory at once — the exact contention this
+        # session already hit once and corrupted two runs (see
+        # docs/TALK2-DATA-ENGINEERING-IMPACT-TRACK.md).
         triage.close()
-
-    ram_after_mb = peak_child_rss_mb()
 
     all_trials = list(format_trials) + [t for trials in gate2_scenario_trials.values() for t in trials]
     ordered = sorted(t.latency_seconds for t in all_trials)
     latency = {
         "p50_seconds": _percentile(ordered, 0.50) if ordered else None,
         "p95_seconds": _percentile(ordered, 0.95) if ordered else None,
+        "mean_seconds": statistics.fmean(ordered) if ordered else None,
+        "total_seconds": sum(ordered),
         "n": len(ordered),
     }
 
@@ -220,6 +328,21 @@ def _run_one_model(entry: ModelEntry, request: pytest.FixtureRequest) -> dict:
         "binary_path": str(entry.binary_path),
         "model_path": str(entry.model_path),
         "extra_args": list(entry.extra_args),
+        "backend": backend_kind,
+        "gpu_layers": gpu_layers if backend_kind == "inprocess" else None,
+        "threads": threads,
+        "vary_events": vary_events,
+        "triage_prompt": triage_prompt,
+        "server_args": server_args if backend_kind == "server" else None,
+        # For lining the run up against a power meter: every call happens inside
+        # this window, after the model load (load_time_seconds) and before release.
+        "trial_window": {
+            "started_utc": trials_started_utc.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "ended_utc": trials_ended_utc.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "wall_seconds": trials_seconds,
+            "calls": len(all_trials),
+        },
+        "prompt_vs_generation": _timings_summary(all_trials),
         "format_reliability": fr_result,
         "escalation_calibration": ec_result,
         "latency": latency,
@@ -232,10 +355,12 @@ def _run_one_model(entry: ModelEntry, request: pytest.FixtureRequest) -> dict:
         "resident_ram_mb_before": ram_before_mb,
         "resident_ram_mb_after": ram_after_mb,
         "resident_ram_mb_note": (
-            "RUSAGE_CHILDREN ru_maxrss is a cumulative max for the whole test session "
-            "and isn't resettable per model; this is exact for the first model in a "
-            "run (or when a model is run alone) and otherwise a floor — not a true "
-            "peak — for models measured later in the same run."
+            "ru_maxrss is a cumulative max for the whole test session and isn't "
+            "resettable per model; this is exact for the first model in a run (or "
+            "when a model is run alone) and otherwise a floor — not a true peak — for "
+            "models measured later in the same run. Server backend: RUSAGE_CHILDREN "
+            "(llama-server alone). In-process: RUSAGE_SELF, so it also counts the "
+            "test process's own Python heap."
         ),
     }
 
@@ -351,6 +476,11 @@ def _render_table(report: dict, artifact_path: Path) -> str:
         f"artifact: {artifact_path}",
         f"host: {report['host']} ({report['arch']}, {report['platform']})",
         f"decision_grade: {report['decision_grade']}",
+        (
+            f"backend: {report['seed_config']['model_backend']}, vary_events: {report['seed_config']['vary_events']}, "
+            f"triage_prompt: {report['seed_config']['triage_prompt']}, "
+            f"server_args: {report['seed_config']['model_server_args'] or '-'}"
+        ),
         "  ".join(h.ljust(w) for h, w in zip(headers, widths)),
         "  ".join("-" * w for w in widths),
     ]
@@ -426,6 +556,12 @@ def test_compare_edge_triage_models(request: pytest.FixtureRequest) -> None:
         "seed_config": {
             "model_eval_runs": request.config.getoption("--model-eval-runs"),
             "model_timeout_seconds": request.config.getoption("--model-timeout-seconds"),
+            "model_backend": request.config.getoption("--model-backend"),
+            "model_gpu_layers": request.config.getoption("--model-gpu-layers"),
+            "model_threads": request.config.getoption("--model-threads"),
+            "vary_events": request.config.getoption("--vary-events"),
+            "triage_prompt": request.config.getoption("--triage-prompt"),
+            "model_server_args": request.config.getoption("--model-server-args"),
         },
         "models": results,
         "comparison": comparison,
