@@ -39,13 +39,15 @@ Caveat: the published runtime and measurement method aren't verified to match ou
 - **iphone-flagship full suite** (mac-m4.metal, us-west-2b, ≥ $29.52, releasable 2026-10-05 04:29 UTC).
 - Android proxies destroyed 04:26 UTC after collection.
 
-**Round 3 (2026-10-04): a harder task, and thinking on vs off. Running.** Details, run IDs and first results: test log §5 "Round 3". Tabulate with `scripts/round3_report.py`.
+**Round 3 (2026-10-04/05): a harder task, and thinking on vs off. Complete:** every run finished and collected by 2026-10-05 02:25 UTC; both Mac hosts torn down after collection (mac2 released 02:37; the mac-m4 host releasable from 04:29). Details, run IDs and first results: test log §5 "Round 3". Tabulate with `scripts/round3_report.py`.
 - **Task:** undo the Pi-era narrowing. The LLM classifies the baseline severity, decides the escalation, and derives the final severity and action, scored exactly against the deterministic code. The production (narrow) task runs alongside as the baseline.
 - **Modes:** raw (production), Qwen chat format with thinking off, on (2,048-token budget), and budget-forced (1,024).
 - **Done:** M4 Max, 10 models, 15:37-19:00 UTC. Accuracy valid; latency and energy wait on the context-size check (test log incident 23).
 - **Done:** mac2 (20:13, collected 20:15) and the mac-m4 (19:40), 28 sessions each (Qwen3.5-9B chat-on skipped by user decision).
 - **Running:** the M4 Max 4,096-token think-budget re-run; on the mac-m4, the follow-ups (the same ablation and think-budget re-run; queued by the other session, now owned here).
-- **Queued:** M4 Max context-size check → prompt ablation (4 models × 7 variants) → budget forcing. mac-m4 budget forcing re-run after its follow-ups (the first attempt failed: test log incident 24).
+- **Done since:** M4 Max context-size check (negligible effect) and ablation (28 cells); mac-m4 follow-ups (ablation 28 cells; think-4096 full cell skipped by user decision).
+- **Running / queued (2026-10-04 23:55):** budget forcing on all three Macs (M4 Max ~00:30, mac2 ~00:50, mac-m4 re-run ~01:30-02:00 UTC); then mac2's reduced ablation (base, template, examples; ~00:50 → ~02:45 UTC).
+- **Ablation result (M4 Max and mac-m4 agree):** lookup tables plus the model's own chat template lift Phi-3.5, Llama-3.1-8B and Qwen3-14B by 36-42 points on the full task; worked examples help Gemma-3-4B but nearly double the prompt; temperature 0 and grammar-computed fields add nothing measurable.
 - **First finding:** the narrowing was justified (raw full task ≤ 58% end to end; the small models 11-22%). The chat format lifts Qwen3-14B and Qwen3.5-9B to 72%; thinking adds little for 4-11× the latency; Qwen3.5-9B's thinking runs away.
 
 **Phase 1 full suite on the Linux proxies:** 17 models, 3 reps, a thread sweep, and STREAM bandwidth at each thread count. Each is collected automatically when it finishes.
@@ -100,7 +102,7 @@ Partial results (generation tok/s at full threads; c9g/c7g at t=8):
 - ~~**mac-m4 Phase 1.**~~ Decided 2026-10-04: allocated as iphone-flagship; its full suite ran in round 2.
 - **Time box (user, 2026-10-04):** this round ends with the runs now queued. No Phase 2 (larger models), no round 3b (more distinct cells), no real phones, no Pi 5.
 - ~~**Phase 2 (larger models).**~~ Not this round (time box). Test I, L4 and round 3 partly cover it (12-14B models and the 27B).
-- **Paper (IEEE-quality, Markdown for now).** A separate artifact from the talk. **Outline started 2026-10-04: `docs/TALK2-PAPER-OUTLINE.md`** (research questions, methods, figure/table → data plan, threats to validity, open items).
+- **Paper: IEEE conference, LaTeX** (user, 2026-10-04). Draft 1: `talks/talk2-greenest-token/paper/main.tex` (+ `references.bib`, `README.md` with the source map and open items). It is the source of truth for Talk 2: the talk summarizes it. The earlier Markdown outline (`docs/TALK2-PAPER-OUTLINE.md`) is kept as the planning record.
 - ~~**Files from other Claude sessions**~~ The user will recreate or handle them (2026-10-04); this session takes no action and never commits them. (Talk 1 slide plan, images and slides, the Talk 2 deck-build prompt; the misconceptions and Talk 3 docs are referenced but not on disk): commit, keep local, move or delete? See `docs/TODO-OTHER-SESSION-FILES.md` (2026-10-04).
 - ~~**Round 3 (harder LLM task on newer hardware).**~~ Decided 2026-10-04: items 1 (undo the narrowing) and 2 (thinking on/off) built and running (above), plus the prompt ablation and budget forcing. The other proposals (root cause, fleet correlation, uplink gate) stay in the paper outline §VII.
 
@@ -170,6 +172,8 @@ Not proposed: sustained load (servers don't throttle, so it says nothing about p
 - ~~**Q4_0 accuracy check.**~~ Answered 2026-10-04 (C-q4_0 on both Mac minis, Q-confirm n=45): it depends on the model. Gemma-3-4B regresses 0% → 30.4%, Llama 6.3% → 14.4%, and the others hold. Still open: Q4_0's ARM-CPU latency on the real workload (the Android proxies are gone). See `talks/talk2-greenest-token/TODO-Q4_0-ACCURACY-CHECK.md`.
 - ~~**RAM capacity test.**~~ Done as L1 (c9g, 2026-10-03): 20 models × 4/6/8/12 GB caps in `fits.csv`. A cgroup ceiling, not a phone's per-app budget. See `talks/talk2-greenest-token/TODO-RAM-CAPACITY-TEST.md`.
 
+- **Datadog dashboard demo** (energy per decision, completion, thermal state, invocation rate; live or replay): `talks/talk2-greenest-token/TODO-DATADOG-DASHBOARD-DEMO.md`, plan in `docs/TALK2-DATADOG-DASHBOARD-PLAN.md`. Added 2026-10-04; after the slides.
+
 ## Ideas not yet discussed
 
 - **A real Raspberry Pi 5:** not this round (time box, 2026-10-04). (~$80-120.) The c6g "pi5" proxy has ~5× a Pi 5's bandwidth (89 vs 17.1 GB/s). A real board with the inline meter would give measured energy like the Pi 4 rows.
@@ -190,8 +194,12 @@ Not proposed: sustained load (servers don't throttle, so it says nothing about p
 
 - **mac2 host:** ~$0.65/h until released. AWS allows release from **2026-10-04 18:46 UTC** (11:46 PDT). Then run `terraform destroy` with `iphone-older` removed from `enabled_proxies`, or a full destroy.
   - Its round 3 ended 20:13 UTC and was collected 20:15 (28 sessions, 36/36 model hashes).
-  - **No teardown is scheduled:** the user cancelled the scheduled one 2026-10-04 ~20:25 UTC ("don't delete … until we have collected all of the logs"). Tear down only on the user's word.
-- **mac-m4 host (iphone-flagship):** ≥ $29.52 per 24 h; releasable from 2026-10-05 04:29 UTC.
+  - **Torn down** (user, 2026-10-05 ~02:25 UTC, "tear down mac2 once its data is collected"), after collection was checked: round 3, budget forcing and the reduced ablation, 98 windows all exit 0, 46 eval artifacts, 36/36 model hashes, host logs in `iphone-older/host-logs/`. **Done 2026-10-05 ~02:37 UTC:** instance terminated (9m47s), host `h-0cd7883f65df1cc96` released, us-west-2c subnet removed. The stack default is now `enabled_proxies = []`.
+- **mac-m4 host (iphone-flagship): being torn down** (user, 2026-10-05 ~01:35 UTC, after its data was collected and checked: 5 run dirs, 83 eval artifacts, 38/38 model hashes, host logs in `iphone-flagship/host-logs/`).
+  - The instance termination was requested at 01:39 UTC; Terraform timed out at 20 min while it was still shutting down. The route association and the allocation timestamp are gone.
+  - **Status 02:37 UTC:** instance terminated and out of Terraform state; us-west-2b subnet removed; **only the host `h-0ef56a222e2ebe7fb` remains**. AWS refused its release (`HostMinAllocationPeriodUnexpired`, releasable after 2026-10-05T04:29:17Z).
+  - **To finish, after 04:29 UTC:** `aws sso login --profile advocacy-dev`, then a plain `terraform apply`. The default `enabled_proxies` is now `[]`, so the apply releases whatever is left of both Mac hosts (~$1.23/h for the mac-m4 until then). Its terminated instance has already left Terraform's state.
+  - ≥ $29.52 per 24 h.
   - Still running the other session's follow-ups (ablation, think budget 4096), then the budget-forcing re-run, until ~03:30 UTC.
   - **No teardown is scheduled:** the user cancelled the 04:37 UTC one at ~20:30 UTC. Collect everything first; tear down only on the user's word.
 - **Linux proxies:** destroyed 2026-10-04 04:26 UTC after collection.

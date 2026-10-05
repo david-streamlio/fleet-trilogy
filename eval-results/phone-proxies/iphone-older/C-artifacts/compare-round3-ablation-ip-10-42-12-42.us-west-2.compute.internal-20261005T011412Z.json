@@ -1,0 +1,1148 @@
+{
+ "host": "ip-10-42-12-42.us-west-2.compute.internal",
+ "arch": "arm64",
+ "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+ "timestamp": "2026-10-05T01:14:12Z",
+ "config": {
+  "task": "full",
+  "variant": "base",
+  "variant_spec": {
+   "style": "base",
+   "facts": false,
+   "native": false,
+   "examples": false,
+   "temperature": null,
+   "consistent": false
+  },
+  "n_per_cell": 2,
+  "gguf": "/Users/ec2-user/phoneproxy/models/Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "server": "/Users/ec2-user/phoneproxy/llama.cpp/build/bin/llama-server",
+  "threads": 4,
+  "temperature": 0.2,
+  "timeout_seconds": 180.0
+ },
+ "summary": {
+  "n": 36,
+  "rates": {
+   "action_ok": 0.5277777777777778,
+   "all_ok": 0.16666666666666666,
+   "baseline_ok": 0.6111111111111112,
+   "consistent": 0.5833333333333334,
+   "escalation_ok": 0.5,
+   "format_ok": 1.0,
+   "severity_ok": 0.6944444444444444
+  },
+  "latency_p50_seconds": 9.449224374999176,
+  "latency_p95_seconds": 12.95243487499829,
+  "tokens_predicted_mean": 98.80555555555556,
+  "think_tokens_mean": 0.0,
+  "truncated": 0,
+  "errors": 0,
+  "by_scenario": {
+   "escalate-worthy": {
+    "n": 12,
+    "escalations": {
+     "lower": 4,
+     "raise": 8
+    },
+    "all_ok": 4
+   },
+   "benign": {
+    "n": 12,
+    "escalations": {
+     "lower": 3,
+     "raise": 8,
+     "hold": 1
+    },
+    "all_ok": 0
+   },
+   "de-escalate-worthy": {
+    "n": 12,
+    "escalations": {
+     "lower": 9,
+     "raise": 3
+    },
+    "all_ok": 2
+   }
+  },
+  "by_profile": {
+   "low": {
+    "n": 6,
+    "baseline_ok": 6,
+    "all_ok": 0
+   },
+   "medium-volatile": {
+    "n": 6,
+    "baseline_ok": 0,
+    "all_ok": 0
+   },
+   "medium": {
+    "n": 6,
+    "baseline_ok": 4,
+    "all_ok": 2
+   },
+   "high-volatile": {
+    "n": 6,
+    "baseline_ok": 6,
+    "all_ok": 2
+   },
+   "high-decel": {
+    "n": 6,
+    "baseline_ok": 0,
+    "all_ok": 0
+   },
+   "high-abs": {
+    "n": 6,
+    "baseline_ok": 6,
+    "all_ok": 2
+   }
+  },
+  "prompt_tokens_mean": 587.3333333333334
+ },
+ "calls": [
+  {
+   "scenario": "escalate-worthy",
+   "profile": "low",
+   "latency_seconds": 13.473187167008291,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"The baseline severity is low because the peak deceleration is 0.15 g, which is below 0.22 g. The traffic pattern is elevated velocity variance, which is not severe stop-and-go compaction.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 104,
+   "tokens_evaluated": 585,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "The baseline severity is low because the peak deceleration is 0.15 g, which is below 0.22 g. The traffic pattern is elevated velocity variance, which is not severe stop-and-go compaction.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": false,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "low",
+   "latency_seconds": 12.24901262500498,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"The traffic pattern is severe stop-and-go compaction, which is a risk multiplier. However, the peak deceleration is 0.15 g, which is below the threshold for medium severity. Therefore, the baseline severity is low.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 109,
+   "tokens_evaluated": 580,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "The traffic pattern is severe stop-and-go compaction, which is a risk multiplier. However, the peak deceleration is 0.15 g, which is below the threshold for medium severity. Therefore, the baseline severity is low.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "low",
+   "latency_seconds": 9.871622416001628,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"None of the fields are risk multipliers, and at least one positively indicates safe, controlled conditions.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 79,
+   "tokens_evaluated": 594,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "None of the fields are risk multipliers, and at least one positively indicates safe, controlled conditions.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "medium-volatile",
+   "latency_seconds": 12.359551792003913,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"The severe stop-and-go traffic pattern is the specific field that drove the escalation. This is because it is a risk multiplier, as it increases the likelihood of a collision or other safety issue due to the repeated hard braking.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 106,
+   "tokens_evaluated": 588,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "The severe stop-and-go traffic pattern is the specific field that drove the escalation. This is because it is a risk multiplier, as it increases the likelihood of a collision or other safety issue due to the repeated hard braking.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "medium-volatile",
+   "latency_seconds": 11.871537499988335,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"The traffic pattern is a severe stop-and-go compaction, which is a risk multiplier. The peak deceleration is 0.15 g, which is below 0.22 g, so the baseline is high.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 104,
+   "tokens_evaluated": 583,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "The traffic pattern is a severe stop-and-go compaction, which is a risk multiplier. The peak deceleration is 0.15 g, which is below 0.22 g, so the baseline is high.",
+    "escalation": "lower",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": false,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "medium-volatile",
+   "latency_seconds": 12.529688458991586,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"The traffic pattern is severe stop-and-go compaction, which is a risk multiplier. The driver executed a documented defensive maneuver for a merging vehicle, which is evidence the driver is in control, but this does not outweigh the risk of the traffic pattern.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 112,
+   "tokens_evaluated": 597,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "The traffic pattern is severe stop-and-go compaction, which is a risk multiplier. The driver executed a documented defensive maneuver for a merging vehicle, which is evidence the driver is in control, but this does not outweigh the risk of the traffic pattern.",
+    "escalation": "raise",
+    "severity": "medium",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": false,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "medium",
+   "latency_seconds": 12.182135458002449,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"The baseline severity is low because the peak deceleration is 0.3 g, which is below 0.22 g. The traffic pattern is elevated velocity variance, which is not severe stop-and-go compaction.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 104,
+   "tokens_evaluated": 585,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "The baseline severity is low because the peak deceleration is 0.3 g, which is below 0.22 g. The traffic pattern is elevated velocity variance, which is not severe stop-and-go compaction.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": false,
+    "consistent": false,
+    "severity_ok": false,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "medium",
+   "latency_seconds": 11.386766415991588,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"elevated velocity variance (frequent speed cycling) is a genuine risk multiplier because it indicates the driver is under pressure to maintain speed, and the driver is not in control.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 98,
+   "tokens_evaluated": 580,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "elevated velocity variance (frequent speed cycling) is a genuine risk multiplier because it indicates the driver is under pressure to maintain speed, and the driver is not in control.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "medium",
+   "latency_seconds": 11.451582790992688,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The elevated velocity variance (frequent speed cycling) traffic pattern drove the escalation because it indicates the driver is accelerating and decelerating frequently, which increases the risk of a sudden slowdown.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 98,
+   "tokens_evaluated": 594,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The elevated velocity variance (frequent speed cycling) traffic pattern drove the escalation because it indicates the driver is accelerating and decelerating frequently, which increases the risk of a sudden slowdown.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-volatile",
+   "latency_seconds": 12.904076332997647,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"The severe stop-and-go compaction traffic pattern is the specific field that drove the escalation. This is because it is a risk multiplier, as it increases the likelihood of a driver losing control or making a mistake, which could lead to a more severe event.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 113,
+   "tokens_evaluated": 588,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "The severe stop-and-go compaction traffic pattern is the specific field that drove the escalation. This is because it is a risk multiplier, as it increases the likelihood of a driver losing control or making a mistake, which could lead to a more severe event.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-volatile",
+   "latency_seconds": 12.915087291999953,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"The traffic pattern is a severe stop-and-go compaction, which is a risk multiplier. The peak deceleration is 0.3 g, which is below the threshold for high severity, but the traffic pattern is a strong enough evidence to move away from the baseline.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 117,
+   "tokens_evaluated": 583,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "The traffic pattern is a severe stop-and-go compaction, which is a risk multiplier. The peak deceleration is 0.3 g, which is below the threshold for high severity, but the traffic pattern is a strong enough evidence to move away from the baseline.",
+    "escalation": "raise",
+    "severity": "medium",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": false,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-volatile",
+   "latency_seconds": 12.95243487499829,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"The traffic pattern is severe stop-and-go compaction, which is a risk multiplier. The peak deceleration is 0.3 g, which is below the threshold for high severity, but the traffic pattern is a strong enough evidence to move away from the baseline.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 116,
+   "tokens_evaluated": 597,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "The traffic pattern is severe stop-and-go compaction, which is a risk multiplier. The peak deceleration is 0.3 g, which is below the threshold for high severity, but the traffic pattern is a strong enough evidence to move away from the baseline.",
+    "escalation": "raise",
+    "severity": "medium",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-decel",
+   "latency_seconds": 11.777566417003982,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The elevated velocity variance (frequent speed cycling) traffic pattern drove the escalation, because it indicates the driver is under pressure to maintain speed, and thus more likely to make a mistake.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 99,
+   "tokens_evaluated": 585,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The elevated velocity variance (frequent speed cycling) traffic pattern drove the escalation, because it indicates the driver is under pressure to maintain speed, and thus more likely to make a mistake.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-decel",
+   "latency_seconds": 10.601380084000994,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The elevated velocity variance traffic pattern drove the escalation, as it indicates a high risk of sudden stops or unexpected changes in traffic flow.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 88,
+   "tokens_evaluated": 580,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The elevated velocity variance traffic pattern drove the escalation, as it indicates a high risk of sudden stops or unexpected changes in traffic flow.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-decel",
+   "latency_seconds": 11.102084583995747,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The elevated velocity variance traffic pattern drove the escalation, because it indicates a high likelihood of sudden stops or sharp turns, which can be difficult to anticipate and respond to.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 94,
+   "tokens_evaluated": 594,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The elevated velocity variance traffic pattern drove the escalation, because it indicates a high likelihood of sudden stops or sharp turns, which can be difficult to anticipate and respond to.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-abs",
+   "latency_seconds": 11.570639999990817,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"The ABS engaged is a high-severity indicator, and the elevated velocity variance traffic pattern is a medium-severity indicator. The combination of these two indicators drives the escalation.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 96,
+   "tokens_evaluated": 585,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "The ABS engaged is a high-severity indicator, and the elevated velocity variance traffic pattern is a medium-severity indicator. The combination of these two indicators drives the escalation.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-abs",
+   "latency_seconds": 9.449224374999176,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"ABS engaged is yes, which is a high-severity indicator by rule.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 74,
+   "tokens_evaluated": 580,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "ABS engaged is yes, which is a high-severity indicator by rule.",
+    "escalation": "lower",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": false,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-abs",
+   "latency_seconds": 9.477635791001376,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"ABS engaged is yes, which is a high-severity indicator by rule.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 74,
+   "tokens_evaluated": 594,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "ABS engaged is yes, which is a high-severity indicator by rule.",
+    "escalation": "lower",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "low",
+   "latency_seconds": 8.501332584011834,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"The baseline severity is low because the peak deceleration is 0.15 g, which is below 0.22 g. The traffic pattern is elevated velocity variance, which is not severe stop-and-go compaction.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 104,
+   "tokens_evaluated": 585,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "The baseline severity is low because the peak deceleration is 0.15 g, which is below 0.22 g. The traffic pattern is elevated velocity variance, which is not severe stop-and-go compaction.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": false,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "low",
+   "latency_seconds": 9.331500125001185,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"The traffic pattern is severe stop-and-go compaction, which is a risk multiplier. However, the peak deceleration is 0.15 g, which is below 0.22 g, so it does not meet the criteria for high or medium severity.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 114,
+   "tokens_evaluated": 580,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "The traffic pattern is severe stop-and-go compaction, which is a risk multiplier. However, the peak deceleration is 0.15 g, which is below 0.22 g, so it does not meet the criteria for high or medium severity.",
+    "escalation": "hold",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "low",
+   "latency_seconds": 6.5751429999945685,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"None of the fields are risk multipliers, and the dispatch status indicates the driver handled a hazard safely.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 80,
+   "tokens_evaluated": 594,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "None of the fields are risk multipliers, and the dispatch status indicates the driver handled a hazard safely.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "medium-volatile",
+   "latency_seconds": 8.653570624999702,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"The traffic pattern is severe stop-and-go compaction, which is a risk multiplier. The peak deceleration is 0.15 g, which is below 0.22 g, so the baseline is high.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 106,
+   "tokens_evaluated": 588,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "The traffic pattern is severe stop-and-go compaction, which is a risk multiplier. The peak deceleration is 0.15 g, which is below 0.22 g, so the baseline is high.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "medium-volatile",
+   "latency_seconds": 8.088603332987987,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"The severe stop-and-go compaction traffic pattern drove the escalation. This is because it is a risk multiplier according to the rules, and the other fields do not point the other way.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 99,
+   "tokens_evaluated": 583,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "The severe stop-and-go compaction traffic pattern drove the escalation. This is because it is a risk multiplier according to the rules, and the other fields do not point the other way.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "medium-volatile",
+   "latency_seconds": 8.243296707994887,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"The traffic pattern is severe stop-and-go compaction, which is a risk multiplier. The driver executed a documented defensive maneuver for a merging vehicle, which indicates the driver is in control and handling the situation safely.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 101,
+   "tokens_evaluated": 597,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "The traffic pattern is severe stop-and-go compaction, which is a risk multiplier. The driver executed a documented defensive maneuver for a merging vehicle, which indicates the driver is in control and handling the situation safely.",
+    "escalation": "lower",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "medium",
+   "latency_seconds": 8.594564083003206,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"The baseline severity is low because the peak deceleration is 0.3 g, which is below 0.22 g, and the traffic pattern is elevated velocity variance, which is not severe stop-and-go compaction.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 105,
+   "tokens_evaluated": 585,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "The baseline severity is low because the peak deceleration is 0.3 g, which is below 0.22 g, and the traffic pattern is elevated velocity variance, which is not severe stop-and-go compaction.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": false,
+    "consistent": false,
+    "severity_ok": false,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "medium",
+   "latency_seconds": 7.44271524999931,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"elevated velocity variance (frequent speed cycling) is a genuine risk factor because it is a traffic pattern that can cause frequent speed cycling.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 91,
+   "tokens_evaluated": 580,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "elevated velocity variance (frequent speed cycling) is a genuine risk factor because it is a traffic pattern that can cause frequent speed cycling.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "medium",
+   "latency_seconds": 7.8688409159949515,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The elevated velocity variance (frequent speed cycling) traffic pattern drove the escalation. It indicates a high level of driver workload and potential for error, which is a risk multiplier.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 96,
+   "tokens_evaluated": 594,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The elevated velocity variance (frequent speed cycling) traffic pattern drove the escalation. It indicates a high level of driver workload and potential for error, which is a risk multiplier.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-volatile",
+   "latency_seconds": 8.029080541004078,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"The severe stop-and-go compaction traffic pattern is the specific field that drove the escalation. This is because it is a risk multiplier that is not mitigated by the other fields.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 98,
+   "tokens_evaluated": 588,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "The severe stop-and-go compaction traffic pattern is the specific field that drove the escalation. This is because it is a risk multiplier that is not mitigated by the other fields.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-volatile",
+   "latency_seconds": 6.4867784999951255,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"The traffic pattern is severe stop-and-go compaction, which is a risk multiplier.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 79,
+   "tokens_evaluated": 583,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "The traffic pattern is severe stop-and-go compaction, which is a risk multiplier.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-volatile",
+   "latency_seconds": 9.214567958988482,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"The traffic pattern is a severe stop-and-go compaction, which is a risk multiplier. The driver executed a documented defensive maneuver for a merging vehicle, which is evidence the driver is in control, but this does not outweigh the risk of the traffic pattern.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 113,
+   "tokens_evaluated": 597,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "The traffic pattern is a severe stop-and-go compaction, which is a risk multiplier. The driver executed a documented defensive maneuver for a merging vehicle, which is evidence the driver is in control, but this does not outweigh the risk of the traffic pattern.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-decel",
+   "latency_seconds": 7.760877875000006,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"the elevated velocity variance traffic pattern drove the escalation because it indicates the driver is under pressure to maintain speed, which is a risk factor for a driver running behind schedule.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 95,
+   "tokens_evaluated": 585,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "the elevated velocity variance traffic pattern drove the escalation because it indicates the driver is under pressure to maintain speed, which is a risk factor for a driver running behind schedule.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-decel",
+   "latency_seconds": 8.724157375007053,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The elevated velocity variance traffic pattern drove the escalation. This is because it is a risk multiplier, and the driver is likely to be more reactive to the traffic conditions, which may lead to a higher risk of a slowdown event.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 107,
+   "tokens_evaluated": 580,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The elevated velocity variance traffic pattern drove the escalation. This is because it is a risk multiplier, and the driver is likely to be more reactive to the traffic conditions, which may lead to a higher risk of a slowdown event.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-decel",
+   "latency_seconds": 7.605752291987301,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The elevated velocity variance (frequent speed cycling) traffic pattern drove the escalation. This is because it is a risk multiplier in the rules for medium baseline severity.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 93,
+   "tokens_evaluated": 594,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The elevated velocity variance (frequent speed cycling) traffic pattern drove the escalation. This is because it is a risk multiplier in the rules for medium baseline severity.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-abs",
+   "latency_seconds": 8.496144709002692,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"ABS engaged is a high-severity risk factor, and the traffic pattern is elevated velocity variance, which is a medium-severity risk factor. The combination of these two factors is a high-severity risk factor.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 104,
+   "tokens_evaluated": 585,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "ABS engaged is a high-severity risk factor, and the traffic pattern is elevated velocity variance, which is a medium-severity risk factor. The combination of these two factors is a high-severity risk factor.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-abs",
+   "latency_seconds": 7.406652457997552,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"ABS engaged is a strong indicator of a high-severity event, as it suggests the driver is actively working to maintain control of the vehicle.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 90,
+   "tokens_evaluated": 580,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "ABS engaged is a strong indicator of a high-severity event, as it suggests the driver is actively working to maintain control of the vehicle.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-abs",
+   "latency_seconds": 7.932916709003621,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"The high baseline severity is driven by the ABS engaged and the peak deceleration above 0.45 g. The traffic pattern of elevated velocity variance is a neutral factor in this case.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 97,
+   "tokens_evaluated": 594,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "The high baseline severity is driven by the ABS engaged and the peak deceleration above 0.45 g. The traffic pattern of elevated velocity variance is a neutral factor in this case.",
+    "escalation": "lower",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  }
+ ]
+}

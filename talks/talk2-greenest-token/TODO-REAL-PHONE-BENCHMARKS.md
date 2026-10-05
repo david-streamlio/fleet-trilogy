@@ -1,6 +1,8 @@
 # TODO: benchmark on real phones (AWS Device Farm)
 
-**Status:** not this round. The user time-boxed the study on 2026-10-04: no real phones, no Pi 5, no Phase 2, no round 3b. The proxy results stand in, with their caveats (test log §8). Kept as the plan for a later round.
+**Status:** deferred until the paper is ready to submit (user, 2026-10-04). The paper's job until then is to guide Talk 2 and supply its charts; the proxy results stand in, with their caveats (test log §8).
+
+**Cost estimate (2026-10-04), at $0.17 per device-minute:** a paper-focused pass on the four Android phones (5 models' speed, the real workload on 2-3 models via a llama-server on the phone driven from the Device Farm host over `adb forward`, a 15-minute thermal run) is ~60-75 device-minutes per phone, ~$40-55 per clean pass, ~$100-200 with harness debugging and a repeat. The full 17-model replication below is ~$150-250. Each iPhone, if signing works: +$10-15 per pass. Device Farm still gives no energy numbers.
 
 ## Why
 The EC2 proxies share the phones' core lineage but not their memory system or thermals:

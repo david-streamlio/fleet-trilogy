@@ -1,0 +1,461 @@
+{
+ "host": "ip-10-42-11-136.us-west-2.compute.internal",
+ "arch": "arm64",
+ "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+ "timestamp": "2026-10-04T19:34:12Z",
+ "config": {
+  "task": "narrow",
+  "mode": "chat-off",
+  "n_per_cell": 2,
+  "gguf": "/Users/ec2-user/phoneproxy/models-round3/Qwen3.5-9B-Q4_K_M.gguf",
+  "server": "/Users/ec2-user/phoneproxy/llama.cpp/build/bin/llama-server",
+  "threads": 4,
+  "temperature": 0.2,
+  "n_predict": 300,
+  "think_budget": 0,
+  "timeout_seconds": 180.0
+ },
+ "summary": {
+  "n": 18,
+  "rates": {
+   "all_ok": 0.7222222222222222,
+   "escalation_ok": 0.7222222222222222,
+   "format_ok": 1.0
+  },
+  "latency_p50_seconds": 6.738220166997053,
+  "latency_p95_seconds": 8.911452375003137,
+  "tokens_predicted_mean": 113.44444444444444,
+  "think_tokens_mean": 0.0,
+  "truncated": 0,
+  "errors": 0,
+  "by_scenario": {
+   "escalate-worthy": {
+    "n": 6,
+    "escalations": {
+     "raise": 6
+    },
+    "all_ok": 6
+   },
+   "benign": {
+    "n": 6,
+    "escalations": {
+     "hold": 1,
+     "lower": 5
+    },
+    "all_ok": 1
+   },
+   "de-escalate-worthy": {
+    "n": 6,
+    "escalations": {
+     "lower": 6
+    },
+    "all_ok": 6
+   }
+  },
+  "by_profile": {
+   "canonical": {
+    "n": 18,
+    "baseline_ok": 0,
+    "all_ok": 13
+   }
+  }
+ },
+ "calls": [
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 8.911452375003137,
+   "content": "{\n  \"risk_synthesis\": \"The Cargo field is a genuine risk multiplier because 'Liquids / Chemical Tanker' qualifies as hazardous material where spill or shift would cause significant damage. The Weather field is also a genuine risk multiplier because 'Heavy rain, wet asphalt' degrades traction and visibility. The Dispatch status indicates the driver is under pressure (20 minutes behind), which is a genuine risk factor. Since multiple fields act as risk multipliers, the severity must be raised.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 125,
+   "tokens_evaluated": 449,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "The Cargo field is a genuine risk multiplier because 'Liquids / Chemical Tanker' qualifies as hazardous material where spill or shift would cause significant damage. The Weather field is also a genuine risk multiplier because 'Heavy rain, wet asphalt' degrades traction and visibility. The Dispatch status indicates the driver is under pressure (20 minutes behind), which is a genuine risk factor. Since multiple fields act as risk multipliers, the severity must be raised.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 7.623445999997784,
+   "content": "{\n  \"risk_synthesis\": \"Weather is clear and dry, so it is not a risk multiplier. Cargo is dry general freight, so it is not a risk multiplier. Dispatch status is 'On schedule', indicating no pressure-induced risk. None of the operational fields act as risk multipliers; the absence of weather hazards and the neutral dispatch status support maintaining the baseline.\",\n  \"escalation\": \"hold\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 101,
+   "tokens_evaluated": 443,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "Weather is clear and dry, so it is not a risk multiplier. Cargo is dry general freight, so it is not a risk multiplier. Dispatch status is 'On schedule', indicating no pressure-induced risk. None of the operational fields act as risk multipliers; the absence of weather hazards and the neutral dispatch status support maintaining the baseline.",
+    "escalation": "hold",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 6.738220166997053,
+   "content": "{\n  \"risk_synthesis\": \"Weather is clear and cargo is empty/non-hazardous, so neither acts as a risk multiplier. The dispatch status indicates the driver executed a documented defensive maneuver while ahead of schedule, which confirms control and serves as a reason to lower severity.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 82,
+   "tokens_evaluated": 457,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "Weather is clear and cargo is empty/non-hazardous, so neither acts as a risk multiplier. The dispatch status indicates the driver executed a documented defensive maneuver while ahead of schedule, which confirms control and serves as a reason to lower severity.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 7.458445083000697,
+   "content": "{\n  \"risk_synthesis\": \"The Cargo field is a genuine risk multiplier because 'Liquids / Chemical Tanker' constitutes hazardous material where spill or shift would cause severe consequences. The Weather field is also a genuine risk multiplier because 'Heavy rain, wet asphalt' degrades traction and increases stopping distances. While the dispatch status indicates the driver is under pressure (running 20 minutes behind), the presence of two active risk multipliers (hazardous cargo and adverse weather) overrides this context, necessitating an escalation of the baseline severity.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 137,
+   "tokens_evaluated": 449,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "The Cargo field is a genuine risk multiplier because 'Liquids / Chemical Tanker' constitutes hazardous material where spill or shift would cause severe consequences. The Weather field is also a genuine risk multiplier because 'Heavy rain, wet asphalt' degrades traction and increases stopping distances. While the dispatch status indicates the driver is under pressure (running 20 minutes behind), the presence of two active risk multipliers (hazardous cargo and adverse weather) overrides this context, necessitating an escalation of the baseline severity.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 5.753213666997908,
+   "content": "{\n  \"risk_synthesis\": \"Weather is clear and dry, so it is not a risk multiplier. Cargo is dry general freight, which is not a risk multiplier. Dispatch status is 'On schedule', indicating the driver is not under pressure to compromise safety. None of the operational fields act as risk multipliers; instead, the clear weather and on-schedule status positively indicate controlled conditions.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 105,
+   "tokens_evaluated": 443,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "Weather is clear and dry, so it is not a risk multiplier. Cargo is dry general freight, which is not a risk multiplier. Dispatch status is 'On schedule', indicating the driver is not under pressure to compromise safety. None of the operational fields act as risk multipliers; instead, the clear weather and on-schedule status positively indicate controlled conditions.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 4.999972459001583,
+   "content": "{\n  \"risk_synthesis\": \"Weather is clear and light traffic indicates low environmental stress. Cargo is empty and non-hazardous, eliminating shift or spill risks. Dispatch status shows the driver is ahead of schedule and successfully executed a documented defensive maneuver, confirming control rather than pressure. No fields act as risk multipliers.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 91,
+   "tokens_evaluated": 457,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "Weather is clear and light traffic indicates low environmental stress. Cargo is empty and non-hazardous, eliminating shift or spill risks. Dispatch status shows the driver is ahead of schedule and successfully executed a documented defensive maneuver, confirming control rather than pressure. No fields act as risk multipliers.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 7.769277833001979,
+   "content": "{\n  \"risk_synthesis\": \"The Cargo field is a genuine risk multiplier because 'Liquids / Chemical Tanker' represents hazardous material that could shift or spill under stress. The Weather field is also a genuine risk multiplier because 'Heavy rain, wet asphalt' degrades traction and increases stopping distances. The Dispatch status ('Running 20 minutes behind schedule') adds pressure but does not negate the physical risks of the cargo and weather. Since at least one field (in fact, two) acts as a genuine risk multiplier per the rules, the severity must be raised.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 142,
+   "tokens_evaluated": 449,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "The Cargo field is a genuine risk multiplier because 'Liquids / Chemical Tanker' represents hazardous material that could shift or spill under stress. The Weather field is also a genuine risk multiplier because 'Heavy rain, wet asphalt' degrades traction and increases stopping distances. The Dispatch status ('Running 20 minutes behind schedule') adds pressure but does not negate the physical risks of the cargo and weather. Since at least one field (in fact, two) acts as a genuine risk multiplier per the rules, the severity must be raised.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 5.811727209002129,
+   "content": "{\n  \"risk_synthesis\": \"Weather is clear and dry, so it is not a risk multiplier. Cargo is general freight, so it is not a risk multiplier. Dispatch status is 'On schedule', indicating the driver is not under pressure; this is not a risk multiplier. None of the operational fields act as risk multipliers, and the 'On schedule' status positively indicates controlled conditions.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 106,
+   "tokens_evaluated": 443,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "Weather is clear and dry, so it is not a risk multiplier. Cargo is general freight, so it is not a risk multiplier. Dispatch status is 'On schedule', indicating the driver is not under pressure; this is not a risk multiplier. None of the operational fields act as risk multipliers, and the 'On schedule' status positively indicates controlled conditions.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 5.698568500003603,
+   "content": "{\n  \"risk_synthesis\": \"The Cargo field is neutral as the trailer is empty and non-hazardous. The Weather field is neutral as conditions are clear with light traffic. The Dispatch status field indicates the driver executed a documented defensive maneuver while ahead of schedule, which serves as positive evidence of control rather than a risk multiplier. None of the operational fields act as risk multipliers.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 104,
+   "tokens_evaluated": 457,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "The Cargo field is neutral as the trailer is empty and non-hazardous. The Weather field is neutral as conditions are clear with light traffic. The Dispatch status field indicates the driver executed a documented defensive maneuver while ahead of schedule, which serves as positive evidence of control rather than a risk multiplier. None of the operational fields act as risk multipliers.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 7.951649208996969,
+   "content": "{\n  \"risk_synthesis\": \"The Cargo field is a genuine risk multiplier because 'Liquids / Chemical Tanker' represents hazardous material that could spill or shift if the vehicle experiences instability. The Weather field is also a genuine risk multiplier because 'Heavy rain, wet asphalt' degrades traction and increases stopping distances. The Dispatch status indicates the driver is under pressure ('Running 20 minutes behind schedule'), which is a genuine risk factor for compromised decision-making, whereas being ahead or on schedule would not be. Since multiple fields act as risk multipliers, the baseline severity must be increased.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 146,
+   "tokens_evaluated": 449,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "The Cargo field is a genuine risk multiplier because 'Liquids / Chemical Tanker' represents hazardous material that could spill or shift if the vehicle experiences instability. The Weather field is also a genuine risk multiplier because 'Heavy rain, wet asphalt' degrades traction and increases stopping distances. The Dispatch status indicates the driver is under pressure ('Running 20 minutes behind schedule'), which is a genuine risk factor for compromised decision-making, whereas being ahead or on schedule would not be. Since multiple fields act as risk multipliers, the baseline severity must be increased.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 7.787536749994615,
+   "content": "{\n  \"risk_synthesis\": \"The weather field (Clear skies, dry pavement) does not degrade traction or visibility, so it is not a risk multiplier. The cargo field (Dry goods / General freight) is not hazardous, liquid, or prone to shifting, so it is not a risk multiplier. The dispatch status field (On schedule) indicates the driver is not under pressure to compromise safety, which supports a controlled state rather than raising severity. Since none of the operational fields act as risk multipliers and the status indicates a controlled environment, the baseline severity should be lowered.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 143,
+   "tokens_evaluated": 443,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "The weather field (Clear skies, dry pavement) does not degrade traction or visibility, so it is not a risk multiplier. The cargo field (Dry goods / General freight) is not hazardous, liquid, or prone to shifting, so it is not a risk multiplier. The dispatch status field (On schedule) indicates the driver is not under pressure to compromise safety, which supports a controlled state rather than raising severity. Since none of the operational fields act as risk multipliers and the status indicates a controlled environment, the baseline severity should be lowered.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 4.734588583000004,
+   "content": "{\n  \"risk_synthesis\": \"The weather field (Clear conditions) and cargo field (Empty trailer) are not risk multipliers per the rules. The dispatch status field explicitly describes a documented defensive maneuver executed while ahead of schedule, which indicates driver control and serves as a reason to lower severity.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 86,
+   "tokens_evaluated": 457,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "The weather field (Clear conditions) and cargo field (Empty trailer) are not risk multipliers per the rules. The dispatch status field explicitly describes a documented defensive maneuver executed while ahead of schedule, which indicates driver control and serves as a reason to lower severity.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 7.895371792001242,
+   "content": "{\n  \"risk_synthesis\": \"The Cargo field is a genuine risk multiplier because 'Liquids / Chemical Tanker' constitutes hazardous material that could shift or spill, increasing severity beyond the vehicle physics baseline. The Weather field is also a genuine risk multiplier as 'Heavy rain, wet asphalt' degrades traction and visibility. The Dispatch status indicates the driver is under pressure (20 minutes behind schedule), which is a genuine risk factor for compromised decision-making, whereas being ahead or on schedule would not be. Since multiple fields act as risk multipliers, the baseline severity must be elevated.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 145,
+   "tokens_evaluated": 449,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "The Cargo field is a genuine risk multiplier because 'Liquids / Chemical Tanker' constitutes hazardous material that could shift or spill, increasing severity beyond the vehicle physics baseline. The Weather field is also a genuine risk multiplier as 'Heavy rain, wet asphalt' degrades traction and visibility. The Dispatch status indicates the driver is under pressure (20 minutes behind schedule), which is a genuine risk factor for compromised decision-making, whereas being ahead or on schedule would not be. Since multiple fields act as risk multipliers, the baseline severity must be elevated.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 5.161239250002836,
+   "content": "{\n  \"risk_synthesis\": \"Weather is clear and dry, so no traction or visibility risk. Cargo is dry general freight, so no spill or shift risk. Dispatch status is 'on schedule,' indicating the driver is not under time pressure; this is neutral to slightly positive. None of the operational fields act as risk multipliers.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 94,
+   "tokens_evaluated": 443,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "Weather is clear and dry, so no traction or visibility risk. Cargo is dry general freight, so no spill or shift risk. Dispatch status is 'on schedule,' indicating the driver is not under time pressure; this is neutral to slightly positive. None of the operational fields act as risk multipliers.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 4.367880500001775,
+   "content": "{\n  \"risk_synthesis\": \"Weather is clear and cargo is empty, so neither acts as a risk multiplier. The dispatch status indicates the driver executed a documented defensive maneuver while ahead of schedule, which confirms controlled conditions and serves as a reason to lower severity.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 79,
+   "tokens_evaluated": 457,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "Weather is clear and cargo is empty, so neither acts as a risk multiplier. The dispatch status indicates the driver executed a documented defensive maneuver while ahead of schedule, which confirms controlled conditions and serves as a reason to lower severity.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 7.625939750003454,
+   "content": "{\n  \"risk_synthesis\": \"The Cargo field is a genuine risk multiplier because 'Liquids / Chemical Tanker' qualifies as hazardous material where spill or shift is dangerous. The Weather field is also a genuine risk multiplier because 'Heavy rain, wet asphalt' degrades traction and visibility. The Dispatch status ('Running 20 minutes behind schedule') confirms the driver is under pressure, which is a genuine risk factor per the rules. Since at least one field (in fact, all three) acts as a genuine risk multiplier, the severity must be raised.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 140,
+   "tokens_evaluated": 449,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "The Cargo field is a genuine risk multiplier because 'Liquids / Chemical Tanker' qualifies as hazardous material where spill or shift is dangerous. The Weather field is also a genuine risk multiplier because 'Heavy rain, wet asphalt' degrades traction and visibility. The Dispatch status ('Running 20 minutes behind schedule') confirms the driver is under pressure, which is a genuine risk factor per the rules. Since at least one field (in fact, all three) acts as a genuine risk multiplier, the severity must be raised.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 5.726479333003226,
+   "content": "{\n  \"risk_synthesis\": \"Weather is clear and dry, so it is not a risk multiplier. Cargo is dry general freight, which is not a risk multiplier. Dispatch status is 'On schedule', indicating the driver is not under pressure; this is not a risk multiplier. None of the fields act as risk multipliers, and the on-schedule status positively indicates controlled conditions.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 104,
+   "tokens_evaluated": 443,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "Weather is clear and dry, so it is not a risk multiplier. Cargo is dry general freight, which is not a risk multiplier. Dispatch status is 'On schedule', indicating the driver is not under pressure; this is not a risk multiplier. None of the fields act as risk multipliers, and the on-schedule status positively indicates controlled conditions.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 6.132216332996904,
+   "content": "{\n  \"risk_synthesis\": \"Weather is clear and light traffic is present, so no traction or visibility risk exists. Cargo is empty and non-hazardous, so no spill or shift risk exists. Dispatch status shows the driver is ahead of schedule and executed a documented defensive maneuver, indicating control rather than pressure. None of the fields act as risk multipliers; instead, the defensive maneuver positively indicates safe, controlled conditions.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 112,
+   "tokens_evaluated": 457,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "Weather is clear and light traffic is present, so no traction or visibility risk exists. Cargo is empty and non-hazardous, so no spill or shift risk exists. Dispatch status shows the driver is ahead of schedule and executed a documented defensive maneuver, indicating control rather than pressure. None of the fields act as risk multipliers; instead, the defensive maneuver positively indicates safe, controlled conditions.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  }
+ ]
+}

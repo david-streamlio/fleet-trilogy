@@ -1,0 +1,1090 @@
+{
+ "host": "ip-10-42-11-136.us-west-2.compute.internal",
+ "arch": "arm64",
+ "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+ "timestamp": "2026-10-04T17:41:44Z",
+ "config": {
+  "task": "full",
+  "mode": "raw",
+  "n_per_cell": 2,
+  "gguf": "/Users/ec2-user/phoneproxy/models-phase2/gemma-4-12b-it-Q4_K_M.gguf",
+  "server": "/Users/ec2-user/phoneproxy/llama.cpp/build/bin/llama-server",
+  "threads": 4,
+  "temperature": 0.2,
+  "n_predict": 450,
+  "think_budget": 0,
+  "timeout_seconds": 180.0
+ },
+ "summary": {
+  "n": 36,
+  "rates": {
+   "action_ok": 0.6666666666666666,
+   "all_ok": 0.3611111111111111,
+   "baseline_ok": 0.6944444444444444,
+   "consistent": 0.7777777777777778,
+   "escalation_ok": 0.6666666666666666,
+   "format_ok": 0.9722222222222222,
+   "severity_ok": 0.6666666666666666
+  },
+  "latency_p50_seconds": 14.49289441700239,
+  "latency_p95_seconds": 25.25032858299528,
+  "tokens_predicted_mean": 119.44444444444444,
+  "think_tokens_mean": 0.0,
+  "truncated": 0,
+  "errors": 1,
+  "by_scenario": {
+   "escalate-worthy": {
+    "n": 12,
+    "escalations": {
+     "raise": 11,
+     "unparsed": 1
+    },
+    "all_ok": 6
+   },
+   "benign": {
+    "n": 12,
+    "escalations": {
+     "lower": 11,
+     "hold": 1
+    },
+    "all_ok": 1
+   },
+   "de-escalate-worthy": {
+    "n": 12,
+    "escalations": {
+     "lower": 12
+    },
+    "all_ok": 6
+   }
+  },
+  "by_profile": {
+   "low": {
+    "n": 6,
+    "baseline_ok": 3,
+    "all_ok": 1
+   },
+   "medium-volatile": {
+    "n": 6,
+    "baseline_ok": 5,
+    "all_ok": 3
+   },
+   "medium": {
+    "n": 6,
+    "baseline_ok": 6,
+    "all_ok": 4
+   },
+   "high-volatile": {
+    "n": 6,
+    "baseline_ok": 0,
+    "all_ok": 0
+   },
+   "high-decel": {
+    "n": 6,
+    "baseline_ok": 6,
+    "all_ok": 3
+   },
+   "high-abs": {
+    "n": 6,
+    "baseline_ok": 5,
+    "all_ok": 2
+   }
+  }
+ },
+ "calls": [
+  {
+   "scenario": "escalate-worthy",
+   "profile": "low",
+   "latency_seconds": 12.079745625000214,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The truck is carrying hazardous liquid cargo in heavy rain, which significantly increases the risk of a motor vehicle accident or cargo spill during a slowdown event.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 99,
+   "tokens_evaluated": 607,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The truck is carrying hazardous liquid cargo in heavy rain, which significantly increases the risk of a motor vehicle accident or cargo spill during a slowdown event.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "low",
+   "latency_seconds": 13.058875832997728,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"None of the operational context fields (Weather: Clear, Cargo: Dry goods, Dispatch: On schedule) qualify as risk multipliers or safety indicators. Since no fields are risk multipliers and 'On schedule' indicates a controlled condition, the baseline is lowered.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 121,
+   "tokens_evaluated": 602,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "None of the operational context fields (Weather: Clear, Cargo: Dry goods, Dispatch: On schedule) qualify as risk multipliers or safety indicators. Since no fields are risk multipliers and 'On schedule' indicates a controlled condition, the baseline is lowered.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "low",
+   "latency_seconds": 12.422874665993731,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"None of the operational context fields (Weather, Cargo, Cargo, Dispatch status) meet the risk multiplier criteria; the driver's defensive maneuver and being ahead of schedule are positive safety indicators.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 109,
+   "tokens_evaluated": 615,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "None of the operational context fields (Weather, Cargo, Cargo, Dispatch status) meet the risk multiplier criteria; the driver's defensive maneuver and being ahead of schedule are positive safety indicators.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "medium-volatile",
+   "latency_seconds": 11.184337417005736,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The combination of hazardous liquid cargo and heavy rain weather conditions significantly increases the risk of a rollover or loss of control during braking events.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 96,
+   "tokens_evaluated": 610,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The combination of hazardous liquid cargo and heavy rain weather conditions significantly increases the risk of a rollover or loss of control during braking events.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "medium-volatile",
+   "latency_seconds": 13.362943749998522,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"None of the operational context fields (Weather, Cargo, Type, Dispatch status) qualify as risk multipliers or risk reducers under the rules. Clear weather and dry pavement do not degrade traction; dry goods are not hazardous; and being on schedule indicates a driver in control.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 125,
+   "tokens_evaluated": 605,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "None of the operational context fields (Weather, Cargo, Type, Dispatch status) qualify as risk multipliers or risk reducers under the rules. Clear weather and dry pavement do not degrade traction; dry goods are not hazardous; and being on schedule indicates a driver in control.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "medium-volatile",
+   "latency_seconds": 12.794372917000146,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"None of the operational context fields (Weather, Cargo, Cargo, Dispatch status) meet the risk multiplier criteria; the driver's defensive maneuver and being ahead of schedule are positive indicators of safe, controlled conditions.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 113,
+   "tokens_evaluated": 618,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "None of the operational context fields (Weather, Cargo, Cargo, Dispatch status) meet the risk multiplier criteria; the driver's defensive maneuver and being ahead of schedule are positive indicators of safe, controlled conditions.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "medium",
+   "latency_seconds": 12.254731749999337,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The cargo type (Liquids / Chemical Tanker) and the weather conditions (Heavy rain, wet asphalt) are both genuine risk multipliers, as they involve hazardous liquids and traction-degrading weather.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 110,
+   "tokens_evaluated": 606,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The cargo type (Liquids / Chemical Tanker) and the weather conditions (Heavy rain, wet asphalt) are both genuine risk multipliers, as they involve hazardous liquids and traction-degrading weather.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "medium",
+   "latency_seconds": 12.353995749996102,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"None of the operational context fields (Weather, Cargo, Type, Dispatch status) meet the risk multiplier criteria; Weather is clear/dry, Cargo is general freight, and Dispatch status is on schedule.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 111,
+   "tokens_evaluated": 601,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "None of the operational context fields (Weather, Cargo, Type, Dispatch status) meet the risk multiplier criteria; Weather is clear/dry, Cargo is general freight, and Dispatch status is on schedule.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "medium",
+   "latency_seconds": 12.099812625005143,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"None of the operational context fields (Weather, Cargo, Cargo, Dispatch status) meet the risk multiplier criteria; the driver's documented defensive maneuver indicates a controlled, safe condition.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 107,
+   "tokens_evaluated": 614,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "None of the operational context fields (Weather, Cargo, Cargo, Dispatch status) meet the risk multiplier criteria; the driver's documented defensive maneuver indicates a controlled, safe condition.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-volatile",
+   "latency_seconds": 38.924993624998024,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The combination of hazardous liquid cargo and heavy rain on wet asphalt significantly increases the risk of a jackknife or jackknife-related spill, and being behind schedule creates pressure for the pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure-driven risk of a pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure- pressure-driven risk of a pressure-driven risk of a pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure-driven risk of a pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure-driver review.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 448,
+   "tokens_evaluated": 609,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The combination of hazardous liquid cargo and heavy rain on wet asphalt significantly increases the risk of a jackknife or jackknife-related spill, and being behind schedule creates pressure for the pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of a pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure-driven risk of a pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure- pressure-driven risk of a pressure-driven risk of a pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure-driven risk of a pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure-driven risk of pressure-driver review.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-volatile",
+   "latency_seconds": 13.885088417002407,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"None of the operational context fields (Weather, Cargo, Type, Dispatch status) qualify as risk multipliers or risk mitigators according to the rules. Weather is clear/dry, Cargo is dry goods/general freight, and Dispatch status is on schedule.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 121,
+   "tokens_evaluated": 604,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "None of the operational context fields (Weather, Cargo, Type, Dispatch status) qualify as risk multipliers or risk mitigators according to the rules. Weather is clear/dry, Cargo is dry goods/general freight, and Dispatch status is on schedule.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-volatile",
+   "latency_seconds": 13.177475042000879,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"None of the operational context fields (Weather, Cargo, Cargo, Dispatch status) meet the risk multiplier criteria. Weather is clear, Cargo is empty/non-hazardous, and Dispatch status is ahead of schedule with a documented defensive maneuver.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 118,
+   "tokens_evaluated": 617,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "None of the operational context fields (Weather, Cargo, Cargo, Dispatch status) meet the risk multiplier criteria. Weather is clear, Cargo is empty/non-hazardous, and Dispatch status is ahead of schedule with a documented defensive maneuver.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-decel",
+   "latency_seconds": 12.114156167001056,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"The peak deceleration of 0.5 g exceeds the 0.45 g threshold, which automatically classifies the baseline as high severity.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 98,
+   "tokens_evaluated": 606,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "The peak deceleration of 0.5 g exceeds the 0.45 g threshold, which automatically classifies the baseline as high severity.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-decel",
+   "latency_seconds": 11.569414666999364,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"None of the operational context fields (Weather, Cargo, Type, Dispatch Status) qualify as risk multipliers or safety-positive indicators under the rules provided.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 101,
+   "tokens_evaluated": 601,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "None of the operational context fields (Weather, Cargo, Type, Dispatch Status) qualify as risk multipliers or safety-positive indicators under the rules provided.",
+    "escalation": "lower",
+    "severity": "medium",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-decel",
+   "latency_seconds": 13.014691332995426,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"None of the operational context fields (Weather, Cargo, Cargo, Dispatch status) qualify as risk multipliers under the rules. Weather is clear, Cargo is non-hazardous, and Dispatch status is ahead of schedule with a documented defensive maneuver.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 118,
+   "tokens_evaluated": 614,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "None of the operational context fields (Weather, Cargo, Cargo, Dispatch status) qualify as risk multipliers under the rules. Weather is clear, Cargo is non-hazardous, and Dispatch status is ahead of schedule with a documented defensive maneuver.",
+    "escalation": "lower",
+    "severity": "medium",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-abs",
+   "latency_seconds": 11.13251037500595,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"ABS engaged is yes, which triggers the high baseline severity according to thethought\n<|channel>thought\n<channel|>{\n  \",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 95,
+   "tokens_evaluated": 607,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": null,
+   "error": "unparsable card: Invalid control character at: line 3 column 107 (char 139)",
+   "scores": {
+    "format_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-abs",
+   "latency_seconds": 22.075375790998805,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"None of the operational context fields (Weather, Cargo, Type, Dispatch status) meet the criteria for risk multipliers or safety indicators. Therefore, the baseline remains unchanged.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 102,
+   "tokens_evaluated": 602,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "None of the operational context fields (Weather, Cargo, Type, Dispatch status) meet the criteria for risk multipliers or safety indicators. Therefore, the baseline remains unchanged.",
+    "escalation": "hold",
+    "severity": "high",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-abs",
+   "latency_seconds": 13.756651541996689,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"None of the operational context fields (Weather, Cargo, Cargo, Dispatch status) meet the risk multiplier criteria; the driver's defensive maneuver and ahead-of-schedule status indicate a controlled, safe environment.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 113,
+   "tokens_evaluated": 615,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "None of the operational context fields (Weather, Cargo, Cargo, Dispatch status) meet the risk multiplier criteria; the driver's defensive maneuver and ahead-of-schedule status indicate a controlled, safe environment.",
+    "escalation": "lower",
+    "severity": "high",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "low",
+   "latency_seconds": 17.371053917006066,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"The truck is carrying hazardous liquid cargo in heavy rain, which significantly increases the risk of a motor vehicle accident or cargo spill during a slowdown event.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 99,
+   "tokens_evaluated": 607,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "The truck is carrying hazardous liquid cargo in heavy rain, which significantly increases the risk of a motor vehicle accident or cargo spill during a slowdown event.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": false,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "low",
+   "latency_seconds": 24.46284229199955,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"None of the operational context fields (Weather, Cargo, Type, Dispatch status) meet the risk multiplier criteria; Weather is clear/dry, Cargo is general freight, and Dispatch status is on schedule.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 111,
+   "tokens_evaluated": 602,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "None of the operational context fields (Weather, Cargo, Type, Dispatch status) meet the risk multiplier criteria; Weather is clear/dry, Cargo is general freight, and Dispatch status is on schedule.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "low",
+   "latency_seconds": 19.306399792003504,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"None of the operational context fields (Weather, Cargo, Cargo, Dispatch status) meet the risk multiplier criteria; the driver's defensive maneuver and ahead-of-schedule status indicate a controlled, safe environment.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 113,
+   "tokens_evaluated": 615,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "None of the operational context fields (Weather, Cargo, Cargo, Dispatch status) meet the risk multiplier criteria; the driver's defensive maneuver and ahead-of-schedule status indicate a controlled, safe environment.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "medium-volatile",
+   "latency_seconds": 23.538359541998943,
+   "content": "{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"The vehicle is transporting hazardous liquid cargo in heavy rain, which significantly increases the risk of a spill or loss of control during braking events.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 97,
+   "tokens_evaluated": 610,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "The vehicle is transporting hazardous liquid cargo in heavy rain, which significantly increases the risk of a spill or loss of control during braking events.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "medium-volatile",
+   "latency_seconds": 25.197554665995995,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"None of the operational context fields (Cargo, Weather, Weather, Dispatch status) are risk multipliers per the rules; Cargo is general freight, Weather is clear/dry, and Dispatch status is on schedule.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 112,
+   "tokens_evaluated": 605,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "None of the operational context fields (Cargo, Weather, Weather, Dispatch status) are risk multipliers per the rules; Cargo is general freight, Weather is clear/dry, and Dispatch status is on schedule.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "medium-volatile",
+   "latency_seconds": 20.402736500000174,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"None of the operational context fields (Weather, Cargo, Cargo, Dispatch status) meet the risk multiplier criteria; Weather is clear, Cargo is non-hazardous, and Dispatch status is ahead of schedule with a documented defensive maneuver.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 116,
+   "tokens_evaluated": 618,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "None of the operational context fields (Weather, Cargo, Cargo, Dispatch status) meet the risk multiplier criteria; Weather is clear, Cargo is non-hazardous, and Dispatch status is ahead of schedule with a documented defensive maneuver.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "medium",
+   "latency_seconds": 14.196735083998647,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The cargo type (Liquids / Chemical Tanker) and the weather conditions (Heavy rain, wet asphalt) create a high-risk scenario for liquid shift and traction loss, both of which are a risk multiplier.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 113,
+   "tokens_evaluated": 606,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The cargo type (Liquids / Chemical Tanker) and the weather conditions (Heavy rain, wet asphalt) create a high-risk scenario for liquid shift and traction loss, both of which are a risk multiplier.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "medium",
+   "latency_seconds": 20.09269320799649,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"None of the operational context fields (Weather: Clear skies, dry pavement; Cargo: Dry goods / General freight; Dispatch status: On schedule) qualify as risk multipliers according to the rules. The driver is on schedule and conditions are clear, indicating a controlled environment.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 124,
+   "tokens_evaluated": 601,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "None of the operational context fields (Weather: Clear skies, dry pavement; Cargo: Dry goods / General freight; Dispatch status: On schedule) qualify as risk multipliers according to the rules. The driver is on schedule and conditions are clear, indicating a controlled environment.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "medium",
+   "latency_seconds": 25.25032858299528,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"None of the operational context fields (Weather, Cargo, Cargo, Dispatch status) meet the risk multiplier criteria. Weather is clear, Cargo is non-hazardous, and Dispatch status is ahead of schedule with a documented defensive maneuver, which indicates a controlled situation.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 122,
+   "tokens_evaluated": 614,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "None of the operational context fields (Weather, Cargo, Cargo, Dispatch status) meet the risk multiplier criteria. Weather is clear, Cargo is non-hazardous, and Dispatch status is ahead of schedule with a documented defensive maneuver, which indicates a controlled situation.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-volatile",
+   "latency_seconds": 12.13988833399344,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The combination of hazardous liquid cargo and heavy rain on wet asphalt significantly increases the risk of a rollover or loss of control during braking events.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 97,
+   "tokens_evaluated": 609,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The combination of hazardous liquid cargo and heavy rain on wet asphalt significantly increases the risk of a rollover or loss of control during braking events.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-volatile",
+   "latency_seconds": 21.598356209004123,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"None of the operational context fields (Weather, Cargo, Type, Dispatch status) qualify as risk multipliers under the rules. Weather is clear/dry, Cargo is dry goods, and Dispatch status is on schedule.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 113,
+   "tokens_evaluated": 604,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "None of the operational context fields (Weather, Cargo, Type, Dispatch status) qualify as risk multipliers under the rules. Weather is clear/dry, Cargo is dry goods, and Dispatch status is on schedule.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-volatile",
+   "latency_seconds": 18.62622808299784,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"None of the operational context fields (Weather, Cargo, Cargo, Dispatch status) meet the risk multiplier criteria. Weather is clear, Cargo is non-hazardous, and Dispatch status is ahead of schedule with a documented defensive maneuver.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 116,
+   "tokens_evaluated": 617,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "None of the operational context fields (Weather, Cargo, Cargo, Dispatch status) meet the risk multiplier criteria. Weather is clear, Cargo is non-hazardous, and Dispatch status is ahead of schedule with a documented defensive maneuver.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-decel",
+   "latency_seconds": 18.98794925000402,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"The peak deceleration of 0.5 g exceeds the 0.45 g threshold, automatically triggering a high baseline severity regardless of the other physics variables.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 102,
+   "tokens_evaluated": 606,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "The peak deceleration of 0.5 g exceeds the 0.45 g threshold, automatically triggering a high baseline severity regardless of the other physics variables.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-decel",
+   "latency_seconds": 14.49289441700239,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"None of the operational context fields (Weather, Cargo, Type, Dispatch Status) meet the criteria for risk multipliers or safety indicators. The cargo is general freight, and the weather is clear/dry, and the driver is on schedule.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 118,
+   "tokens_evaluated": 601,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "None of the operational context fields (Weather, Cargo, Type, Dispatch Status) meet the criteria for risk multipliers or safety indicators. The cargo is general freight, and the weather is clear/dry, and the driver is on schedule.",
+    "escalation": "lower",
+    "severity": "high",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-decel",
+   "latency_seconds": 19.876995207996515,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"None of the operational context fields (Weather, Cargo, Cargo, Dispatch status) meet the risk multiplier criteria. Weather is clear, Cargo is non-hazardous/empty, and Dispatch status is ahead of schedule with a documented defensive maneuver, which indicates controlled conditions.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 123,
+   "tokens_evaluated": 614,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "None of the operational context fields (Weather, Cargo, Cargo, Dispatch status) meet the risk multiplier criteria. Weather is clear, Cargo is non-hazardous/empty, and Dispatch status is ahead of schedule with a documented defensive maneuver, which indicates controlled conditions.",
+    "escalation": "lower",
+    "severity": "high",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-abs",
+   "latency_seconds": 18.695093583002745,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"ABS engaged is yes, which triggers the high baseline severity according to the vehicle physics rules.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 88,
+   "tokens_evaluated": 607,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "ABS engaged is yes, which triggers the high baseline severity according to the vehicle physics rules.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-abs",
+   "latency_seconds": 19.73124225000356,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"None of the operational context fields (Weather, Cargo, Type, Dispatch status) meet the risk multiplier criteria; Weather is clear/dry, Cargo is dry goods, and Dispatch status is on schedule.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 111,
+   "tokens_evaluated": 602,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "None of the operational context fields (Weather, Cargo, Type, Dispatch status) meet the risk multiplier criteria; Weather is clear/dry, Cargo is dry goods, and Dispatch status is on schedule.",
+    "escalation": "lower",
+    "severity": "high",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-abs",
+   "latency_seconds": 19.243586584001605,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"None of the operational context fields (Weather, Cargo, Cargo, Dispatch status) meet the risk multiplier criteria. Weather is clear, cargo is empty, and the driver is ahead of schedule. The documented defensive maneuver indicates the driver is in control.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 120,
+   "tokens_evaluated": 615,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "None of the operational context fields (Weather, Cargo, Cargo, Dispatch status) meet the risk multiplier criteria. Weather is clear, cargo is empty, and the driver is ahead of schedule. The documented defensive maneuver indicates the driver is in control.",
+    "escalation": "lower",
+    "severity": "high",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  }
+ ]
+}

@@ -1,0 +1,461 @@
+{
+ "host": "ip-10-42-11-136.us-west-2.compute.internal",
+ "arch": "arm64",
+ "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+ "timestamp": "2026-10-04T23:59:23Z",
+ "config": {
+  "task": "narrow",
+  "mode": "chat-budget",
+  "n_per_cell": 2,
+  "gguf": "/Users/ec2-user/phoneproxy/models-phase2/Qwen3-14B-Q4_K_M.gguf",
+  "server": "/Users/ec2-user/phoneproxy/llama.cpp/build/bin/llama-server",
+  "threads": 4,
+  "temperature": 0.2,
+  "n_predict": 1324,
+  "think_budget": 1024,
+  "timeout_seconds": 391.0
+ },
+ "summary": {
+  "n": 18,
+  "rates": {
+   "all_ok": 0.8888888888888888,
+   "escalation_ok": 0.8888888888888888,
+   "format_ok": 1.0
+  },
+  "latency_p50_seconds": 30.780652458008262,
+  "latency_p95_seconds": 69.24819945899071,
+  "tokens_predicted_mean": 406.3333333333333,
+  "think_tokens_mean": 322.1111111111111,
+  "truncated": 0,
+  "errors": 0,
+  "by_scenario": {
+   "escalate-worthy": {
+    "n": 6,
+    "escalations": {
+     "raise": 6
+    },
+    "all_ok": 6
+   },
+   "benign": {
+    "n": 6,
+    "escalations": {
+     "hold": 4,
+     "lower": 2
+    },
+    "all_ok": 4
+   },
+   "de-escalate-worthy": {
+    "n": 6,
+    "escalations": {
+     "lower": 6
+    },
+    "all_ok": 6
+   }
+  },
+  "by_profile": {
+   "canonical": {
+    "n": 18,
+    "baseline_ok": 0,
+    "all_ok": 16
+   }
+  }
+ },
+ "calls": [
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 35.090616041998146,
+   "content": "Okay, let's break this down. The baseline severity is medium. Now, looking at the operational context fields: weather is heavy rain and wet asphalt, cargo is liquids/chemical tanker, and dispatch status is running 20 minutes behind schedule.\n\nFirst, the weather: heavy rain and wet asphalt. According to the rules, weather is a risk multiplier if it degrades traction or visibility. Heavy rain definitely does that, so that's a risk multiplier. \n\nNext, cargo: liquids/chemical tanker. The rules say cargo is a risk multiplier only if it's hazardous, liquid, or dangerous if spilled. Since this is a chemical tanker, that's definitely hazardous and liquid. So that's another risk multiplier. \n\nThen dispatch status: running behind schedule. The rules state that being behind schedule under pressure is a genuine risk factor. So that's a third risk multiplier. \n\nSo all three fields are risk multipliers. The rules say if at least one is a risk multiplier, we should raise the severity. But here, all three are. So the decision should be to raise the baseline severity from medium to higher. \n\nWait, but the instructions say to check if the fields together are strong enough to move away from the baseline. Since all three are risk factors, combining them would definitely be a strong reason to raise. So the answer should be 'raise' with all three fields mentioned.\n\n</think>\n\n{\n  \"risk_synthesis\": \"Weather (heavy rain, wet asphalt) degrades traction and visibility, qualifying as a risk multiplier. Cargo (liquids/chemical tanker) is hazardous and liquid, also a risk multiplier. Dispatch status (20 minutes behind schedule) indicates pressure, a genuine risk factor. All three fields are risk multipliers.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 374,
+   "tokens_evaluated": 1155,
+   "think_tokens": 282,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "Weather (heavy rain, wet asphalt) degrades traction and visibility, qualifying as a risk multiplier. Cargo (liquids/chemical tanker) is hazardous and liquid, also a risk multiplier. Dispatch status (20 minutes behind schedule) indicates pressure, a genuine risk factor. All three fields are risk multipliers.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 52.136309708002955,
+   "content": "Okay, let's see. The baseline severity is medium. Now I need to check the operational context fields: weather, cargo, and dispatch status.\n\nWeather is clear skies and dry pavement. According to the rules, weather is only a risk multiplier if it degrades traction or visibility, like rain, ice, etc. Since it's clear and dry, that's not a risk factor. So weather doesn't affect the severity here.\n\nCargo is dry goods or general freight. The rules say cargo is a risk multiplier only if it's hazardous, liquid, or dangerous if spilled. Dry goods aren't considered a risk, so cargo isn't a multiplier here either.\n\nDispatch status is on schedule. The rules mention that being on schedule isn't a risk factor. In fact, if the driver is handling a hazard safely, that's a positive sign. But here, the dispatch status just says on schedule. There's no mention of any defensive maneuvers or safety checks. However, since being on schedule isn't a risk factor, it doesn't increase the severity. Also, there's no indication of being behind schedule under pressure, which would be a risk. So dispatch status doesn't add any risk here.\n\nPutting it all together: none of the fields are risk multipliers. The weather and cargo are neutral, and dispatch status is neutral as well. Since none of them are risk factors, and there's no positive indication of safe conditions, the decision would be to hold. Wait, but the instructions say that if none are risk multipliers and at least one positively indicates safe conditions, then lower. But in this case, the dispatch status is on schedule, which isn't a positive indicator. The rules say that a dispatch status describing safe handling is a reason to lower, but here it's just on schedule. So maybe there's no positive indicator. Therefore, since none of the fields are risk multipliers and there's no positive safe indication, the decision is to hold. Wait, the options are raise, lower, or hold. The rules for lower require that none are risk multipliers and at least one positively indicates safe. Since the dispatch status is on schedule, but that's not a positive indicator. The rules specify that only if the dispatch status describes a defensive maneuver or safety check would it be a positive. Since it's just on schedule, it's neutral. Therefore, the fields are neutral, so the decision is to hold.\n\n</think>\n\n{\n  \"risk_synthesis\": \"None of the operational-context fields are risk multipliers. Weather is clear/dry (no traction/visibility degradation), cargo is general freight (no spillage/shifting risk), and dispatch status is on schedule (no pressure-induced risk). No field provides evidence to raise severity, and no field positively indicates safe conditions to lower severity.\",\n  \"escalation\": \"hold\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 586,
+   "tokens_evaluated": 1352,
+   "think_tokens": 491,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "None of the operational-context fields are risk multipliers. Weather is clear/dry (no traction/visibility degradation), cargo is general freight (no spillage/shifting risk), and dispatch status is on schedule (no pressure-induced risk). No field provides evidence to raise severity, and no field positively indicates safe conditions to lower severity.",
+    "escalation": "hold",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 32.57495329200174,
+   "content": "Okay, let's see. The baseline severity is medium. Now I need to check the operational context fields to see if they affect that.\n\nFirst, the weather is clear with light traffic. According to the rules, weather is only a risk multiplier if it degrades traction or visibility, like rain, ice, etc. Since it's clear, that's not a risk factor. So weather doesn't add anything here.\n\nNext, the cargo is an empty trailer with non-hazardous materials. The rules say cargo is a risk multiplier only if it's hazardous, liquid, or dangerous if spilled. Empty and non-hazardous means it's not a risk factor. So cargo doesn't affect the severity either.\n\nThen the dispatch status: the driver was ahead of schedule and executed a documented defensive maneuver for a merging vehicle. The rules mention that if the driver handled a hazard safely, like a defensive maneuver, that's evidence of being in control. This should be a reason to lower or hold the severity. Being ahead of schedule isn't a risk factor, so that's good. \n\nSo none of the fields are risk multipliers. The dispatch status even indicates safe handling. Therefore, the decision should be to lower the severity. The fields don't have any negative factors, and one (dispatch status) shows safe control. So the answer should be lower.\n\n</think>\n\n{\n  \"risk_synthesis\": \"None of the operational-context fields are risk multipliers. Weather is clear (no traction/visibility degradation), cargo is non-hazardous and empty (no risk), and dispatch status indicates the driver executed a documented defensive maneuver (safe, controlled conditions).\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 354,
+   "tokens_evaluated": 1163,
+   "think_tokens": 274,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "None of the operational-context fields are risk multipliers. Weather is clear (no traction/visibility degradation), cargo is non-hazardous and empty (no risk), and dispatch status indicates the driver executed a documented defensive maneuver (safe, controlled conditions).",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 26.175959959000465,
+   "content": "Okay, let's tackle this. The baseline severity is medium. Now, looking at the operational context: weather is heavy rain and wet asphalt. According to the rules, weather is a risk multiplier if it degrades traction or visibility. Heavy rain definitely does that, so that's a multiplier. Then cargo is liquids/chemical tanker. The rules say cargo is a risk multiplier only if it's hazardous, liquid, etc. Since it's a liquid, that's a multiplier. Dispatch status is running 20 minutes behind schedule. The rules mention that being behind schedule under pressure is a risk factor. So all three fields are risk multipliers. But wait, the instructions say if at least one is a genuine risk multiplier, we should raise. But here all three are. So the decision should be to raise. Let me check again. Weather (rain) is a multiplier, cargo (liquid) is a multiplier, and dispatch status (behind schedule) is a risk factor. So all three contribute. Therefore, the escalation should be to raise.\n\n</think>\n\n{\n  \"risk_synthesis\": \"Weather (heavy rain, wet asphalt) degrades traction and visibility, qualifying as a risk multiplier. Cargo (liquids/chemical tanker) is hazardous and liquid, also a risk multiplier. Dispatch status (20 minutes behind schedule) indicates pressure, a genuine risk factor. All three fields independently qualify as risk multipliers under the given rules.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 311,
+   "tokens_evaluated": 1086,
+   "think_tokens": 213,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "Weather (heavy rain, wet asphalt) degrades traction and visibility, qualifying as a risk multiplier. Cargo (liquids/chemical tanker) is hazardous and liquid, also a risk multiplier. Dispatch status (20 minutes behind schedule) indicates pressure, a genuine risk factor. All three fields independently qualify as risk multipliers under the given rules.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 69.24819945899071,
+   "content": "Okay, let's tackle this. The baseline severity is medium. The operational context has three fields: weather, cargo, and dispatch status.\n\nFirst, weather is clear skies and dry pavement. According to the rules, weather is only a risk multiplier if it degrades traction or visibility, like rain, ice, etc. Since it's clear and dry, that's not a risk factor. So weather doesn't affect the severity here.\n\nNext, cargo is dry goods or general freight. The rules say cargo is a risk multiplier only if it's hazardous, liquid, or dangerous if spilled. Dry goods aren't considered a risk, so cargo isn't a multiplier here either.\n\nThen, dispatch status is on schedule. The rules mention that being on schedule isn't a risk factor. In fact, if the driver is handling a hazard safely (like defensive maneuvers), that's a positive sign. But here, it's just on schedule. The note says being behind schedule under pressure is a risk, but on schedule isn't. So dispatch status doesn't add any risk here.\n\nPutting it all together, none of the fields are risk multipliers. Also, the dispatch status being on schedule might indicate the driver is in control, but the rules say that only if there's a documented defensive maneuver. Since there's no mention of that here, maybe it's neutral. However, the absence of risk factors and the fact that dispatch is on schedule (not under pressure) might mean we can lower the severity. Wait, the rules say that if none are risk multipliers and at least one indicates safe conditions, then lower. The dispatch status being on schedule isn't a positive indicator unless there's a documented safe action. But maybe the lack of risk factors is enough. The instructions say that if none are risk multipliers and at least one positively indicates safe conditions, then lower. But the dispatch status here is just \"on schedule,\" which isn't a positive indicator. The cargo and weather are not risk factors. So maybe the fields are neutral. Wait, the rules say that a dispatch status that describes the driver handling a hazard safely is evidence of control. But here, the dispatch status is just \"on schedule,\" not indicating any action. So maybe none of the fields are positive indicators. Therefore, since none are risk multipliers and there's no positive indicator, the decision would be to hold. Wait, but the rules for \"lower\" require that none are risk multipliers AND at least one positively indicates safe conditions. Since the dispatch status is on schedule, but that's not a positive indicator unless there's a documented maneuver. So maybe there's no positive indicator. Therefore, the fields are mixed or none clearly point either way. So the decision is hold. But wait, the user says that if none are risk multipliers and at least one positively indicates safe conditions, then lower. But in this case, the dispatch status is on schedule, which isn't a positive indicator. So maybe the answer is hold. Alternatively, maybe the absence of risk factors is enough to lower. Hmm, the rules are specific. Let me check again. The rules for lower: none of the fields are risk multipliers, and at least one positively indicates safe, controlled conditions. The dispatch status being on schedule isn't a positive indicator. The weather and cargo are not risk factors. So there's no field that positively indicates safe conditions. Therefore, the fields are mixed or none clearly point either way. So the decision is hold. Therefore, the risk_synthesis would state that none of the fields are risk multipliers, and no field positively indicates safe conditions, so the decision is hold.\n\n</think>\n\n{\n  \"risk_synthesis\": \"None of the operational-context fields are risk multipliers. Weather is clear/dry (no traction/visibility degradation), cargo is non-hazardous (dry goods), and dispatch status is on schedule (not under pressure). No field indicates unsafe conditions or driver control issues.\",\n  \"escalation\": \"hold\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 822,
+   "tokens_evaluated": 1600,
+   "think_tokens": 739,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "None of the operational-context fields are risk multipliers. Weather is clear/dry (no traction/visibility degradation), cargo is non-hazardous (dry goods), and dispatch status is on schedule (not under pressure). No field indicates unsafe conditions or driver control issues.",
+    "escalation": "hold",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 19.700910375002422,
+   "content": "Okay, let's break this down. The baseline severity is medium. Now, looking at the operational context fields: Weather is clear and light traffic, so that's not a risk multiplier. Cargo is an empty trailer with non-hazardous materials, so that's not a risk factor either. Dispatch status says the driver was ahead of schedule and executed a defensive maneuver for a merging vehicle. According to the rules, a defensive maneuver indicates the driver is in control, which is a reason to lower the severity. Since none of the fields are risk multipliers and there's a positive indicator of safe conditions, the decision should be to lower the severity. So the specific field here is the dispatch status mentioning the defensive maneuver. No other fields contribute to raising or holding. Therefore, the escalation should be lower.\n\n</think>\n\n{\n  \"risk_synthesis\": \"Dispatch status indicates the driver executed a documented defensive maneuver for a merging vehicle, which positively signals controlled conditions and reduces risk. Weather (clear) and cargo (empty, non-hazardous) are not risk factors.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 234,
+   "tokens_evaluated": 1051,
+   "think_tokens": 162,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "Dispatch status indicates the driver executed a documented defensive maneuver for a merging vehicle, which positively signals controlled conditions and reduces risk. Weather (clear) and cargo (empty, non-hazardous) are not risk factors.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 31.312099624992697,
+   "content": "Okay, let's break this down. The baseline severity is medium. Now, looking at the operational context fields: weather is heavy rain and wet asphalt, cargo is liquids/chemical tanker, and dispatch status is running 20 minutes behind schedule.\n\nFirst, the weather: heavy rain and wet asphalt. According to the rules, weather is a risk multiplier if it degrades traction or visibility. Rain definitely does that, so that's a multiplier. Then the cargo is liquids/chemical tanker. The rules say cargo is a risk multiplier only if it's hazardous, liquid, or dangerous if spilled. Since this is a liquid chemical tanker, that's a risk multiplier. The dispatch status is behind schedule. The rules mention that being behind schedule under pressure is a genuine risk factor. So all three fields are risk multipliers. \n\nWait, but the user said to check if the three fields together are strong enough to move away from the baseline. The baseline is medium. If all three are risk multipliers, then the decision should be to raise the severity. Let me check again. The weather (rain) is a multiplier, cargo (liquid) is a multiplier, and dispatch status (behind schedule) is a risk factor. So all three are contributing. Therefore, the answer should be to raise the severity. The synthesis should mention each of these factors as per the rules.\n\n</think>\n\n{\n  \"risk_synthesis\": \"Weather (heavy rain, wet asphalt) degrades traction and visibility, qualifying as a risk multiplier. Cargo (liquids/chemical tanker) is hazardous and could pose additional danger if spilled or shifted, also a risk multiplier. Dispatch status (20 minutes behind schedule) indicates operational pressure, a genuine risk factor per rules.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 372,
+   "tokens_evaluated": 1151,
+   "think_tokens": 278,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "Weather (heavy rain, wet asphalt) degrades traction and visibility, qualifying as a risk multiplier. Cargo (liquids/chemical tanker) is hazardous and could pose additional danger if spilled or shifted, also a risk multiplier. Dispatch status (20 minutes behind schedule) indicates operational pressure, a genuine risk factor per rules.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 60.20642587498878,
+   "content": "Okay, let's tackle this. The baseline severity is medium. The operational context has three fields: weather, cargo, and dispatch status.\n\nFirst, weather is clear skies and dry pavement. According to the rules, weather is only a risk multiplier if it degrades traction or visibility, like rain, ice, etc. Since it's clear and dry, that's not a risk factor. So weather doesn't affect the severity here.\n\nNext, cargo is dry goods or general freight. The rules say cargo is a risk multiplier only if it's hazardous, liquid, or dangerous if spilled. Dry goods aren't considered a risk, so cargo isn't a multiplier here either.\n\nThen, dispatch status is on schedule. The rules mention that being on schedule isn't a risk factor. In fact, if the driver is handling a hazard safely (like defensive maneuvers), that's a positive sign. But here, it's just on schedule. The note says being behind schedule under pressure is a risk, but being on schedule isn't. So dispatch status doesn't add any risk here.\n\nPutting it all together: none of the fields are risk multipliers. Also, the dispatch status being on schedule might indicate the driver is in control, which could be a reason to lower the severity. But the rules say that if none are risk multipliers and at least one indicates safe conditions, we should lower. However, the dispatch status is neutral (on schedule isn't a positive indicator, just not a risk). The weather and cargo are both non-risk factors. So maybe it's a hold? Wait, the rules for lower say \"none of the fields are risk multipliers, and at least one positively indicates safe, controlled conditions.\" The dispatch status being on schedule isn't a positive indicator, but maybe the absence of risk factors is enough? Wait, the rules for lower require at least one positive indicator. Since none of the fields are positive indicators (weather is neutral, cargo is neutral, dispatch is neutral), maybe it's a hold. But the original baseline is medium. The user says if none are risk multipliers and at least one is safe, then lower. But here, there's no positive indicator. So maybe the answer is hold because the fields are mixed or not clearly pointing either way. Wait, but all three fields are not risk factors. So maybe the decision is to hold because there's no evidence to change the baseline. Alternatively, since none of the fields are risk multipliers, and there's no positive indicators, maybe it's hold. The rules for lower require at least one positive. Since there's no positive, but no risk multipliers, maybe hold. So the answer would be hold. But the user's instruction says: if none are risk multipliers and at least one indicates safe, then lower. If there's no positive indicators, then it's hold. So in this case, the three fields are all non-risk, but none are positive. So the decision is hold. Therefore, the risk_synthesis would state that none of the fields are risk multipliers, and no positive indicators, so hold.\n\n</think>\n\n{\n  \"risk_synthesis\": \"None of the operational-context fields are risk multipliers. Weather is clear/dry (no traction/visibility degradation), cargo is non-hazardous (dry goods), and dispatch status is on schedule (not a risk factor). No field provides evidence of unsafe conditions or driver pressure.\",\n  \"escalation\": \"hold\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 715,
+   "tokens_evaluated": 1491,
+   "think_tokens": 630,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "None of the operational-context fields are risk multipliers. Weather is clear/dry (no traction/visibility degradation), cargo is non-hazardous (dry goods), and dispatch status is on schedule (not a risk factor). No field provides evidence of unsafe conditions or driver pressure.",
+    "escalation": "hold",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 30.665661459002877,
+   "content": "Okay, let's see. The baseline severity is medium. Now I need to check the operational context fields to see if they affect that.\n\nFirst, the weather is clear with light traffic. According to the rules, weather is only a risk multiplier if it degrades traction or visibility, like rain, ice, etc. Since it's clear, that's not a risk factor. So weather doesn't add anything here.\n\nNext, the cargo is an empty trailer with non-hazardous materials. The rules say cargo is a risk multiplier only if it's hazardous, liquid, or dangerous if spilled. Empty and non-hazardous means it's not a risk factor. So cargo doesn't affect the severity either.\n\nThen, the dispatch status is ahead of schedule, and the driver did a documented defensive maneuver for a merging vehicle. The rules mention that if the driver handled a hazard safely, like a defensive maneuver, that's evidence of being in control. This would be a reason to lower the severity. Being ahead of schedule isn't a risk factor, so that's good. \n\nPutting it all together: none of the fields are risk multipliers. The dispatch status even indicates safe handling. So the decision should be to lower the severity. The fields that drove this are the dispatch status with the defensive maneuver. The weather and cargo don't add risk, so they don't affect the decision. Therefore, the escalation should be lower.\n\n</think>\n\n{\n  \"risk_synthesis\": \"Dispatch status indicates the driver executed a documented defensive maneuver for a merging vehicle, demonstrating control and safe handling of a hazard. Weather (clear conditions) and cargo (empty, non-hazardous) are not risk factors per the rules.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 365,
+   "tokens_evaluated": 1178,
+   "think_tokens": 289,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "Dispatch status indicates the driver executed a documented defensive maneuver for a merging vehicle, demonstrating control and safe handling of a hazard. Weather (clear conditions) and cargo (empty, non-hazardous) are not risk factors per the rules.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 27.75824879099673,
+   "content": "Okay, let's break this down. The baseline severity is medium. Now, looking at the operational context fields: weather is heavy rain and wet asphalt, cargo is liquids/chemical tanker, and dispatch status is running 20 minutes behind schedule.\n\nFirst, the weather: heavy rain and wet asphalt. According to the rules, weather is a risk multiplier if it degrades traction or visibility. Heavy rain definitely does that, so that's a risk multiplier. \n\nNext, cargo: liquids/chemical tanker. The rules say cargo is a risk multiplier only if it's hazardous, liquid, or dangerous if spilled. Since this is a chemical tanker, that's definitely hazardous and liquid. So that's another risk multiplier. \n\nThen, dispatch status: running behind schedule. The rules state that being behind schedule under pressure is a genuine risk factor. So that's a third risk multiplier. \n\nNow, the decision options are raise, lower, or hold. Since all three fields are risk multipliers, the decision should be to raise the severity. The synthesis should mention each of these factors and why they qualify as multipliers. The escalation value would then be \"raise\".\n\n</think>\n\n{\n  \"risk_synthesis\": \"Weather (heavy rain, wet asphalt) degrades traction and visibility, qualifying as a risk multiplier. Cargo (liquids/chemical tanker) is hazardous and liquid, also a risk multiplier. Dispatch status (20 minutes behind schedule) indicates pressure, a genuine risk factor. All three fields are risk multipliers per the rules.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 330,
+   "tokens_evaluated": 1108,
+   "think_tokens": 235,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "Weather (heavy rain, wet asphalt) degrades traction and visibility, qualifying as a risk multiplier. Cargo (liquids/chemical tanker) is hazardous and liquid, also a risk multiplier. Dispatch status (20 minutes behind schedule) indicates pressure, a genuine risk factor. All three fields are risk multipliers per the rules.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 16.813686833993415,
+   "content": "Okay, let's tackle this. The baseline severity is medium. Now, looking at the operational context: weather is clear and dry, which according to the rules, isn't a risk multiplier. Cargo is dry goods, which also isn't a risk factor. Dispatch status is on schedule, which the rules say isn't a risk factor either. So none of these fields are risk multipliers. But the dispatch status being on schedule is a positive indicator of safe conditions. So the decision should be to lower the severity. Let me check again. Weather and cargo are neutral, dispatch is positive. So the answer is lower.\n\n</think>\n\n{\n  \"risk_synthesis\": \"None of the operational-context fields are risk multipliers. Weather is clear/dry (no risk), cargo is non-hazardous (no risk), and dispatch status is on schedule (indicates safe, controlled conditions).\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 200,
+   "tokens_evaluated": 987,
+   "think_tokens": 126,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "None of the operational-context fields are risk multipliers. Weather is clear/dry (no risk), cargo is non-hazardous (no risk), and dispatch status is on schedule (indicates safe, controlled conditions).",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 28.607381334004458,
+   "content": "Okay, let's tackle this. The baseline severity is medium. I need to check the three operational context fields to see if they affect that.\n\nFirst, weather is clear and light traffic. According to the rules, weather is only a risk multiplier if it degrades traction or visibility. Since it's clear, that's not a factor. So weather doesn't increase risk here.\n\nNext, cargo is an empty trailer with non-hazardous materials. The rules say cargo is a risk multiplier only if hazardous, liquid, etc. Empty and non-hazardous means it's not a risk factor. So cargo doesn't add to the severity.\n\nThen, dispatch status: ahead of schedule and the driver did a defensive maneuver for a merging vehicle. The rules mention that a documented defensive maneuver indicates the driver is in control, which is a reason to lower or hold the severity. Being ahead of schedule isn't a risk factor. So this actually suggests the situation is under control, which might lower the risk.\n\nPutting it all together: none of the fields are risk multipliers. The dispatch status even shows a safe action by the driver. So according to the decision options, if none are risk multipliers and at least one indicates safe conditions, we should lower the severity. Therefore, the decision is to lower.\n\n</think>\n\n{\n  \"risk_synthesis\": \"None of the operational-context fields are risk multipliers. Weather is clear (no traction/visibility degradation), cargo is non-hazardous and empty (no risk), and dispatch status indicates a documented defensive maneuver (safe, controlled conditions).\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 340,
+   "tokens_evaluated": 1152,
+   "think_tokens": 263,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "None of the operational-context fields are risk multipliers. Weather is clear (no traction/visibility degradation), cargo is non-hazardous and empty (no risk), and dispatch status indicates a documented defensive maneuver (safe, controlled conditions).",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 30.833833833996323,
+   "content": "Okay, let's break this down. The baseline severity is medium. Now, looking at the operational context fields: weather is heavy rain and wet asphalt, cargo is liquids/chemical tanker, and dispatch status is running 20 minutes behind schedule.\n\nFirst, the weather: heavy rain and wet asphalt. According to the rules, weather is a risk multiplier if it degrades traction or visibility. Heavy rain definitely does that, so that's a risk multiplier. \n\nNext, cargo: liquids/chemical tanker. The rules say cargo is a risk multiplier only if it's hazardous, liquid, or dangerous if spilled. Since this is a chemical tanker, that's definitely hazardous and liquid. So that's another risk multiplier. \n\nThen dispatch status: running behind schedule. The rules state that being behind schedule under pressure is a genuine risk factor. So that's a third risk multiplier. \n\nSo all three fields are risk multipliers. The rules say if at least one is a risk multiplier, we should raise the severity. But here, all three are. So the decision should be to raise the baseline severity from medium to higher. \n\nWait, but the user's instruction says to decide whether the three fields together are strong enough to move away from the baseline. Since all three are risk multipliers, that's definitely strong evidence. So the answer should be to raise.\n\n</think>\n\n{\n  \"risk_synthesis\": \"Weather (heavy rain, wet asphalt) degrades traction and visibility, qualifying as a risk multiplier. Cargo (liquids/chemical tanker) is hazardous and liquid, also a risk multiplier. Dispatch status (20 minutes behind schedule) indicates pressure, a genuine risk factor. All three fields are risk multipliers.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 367,
+   "tokens_evaluated": 1148,
+   "think_tokens": 275,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "Weather (heavy rain, wet asphalt) degrades traction and visibility, qualifying as a risk multiplier. Cargo (liquids/chemical tanker) is hazardous and liquid, also a risk multiplier. Dispatch status (20 minutes behind schedule) indicates pressure, a genuine risk factor. All three fields are risk multipliers.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 18.997174582997104,
+   "content": "Okay, let's tackle this. The baseline severity is medium. Now, looking at the operational context: weather is clear and dry, which according to the rules, isn't a risk multiplier. Cargo is dry goods, which also isn't a risk factor. Dispatch status is on schedule, which the rules say isn't a risk factor either. So none of these fields are risk multipliers. But the dispatch status being on schedule is a positive indicator of safe conditions. So the decision should be to lower the severity. Let me make sure I didn't miss anything. No hazardous cargo, no bad weather, and being on schedule is neutral but not a risk. So yes, lower makes sense here.\n\n</think>\n\n{\n  \"risk_synthesis\": \"None of the operational-context fields are risk multipliers. Weather is clear/dry (no traction/visibility degradation), cargo is non-hazardous (dry goods), and dispatch status is on schedule (no pressure-induced risk). The on-schedule status positively indicates controlled conditions.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 226,
+   "tokens_evaluated": 1003,
+   "think_tokens": 142,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "None of the operational-context fields are risk multipliers. Weather is clear/dry (no traction/visibility degradation), cargo is non-hazardous (dry goods), and dispatch status is on schedule (no pressure-induced risk). The on-schedule status positively indicates controlled conditions.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 26.253620083007263,
+   "content": "Okay, let's see. The baseline severity is medium. I need to check the operational context fields to see if they affect that.\n\nFirst, the weather is clear and light traffic. According to the rules, weather is only a risk multiplier if it's bad like rain or snow. So clear conditions aren't a risk factor. That's a positive sign.\n\nNext, the cargo is an empty trailer with non-hazardous stuff. The rules say cargo is only a risk multiplier if it's hazardous or liquid. Since it's empty and non-hazardous, that's not a risk factor either. So that's another positive.\n\nThen the dispatch status: the driver was ahead of schedule and did a defensive maneuver for a merging vehicle. The rules mention that if the driver handles a hazard safely, like a documented defensive move, that shows they're in control. This would be a reason to lower the severity. Being ahead of schedule isn't a risk factor, so that's good.\n\nSo none of the fields are risk multipliers. And there's a positive indicator (defensive maneuver) which suggests safe conditions. So according to the decision rules, I should lower the severity. The answer should be lower with the reasoning about the dispatch status indicating safe control.\n\n</think>\n\n{\n  \"risk_synthesis\": \"None of the operational-context fields are risk multipliers. The dispatch status indicates the driver executed a documented defensive maneuver, which positively signals controlled conditions.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 312,
+   "tokens_evaluated": 1143,
+   "think_tokens": 254,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "None of the operational-context fields are risk multipliers. The dispatch status indicates the driver executed a documented defensive maneuver, which positively signals controlled conditions.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 30.780652458008262,
+   "content": "Okay, let's break this down. The baseline severity is medium. Now, looking at the operational context fields: weather is heavy rain and wet asphalt, cargo is liquids/chemical tanker, and dispatch status is running 20 minutes behind schedule.\n\nFirst, the weather: heavy rain and wet asphalt. According to the rules, weather is a risk multiplier if it degrades traction or visibility. Rain definitely does that, so that's a multiplier. Then the cargo is liquids/chemical tanker. The rules say cargo is a risk multiplier only if it's hazardous, liquid, or dangerous if spilled. Since this is a liquid chemical tanker, that's a risk multiplier. The dispatch status is behind schedule. The rules mention that being behind schedule under pressure is a genuine risk factor. So all three fields are risk multipliers. \n\nWait, but the user says to check if the three fields together are strong enough to move away from the baseline. The baseline is medium. If all three are risk multipliers, then the decision would be to raise the severity. Let me confirm each field again. Weather: yes, degrades traction. Cargo: yes, hazardous liquid. Dispatch: behind schedule is a risk. So all three are risk factors. Therefore, the decision is to raise the severity. The synthesis should name each of these factors and explain why they are multipliers.\n\n</think>\n\n{\n  \"risk_synthesis\": \"Weather (heavy rain, wet asphalt) degrades traction and visibility, qualifying as a risk multiplier. Cargo (liquids/chemical tanker) is hazardous and poses spillage/shift risk, another multiplier. Dispatch status (20 minutes behind schedule) indicates operational pressure, a genuine risk factor per rules.\",\n  \"escalation\": \"raise\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 366,
+   "tokens_evaluated": 1149,
+   "think_tokens": 276,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "Weather (heavy rain, wet asphalt) degrades traction and visibility, qualifying as a risk multiplier. Cargo (liquids/chemical tanker) is hazardous and poses spillage/shift risk, another multiplier. Dispatch status (20 minutes behind schedule) indicates operational pressure, a genuine risk factor per rules.",
+    "escalation": "raise",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "canonical",
+   "latency_seconds": 59.866359999999986,
+   "content": "Okay, let's see. The baseline severity is medium. Now I need to check the operational context fields: weather, cargo, and dispatch status.\n\nWeather is clear skies and dry pavement. According to the rules, weather is only a risk multiplier if it degrades traction or visibility, like rain, ice, etc. Since it's clear and dry, that's not a risk factor. So weather doesn't affect the severity here.\n\nCargo is dry goods or general freight. The rules say cargo is a risk multiplier only if it's hazardous, liquid, or dangerous if spilled. Dry goods aren't considered a risk, so cargo isn't a multiplier either.\n\nDispatch status is on schedule. The rules mention that being on schedule isn't a risk factor. In fact, if the driver is handling a hazard safely, that's a positive sign. But here, the dispatch status just says on schedule. There's no mention of any defensive maneuvers or safety checks. However, being on schedule isn't a risk multiplier. The only time dispatch status is a risk is if they're behind schedule under pressure. Since they're on schedule, that's neutral.\n\nSo none of the fields are risk multipliers. Also, the dispatch status being on schedule might indicate that the driver isn't under pressure, which could be a positive. But according to the rules, the dispatch status only positively indicates safe conditions if there's a documented defensive maneuver or safety check. Since there's no such mention here, maybe it's neutral. But the rules say that being on schedule is not a risk factor. So the absence of risk factors and maybe a neutral dispatch status would lead to holding the baseline severity. Wait, but the decision options are raise, lower, or hold. The user says that if none are risk multipliers and at least one positively indicates safe conditions, then lower. But in this case, the dispatch status is on schedule, which isn't a risk factor. However, the rules say that a dispatch status that shows the driver is in control (like defensive maneuvers) would be a reason to lower. But here, the dispatch status is just on schedule, not indicating any safe handling. So maybe there's no positive indicator. Therefore, since none of the fields are risk multipliers and there's no positive indicator, the decision would be to hold. Wait, but the rules for lower say \"none of the fields are risk multipliers, and at least one positively indicates safe, controlled conditions.\" In this case, the dispatch status is on schedule, but that's not a positive indicator unless there's a documented maneuver. So maybe there's no positive indicator. Therefore, the fields are neutral, so hold. But the user's instruction says that if none are risk multipliers and at least one positively indicates safe, then lower. Since there's no positive indication here, maybe it's hold. Alternatively, maybe the dispatch status being on schedule is considered as not a risk factor, so the fields are mixed or neutral. Therefore, the answer would be hold.\n\n</think>\n\n{\n  \"risk_synthesis\": \"None of the operational-context fields are risk multipliers. Weather is clear/dry (no risk), cargo is non-hazardous (no risk), and dispatch status is on schedule (not a risk factor). No field indicates unsafe conditions, but no field also provides a documented safety indicator (e.g., defensive maneuver) to justify lowering the baseline.\",\n  \"escalation\": \"hold\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 711,
+   "tokens_evaluated": 1473,
+   "think_tokens": 612,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "None of the operational-context fields are risk multipliers. Weather is clear/dry (no risk), cargo is non-hazardous (no risk), and dispatch status is on schedule (not a risk factor). No field indicates unsafe conditions, but no field also provides a documented safety indicator (e.g., defensive maneuver) to justify lowering the baseline.",
+    "escalation": "hold",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "canonical",
+   "latency_seconds": 27.676503458002117,
+   "content": "Okay, let's tackle this. The baseline severity is medium. Now, looking at the operational context.\n\nWeather is clear and light traffic. According to the rules, weather is only a risk multiplier if it degrades traction or visibility. Since it's clear, that's not a factor. So weather doesn't add risk here.\n\nCargo is an empty trailer with non-hazardous materials. The rules say cargo is a risk multiplier only if hazardous, liquid, etc. Empty and non-hazardous means it's not a risk factor. So cargo is neutral.\n\nDispatch status is ahead of schedule, and the driver did a documented defensive maneuver for a merging vehicle. The rules mention that being ahead of schedule isn't a risk factor. In fact, the defensive maneuver indicates the driver is in control. That's a positive sign, suggesting safe conditions. So dispatch status here is a reason to lower the severity.\n\nPutting it all together: none of the fields are risk multipliers. The dispatch status even has a positive indicator. So the decision should be to lower the baseline severity. The fields that drove this are the dispatch status's defensive maneuver, as it shows control, and the other factors (weather, cargo) are not risk factors. So the escalation should be \"lower\".\n\n</think>\n\n{\n  \"risk_synthesis\": \"Dispatch status indicates the driver executed a documented defensive maneuver for a merging vehicle, demonstrating control and safe handling. Weather (clear) and cargo (empty, non-hazardous) are not risk factors per the rules.\",\n  \"escalation\": \"lower\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 329,
+   "tokens_evaluated": 1146,
+   "think_tokens": 257,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "risk_synthesis": "Dispatch status indicates the driver executed a documented defensive maneuver for a merging vehicle, demonstrating control and safe handling. Weather (clear) and cargo (empty, non-hazardous) are not risk factors per the rules.",
+    "escalation": "lower",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "all_ok": true
+   }
+  }
+ ]
+}

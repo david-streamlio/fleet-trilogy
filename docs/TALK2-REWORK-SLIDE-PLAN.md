@@ -169,25 +169,26 @@
   - "Do this: run on the accelerator; compare joules per job, not watts"
 - **Speaker Notes:**
   - Why: energy is power × time. The Pi draws ~7 W but takes 17-90× longer, so it pays for every second.
-  - Reading the prompt (~700 tokens against a 50-250-token answer) is compute-heavy, which GPUs do far better.
+  - On the same chip the CPU loses most when reading the prompt (~4× the GPU's energy per token) and still loses when writing the answer (1.4-1.6×).
   - Pi 4 measured at the wall, the Macs at the chip; even doubling the Mac figures leaves the Pi several times higher.
   - Forward: if the hardware choice cost energy, what about the model's settings?
 - **Time:** Section 3, ~2.25 min.
 
 ### Slide 11 — I assumed thinking would make it more accurate. It didn't, and sometimes it never answered.
 - **Core Message:** reasoning added time and energy without measurable accuracy, and one model never finished thinking.
-- **Visual Manifest:** Type `Time_Series_Line_Chart`, overridden to a content slide with the chart. Spec: the paper's Fig. 3: correctness (%) vs median latency (s, log) for Qwen3-8B, Qwen3-14B, Qwen3.5-9B and Qwen3.8-27B in raw, chat-off and chat-on modes; Qwen3.5-9B chat-on at 0%. File: `slides/charts/slide_fig3_thinking.png`.
+- **Visual Manifest:** Type `Time_Series_Line_Chart`, overridden to a content slide with the chart. Spec: the paper's Fig. 3: correctness (%) vs median latency (s, log) for Qwen3-8B, Qwen3-14B, Qwen3.5-9B and Qwen3.8-27B in raw, chat-off and chat-on modes, plus thinking capped at 1,024 tokens (hollow diamonds); Qwen3.5-9B chat-on at 0%. File: `slides/charts/slide_fig3_thinking.png`.
 - **Suggested Layout:** `Content`. Override: the affinity map's `Stats` can't show the trade-off curve.
 - **On-Screen Text:**
   - "No measurable gain, at 4-11× the time and 4-7× the energy per call"
   - "Qwen3.5-9B: 36 of 36 calls never finished thinking"
   - "Do this: thinking off for short tasks; if you need it, cap it and track completion"
-  - Pending chip: [PLACEHOLDER: capped thinking (1,024 tokens): accuracy, time and energy on M1, M4, M4 Max]
+  - Small line under the chart: "Capped at 1,024 tokens: every call finished, no better accuracy, 3-10× the energy"
 - **Speaker Notes:**
   - Qwen3-14B 72% → 78%, Qwen3-8B 44% → 47%, Qwen3.8-27B 67% → 67%: all within each other's ranges.
   - On the iPhone-class M1, thinking took Qwen3-14B from 202 to 817 J per call.
   - Qwen3.5-9B on the hard task hit a 2,048-token budget on every call, and 35 of 36 still at 4,096 (128 s each, 0% correct). On the easy task, 4,096 was enough for most calls (61%).
-  - Capped thinking so far on the M1: Qwen3-8B 89% (easy) and 50% (hard), at 40-56 s per call against 5.8-8.5 s with thinking off.
+  - Capped at 1,024 tokens, on all three machines: no call truncated, and Qwen3.5-9B hit the cap every time but still answered. Accuracy stayed within range of thinking off (Qwen3-14B 72-83% vs 72%), at 3-10× the energy and 3.5-17× the time.
+  - On the iPhone-class M1: Qwen3-14B 202 → 768 J per call; Qwen3.5-9B 99 → 960 J at 105 s per call.
   - Why: a short, bounded judgment doesn't need multi-step reasoning, and some models don't know when to stop. Forward: what if the model gets more of the job?
 - **Time:** Section 3, ~2.5 min.
 
@@ -208,17 +209,24 @@
 
 ### Slide 13 — I assumed raw completion was the neutral default. The chat format mattered more than model size.
 - **Core Message:** the same prompt in the model's own chat format tripled one model's accuracy at no extra compute.
-- **Visual Manifest:** Type `Bar_Comparison`. Spec: before (raw prompt) vs after (chat format, thinking off) for Qwen3.5-9B on the whole job: 22% → 72%; M1 replicate 19% → 61%.
+- **Visual Manifest:** Type `Bar_Comparison`. Spec: before (raw prompt) vs after (chat format, thinking off) for Qwen3.5-9B on the whole job: 22% → 72%; M1 replicate 19% → 61%. Plus a prompt-ablation line from the M4 Max and M4 runs, which agree: lookup tables + the model's own chat template lifted Phi-3.5 (11% → ~50%), Llama-3.1-8B (~15% → ~55%) and Qwen3-14B (~35% → ~75%), i.e. +36 to +42 points.
 - **Suggested Layout:** `Comparison` (the affinity-map match).
 - **On-Screen Text:**
   - Before column: "Bare prompt: Qwen3.5-9B 22%"
   - After column: "Its own chat format, thinking off: 72% (19% → 61% on the M1)"
   - Footer: "Do this: use the model's chat template; check it before blaming the model"
-  - Pending chip: [PLACEHOLDER: prompt-ablation result: one line if a variant clearly helps or clearly costs energy]
+  - Line under the After column: "Lookup tables + the chat template lifted 3 of 4 small models by 36-42 points"
+  - Second small line: "On the M1, worked examples nearly doubled the prompt but cost no more energy: answers got shorter"
 - **Speaker Notes:**
   - Same model, same compute, same prompt text; only the wrapping changed.
   - Why: instruct models are trained on their template, so a bare prompt is out of distribution.
-  - The runtime can apply the template for you. Forward: about measuring all this, the dice from earlier.
+  - The runtime can apply the template for you.
+  - Going further, a prompt ablation (cumulative variants, fixed before any results; the M4 Max and M4 agree):
+    - physics facts + lookup tables + the native chat template took Phi-3.5 from 11% to ~50%, Llama-3.1-8B from ~15% to ~55%, and Qwen3-14B from ~35% to ~75%;
+    - worked examples helped Gemma-3-4B by another 8-14 points but nearly doubled the prompt (~780 → ~1,400 tokens);
+    - temperature 0 and grammar-computed fields added nothing measurable.
+  - On the iPhone-class M1, the template variant cost 9-52% more energy per call (answers grew longer too). Worked examples nearly doubled the prompt yet cost −12% to +7%, because answers got shorter (Phi-3.5: 258 → 186 tokens). On the GPU a generated token costs ~9× a prompt token, so answer length drives energy.
+  - Forward: about measuring all this, the dice from earlier.
 - **Time:** Section 3, ~1.75 min.
 
 ### Slide 14 — I assumed more repeats made a result solid. The die was loaded.
@@ -432,8 +440,6 @@
 |---|---|
 | 2 | IEA data-center electricity figures |
 | 4 | smartphones in use |
-| 11 | capped thinking on three machines |
-| 13 | prompt-ablation line |
 | 24 | dashboard screenshot |
 | 27 | paper link |
 

@@ -1,0 +1,1148 @@
+{
+ "host": "ip-10-42-12-42.us-west-2.compute.internal",
+ "arch": "arm64",
+ "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+ "timestamp": "2026-10-05T00:53:34Z",
+ "config": {
+  "task": "full",
+  "variant": "base",
+  "variant_spec": {
+   "style": "base",
+   "facts": false,
+   "native": false,
+   "examples": false,
+   "temperature": null,
+   "consistent": false
+  },
+  "n_per_cell": 2,
+  "gguf": "/Users/ec2-user/phoneproxy/models/gemma-3-4b-it-Q4_K_M.gguf",
+  "server": "/Users/ec2-user/phoneproxy/llama.cpp/build/bin/llama-server",
+  "threads": 4,
+  "temperature": 0.2,
+  "timeout_seconds": 180.0
+ },
+ "summary": {
+  "n": 36,
+  "rates": {
+   "action_ok": 0.5555555555555556,
+   "all_ok": 0.16666666666666666,
+   "baseline_ok": 0.7777777777777778,
+   "consistent": 0.5,
+   "escalation_ok": 0.5833333333333334,
+   "format_ok": 1.0,
+   "severity_ok": 0.8333333333333334
+  },
+  "latency_p50_seconds": 7.905493666999973,
+  "latency_p95_seconds": 11.342984750008327,
+  "tokens_predicted_mean": 108.61111111111111,
+  "think_tokens_mean": 0.0,
+  "truncated": 0,
+  "errors": 0,
+  "by_scenario": {
+   "escalate-worthy": {
+    "n": 12,
+    "escalations": {
+     "raise": 12
+    },
+    "all_ok": 6
+   },
+   "benign": {
+    "n": 12,
+    "escalations": {
+     "raise": 9,
+     "lower": 2,
+     "hold": 1
+    },
+    "all_ok": 0
+   },
+   "de-escalate-worthy": {
+    "n": 12,
+    "escalations": {
+     "hold": 4,
+     "lower": 4,
+     "raise": 4
+    },
+    "all_ok": 0
+   }
+  },
+  "by_profile": {
+   "low": {
+    "n": 6,
+    "baseline_ok": 0,
+    "all_ok": 0
+   },
+   "medium-volatile": {
+    "n": 6,
+    "baseline_ok": 6,
+    "all_ok": 0
+   },
+   "medium": {
+    "n": 6,
+    "baseline_ok": 4,
+    "all_ok": 0
+   },
+   "high-volatile": {
+    "n": 6,
+    "baseline_ok": 6,
+    "all_ok": 2
+   },
+   "high-decel": {
+    "n": 6,
+    "baseline_ok": 6,
+    "all_ok": 2
+   },
+   "high-abs": {
+    "n": 6,
+    "baseline_ok": 6,
+    "all_ok": 2
+   }
+  },
+  "prompt_tokens_mean": 608.5
+ },
+ "calls": [
+  {
+   "scenario": "escalate-worthy",
+   "profile": "low",
+   "latency_seconds": 6.797799666994251,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Traffic pattern: elevated velocity variance (frequent speed cycling) and Weather: Heavy rain, wet asphalt\",\n  \"escalation\": \"raise\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 91,
+   "tokens_evaluated": 607,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Traffic pattern: elevated velocity variance (frequent speed cycling) and Weather: Heavy rain, wet asphalt",
+    "escalation": "raise",
+    "severity": "medium",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "low",
+   "latency_seconds": 6.86816570800147,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Traffic pattern: elevated velocity variance (frequent speed cycling) is a risk multiplier because it indicates a high degree of driver stress and potential for erratic driving.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 101,
+   "tokens_evaluated": 602,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Traffic pattern: elevated velocity variance (frequent speed cycling) is a risk multiplier because it indicates a high degree of driver stress and potential for erratic driving.",
+    "escalation": "raise",
+    "severity": "medium",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": false,
+    "consistent": false,
+    "severity_ok": false,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "low",
+   "latency_seconds": 6.67483370899572,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Traffic pattern: elevated velocity variance (frequent speed cycling) and Peak deceleration: 0.15 g\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 94,
+   "tokens_evaluated": 615,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Traffic pattern: elevated velocity variance (frequent speed cycling) and Peak deceleration: 0.15 g",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": false,
+    "severity_ok": false,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "medium-volatile",
+   "latency_seconds": 7.946103541995399,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Traffic pattern (severe stop-and-go compaction) and weather (heavy rain, wet asphalt) are risk multipliers. The repeated hard braking due to the stop-and-go traffic, combined with the reduced traction from the wet asphalt, elevates the baseline severity.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 123,
+   "tokens_evaluated": 610,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Traffic pattern (severe stop-and-go compaction) and weather (heavy rain, wet asphalt) are risk multipliers. The repeated hard braking due to the stop-and-go traffic, combined with the reduced traction from the wet asphalt, elevates the baseline severity.",
+    "escalation": "raise",
+    "severity": "medium",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": false,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "medium-volatile",
+   "latency_seconds": 6.076050874995417,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Traffic pattern: severe stop-and-go compaction\",\n  \"escalation\": \"lower\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 82,
+   "tokens_evaluated": 605,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Traffic pattern: severe stop-and-go compaction",
+    "escalation": "lower",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "medium-volatile",
+   "latency_seconds": 6.179387416006648,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Traffic pattern: severe stop-and-go compaction\",\n  \"escalation\": \"lower\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 82,
+   "tokens_evaluated": 618,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Traffic pattern: severe stop-and-go compaction",
+    "escalation": "lower",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "medium",
+   "latency_seconds": 7.420594334005727,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Peak deceleration (0.3 g) and elevated velocity variance (frequent speed cycling) are driving the 'high' severity. The combination of high deceleration and frequent speed changes indicates a potentially stressful and hazardous driving environment.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 114,
+   "tokens_evaluated": 606,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Peak deceleration (0.3 g) and elevated velocity variance (frequent speed cycling) are driving the 'high' severity. The combination of high deceleration and frequent speed changes indicates a potentially stressful and hazardous driving environment.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "medium",
+   "latency_seconds": 6.442645250004716,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Traffic pattern: elevated velocity variance (frequent speed cycling) and Peak deceleration: 0.3 g\",\n  \"escalation\": \"raise\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 92,
+   "tokens_evaluated": 601,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Traffic pattern: elevated velocity variance (frequent speed cycling) and Peak deceleration: 0.3 g",
+    "escalation": "raise",
+    "severity": "medium",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "medium",
+   "latency_seconds": 6.5304086660034955,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Traffic pattern: elevated velocity variance (frequent speed cycling) and Peak deceleration: 0.3 g\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 93,
+   "tokens_evaluated": 614,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Traffic pattern: elevated velocity variance (frequent speed cycling) and Peak deceleration: 0.3 g",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-volatile",
+   "latency_seconds": 7.536897624988342,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Traffic pattern (severe stop-and-go compaction) and weather (heavy rain, wet asphalt) are both risk multipliers. The combination of these factors, coupled with the high peak deceleration, results in a high baseline severity.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 115,
+   "tokens_evaluated": 609,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Traffic pattern (severe stop-and-go compaction) and weather (heavy rain, wet asphalt) are both risk multipliers. The combination of these factors, coupled with the high peak deceleration, results in a high baseline severity.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-volatile",
+   "latency_seconds": 6.915355999997701,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Vehicle physics: Peak deceleration of 0.3 g exceeds the threshold for high severity, combined with the severe stop-and-go compaction traffic pattern.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 101,
+   "tokens_evaluated": 604,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Vehicle physics: Peak deceleration of 0.3 g exceeds the threshold for high severity, combined with the severe stop-and-go compaction traffic pattern.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-volatile",
+   "latency_seconds": 7.661894166012644,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Vehicle physics: Peak deceleration of 0.3 g exceeds the baseline threshold of 0.22 g, and the traffic pattern is severe stop-and-go compaction. These factors combined indicate a significant operational risk.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 115,
+   "tokens_evaluated": 617,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Vehicle physics: Peak deceleration of 0.3 g exceeds the baseline threshold of 0.22 g, and the traffic pattern is severe stop-and-go compaction. These factors combined indicate a significant operational risk.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-decel",
+   "latency_seconds": 8.76614841700939,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Peak deceleration (0.5 g) and elevated velocity variance (frequent speed cycling) due to heavy rain and wet asphalt, combined with the chemical tanker cargo, represent a significant risk. The high peak deceleration and the frequent speed cycling indicate a high level of operational stress on the driver, compounded by the hazardous nature of the cargo and the adverse weather conditions.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 142,
+   "tokens_evaluated": 606,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Peak deceleration (0.5 g) and elevated velocity variance (frequent speed cycling) due to heavy rain and wet asphalt, combined with the chemical tanker cargo, represent a significant risk. The high peak deceleration and the frequent speed cycling indicate a high level of operational stress on the driver, compounded by the hazardous nature of the cargo and the adverse weather conditions.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-decel",
+   "latency_seconds": 8.663145499987877,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Vehicle physics: Peak deceleration of 0.5 g exceeds the threshold of 0.45 g, triggering the 'high' severity level. The traffic pattern of elevated velocity variance further contributes to the high severity due to the increased risk of sudden braking and potential for loss of control.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 128,
+   "tokens_evaluated": 601,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Vehicle physics: Peak deceleration of 0.5 g exceeds the threshold of 0.45 g, triggering the 'high' severity level. The traffic pattern of elevated velocity variance further contributes to the high severity due to the increased risk of sudden braking and potential for loss of control.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-decel",
+   "latency_seconds": 7.665371416005655,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Vehicle physics: Peak deceleration is above 0.45 g, which triggers the 'high' severity level according to the rules. The traffic pattern is elevated velocity variance, which is considered severe stop-and-go compaction.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 116,
+   "tokens_evaluated": 614,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Vehicle physics: Peak deceleration is above 0.45 g, which triggers the 'high' severity level according to the rules. The traffic pattern is elevated velocity variance, which is considered severe stop-and-go compaction.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-abs",
+   "latency_seconds": 7.905493666999973,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Vehicle physics: ABS engaged and peak deceleration of 0.15g is above 0.22g, combined with elevated velocity variance. The ABS engagement indicates a loss of control, and the high deceleration combined with the elevated velocity variance is a significant risk.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 124,
+   "tokens_evaluated": 607,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Vehicle physics: ABS engaged and peak deceleration of 0.15g is above 0.22g, combined with elevated velocity variance. The ABS engagement indicates a loss of control, and the high deceleration combined with the elevated velocity variance is a significant risk.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-abs",
+   "latency_seconds": 6.505129791999934,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Vehicle physics: ABS engaged is a primary risk factor. Traffic pattern: elevated velocity variance is a secondary risk factor.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 93,
+   "tokens_evaluated": 602,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Vehicle physics: ABS engaged is a primary risk factor. Traffic pattern: elevated velocity variance is a secondary risk factor.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-abs",
+   "latency_seconds": 6.632388792000711,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Vehicle physics: ABS engaged is yes, and peak deceleration is above 0.45 g.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 92,
+   "tokens_evaluated": 615,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Vehicle physics: ABS engaged is yes, and peak deceleration is above 0.45 g.",
+    "escalation": "lower",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "low",
+   "latency_seconds": 4.110192874999484,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Traffic pattern (elevated velocity variance) and weather (heavy rain)\",\n  \"escalation\": \"raise\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 84,
+   "tokens_evaluated": 607,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Traffic pattern (elevated velocity variance) and weather (heavy rain)",
+    "escalation": "raise",
+    "severity": "medium",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "low",
+   "latency_seconds": 5.39206708301208,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Traffic pattern: elevated velocity variance (frequent speed cycling) is a risk multiplier because it indicates a potentially stressful driving environment with frequent braking and acceleration, which could lead to driver fatigue and increased risk of incidents.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 111,
+   "tokens_evaluated": 602,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Traffic pattern: elevated velocity variance (frequent speed cycling) is a risk multiplier because it indicates a potentially stressful driving environment with frequent braking and acceleration, which could lead to driver fatigue and increased risk of incidents.",
+    "escalation": "lower",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": false,
+    "consistent": false,
+    "severity_ok": false,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "low",
+   "latency_seconds": 4.948754084005486,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Traffic pattern: elevated velocity variance (frequent speed cycling) is a risk multiplier because it is a severe stop-and-go compaction.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 97,
+   "tokens_evaluated": 615,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Traffic pattern: elevated velocity variance (frequent speed cycling) is a risk multiplier because it is a severe stop-and-go compaction.",
+    "escalation": "lower",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": false,
+    "severity_ok": false,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "medium-volatile",
+   "latency_seconds": 5.901715042011347,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Traffic pattern (severe stop-and-go compaction) and weather (heavy rain, wet asphalt) are risk multipliers. The repeated hard braking due to the stop-and-go compaction, combined with reduced traction from the wet asphalt, elevates the severity.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 121,
+   "tokens_evaluated": 610,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Traffic pattern (severe stop-and-go compaction) and weather (heavy rain, wet asphalt) are risk multipliers. The repeated hard braking due to the stop-and-go compaction, combined with reduced traction from the wet asphalt, elevates the severity.",
+    "escalation": "raise",
+    "severity": "medium",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": false,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "medium-volatile",
+   "latency_seconds": 7.919277833992965,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Traffic pattern (severe stop-and-go compaction) is a risk multiplier because the peak deceleration is above 0.22 g and the traffic pattern is severe stop-and-go compaction.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 111,
+   "tokens_evaluated": 605,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Traffic pattern (severe stop-and-go compaction) is a risk multiplier because the peak deceleration is above 0.22 g and the traffic pattern is severe stop-and-go compaction.",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "medium-volatile",
+   "latency_seconds": 11.342984750008327,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Traffic pattern: severe stop-and-go compaction. The repeated hard braking due to the stop-and-go traffic pattern, combined with the peak deceleration of 0.15 g, which is above the baseline threshold of 0.22 g, results in a medium severity.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 130,
+   "tokens_evaluated": 618,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Traffic pattern: severe stop-and-go compaction. The repeated hard braking due to the stop-and-go traffic pattern, combined with the peak deceleration of 0.15 g, which is above the baseline threshold of 0.22 g, results in a medium severity.",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "medium",
+   "latency_seconds": 10.957504457997857,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Peak deceleration (0.3 g) and elevated velocity variance (frequent speed cycling) due to heavy rain and wet asphalt represent a significant risk to vehicle control and cargo security. The combination of these factors elevates the severity beyond a simple 'medium' assessment.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 122,
+   "tokens_evaluated": 606,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Peak deceleration (0.3 g) and elevated velocity variance (frequent speed cycling) due to heavy rain and wet asphalt represent a significant risk to vehicle control and cargo security. The combination of these factors elevates the severity beyond a simple 'medium' assessment.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": false,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "medium",
+   "latency_seconds": 9.616678917009267,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Traffic pattern: elevated velocity variance (frequent speed cycling) and Peak deceleration: 0.3 g\",\n  \"escalation\": \"raise\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 92,
+   "tokens_evaluated": 601,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Traffic pattern: elevated velocity variance (frequent speed cycling) and Peak deceleration: 0.3 g",
+    "escalation": "raise",
+    "severity": "medium",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "medium",
+   "latency_seconds": 9.873723041993799,
+   "content": "{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Traffic pattern: elevated velocity variance (frequent speed cycling) and Peak deceleration: 0.3 g\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 93,
+   "tokens_evaluated": 614,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Traffic pattern: elevated velocity variance (frequent speed cycling) and Peak deceleration: 0.3 g",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-volatile",
+   "latency_seconds": 11.035920541995438,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Traffic pattern (severe stop-and-go compaction) and weather (heavy rain, wet asphalt) are both risk multipliers. The repeated hard braking due to the stop-and-go traffic, combined with the reduced traction from the wet asphalt, creates a significant risk of loss of control.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 128,
+   "tokens_evaluated": 609,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Traffic pattern (severe stop-and-go compaction) and weather (heavy rain, wet asphalt) are both risk multipliers. The repeated hard braking due to the stop-and-go traffic, combined with the reduced traction from the wet asphalt, creates a significant risk of loss of control.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-volatile",
+   "latency_seconds": 10.54781245799677,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Vehicle physics: Peak deceleration of 0.3 g exceeds the baseline threshold of 0.22 g, and the traffic pattern is severe stop-and-go compaction. These factors combined indicate a significant operational risk.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 115,
+   "tokens_evaluated": 604,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Vehicle physics: Peak deceleration of 0.3 g exceeds the baseline threshold of 0.22 g, and the traffic pattern is severe stop-and-go compaction. These factors combined indicate a significant operational risk.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-volatile",
+   "latency_seconds": 10.433295458002249,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Vehicle physics: Peak deceleration of 0.3 g exceeds the baseline threshold of 0.22 g, combined with the severe stop-and-go compaction traffic pattern, results in a high baseline severity.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 113,
+   "tokens_evaluated": 617,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Vehicle physics: Peak deceleration of 0.3 g exceeds the baseline threshold of 0.22 g, combined with the severe stop-and-go compaction traffic pattern, results in a high baseline severity.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-decel",
+   "latency_seconds": 10.457893917002366,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Peak deceleration (0.5 g) and elevated velocity variance (frequent speed cycling) are driving the 'high' severity. The high peak deceleration, combined with the frequent speed cycling, indicates a high-risk traffic pattern.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 116,
+   "tokens_evaluated": 606,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Peak deceleration (0.5 g) and elevated velocity variance (frequent speed cycling) are driving the 'high' severity. The high peak deceleration, combined with the frequent speed cycling, indicates a high-risk traffic pattern.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-decel",
+   "latency_seconds": 11.022878709001816,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Vehicle physics: Peak deceleration of 0.5 g exceeds the threshold of 0.45 g, triggering the 'high' severity level based on the rules. The elevated velocity variance (frequent speed cycling) also contributes to the 'high' severity.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 123,
+   "tokens_evaluated": 601,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Vehicle physics: Peak deceleration of 0.5 g exceeds the threshold of 0.45 g, triggering the 'high' severity level based on the rules. The elevated velocity variance (frequent speed cycling) also contributes to the 'high' severity.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-decel",
+   "latency_seconds": 10.94910675000574,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Vehicle physics: Peak deceleration of 0.5 g exceeds the baseline threshold of 0.45 g, triggering the 'high' severity level. The traffic pattern of elevated velocity variance also contributes to the 'high' severity.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 117,
+   "tokens_evaluated": 614,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Vehicle physics: Peak deceleration of 0.5 g exceeds the baseline threshold of 0.45 g, triggering the 'high' severity level. The traffic pattern of elevated velocity variance also contributes to the 'high' severity.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-abs",
+   "latency_seconds": 11.434566750001977,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Vehicle physics: ABS engaged and peak deceleration of 0.15g is above 0.22g, and the traffic pattern is elevated velocity variance. The combination of ABS engagement, high deceleration, and elevated velocity variance indicates a significant risk due to the potential for loss of control.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 129,
+   "tokens_evaluated": 607,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Vehicle physics: ABS engaged and peak deceleration of 0.15g is above 0.22g, and the traffic pattern is elevated velocity variance. The combination of ABS engagement, high deceleration, and elevated velocity variance indicates a significant risk due to the potential for loss of control.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-abs",
+   "latency_seconds": 10.598299708013656,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Vehicle physics: ABS engaged is a primary driver of the high severity, despite the elevated velocity variance. The combination of ABS engagement and high deceleration (0.15g) indicates a potential for loss of control, even under dry conditions.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 118,
+   "tokens_evaluated": 602,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Vehicle physics: ABS engaged is a primary driver of the high severity, despite the elevated velocity variance. The combination of ABS engagement and high deceleration (0.15g) indicates a potential for loss of control, even under dry conditions.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-abs",
+   "latency_seconds": 9.214745457997196,
+   "content": "{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Vehicle physics: ABS engaged is yes, and peak deceleration is above 0.45 g.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 92,
+   "tokens_evaluated": 615,
+   "think_tokens": 0,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Vehicle physics: ABS engaged is yes, and peak deceleration is above 0.45 g.",
+    "escalation": "lower",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": false,
+    "severity_ok": true,
+    "action_ok": false,
+    "all_ok": false
+   }
+  }
+ ]
+}

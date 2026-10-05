@@ -1,0 +1,175 @@
+{
+  "host": "ip-10-42-11-136.us-west-2.compute.internal",
+  "arch": "arm64",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "decision_grade": "quality-only (non-target hardware)",
+  "timestamp": "2026-10-04T16:44:23Z",
+  "seed_config": {
+    "model_eval_runs": 45,
+    "model_timeout_seconds": 180.0
+  },
+  "models": {
+    "llama-3.1-8b-instruct-q4km": {
+      "id": "llama-3.1-8b-instruct-q4km",
+      "display_name": "Llama-3.1-8B-Instruct (Q4_K_M)",
+      "available": true,
+      "binary_path": "/Users/ec2-user/phoneproxy/llama.cpp/build/bin/llama-completion",
+      "model_path": "/Users/ec2-user/phoneproxy/models-quant/Llama-3.1-8B-Instruct-Q4_0.gguf",
+      "extra_args": [
+        "-no-cnv"
+      ],
+      "format_reliability": {
+        "total": 45,
+        "parsed": 45,
+        "rate": 1.0,
+        "sample_failures": []
+      },
+      "escalation_calibration": {
+        "per_scenario": {
+          "escalate-worthy": {
+            "expected_direction": "raise",
+            "escalation_tally": {
+              "raise": 42,
+              "hold": 3
+            },
+            "total": 45,
+            "matched": 42,
+            "match_rate": 0.9333333333333333
+          },
+          "benign": {
+            "expected_direction": "hold",
+            "escalation_tally": {
+              "hold": 28,
+              "lower": 17
+            },
+            "total": 45,
+            "matched": 28,
+            "match_rate": 0.6222222222222222
+          },
+          "de-escalate-worthy": {
+            "expected_direction": "lower_or_hold",
+            "escalation_tally": {
+              "lower": 34,
+              "hold": 11
+            },
+            "total": 45,
+            "matched": 45,
+            "match_rate": 1.0
+          }
+        },
+        "total": 135,
+        "matched": 115,
+        "mismatches": 20,
+        "mismatch_rate": 0.14814814814814814,
+        "sample_mismatches": [
+          {
+            "scenario": "escalate-worthy",
+            "expected_direction": "raise",
+            "escalation": "hold"
+          },
+          {
+            "scenario": "escalate-worthy",
+            "expected_direction": "raise",
+            "escalation": "hold"
+          },
+          {
+            "scenario": "escalate-worthy",
+            "expected_direction": "raise",
+            "escalation": "hold"
+          },
+          {
+            "scenario": "benign",
+            "expected_direction": "hold",
+            "escalation": "lower"
+          },
+          {
+            "scenario": "benign",
+            "expected_direction": "hold",
+            "escalation": "lower"
+          }
+        ],
+        "gate2_confirmed": true,
+        "gate2_per_scenario_n": 45,
+        "gate2_format_threshold": 0.8
+      },
+      "latency": {
+        "p50_seconds": 2.2163404999992053,
+        "p95_seconds": 2.5753361499999303,
+        "n": 180
+      },
+      "tokens_per_sec_approx": 17.218583857312964,
+      "tokens_per_sec_note": "approximate \u2014 whitespace word count / latency over parsed trials, not an exact tokenizer count",
+      "load_time_seconds": 2.0253940409966162,
+      "resident_ram_mb_before": 0.0,
+      "resident_ram_mb_after": 17188.640625,
+      "resident_ram_mb_note": "RUSAGE_CHILDREN ru_maxrss is a cumulative max for the whole test session and isn't resettable per model; this is exact for the first model in a run (or when a model is run alone) and otherwise a floor \u2014 not a true peak \u2014 for models measured later in the same run."
+    }
+  },
+  "comparison": {
+    "format_parse_rate": {
+      "direction": "higher",
+      "values": {
+        "llama-3.1-8b-instruct-q4km": 1.0
+      },
+      "best": "llama-3.1-8b-instruct-q4km"
+    },
+    "escalation_mismatch_rate": {
+      "direction": "lower",
+      "values": {
+        "llama-3.1-8b-instruct-q4km": 0.14814814814814814
+      },
+      "best": "llama-3.1-8b-instruct-q4km"
+    },
+    "latency_p50_seconds": {
+      "direction": "lower",
+      "values": {
+        "llama-3.1-8b-instruct-q4km": 2.2163404999992053
+      },
+      "best": "llama-3.1-8b-instruct-q4km"
+    },
+    "latency_p95_seconds": {
+      "direction": "lower",
+      "values": {
+        "llama-3.1-8b-instruct-q4km": 2.5753361499999303
+      },
+      "best": "llama-3.1-8b-instruct-q4km"
+    },
+    "tokens_per_sec_approx": {
+      "direction": "higher",
+      "values": {
+        "llama-3.1-8b-instruct-q4km": 17.218583857312964
+      },
+      "best": "llama-3.1-8b-instruct-q4km"
+    },
+    "load_time_seconds": {
+      "direction": "lower",
+      "values": {
+        "llama-3.1-8b-instruct-q4km": 2.0253940409966162
+      },
+      "best": "llama-3.1-8b-instruct-q4km"
+    },
+    "resident_ram_mb_after": {
+      "direction": "lower",
+      "values": {
+        "llama-3.1-8b-instruct-q4km": 17188.640625
+      },
+      "best": "llama-3.1-8b-instruct-q4km"
+    }
+  },
+  "recommendation": "format_parse_rate: Llama-3.1-8B-Instruct (Q4_K_M) leads (1.000)\nescalation_mismatch_rate: Llama-3.1-8B-Instruct (Q4_K_M) leads (0.148)\n[informational \u2014 non-target hardware] latency_p50_seconds: Llama-3.1-8B-Instruct (Q4_K_M) leads (2.216)\n[informational \u2014 non-target hardware] latency_p95_seconds: Llama-3.1-8B-Instruct (Q4_K_M) leads (2.575)\n[informational \u2014 non-target hardware] tokens_per_sec_approx: Llama-3.1-8B-Instruct (Q4_K_M) leads (17.219)\n[informational \u2014 non-target hardware] load_time_seconds: Llama-3.1-8B-Instruct (Q4_K_M) leads (2.025)\n[informational \u2014 non-target hardware] resident_ram_mb_after: Llama-3.1-8B-Instruct (Q4_K_M) leads (17188.641)\nThis note does not pick a stage model. Quality axes above are decision-relevant on any host; speed/RAM axes only count when measured on the Pi 4 target.",
+  "production_candidates": {
+    "format_threshold": 0.8,
+    "escalation_threshold": 0.5,
+    "passed": [
+      {
+        "id": "llama-3.1-8b-instruct-q4km",
+        "display_name": "Llama-3.1-8B-Instruct (Q4_K_M)",
+        "format_parse_rate": 1.0,
+        "gate2_confirmed": true,
+        "escalation_mismatch_rate": 0.14814814814814814,
+        "escalation_sample_n": 135
+      }
+    ],
+    "rejected": []
+  }
+}

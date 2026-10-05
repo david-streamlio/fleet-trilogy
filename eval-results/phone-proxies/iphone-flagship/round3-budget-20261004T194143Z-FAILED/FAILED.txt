@@ -1,0 +1,4 @@
+FAILED 2026-10-04 19:41-19:44Z: all 6 sessions exited 4 in under 1 s (pytest: argument --round3-mode: invalid choice: chat-budget). No measurements.
+Cause: followups_after_round3.sh (queued by the user's other Claude session) installed at 19:40:55 a conftest.py staged at 18:53, without the chat-budget choice; this run started 48 s later.
+Side effect: this run's powermetrics sampled alongside the follow-ups' own trace during their first ablation cell (phi-3.5-mini base), plus six ~0.5 s pytest start-ups.
+Re-run by budget_rerun_after_followups.sh after the follow-ups end; conftest.py restored by copy-then-rename.

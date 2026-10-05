@@ -1,0 +1,51 @@
+F
+=================================== FAILURES ===================================
+______________________________ test_round3_tasks _______________________________
+
+request = <FixtureRequest for <Function test_round3_tasks>>
+
+    def test_round3_tasks(request: pytest.FixtureRequest) -> None:
+        opt = request.config.getoption
+        server, gguf = opt("--round3-server"), opt("--round3-gguf")
+        if not server or not gguf:
+            pytest.skip("round 3 needs --round3-server and --round3-gguf")
+        task, mode, n = opt("--round3-task"), opt("--round3-mode"), opt("--round3-n")
+        threads = opt("--model-threads") or DEFAULT_THREADS
+        temperature, think_budget = opt("--round3-temperature"), opt("--round3-think-budget")
+        n_predict = r.JSON_MAX_TOKENS[task] + (think_budget if mode in ("chat-on", "chat-budget") else 0)
+        timeout = max(opt("--model-timeout-seconds"), 60 + 0.25 * n_predict)
+    
+        backend = LlmServerBackend(binary_path=server, model_path=gguf, threads=threads, startup_timeout_seconds=600)
+        coprocessor, context = TelemetryCoprocessorFunction(), _EdgeTriageEvalContext({})
+        calls: list[r.Round3Call] = []
+        try:
+>           backend.start()
+
+tests/model/test_round3_tasks.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+shared/llm-inference/src/llm_inference/client.py:307: in start
+    self._check_binary_and_model_exist()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <llm_inference.client.LlmServerBackend object at 0x107a69940>
+
+    def _check_binary_and_model_exist(self) -> None:
+        if self._binary_path is None or not self._binary_path.exists():
+            raise LlmInferenceError(
+                f"llama-server binary not found at {self._binary_path!r}. Build it with "
+                "`cmake -S . -B build -DLLAMA_BUILD_SERVER=ON && cmake --build build "
+                "--target llama-server`, or construct with mock=True / set LLM_MOCK=1 "
+                "to develop without it."
+            )
+        if self._model_path is None or not self._model_path.exists():
+>           raise LlmInferenceError(
+                f"Model not found at {self._model_path!r}. Point model_path at a GGUF "
+                "weights file, or construct with mock=True / set LLM_MOCK=1 to develop "
+                "without it."
+            )
+E           llm_inference.client.LlmInferenceError: Model not found at PosixPath('/Users/ec2-user/phoneproxy/models-round3/Qwen3.5-9B-Q4_K_M.gguf'). Point model_path at a GGUF weights file, or construct with mock=True / set LLM_MOCK=1 to develop without it.
+
+shared/llm-inference/src/llm_inference/client.py:406: LlmInferenceError
+=========================== short test summary info ============================
+FAILED tests/model/test_round3_tasks.py::test_round3_tasks - llm_inference.cl...
+1 failed in 0.02s

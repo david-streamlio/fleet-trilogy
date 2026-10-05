@@ -90,11 +90,11 @@ Slides 10-18 are a series of nine assumptions, so they must look like one family
 The slides:
 - Slides 10-12 (Content, chart slides):
   - 10: slide_fig2_energy.png;
-  - 11: slide_fig3_thinking.png, plus a "data pending" chip for capped-thinking results placed near the chart;
+  - 11: slide_fig3_thinking.png (it includes the capped-thinking diamonds), with the plan's small line under the chart;
   - 12: slide_fig5_task_scope.png.
 
   Put the chart large, with the first two on-screen lines beside it and the "Do this:" line in its usual place.
-- Slides 13-18 (Comparison): left column = what I assumed (the plan's "Before column"), right column = what happened (the plan's "After column"), highlighted as the winning side, with the "Do this:" line in its usual place. Slide 13 also carries a "data pending" chip (prompt-ablation result) under the right column.
+- Slides 13-18 (Comparison): left column = what I assumed (the plan's "Before column"), right column = what happened (the plan's "After column"), highlighted as the winning side, with the "Do this:" line in its usual place. Slide 13 also has two small lines under the right column, both from the plan: "Lookup tables + the chat template lifted 3 of 4 small models by 36-42 points" and "On the M1, worked examples nearly doubled the prompt but cost no more energy: answers got shorter".
 
 When done, list any judgment calls.
 ```
@@ -125,8 +125,6 @@ Do a final check of the whole deck against the attached plan and report the resu
 3. "Data pending" chips: exactly these, all in the same style:
    - slide 2 (two chips)
    - slide 4
-   - slide 11
-   - slide 13
    - slide 24
    - slide 27
 4. Numbers: spot-check every number on slides 6, 8, 10-18, 22-25 against the plan; list any mismatch.
@@ -147,7 +145,7 @@ Replace the "data pending" chip on slide <N> with: <final text or number>. Keep 
 |---|---|---|---|
 | 2 | IEA data-center electricity (2024; 2030 projection) | before the talk | IEA "Energy and AI" (2025): confirm the figures |
 | 4 | smartphones in use worldwide | before the talk | a citable figure (e.g. an industry survey) |
-| 11 | capped-thinking accuracy, time and energy (M1, M4, M4 Max) | 2026-10-05 | `round3_report.py` on the three budget runs; also regenerates Fig. 3 with budget points |
-| 13 | prompt-ablation one-liner | 2026-10-05 | the ablation runs (M4 Max, M4; reduced set on M1) |
+| ~~11~~ | capped thinking: **filled in** 2026-10-05 (the slide plan's line and notes; Fig. 3 regenerated with the capped points) | done | — |
+| ~~13~~ | worked-examples energy on the M1: **filled in** 2026-10-05 | done | — |
 | 24 | Datadog dashboard screenshot | after the slides | `talks/talk2-greenest-token/TODO-DATADOG-DASHBOARD-DEMO.md` |
 | 27 | paper link | when available | — |

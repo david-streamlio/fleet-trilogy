@@ -2,7 +2,7 @@
 
 **Working title:** *Can Phones Democratize Edge Intelligence? Latency, Energy and Capacity of Small Language Models Across the Consumer Hardware Spectrum*
 
-**Status:** outline, started 2026-10-04 after rounds 1-2 of the hardware-spectrum runs.
+**Status:** outline, started 2026-10-04 after rounds 1-2 of the hardware-spectrum runs. **Superseded as the working document by the LaTeX draft** (`talks/talk2-greenest-token/paper/main.tex`, IEEE conference format, draft 1 2026-10-04), which reframes the title and research questions around AI's environmental footprint and adds round 3. Kept as the planning record.
 - Talk 2 presents this study; the paper is the standalone, reviewable artifact.
 - Numbers below marked **[prelim]** come from `eval-results/phone-proxies/PRELIMINARY-20261003.md` and the test log. A final analysis script must regenerate every figure and table from the raw data before submission.
 - Sources:
@@ -184,7 +184,7 @@ Repository paths, commit IDs (`8512294`, `bca0e0d`, later), the runbook, the loc
 ## Open items before drafting prose
 - [ ] Final analysis script (one command → every figure and table), replacing `prelim_report.py`.
 - [ ] Fold in the Q-confirm n=45 run.
-- [ ] Decide on round 3 (harder task) and whether it belongs in this paper or a follow-up.
+- [x] Round 3 is in this paper (§IV-D of the draft): the talk summarizes the paper's lessons, and they depend on it.
 - [ ] Verify every citation marked [verify]. Get the MELT and apple-silicon-llm-bench methods.
-- [ ] Re-check impact-track rows that used the invalid 2026-09-26 multi-model M4 latencies.
-- [ ] Choose the venue (IEEE conference vs journal), which sets the page budget.
+- [x] Impact-track rows that used the invalid 2026-09-26 multi-model M4 latencies are listed (test log caveat 5); corrections are the user's call.
+- [x] Venue type: an IEEE conference (user, 2026-10-04); the specific conference is still open.

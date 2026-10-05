@@ -1,0 +1,1138 @@
+{
+ "host": "ip-10-42-11-136.us-west-2.compute.internal",
+ "arch": "arm64",
+ "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+ "timestamp": "2026-10-05T00:30:24Z",
+ "config": {
+  "task": "full",
+  "mode": "chat-budget",
+  "n_per_cell": 2,
+  "gguf": "/Users/ec2-user/phoneproxy/models-phase2/Qwen3-14B-Q4_K_M.gguf",
+  "server": "/Users/ec2-user/phoneproxy/llama.cpp/build/bin/llama-server",
+  "threads": 4,
+  "temperature": 0.2,
+  "n_predict": 1474,
+  "think_budget": 1024,
+  "timeout_seconds": 428.5
+ },
+ "summary": {
+  "n": 36,
+  "rates": {
+   "action_ok": 0.8333333333333334,
+   "all_ok": 0.8333333333333334,
+   "baseline_ok": 1.0,
+   "consistent": 1.0,
+   "escalation_ok": 0.8333333333333334,
+   "format_ok": 1.0,
+   "severity_ok": 0.8333333333333334
+  },
+  "latency_p50_seconds": 49.110479707989725,
+  "latency_p95_seconds": 70.73940366700117,
+  "tokens_predicted_mean": 583.5833333333334,
+  "think_tokens_mean": 476.0833333333333,
+  "truncated": 0,
+  "errors": 0,
+  "by_scenario": {
+   "escalate-worthy": {
+    "n": 12,
+    "escalations": {
+     "raise": 12
+    },
+    "all_ok": 12
+   },
+   "benign": {
+    "n": 12,
+    "escalations": {
+     "hold": 6,
+     "lower": 6
+    },
+    "all_ok": 6
+   },
+   "de-escalate-worthy": {
+    "n": 12,
+    "escalations": {
+     "lower": 12
+    },
+    "all_ok": 12
+   }
+  },
+  "by_profile": {
+   "low": {
+    "n": 6,
+    "baseline_ok": 6,
+    "all_ok": 6
+   },
+   "medium-volatile": {
+    "n": 6,
+    "baseline_ok": 6,
+    "all_ok": 5
+   },
+   "medium": {
+    "n": 6,
+    "baseline_ok": 6,
+    "all_ok": 4
+   },
+   "high-volatile": {
+    "n": 6,
+    "baseline_ok": 6,
+    "all_ok": 5
+   },
+   "high-decel": {
+    "n": 6,
+    "baseline_ok": 6,
+    "all_ok": 6
+   },
+   "high-abs": {
+    "n": 6,
+    "baseline_ok": 6,
+    "all_ok": 4
+   }
+  }
+ },
+ "calls": [
+  {
+   "scenario": "escalate-worthy",
+   "profile": "low",
+   "latency_seconds": 69.1888346249907,
+   "content": "Okay, let's tackle this step by step. First, I need to figure out the baseline severity based on the vehicle physics data provided. The rules say that if ABS is engaged or peak deceleration is above 0.45g, it's high. Here, peak deceleration is 0.15g and ABS is not engaged. So that's not high. Then, the next part: if peak deceleration is 0.22g or below, check the traffic pattern. The traffic pattern here is \"elevated velocity variance (frequent speed cycling)\". The rules say if it's severe stop-and-go compaction, then medium, else low. But the traffic pattern here isn't severe stop-and-go compaction; it's elevated velocity variance. So according to the rules, since peak deceleration is below 0.22g and traffic isn't severe stop-and-go, baseline severity is low.\n\nNext, the escalation step. The operational context includes heavy rain (which degrades traction, so a risk multiplier), cargo is liquids/chemical tanker (hazardous, so another risk multiplier), and dispatch status is 20 minutes behind schedule (a genuine risk factor). The rules say that if at least one field is a risk multiplier, we raise. Here, both weather and cargo are risk multipliers. So the escalation decision is to raise.\n\nThen, the final severity. Baseline was low, and we raised it, so severity becomes medium. The recommended action for raise is \"Escalate for driver/dispatcher review.\"\n\nWait, but the rules for escalation say that dispatch status being behind schedule is a risk factor. So even if the cargo and weather are multipliers, the dispatch status adds to that. But the decision to raise is if at least one field is a risk multiplier. Since both weather and cargo are, that's enough. So the escalation is raise. Then, the severity moves up from low to medium. The action is escalate.\n\nI need to make sure all steps align. Baseline severity is low, escalation is raise, so final severity is medium. The recommended action is \"Escalate for driver/dispatcher review.\" The risk synthesis should mention the specific fields: heavy rain (weather) and liquids/chemical tanker (cargo) as risk multipliers, and being behind schedule as a risk factor. But according to the rules, the dispatch status being behind schedule is a genuine risk factor, but the escalation decision is based on whether any field is a risk multiplier. Since both weather and cargo are risk multipliers, that's why we raise. The dispatch status being behind schedule is a separate risk factor but not a multiplier. So the risk synthesis should name the specific fields that are risk multipliers (weather and cargo) and the dispatch status as a risk factor. But the rules for escalation say that if at least one field is a risk multiplier, then raise. So the main drivers here are the two risk multipliers. The dispatch status is a risk factor but not a multiplier. So the synthesis should mention the two multipliers and the dispatch status as a risk factor. But the rules for escalation only consider the multipliers. So the answer should reflect that.\n\n</think>\n\n{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"Heavy rain (weather) degrades traction, and liquids/chemical tanker (cargo) pose spillage/shift risks. Dispatch status being 20 minutes behind schedule adds pressure as a risk factor.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 760,
+   "tokens_evaluated": 1864,
+   "think_tokens": 659,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "Heavy rain (weather) degrades traction, and liquids/chemical tanker (cargo) pose spillage/shift risks. Dispatch status being 20 minutes behind schedule adds pressure as a risk factor.",
+    "escalation": "raise",
+    "severity": "medium",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "low",
+   "latency_seconds": 55.25618220800243,
+   "content": "Okay, let's tackle this step by step. First, I need to assess the baseline severity based on the vehicle physics data provided. The peak deceleration is 0.15 g, which is below 0.22 g. The ABS wasn't engaged. According to the rules, if peak deceleration is 0.22 g or below, then the severity is medium if the traffic pattern is severe stop-and-go compaction, else low. The traffic pattern here is \"elevated velocity variance (frequent speed cycling)\" which I think isn't exactly \"severe stop-and-go compaction.\" So maybe that's not severe enough. Therefore, baseline severity would be low.\n\nNext, the escalation step. Looking at the operational context: weather is clear and dry, so no risk multiplier there. Cargo is dry goods, which isn't a risk factor. Dispatch status is on schedule, which isn't a risk multiplier. The rules say that being on schedule isn't a risk factor. So none of the fields are risk multipliers. Also, there's no indication of the driver handling a hazard safely, but since the dispatch status is on schedule, maybe that's a positive indicator. Wait, the rules say that a dispatch status describing the driver handling a hazard safely is evidence of control, which would be a reason to lower. But here, the dispatch status is just \"on schedule,\" not necessarily indicating a defensive maneuver. So maybe there's no clear reason to lower. The fields are mixed or none clearly point either way, so the escalation decision would be hold.\n\nThen, the final severity would stay as low. The recommended action for hold is \"Continue monitoring; no status change.\"\n\nWait, but the traffic pattern was \"elevated velocity variance (frequent speed cycling)\" which might be considered as \"severe stop-and-go compaction\"? The rules for baseline severity say that if peak deceleration is 0.22 g or below, then medium if traffic pattern is severe stop-and-go compaction, else low. So if the traffic pattern isn't severe stop-and-go, then it's low. The given traffic pattern is \"elevated velocity variance\" which might not be the same as \"severe stop-and-go compaction.\" So I think the baseline is low.\n\nThen, in escalation, since none of the operational factors are risk multipliers, and no positive indicators, it's hold. So final severity remains low, action is continue monitoring.\n\n</think>\n\n{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"No fields in the operational context qualify as risk multipliers (weather is clear/dry, cargo is non-hazardous, dispatch is on schedule). Dispatch status does not indicate unsafe pressure or hazards handled, so no escalation factors are present.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 615,
+   "tokens_evaluated": 1701,
+   "think_tokens": 508,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "No fields in the operational context qualify as risk multipliers (weather is clear/dry, cargo is non-hazardous, dispatch is on schedule). Dispatch status does not indicate unsafe pressure or hazards handled, so no escalation factors are present.",
+    "escalation": "hold",
+    "severity": "low",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "low",
+   "latency_seconds": 60.66698675000225,
+   "content": "Okay, let's tackle this step by step. First, I need to determine the baseline severity based on the vehicle physics data provided. The rules are pretty specific here.\n\nThe peak deceleration is 0.15 g, which is below 0.22 g. The ABS wasn't engaged. According to the rules, if peak deceleration is 0.22 g or below, then we check the traffic pattern. The traffic pattern here is \"elevated velocity variance (frequent speed cycling)\". The rules say that if the traffic pattern is severe stop-and-go compaction, then it's medium; otherwise, low. Wait, the traffic pattern here isn't exactly \"severe stop-and-go compaction\" but \"elevated velocity variance\". The problem is whether \"elevated velocity variance\" qualifies as \"severe stop-and-go compaction\". The original instruction says \"severe stop-and-go compaction\" is a condition that would make it medium if the deceleration is 0.22 g or below. Since the traffic pattern here is not \"severe stop-and-go compaction\", but rather \"elevated velocity variance\", which might be a different category. The rules don't mention \"elevated velocity variance\" as a traffic pattern, so maybe it's not considered severe stop-and-go compaction. Therefore, the baseline severity would be low.\n\nNext, the escalation step. The operational context includes weather (clear, light traffic), cargo (empty trailer, non-hazardous), and dispatch status (ahead of schedule, defensive maneuver executed). According to the rules, cargo is only a risk multiplier if hazardous, liquid, etc. Here, it's empty and non-hazardous, so no risk. Weather is clear, so no risk multiplier. Dispatch status is ahead of schedule and the driver executed a defensive maneuver, which is a positive indicator of control. The rules say that being ahead of schedule is not a risk factor. So, none of the fields are risk multipliers. However, the dispatch status includes a documented defensive maneuver, which is a positive factor. Therefore, the escalation decision would be to lower, since none are risk multipliers and there's a positive indicator.\n\nThen, the final severity. The baseline was low. Since we decided to lower, the severity would stay low. The recommended action for lower is \"Log and continue; no immediate action needed.\"\n\nWait, but the rules for escalation say that if none of the fields are risk multipliers and at least one positively indicates safe conditions, then lower. Here, the dispatch status has a documented defensive maneuver, which is a positive indicator. So that's why we lower. Therefore, the final severity is low, and the action is to log and continue.\n\n</think>\n\n{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"The operational context includes a documented defensive maneuver executed by the driver, which positively indicates safe, controlled conditions. Cargo is non-hazardous and weather is clear, neither of which are risk multipliers. Dispatch status being ahead of schedule further supports controlled conditions.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 678,
+   "tokens_evaluated": 1787,
+   "think_tokens": 566,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "The operational context includes a documented defensive maneuver executed by the driver, which positively indicates safe, controlled conditions. Cargo is non-hazardous and weather is clear, neither of which are risk multipliers. Dispatch status being ahead of schedule further supports controlled conditions.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "medium-volatile",
+   "latency_seconds": 42.11109541699989,
+   "content": "Okay, let's tackle this step by step. First, I need to determine the baseline severity based on the vehicle physics data provided. The peak deceleration is 0.15 g, which is below 0.22 g. The ABS wasn't engaged. According to the rules, if peak deceleration is 0.22 g or below, then the severity is medium if the traffic pattern is severe stop-and-go compaction, else low. Since the traffic pattern here is severe stop-and-go, the baseline severity should be medium.\n\nNext, the escalation part. The operational context includes heavy rain, which is a risk multiplier because it degrades traction. The cargo is a liquids/chemical tanker, which is hazardous and a risk multiplier. The dispatch status is running 20 minutes behind schedule, which is a genuine risk factor as per the rules. So, both weather and cargo are risk multipliers. That means the escalation decision is to raise the severity.\n\nNow, applying the escalation to the baseline severity. The baseline was medium. Raising it would move it up one level. The severity levels are low, medium, high. So medium to high. The recommended action for raise is to escalate for driver/dispatcher review.\n\nLet me check again. The peak deceleration is 0.15 g, which is below 0.22, so the first condition applies. Traffic pattern is severe, so baseline is medium. Then, the operational context: heavy rain (risk multiplier), hazardous cargo (liquids/chemicals), and being behind schedule (risk factor). All three factors are risk multipliers. So escalation is raise. Therefore, severity becomes high, and action is to escalate.\n\n</think>\n\n{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Heavy rain (degrades traction) and hazardous cargo (liquids/chemical tanker) are both risk multipliers per rules. Dispatch status being behind schedule adds pressure as a genuine risk factor.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 453,
+   "tokens_evaluated": 1564,
+   "think_tokens": 353,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Heavy rain (degrades traction) and hazardous cargo (liquids/chemical tanker) are both risk multipliers per rules. Dispatch status being behind schedule adds pressure as a genuine risk factor.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "medium-volatile",
+   "latency_seconds": 53.155577584009734,
+   "content": "Okay, let's tackle this step by step. First, I need to figure out the baseline severity based on the vehicle physics data provided. The rules mention that if ABS is engaged or peak deceleration is above 0.45g, it's high. Here, peak deceleration is 0.15g and ABS is not engaged. So that's not high. Then, the next part says if peak deceleration is 0.22g or below, check the traffic pattern. Since the traffic pattern is severe stop-and-go compaction, the severity would be medium. Wait, the rules say if peak deceleration is 0.22g or below, then medium if traffic is severe, else low. So in this case, since peak is 0.15g (which is below 0.22g) and traffic is severe, baseline severity is medium.\n\nNext, the escalation step. The operational context includes weather (clear, dry), cargo (dry goods), and dispatch status (on schedule). According to the rules, cargo isn't a risk multiplier here because it's dry. Weather is clear, so no risk multiplier. Dispatch status is on schedule, which isn't a risk factor. The rules say that being on schedule isn't a risk, and if there's a documented defensive maneuver, that's a positive. But here, there's no mention of such a maneuver. So none of the fields are risk multipliers. However, the dispatch status being on schedule is a positive indicator of safe conditions. So according to the escalation rules, if none are risk multipliers and at least one indicates safe conditions, we should lower the severity. Wait, the rules for escalation say: lower if none are risk multipliers and at least one positively indicates safe. So here, the dispatch status is on schedule, which is a positive. So the escalation decision would be to lower.\n\nThen, the final severity would be baseline (medium) minus one level, which would be low. The recommended action for lower is \"Log and continue; no immediate action needed.\"\n\nWait, but the baseline was medium. If we lower, it moves down one level. So medium to low. Then the action is \"Log and continue...\" So putting it all together: baseline severity is medium, escalation is lower, final severity low, action as per the rules.\n\n</think>\n\n{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"None of the operational context fields (weather, cargo, dispatch status) are risk multipliers. Dispatch status being 'on schedule' positively indicates safe, controlled conditions, which supports a 'lower' escalation decision.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 590,
+   "tokens_evaluated": 1686,
+   "think_tokens": 487,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "None of the operational context fields (weather, cargo, dispatch status) are risk multipliers. Dispatch status being 'on schedule' positively indicates safe, controlled conditions, which supports a 'lower' escalation decision.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "medium-volatile",
+   "latency_seconds": 44.80148441699566,
+   "content": "Okay, let's tackle this step by step. First, I need to figure out the baseline severity based on the vehicle physics data provided. The rules mention that if ABS is engaged or peak deceleration is above 0.45g, it's high. Here, peak deceleration is 0.15g, which is below 0.22g. The traffic pattern is severe stop-and-go compaction. According to the rules, if peak deceleration is 0.22g or below and traffic is severe, then it's medium. So baseline severity is medium.\n\nNext, the escalation part. The operational context has weather as clear, which isn't a risk multiplier. Cargo is empty, non-hazardous, so no risk. Dispatch status is ahead of schedule and the driver did a defensive maneuver. The rules say that being ahead of schedule isn't a risk, and a defensive maneuver indicates safe control. So none of the fields are risk multipliers. However, the defensive maneuver is a positive indicator. So according to the escalation rules, if none are risk multipliers and at least one indicates safe conditions, we lower. So escalation is lower.\n\nThen, final severity: baseline was medium, lower moves it down to low. Recommended action for lower is \"Log and continue; no immediate action needed.\"\n\nWait, but the traffic pattern was severe stop-and-go. But in the baseline severity, since peak deceleration is below 0.22g, and traffic is severe, it's medium. Then, the escalation lowers it because of the safe dispatch status and defensive maneuver. So the final severity is low. Let me check again. Yes, the rules for escalation say that if none are risk multipliers and at least one is safe, then lower. So the baseline was medium, lower reduces it by one level to low. The action is log and continue.\n\n</think>\n\n{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The operational context includes a documented defensive maneuver by the driver and a dispatch status of 'ahead of schedule,' both of which indicate safe, controlled conditions. Weather and cargo are not risk factors under the given rules.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 491,
+   "tokens_evaluated": 1616,
+   "think_tokens": 389,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The operational context includes a documented defensive maneuver by the driver and a dispatch status of 'ahead of schedule,' both of which indicate safe, controlled conditions. Weather and cargo are not risk factors under the given rules.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "medium",
+   "latency_seconds": 65.79896916699363,
+   "content": "Okay, let's tackle this step by step. First, the user wants me to assess a slowdown event using three steps. Let me start with Step 1: Baseline Severity based on vehicle physics.\n\nThe rules say that if ABS is engaged or peak deceleration is above 0.45g, it's high. Here, peak deceleration is 0.3g and ABS is not engaged. So that's not high. Next, check if peak deceleration is 0.22g or below. Since it's 0.3g, which is above 0.22g but below 0.45g, we look at the traffic pattern. The traffic pattern is \"elevated velocity variance (frequent speed cycling)\". The rules state that if the peak deceleration is between 0.22g and 0.45g, it's high if the traffic pattern is severe stop-and-go compaction, else medium. Wait, the traffic pattern here is \"elevated velocity variance\" but not explicitly \"severe stop-and-go compaction\". So maybe that's not the same. The original instruction says \"severe stop-and-go compaction\" is the condition for high. Since the traffic pattern here is different, maybe it's not severe enough. Therefore, baseline severity would be medium.\n\nMoving to Step 2: Escalation. The operational context includes weather (heavy rain, wet asphalt), cargo (liquids/chemical tanker), and dispatch status (20 minutes behind schedule). \n\nCargo is a risk multiplier if hazardous, liquid, etc. Here, it's a liquids/chemical tanker, so that's a risk multiplier. Weather is heavy rain, which degrades traction, so that's another risk multiplier. Dispatch status is behind schedule under pressure, which is a genuine risk factor. So both cargo and weather are risk multipliers. According to the rules, if at least one field is a risk multiplier, we raise. So the escalation decision is to raise.\n\nStep 3: Final Severity and Action. The baseline was medium. Since we raised, severity moves up one level. Medium to high. The recommended action for raise is \"Escalate for driver/dispatcher review.\"\n\nWait, but let me double-check. The baseline severity was medium. If we escalate, it moves up to high. Then the action is to escalate. All steps need to align. The risk synthesis should mention the specific fields: cargo (hazardous/liquid) and weather (heavy rain) as risk multipliers. Dispatch status being behind schedule is a risk factor but according to the rules, the escalation is based on risk multipliers. The dispatch status is a risk factor but not a multiplier. The rules say that dispatch status being behind schedule under pressure is a genuine risk factor, but the escalation decision is based on whether there are risk multipliers. Since both cargo and weather are multipliers, that's why we raise. So the synthesis should name those two fields. Then the final severity is high, action is escalate.\n\n</think>\n\n{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Cargo (liquids/chemical tanker) is a risk multiplier due to potential spillage/shift risk, and weather (heavy rain) degrades traction, both qualifying as genuine risk multipliers per rules.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 733,
+   "tokens_evaluated": 1833,
+   "think_tokens": 630,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Cargo (liquids/chemical tanker) is a risk multiplier due to potential spillage/shift risk, and weather (heavy rain) degrades traction, both qualifying as genuine risk multipliers per rules.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "medium",
+   "latency_seconds": 50.60943862500426,
+   "content": "Okay, let's tackle this step by step. First, I need to determine the baseline severity based on the vehicle physics data provided. The peak deceleration is 0.3 g, which is between 0.22 g and 0.45 g. The ABS wasn't engaged. The traffic pattern is elevated velocity variance, which is frequent speed cycling. According to the rules, if the peak deceleration is above 0.22 g but below 0.45 g, the severity is high if the traffic pattern is severe stop-and-go compaction, else medium. The traffic pattern here is elevated velocity variance, not severe stop-and-go compaction. So, the baseline severity should be medium.\n\nNext, the escalation step. The operational context includes weather (clear and dry), cargo (dry goods), and dispatch status (on schedule). None of these are risk multipliers. The weather is clear, so no risk. The cargo is general freight, not hazardous. Dispatch is on schedule, which isn't a risk factor. However, the dispatch status being on schedule is a positive indicator of safe conditions. So, according to the rules, if none are risk multipliers and at least one indicates safe conditions, we should lower the severity. But wait, the rules say that if none are risk multipliers and at least one positively indicates safe conditions, then lower. So here, the dispatch status being on schedule is a positive indicator. Therefore, the escalation decision is to lower.\n\nNow, the final severity would be baseline (medium) minus one level, which would be low. The recommended action for lower is \"Log and continue; no immediate action needed.\"\n\nWait, but the baseline was medium. If we lower, it moves down one level. So medium to low. That makes sense. Let me check the rules again. Yes, severity is adjusted by one level for raise or lower. So the final severity is low. The action is \"Log and continue...\" \n\nI need to make sure all steps align. The baseline severity is medium. The escalation is lower because of the dispatch status being on schedule. So the final severity is low. The recommended action is \"Log and continue...\" That seems correct.\n\n</think>\n\n{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The operational context includes no risk multipliers (weather is clear/dry, cargo is general freight, dispatch is on schedule). Dispatch status being on schedule positively indicates safe, controlled conditions, which justifies lowering the baseline severity.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 560,
+   "tokens_evaluated": 1645,
+   "think_tokens": 454,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The operational context includes no risk multipliers (weather is clear/dry, cargo is general freight, dispatch is on schedule). Dispatch status being on schedule positively indicates safe, controlled conditions, which justifies lowering the baseline severity.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "medium",
+   "latency_seconds": 44.016804791011964,
+   "content": "Okay, let's tackle this step by step. First, I need to figure out the baseline severity based on the vehicle physics data provided. The peak deceleration is 0.3 g, which is between 0.22 g and 0.45 g. The ABS wasn't engaged. The traffic pattern is elevated velocity variance, which is frequent speed cycling. According to the rules, if the peak deceleration is above 0.22 g but below 0.45 g, then it's high if the traffic pattern is severe stop-and-go compaction, else medium. The traffic pattern here is elevated velocity variance, not severe stop-and-go compaction. So the baseline severity should be medium.\n\nNext, the escalation step. The operational context has clear weather, light traffic, empty trailer, and the driver executed a defensive maneuver. Let's check each field. Weather is clear, so no risk multiplier. Cargo is empty, non-hazardous, so no risk. Dispatch status is ahead of schedule with a documented defensive maneuver. The rules say that a defensive maneuver indicates the driver is in control, which is a reason to lower or hold. Since none of the fields are risk multipliers and there's a positive indicator (defensive maneuver), the escalation decision should be lower.\n\nNow, the final severity. The baseline was medium, and we're lowering it. So the severity becomes low. The recommended action for lower is \"Log and continue; no immediate action needed.\"\n\nWait, but the traffic pattern was elevated velocity variance. The rules for baseline severity mention traffic pattern being severe stop-and-go compaction. Since the traffic pattern here isn't that, the baseline is medium. Then, the escalation is lower because of the defensive maneuver. So final severity is low. That seems right. Let me double-check the rules again to make sure I didn't mix up any steps. Yes, looks correct.\n\n</think>\n\n{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The operational context includes a documented defensive maneuver executed by the driver, which indicates controlled conditions and reduces risk. Weather and cargo are not risk multipliers.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 482,
+   "tokens_evaluated": 1611,
+   "think_tokens": 392,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The operational context includes a documented defensive maneuver executed by the driver, which indicates controlled conditions and reduces risk. Weather and cargo are not risk multipliers.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-volatile",
+   "latency_seconds": 40.16088887499063,
+   "content": "Okay, let's tackle this step by step. First, I need to determine the baseline severity based on the vehicle physics data provided. The peak deceleration is 0.3 g, which is between 0.22 g and 0.45 g. The ABS wasn't engaged. The traffic pattern is severe stop-and-go compaction. According to the rules, if the peak deceleration is above 0.22 g but below 0.45 g, then the severity is high if the traffic pattern is severe stop-and-go, else medium. Since the traffic pattern here is severe, that makes the baseline severity high.\n\nNext, the escalation part. The operational context includes heavy rain (which degrades traction, so a risk multiplier), cargo is liquids/chemical tanker (hazardous, so another risk multiplier), and being 20 minutes behind schedule (a genuine risk factor). The rules say that if at least one field is a risk multiplier, we should raise. Here, both weather and cargo are risk multipliers. So the escalation decision is to raise.\n\nNow, the final severity. The baseline was high, and we raised it. But the rules say severity moves one level up for raise. However, high is the upper limit, so it can't go higher. Therefore, severity remains high. The recommended action for raise is \"Escalate for driver/dispatcher review.\"\n\nLet me check again. The baseline was high. Escalation is raise, so severity stays high. The action is escalate. All steps align with the rules.\n\n</think>\n\n{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Weather (heavy rain degrades traction) and cargo (hazardous liquids/chemical tanker) are both risk multipliers per rules. Dispatch status (20 minutes behind schedule) adds pressure as a genuine risk factor.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 430,
+   "tokens_evaluated": 1533,
+   "think_tokens": 324,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Weather (heavy rain degrades traction) and cargo (hazardous liquids/chemical tanker) are both risk multipliers per rules. Dispatch status (20 minutes behind schedule) adds pressure as a genuine risk factor.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-volatile",
+   "latency_seconds": 68.92102412499662,
+   "content": "Okay, let's tackle this step by step. First, I need to figure out the baseline severity based on the vehicle physics data provided. The rules are pretty specific, so I need to follow them exactly.\n\nStarting with STEP 1: Baseline Severity. The peak deceleration is 0.3 g, which is between 0.22 g and 0.45 g. The ABS wasn't engaged. The traffic pattern is severe stop-and-go compaction. According to the rules, if the peak deceleration is above 0.22 g but up to 0.45 g, then if the traffic pattern is severe stop-and-go, it's high. Otherwise, medium. Since the traffic pattern here is severe, that makes the baseline severity high.\n\nNow, STEP 2: Escalation. Let's look at the operational context. Weather is clear and dry, which the rules say isn't a risk multiplier. Cargo is dry goods, general freight, so no risk there either. Dispatch status is on schedule, which isn't a risk factor. The rules mention that being on schedule isn't a risk, and there's no indication of hazardous cargo or bad weather. So, none of the fields are risk multipliers. However, the dispatch status being on schedule is a positive indicator of safe conditions. So according to the escalation rules, if none are risk multipliers and at least one indicates safe conditions, we should lower the severity. But wait, the rules for escalation say that \"lower: none of the fields are risk multipliers, and at least one positively indicates safe, controlled conditions.\" So in this case, since all three fields are not risk factors and the dispatch status is on schedule (safe), that would be a reason to lower.\n\nWait, but the baseline was high. So if we lower, the severity would go down one level. But the rules for escalation say that if you lower, the severity is adjusted down. However, the baseline was high, so lowering would take it to medium. But the question is whether the escalation decision is to raise, lower, or hold. Since none of the fields are risk multipliers and there's a positive indicator (dispatch on schedule), the decision is to lower.\n\nSo STEP 3: Final severity would be medium (since baseline was high, and we lower it by one level). The recommended action for lower is \"Log and continue; no immediate action needed.\"\n\nWait, but I need to make sure I didn't mix up the steps. Let me check again. Baseline severity is high. Escalation decision is lower. So final severity is medium. The action is \"Log and continue...\" \n\nBut let me confirm the rules again. The escalation decision is based on the operational context. Since none of the fields are risk multipliers (weather, cargo, dispatch status), and the dispatch status is on schedule (safe), that's a reason to lower. So the escalation is \"lower,\" which means the baseline severity (high) is reduced by one level to medium. The recommended action for lower is \"Log and continue; no immediate action needed.\"\n\nSo putting it all together: baseline_severity is high, risk_synthesis mentions the traffic pattern and peak deceleration, escalation is lower, final severity is medium, and the action is log and continue.\n\n</think>\n\n{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Traffic pattern (severe stop-and-go compaction) and peak deceleration (0.3 g) meet the criteria for high severity under vehicle physics rules.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 776,
+   "tokens_evaluated": 1879,
+   "think_tokens": 682,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Traffic pattern (severe stop-and-go compaction) and peak deceleration (0.3 g) meet the criteria for high severity under vehicle physics rules.",
+    "escalation": "lower",
+    "severity": "medium",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-volatile",
+   "latency_seconds": 41.93838337500347,
+   "content": "Okay, let's tackle this step by step. First, I need to figure out the baseline severity based on the vehicle physics data provided. The rules mention checking if ABS is engaged or peak deceleration is above 0.45g. Here, peak deceleration is 0.3g and ABS isn't engaged. So that's not high. Next, check if peak deceleration is 0.22g or below. Since it's 0.3g, which is above 0.22g but below 0.45g, we look at the traffic pattern. The traffic pattern is severe stop-and-go compaction, so according to the rules, that makes it high. So baseline severity is high.\n\nNow for escalation. The operational context has weather as clear, which isn't a risk multiplier. Cargo is empty, non-hazardous, so no risk there. Dispatch status is ahead of schedule with a documented defensive maneuver. The rules say that a defensive maneuver indicates the driver is in control, which is a reason to lower or hold. Since none of the fields are risk multipliers and there's a positive indicator (defensive maneuver), we should lower the baseline. \n\nSo the escalation decision is lower. Then the final severity would be medium (since high lowered by one level). The recommended action for lower is \"Log and continue; no immediate action needed.\"\n\nI need to make sure all steps align. Baseline is high, escalation lowers it to medium, and the action is as specified. The risk synthesis should mention the defensive maneuver as the reason for lowering.\n\n</think>\n\n{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"The traffic pattern of severe stop-and-go compaction, combined with peak deceleration of 0.3 g (above 0.22 g), triggers the 'high' baseline severity. However, the operational context includes a documented defensive maneuver executed by the driver for a merging vehicle, which positively indicates controlled conditions and reduces risk.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 457,
+   "tokens_evaluated": 1554,
+   "think_tokens": 329,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "The traffic pattern of severe stop-and-go compaction, combined with peak deceleration of 0.3 g (above 0.22 g), triggers the 'high' baseline severity. However, the operational context includes a documented defensive maneuver executed by the driver for a merging vehicle, which positively indicates controlled conditions and reduces risk.",
+    "escalation": "lower",
+    "severity": "medium",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-decel",
+   "latency_seconds": 45.05406033300096,
+   "content": "Okay, let's tackle this step by step. First, the baseline severity. The rules say that if ABS is engaged or peak deceleration is above 0.45g, it's high. Here, peak deceleration is 0.5g, which is above 0.45g, so baseline severity should be high. Wait, but the ABS engaged is no. But the first condition is if either ABS is yes or peak deceleration above 0.45g. Since peak deceleration is 0.5g, that's over 0.45g, so baseline is high. Got that.\n\nNext, the escalation. Let's look at the operational context. Weather is heavy rain, which degrades traction, so that's a risk multiplier. Cargo is liquids/chemical tanker, which is hazardous and could be a risk multiplier. Dispatch status is running 20 minutes behind schedule, which is a genuine risk factor. So, both weather and cargo are risk multipliers. According to the rules, if at least one field is a risk multiplier, we raise. So the escalation decision is raise.\n\nNow, the final severity. Baseline was high, and we raised it. But the rules say severity moves one level up for raise. However, high is the upper limit, so it can't go higher. So severity remains high. The recommended action for raise is \"Escalate for driver/dispatcher review.\"\n\nWait, but the baseline was already high. So even after raising, it's still high. So the final severity is high, and the action is to escalate. Let me check the rules again. Yes, severity is the baseline moved one level up for raise. But since high is the top, it can't go higher. So it stays high. Therefore, the final severity is high, and the action is escalate.\n\n</think>\n\n{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Weather (heavy rain degrades traction) and cargo (hazardous liquids/chemical tanker) are risk multipliers. Dispatch status (20 minutes behind schedule) adds pressure as a genuine risk factor.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 488,
+   "tokens_evaluated": 1589,
+   "think_tokens": 386,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Weather (heavy rain degrades traction) and cargo (hazardous liquids/chemical tanker) are risk multipliers. Dispatch status (20 minutes behind schedule) adds pressure as a genuine risk factor.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-decel",
+   "latency_seconds": 97.83571800000209,
+   "content": "Okay, let's tackle this step by step. First, I need to figure out the baseline severity based on the vehicle physics data provided. The peak deceleration is 0.5 g, which is above 0.45 g. According to the rules, if the peak deceleration is above 0.45 g, it's high severity regardless of ABS or traffic pattern. Wait, the first rule says high if ABS is engaged or peak deceleration above 0.45 g. So even though ABS isn't engaged here, the peak deceleration is 0.5 g, which is over 0.45, so baseline severity is high. Got that.\n\nNext, the escalation part. The operational context includes weather (clear, dry), cargo (dry goods), and dispatch status (on schedule). The rules say that cargo is only a risk multiplier if it's hazardous, liquid, etc. Since it's dry goods, that's not a multiplier. Weather is clear and dry, so no risk multiplier there. Dispatch status is on schedule, which isn't a risk factor. The rules mention that being on schedule isn't a risk, and being behind schedule under pressure is. So none of the fields are risk multipliers. Also, there's no indication of the driver handling a hazard safely, but since the dispatch is on schedule, maybe that's a positive. Wait, the rules say that if the dispatch status is on schedule, it's not a risk factor. So the operational context doesn't have any risk multipliers. Therefore, the escalation decision would be to lower, because none are risk multipliers and at least one (dispatch status) indicates safe conditions.\n\nWait, but the rules for lowering say: none of the fields are risk multipliers, and at least one positively indicates safe, controlled conditions. The dispatch status being on schedule is not a risk factor, but does it count as a positive indicator? The rules mention that a dispatch status describing the driver handling a hazard safely is evidence of control. But here, the dispatch status is just \"on schedule,\" which isn't a documented maneuver. So maybe there's no positive indicator. Hmm. The rules say that being on schedule is not a risk factor. So maybe the fields are mixed or none clearly point either way. Wait, the operational context fields are weather, cargo, dispatch status. None are risk multipliers. The dispatch status is on schedule, which isn't a risk factor. So maybe the escalation is to hold because the fields are mixed or none clearly point either way. Wait, the rules for escalation: raise if at least one field is a risk multiplier. Lower if none are risk multipliers and at least one positively indicates safe. Otherwise, hold. Since none are risk multipliers, but there's no positive indicator (the dispatch status is on schedule, which is not a positive indicator but just not a risk), then maybe it's hold. Wait, the rules say that a dispatch status that describes the driver handling a hazard safely is a positive. But here, the dispatch status is just \"on schedule,\" which isn't that. So maybe there's no positive indicator. Therefore, the escalation would be hold because the fields are mixed or none clearly point either way. Wait, but the rules for lower require that none are risk multipliers AND at least one positively indicates safe. Since there's no positive indication, it's not lower. So the escalation is hold.\n\nWait, but the user instructions for step 2 say: \"Decision: raise, lower, or hold.\" So in this case, since none are risk multipliers, and there's no positive indication (since dispatch status is on schedule, which is not a positive), then the fields are mixed or none clearly point either way. Therefore, escalation is hold.\n\nSo the baseline severity is high. Then, escalation is hold. Therefore, the final severity remains high. The recommended action for hold is \"Continue monitoring; no status change.\"\n\nWait, but let me check again. The operational context: weather is clear, cargo is dry, dispatch is on schedule. None of these are risk multipliers. The rules for lowering require that none are risk multipliers AND at least one positively indicates safe. But the dispatch status being on schedule is not a positive indicator. The only positive indicators would be if the dispatch status mentioned a defensive maneuver or safety check. Since it's just on schedule, there's no positive. Therefore, the fields are not mixed, but none are risk multipliers. However, since there's no positive, it's not lower. So the escalation is hold. Therefore, the final severity remains high. So the action is \"Continue monitoring; no status change.\"\n\nPutting it all together: baseline severity is high. Escalation is hold. Final severity is high. Recommended action is \"Continue monitoring; no status change.\"\n\n</think>\n\n{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Peak deceleration of 0.5 g exceeds the 0.45 g threshold, triggering high severity regardless of traffic pattern or ABS status. Operational context has no risk multipliers (non-hazardous cargo, clear weather, on-schedule dispatch), but no explicit positive indicators of safety control.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 1115,
+   "tokens_evaluated": 2185,
+   "think_tokens": 994,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Peak deceleration of 0.5 g exceeds the 0.45 g threshold, triggering high severity regardless of traffic pattern or ABS status. Operational context has no risk multipliers (non-hazardous cargo, clear weather, on-schedule dispatch), but no explicit positive indicators of safety control.",
+    "escalation": "hold",
+    "severity": "high",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-decel",
+   "latency_seconds": 52.45115470899327,
+   "content": "Okay, let's tackle this step by step. First, I need to determine the baseline severity based on the vehicle physics provided. The rules mention that if ABS is engaged or peak deceleration is above 0.45g, it's high. Here, peak deceleration is 0.5g, which is above 0.45g, so baseline severity should be high. Wait, but the ABS engaged is no. But the first condition says if either ABS is engaged or peak deceleration is above 0.45g, it's high. Since peak deceleration is 0.5g, that's above 0.45g, so baseline severity is high. Got that.\n\nNext, the escalation step. The operational context includes weather (clear, light traffic), cargo (empty trailer, non-hazardous), and dispatch status (ahead of schedule, driver executed a defensive maneuver). According to the rules, cargo isn't a risk multiplier here. Weather is clear, so no risk multiplier. Dispatch status mentions a documented defensive maneuver, which is a positive indicator of control. Since none of the fields are risk multipliers and there's a positive indicator, the escalation decision should be lower. \n\nSo the baseline was high, but escalation lowers it. Then the final severity would be medium (since high minus one level is medium). The recommended action for lower is \"Log and continue; no immediate action needed.\"\n\nWait, but the traffic pattern was \"elevated velocity variance (frequent speed cycling)\" in the vehicle physics. The baseline severity rules mention traffic pattern in the second part. Let me check again. The first step: peak deceleration is 0.5g, which is above 0.45g, so regardless of traffic pattern, it's high. So baseline severity is high. Then, in escalation, the factors don't include any risk multipliers, and the dispatch status has a positive factor. So escalation is lower. Therefore, final severity is medium. The action is \"Log and continue...\" \n\nI need to make sure all steps align. The risk synthesis should mention the dispatch status's defensive maneuver as the reason for lowering. The fields that drove the escalation are the dispatch status's safe maneuver. No other factors are risk multipliers. So the answer should reflect that.\n\n</think>\n\n{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Dispatch status indicates a documented defensive maneuver for a merging vehicle, which positively signals controlled conditions and reduces risk. Cargo (empty, non-hazardous) and weather (clear) are not risk multipliers.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 581,
+   "tokens_evaluated": 1698,
+   "think_tokens": 479,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Dispatch status indicates a documented defensive maneuver for a merging vehicle, which positively signals controlled conditions and reduces risk. Cargo (empty, non-hazardous) and weather (clear) are not risk multipliers.",
+    "escalation": "lower",
+    "severity": "medium",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-abs",
+   "latency_seconds": 42.530646250001155,
+   "content": "Okay, let's tackle this step by step. First, I need to figure out the baseline severity based on the vehicle physics data provided. The peak deceleration is 0.15 g, which is below 0.22 g. The ABS was engaged, so according to the rules, if ABS is engaged, it's high severity. Wait, the first rule says high if ABS engaged is yes OR peak deceleration above 0.45g. So even though the peak deceleration is low, since ABS was engaged, that makes it high. So baseline severity is high.\n\nNext, the escalation part. The operational context includes heavy rain (which degrades traction, so a risk multiplier), cargo is liquids/chemical tanker (hazardous, so another risk multiplier), and dispatch status is 20 minutes behind schedule (a genuine risk factor). The rules say that if any of these are risk multipliers, we raise. Since both weather and cargo are risk multipliers, that's two factors. So the decision is to raise.\n\nThen, the final severity would be baseline (high) moved up one level, but high is the maximum, so it stays high. The recommended action for raise is to escalate for driver/dispatcher review.\n\nWait, but the baseline was already high. If we raise, does that make it higher? But the rules say severity is the baseline moved one level up for raise. But high is the top, so maybe it can't go higher. So severity remains high. The action is escalate for review.\n\nSo putting it all together: baseline_severity is high, risk_synthesis mentions the cargo and weather as multipliers, escalation is raise, final severity high, action escalate.\n\n</think>\n\n{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Cargo (liquids/chemical tanker) is a risk multiplier due to potential spillage/shift risk, and weather (heavy rain) degrades traction, both qualifying as genuine risk multipliers per rules.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 458,
+   "tokens_evaluated": 1560,
+   "think_tokens": 355,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Cargo (liquids/chemical tanker) is a risk multiplier due to potential spillage/shift risk, and weather (heavy rain) degrades traction, both qualifying as genuine risk multipliers per rules.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-abs",
+   "latency_seconds": 53.47735137499694,
+   "content": "Okay, let's tackle this step by step. First, I need to figure out the baseline severity based on the vehicle physics data provided. The rules say that if ABS is engaged or the peak deceleration is above 0.45g, it's high. Here, the peak deceleration is 0.15g, which is below 0.22g. But ABS is engaged. Wait, the first condition says if ABS is engaged is yes, then it's high. So even though the deceleration is low, since ABS is engaged, baseline severity is high. Wait, but the rules say \"high if ABS engaged is yes, or the peak deceleration is above 0.45g.\" So either condition makes it high. So even though the deceleration is 0.15g, since ABS is engaged, baseline severity is high. Got it.\n\nNext, the escalation step. The operational context includes weather (clear, dry), cargo (dry goods), and dispatch status (on schedule). According to the rules, cargo isn't a risk multiplier here because it's dry. Weather is clear, so no risk multiplier. Dispatch status is on schedule, which isn't a risk factor. The rules say that being on schedule isn't a risk, but being behind schedule under pressure is. So none of the fields are risk multipliers. Also, the dispatch status is on schedule, which is a positive indicator of safe conditions. So the decision here would be to lower the severity because none are risk multipliers and at least one (dispatch status) indicates safe control.\n\nThen, the final severity would be baseline (high) adjusted down by one level. High to medium. The recommended action for lower is \"Log and continue; no immediate action needed.\"\n\nWait, but the baseline was high. If we lower it, severity becomes medium. So the final severity is medium. Let me check again. The baseline severity is high. Escalation decision is lower, so severity moves down one level from high to medium. The action is \"Log and continue...\" So that's correct.\n\nI need to make sure all steps align. The baseline severity is high because ABS is engaged. The escalation is lower because the operational context has no risk factors and a positive indicator. Final severity is medium, action is log and continue.\n\n</think>\n\n{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"ABS engaged is 'yes', which directly triggers the 'high' baseline severity per the rules. The peak deceleration (0.15g) is below 0.22g, but the presence of ABS engagement overrides this in the first condition.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 594,
+   "tokens_evaluated": 1674,
+   "think_tokens": 481,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "ABS engaged is 'yes', which directly triggers the 'high' baseline severity per the rules. The peak deceleration (0.15g) is below 0.22g, but the presence of ABS engagement overrides this in the first condition.",
+    "escalation": "lower",
+    "severity": "medium",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-abs",
+   "latency_seconds": 70.73940366700117,
+   "content": "Okay, let's tackle this step by step. First, I need to determine the baseline severity based on the vehicle physics data provided. The rules are specific, so I have to follow them exactly.\n\nThe peak deceleration is 0.15 g, which is below 0.22 g. The ABS was engaged, which according to the first rule, makes the severity high. Wait, the first rule says if ABS is engaged or peak deceleration is above 0.45 g, it's high. But here, the peak deceleration is 0.15 g, which is below 0.22. So even though ABS is engaged, the first condition is met (ABS engaged is yes), so baseline severity is high. Wait, the first rule says \"high if ABS engaged is yes, or the peak deceleration is above 0.45 g.\" So even if the peak deceleration is low, if ABS is engaged, it's high. So that's the first step. So baseline severity is high.\n\nNext, the escalation step. The operational context includes weather (clear, light traffic), cargo (empty trailer, non-hazardous), and dispatch status (ahead of schedule, driver executed a defensive maneuver). \n\nLooking at the rules for escalation: Cargo is a risk multiplier only if hazardous, etc. Here it's empty, so no. Weather is clear, so no risk multiplier. Dispatch status: being ahead of schedule is not a risk factor. The driver executed a documented defensive maneuver, which is a positive indicator of control. So according to the rules, if none of the fields are risk multipliers and at least one indicates safe conditions, we lower. So the decision here is to lower.\n\nSo the baseline was high, and we lower it. Then the final severity would be medium (since high can be lowered by one level). The recommended action for lower is \"Log and continue; no immediate action needed.\"\n\nWait, but the traffic pattern was \"elevated velocity variance (frequent speed cycling)\" which is not the same as \"severe stop-and-go compaction.\" The original rules for baseline severity: if peak deceleration is 0.22 g or below, then medium if traffic pattern is severe stop-and-go, else low. But in this case, peak deceleration is 0.15 g, which is below 0.22. The traffic pattern is elevated velocity variance, not severe stop-and-go. So according to the rules, that would be low. But the first rule says if ABS is engaged, it's high regardless. So the baseline severity is high because ABS is engaged. So even though the traffic pattern isn't severe, the ABS engagement makes it high. So that's correct.\n\nThen, in escalation, the operational context has no risk multipliers and a positive indicator (defensive maneuver), so we lower. Therefore, final severity is medium. The action is \"Log and continue...\" \n\nI need to make sure all steps align. The baseline is high, escalation is lower, so severity becomes medium. The recommended action is \"Log and continue; no immediate action needed.\"\n\n</think>\n\n{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"ABS engaged is 'yes', which directly triggers the 'high' baseline severity per the rules. Traffic pattern is 'elevated velocity variance' (not 'severe stop-and-go compaction'), but peak deceleration (0.15 g) is below 0.22 g, which would otherwise have led to 'low' severity. However, ABS engagement overrides this, resulting in 'high'.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 797,
+   "tokens_evaluated": 1873,
+   "think_tokens": 652,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "ABS engaged is 'yes', which directly triggers the 'high' baseline severity per the rules. Traffic pattern is 'elevated velocity variance' (not 'severe stop-and-go compaction'), but peak deceleration (0.15 g) is below 0.22 g, which would otherwise have led to 'low' severity. However, ABS engagement overrides this, resulting in 'high'.",
+    "escalation": "lower",
+    "severity": "medium",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "low",
+   "latency_seconds": 37.86573162500281,
+   "content": "Okay, let's tackle this step by step. First, I need to figure out the baseline severity based on the vehicle physics data provided. The rules mention that if ABS is engaged or peak deceleration is above 0.45g, it's high. Here, the peak deceleration is 0.15g, which is below 0.22g. The traffic pattern is elevated velocity variance, which isn't severe stop-and-go compaction. So according to the rules, since peak deceleration is below 0.22g and traffic isn't severe, the baseline severity should be low.\n\nNext, the escalation part. The operational context includes heavy rain (which degrades traction, so that's a risk multiplier), cargo is liquids/chemical tanker (hazardous, so another risk multiplier), and dispatch is 20 minutes behind schedule (a genuine risk factor). The rules say that if at least one field is a risk multiplier, we raise. Here, both weather and cargo are risk multipliers. So the escalation decision is to raise.\n\nThen, the final severity. The baseline was low, and we raised it, so severity becomes medium. The recommended action for raise is to escalate for driver/dispatcher review. Let me check again: cargo is hazardous (liquids/chemicals), weather is heavy rain (degrades traction), and being behind schedule adds pressure. All these factors contribute to raising the baseline from low to medium. The traffic pattern was elevated velocity variance, but that's not severe stop-and-go, so the initial baseline was correct. The escalation factors are correctly identified. So the final answer should align all these points.\n\n</think>\n\n{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"Heavy rain (degrades traction) and liquids/chemical tanker cargo (hazardous material risk) are both risk multipliers per rules. Dispatch being 20 minutes behind schedule adds pressure as a genuine risk factor.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 449,
+   "tokens_evaluated": 1548,
+   "think_tokens": 343,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "Heavy rain (degrades traction) and liquids/chemical tanker cargo (hazardous material risk) are both risk multipliers per rules. Dispatch being 20 minutes behind schedule adds pressure as a genuine risk factor.",
+    "escalation": "raise",
+    "severity": "medium",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "low",
+   "latency_seconds": 66.85504258298897,
+   "content": "Okay, let's tackle this step by step. First, the user wants me to assess a slowdown event using three steps. Let me start with Step 1: Baseline Severity based on vehicle physics.\n\nThe vehicle physics given are: peak deceleration is 0.15g, ABS engaged is no, and traffic pattern is elevated velocity variance (frequent speed cycling). According to the rules, high severity is if ABS is engaged or peak deceleration is above 0.45g. Since neither of those apply here, we move to the next condition. The peak deceleration is 0.15g, which is below 0.22g. Then, the traffic pattern is elevated velocity variance, which isn't \"severe stop-and-go compaction.\" So, according to the rules, if peak deceleration is 0.22g or below and traffic pattern isn't severe, it's low. So baseline severity is low.\n\nNow, Step 2: Escalation. The operational context includes weather (clear, dry), cargo (dry goods), and dispatch status (on schedule). The rules say that cargo is a risk multiplier only if hazardous, liquid, etc. Here, it's dry goods, so no risk. Weather is clear and dry, so no risk. Dispatch status is on schedule, which isn't a risk factor. The rules mention that being on schedule isn't a risk, and there's no evidence of the driver handling a hazard safely here. So none of the fields are risk multipliers. Also, there's no indication of safe conditions that would lower the severity. Therefore, the escalation decision is to hold because the fields are mixed or don't clearly point either way. Wait, but the rules say if none are risk multipliers and at least one positively indicates safe conditions, then lower. But the dispatch status is on schedule, which isn't a risk factor. However, the rules state that being on schedule is not a risk factor. So maybe there's no positive indication of safe conditions. So maybe it's hold because the fields are mixed or not clear. Hmm. Let me check again. The operational context fields: none are risk multipliers, and there's no field that positively indicates safe conditions. So the decision would be hold because the fields are mixed or none clearly point either way. So escalation is hold.\n\nStep 3: Final severity and action. Since the escalation is hold, the severity remains baseline, which is low. The recommended action for hold is \"Continue monitoring; no status change.\"\n\nWait, but the traffic pattern was elevated velocity variance. The rules for baseline severity: if peak deceleration is 0.22g or below, then check traffic pattern. If traffic pattern is severe stop-and-go compaction, then medium, else low. The traffic pattern here is elevated velocity variance (frequent speed cycling), which isn't the same as severe stop-and-go compaction. So yes, baseline is low. Then, escalation is hold, so severity remains low. Recommended action is continue monitoring.\n\nSo putting it all together: baseline_severity is low, risk_synthesis mentions that none of the operational context fields are risk multipliers, and dispatch status is on schedule (not a risk factor), so escalation is hold. Final severity is low, action is continue monitoring.\n\n</think>\n\n{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"None of the operational context fields (weather: clear/dry, cargo: dry goods, dispatch status: on schedule) are risk multipliers. Dispatch status being on schedule is not a risk factor, and no fields indicate unsafe conditions.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 791,
+   "tokens_evaluated": 1878,
+   "think_tokens": 685,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "None of the operational context fields (weather: clear/dry, cargo: dry goods, dispatch status: on schedule) are risk multipliers. Dispatch status being on schedule is not a risk factor, and no fields indicate unsafe conditions.",
+    "escalation": "hold",
+    "severity": "low",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "low",
+   "latency_seconds": 39.203376625009696,
+   "content": "Okay, let's tackle this step by step. First, I need to assess the baseline severity based on the vehicle physics data provided. The peak deceleration is 0.15 g, which is below 0.22 g. The ABS wasn't engaged. According to the rules, if peak deceleration is 0.22 g or below, then the severity is medium if the traffic pattern is severe stop-and-go compaction, else low. The traffic pattern here is \"elevated velocity variance (frequent speed cycling)\" which I don't think is the same as severe stop-and-go compaction. So, the baseline severity should be low.\n\nNext, the escalation part. The operational context includes weather (clear, light traffic), cargo (empty trailer, non-hazardous), and dispatch status (ahead of schedule, defensive maneuver executed). According to the rules, cargo isn't a risk multiplier here since it's empty. Weather is clear, so no risk multiplier. The dispatch status mentions a documented defensive maneuver, which is a positive indicator of safe conditions. Since none of the fields are risk multipliers and there's a positive indicator, the escalation decision should be to lower.\n\nThen, the final severity would be low (baseline) adjusted by lowering, but since low is the lowest, it stays low. The recommended action for lower is \"Log and continue; no immediate action needed.\"\n\nWait, but the rules say for escalation, if none are risk multipliers and at least one positively indicates safe conditions, then lower. So that's correct. The traffic pattern wasn't severe stop-and-go, so baseline was low. Operational context doesn't add risk, so severity remains low. The action is to log and continue.\n\n</think>\n\n{\n  \"baseline_severity\": \"low\",\n  \"risk_synthesis\": \"The operational context includes clear weather (no risk multiplier), non-hazardous cargo (no risk multiplier), and a documented defensive maneuver (safe condition indicator). None of the fields are risk multipliers, and the defensive maneuver positively indicates controlled conditions.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 465,
+   "tokens_evaluated": 1576,
+   "think_tokens": 355,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "low",
+    "risk_synthesis": "The operational context includes clear weather (no risk multiplier), non-hazardous cargo (no risk multiplier), and a documented defensive maneuver (safe condition indicator). None of the fields are risk multipliers, and the defensive maneuver positively indicates controlled conditions.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "medium-volatile",
+   "latency_seconds": 37.9411080830032,
+   "content": "Okay, let's tackle this step by step. First, I need to assess the baseline severity based on the vehicle physics data provided. The peak deceleration is 0.15 g, which is below 0.22 g. The ABS wasn't engaged. The traffic pattern is severe stop-and-go compaction. According to the rules, if peak deceleration is 0.22 g or below, then the severity is medium if the traffic pattern is severe stop-and-go, else low. Since the traffic pattern here is severe, the baseline severity should be medium.\n\nNext, the escalation part. The operational context includes heavy rain (which degrades traction, so that's a risk multiplier), cargo is liquids/chemical tanker (hazardous, so another risk multiplier), and dispatch status is 20 minutes behind schedule (which is a risk factor as per the rules). The weather and cargo are both risk multipliers. The dispatch status being behind schedule is also a risk factor. So, since there are multiple risk multipliers, the decision here is to raise the severity.\n\nFor the final severity, the baseline was medium. Raising it would move it up one level to high. The recommended action for raise is to escalate for driver/dispatcher review. All the steps need to align with the rules given. Let me double-check each part to make sure I didn't mix up any conditions. The cargo is hazardous, weather is poor, and being behind schedule adds pressure. All these factors contribute to raising the severity. The baseline was medium, so moving up to high makes sense. The action should be to escalate.\n\n</think>\n\n{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Heavy rain (degrades traction), liquids/chemical tanker (hazardous cargo), and being 20 minutes behind schedule (operational pressure) all act as risk multipliers. The hazardous cargo and poor weather independently justify escalation, while the dispatch delay compounds risk.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 450,
+   "tokens_evaluated": 1545,
+   "think_tokens": 334,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Heavy rain (degrades traction), liquids/chemical tanker (hazardous cargo), and being 20 minutes behind schedule (operational pressure) all act as risk multipliers. The hazardous cargo and poor weather independently justify escalation, while the dispatch delay compounds risk.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "medium-volatile",
+   "latency_seconds": 49.946224958999665,
+   "content": "Okay, let's tackle this step by step. First, I need to figure out the baseline severity based on the vehicle physics data provided. The rules mention checking if ABS is engaged or if the peak deceleration is above 0.45g. In this case, the peak deceleration is 0.15g, which is below 0.22g. The traffic pattern is severe stop-and-go compaction. According to the rules, if peak deceleration is 0.22g or below and traffic pattern is severe, then it's medium severity. So baseline severity is medium.\n\nNext, the escalation part. The operational context includes weather (clear and dry), cargo (dry goods), and dispatch status (on schedule). The rules say that cargo is only a risk multiplier if hazardous, liquid, etc. Here, it's dry goods, so no risk. Weather is clear, so no risk. Dispatch status is on schedule, which isn't a risk factor. The rules also mention that being on schedule isn't a risk, and there's no evidence of the driver handling a hazard safely. So none of the fields are risk multipliers. However, the dispatch status being on schedule might indicate safe handling, but the rules say that being on schedule isn't a risk factor. So the escalation decision would be to hold because there's no clear risk multiplier and no positive indicators. Wait, but the rules for lower require that none are risk multipliers and at least one positively indicates safe conditions. The dispatch status being on schedule is not a risk factor, but does it count as a positive indicator? The rules say that a dispatch status describing the driver handling a hazard safely is evidence of control. But here, the dispatch status is just \"on schedule,\" not a documented maneuver. So maybe there's no positive indicator. Therefore, the fields are mixed or none clearly point either way, so escalation is hold.\n\nThen, the final severity would remain medium. The recommended action for hold is \"Continue monitoring; no status change.\"\n\nWait, but the traffic pattern is severe stop-and-go compaction. In the baseline, since peak deceleration is below 0.22g and traffic pattern is severe, it's medium. Then, escalation is hold, so severity remains medium. The action is continue monitoring. That seems correct.\n\n</think>\n\n{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"No fields in the operational context qualify as risk multipliers (weather is clear/dry, cargo is general freight, dispatch is on schedule). Dispatch status being on schedule does not indicate unsafe conditions but also does not provide a positive safety indicator per rules. Fields are neutral.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 592,
+   "tokens_evaluated": 1678,
+   "think_tokens": 479,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "No fields in the operational context qualify as risk multipliers (weather is clear/dry, cargo is general freight, dispatch is on schedule). Dispatch status being on schedule does not indicate unsafe conditions but also does not provide a positive safety indicator per rules. Fields are neutral.",
+    "escalation": "hold",
+    "severity": "medium",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "medium-volatile",
+   "latency_seconds": 37.32306383299874,
+   "content": "Okay, let's tackle this step by step. First, the baseline severity. The rules say that if ABS is engaged or peak deceleration is above 0.45g, it's high. Here, peak deceleration is 0.15g, which is below 0.22g. Then, the traffic pattern is severe stop-and-go compaction. According to the rules, if peak deceleration is 0.22g or below and traffic pattern is severe, then it's medium. So baseline severity is medium.\n\nNext, the escalation. Looking at the operational context: weather is clear, which isn't a risk multiplier. Cargo is empty, non-hazardous, so no risk. Dispatch status says the driver was ahead of schedule and executed a defensive maneuver. That's a positive indicator, meaning it's a reason to lower. Since none of the fields are risk multipliers and there's a positive factor, the decision is to lower.\n\nSo the final severity would be low (medium minus one level). The recommended action for lower is \"Log and continue; no immediate action needed.\"\n\nWait, but the baseline was medium. If we lower, it moves down one level. The options are low, medium, high. So medium to low. That makes sense. Let me check the rules again for escalation. The operational context has a documented defensive maneuver, which is a reason to lower. So yes, the escalation decision is lower. Therefore, the final severity is low. All steps align.\n\n</think>\n\n{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"The peak deceleration (0.15 g) is below 0.22 g, and the traffic pattern is severe stop-and-go compaction, which by rule assigns medium baseline severity. Operational context includes a documented defensive maneuver (safe driver action) and clear weather with no risk multipliers, providing evidence to lower the baseline.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 443,
+   "tokens_evaluated": 1540,
+   "think_tokens": 313,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "The peak deceleration (0.15 g) is below 0.22 g, and the traffic pattern is severe stop-and-go compaction, which by rule assigns medium baseline severity. Operational context includes a documented defensive maneuver (safe driver action) and clear weather with no risk multipliers, providing evidence to lower the baseline.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "medium",
+   "latency_seconds": 36.93773095800134,
+   "content": "Okay, let's tackle this step by step. First, I need to assess the baseline severity based on the vehicle physics data provided. The peak deceleration is 0.3 g, which is between 0.22 g and 0.45 g. The ABS wasn't engaged. The traffic pattern is elevated velocity variance, which is frequent speed cycling. According to the rules, if the peak deceleration is above 0.22 g but below 0.45 g, the severity is high if the traffic pattern is severe stop-and-go compaction, else medium. The traffic pattern here is elevated velocity variance, not severe stop-and-go compaction. So baseline severity should be medium.\n\nNext, the escalation part. The operational context includes heavy rain and wet asphalt, which degrade traction, so that's a risk multiplier. The cargo is liquids/chemical tanker, which is hazardous and could be a risk if spilled. The dispatch status is running 20 minutes behind schedule, which is a genuine risk factor. So, both weather and cargo are risk multipliers. The rules say if at least one field is a risk multiplier, we raise. So escalation is raise.\n\nNow, the final severity. The baseline was medium. Raising it by one level would make it high. The recommended action for raise is to escalate for driver/dispatcher review. Let me check again to make sure I didn't mix up any steps. The traffic pattern wasn't severe stop-and-go, so baseline is medium. Weather and cargo are multipliers, so escalation is raise. Final severity is high, action is escalate.\n\n</think>\n\n{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"Heavy rain (degrades traction) and liquids/chemical tanker (hazardous cargo) are risk multipliers per rules. Dispatch status being behind schedule adds pressure but is not a multiplier; no safe conditions indicated.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 438,
+   "tokens_evaluated": 1536,
+   "think_tokens": 333,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "Heavy rain (degrades traction) and liquids/chemical tanker (hazardous cargo) are risk multipliers per rules. Dispatch status being behind schedule adds pressure but is not a multiplier; no safe conditions indicated.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "medium",
+   "latency_seconds": 47.06441945800907,
+   "content": "Okay, let's tackle this step by step. First, I need to determine the baseline severity based on the vehicle physics data provided. The peak deceleration is 0.3 g, which is between 0.22 g and 0.45 g. The ABS wasn't engaged. The traffic pattern is elevated velocity variance, which is frequent speed cycling. According to the rules, if the peak deceleration is above 0.22 g but below 0.45 g, the severity is high if the traffic pattern is severe stop-and-go compaction, else medium. The traffic pattern here is elevated velocity variance, not severe stop-and-go compaction. So, the baseline severity should be medium.\n\nNext, the escalation step. Looking at the operational context: weather is clear and dry, which isn't a risk multiplier. Cargo is dry goods, not hazardous, so no risk there. Dispatch status is on schedule, which isn't a risk factor. The rules say that if none of the fields are risk multipliers and at least one indicates safe conditions, we lower the severity. Since all three factors are non-risk and the dispatch is on schedule (safe), this would be a 'lower' decision.\n\nFor the final severity, since the baseline was medium and we lower it, it would go to low. The recommended action for lower is \"Log and continue; no immediate action needed.\"\n\nWait, but the traffic pattern was elevated velocity variance. The rules for baseline severity mention \"severe stop-and-go compaction\" as a condition for high severity. The given traffic pattern is \"elevated velocity variance (frequent speed cycling)\" which might be similar but not exactly the same as severe stop-and-go. The rules specify that if the peak deceleration is between 0.22 and 0.45 g, then high if traffic pattern is severe stop-and-go, else medium. Since the traffic pattern here isn't severe stop-and-go, it's medium. That seems correct.\n\nIn escalation, since none of the factors are risk multipliers and dispatch is on schedule (safe), we lower. So the final severity is low. The action is to log and continue. All steps align with the rules.\n\n</think>\n\n{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"No risk multipliers present (weather is clear/dry, cargo is non-hazardous, dispatch is on schedule). Dispatch status indicates safe, controlled conditions, which supports lowering the baseline severity.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 558,
+   "tokens_evaluated": 1649,
+   "think_tokens": 458,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "No risk multipliers present (weather is clear/dry, cargo is non-hazardous, dispatch is on schedule). Dispatch status indicates safe, controlled conditions, which supports lowering the baseline severity.",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "medium",
+   "latency_seconds": 36.72801508299017,
+   "content": "Okay, let's tackle this step by step. First, the baseline severity. The rules say that if ABS is engaged or peak deceleration is above 0.45g, it's high. Here, peak deceleration is 0.3g, which is between 0.22 and 0.45. The traffic pattern is elevated velocity variance, which isn't severe stop-and-go compaction. So according to the rules, since it's between 0.22 and 0.45g and traffic isn't severe, it's medium. Got that.\n\nNext, the escalation. Looking at the operational context: weather is clear, so no risk multiplier. Cargo is empty, non-hazardous, so no risk. Dispatch status is ahead of schedule, and the driver did a defensive maneuver. The rules say that being ahead of schedule isn't a risk, and the defensive maneuver indicates safe control. So there's no risk multiplier here. The driver's action is a positive indicator. So the escalation decision should be lower because none are risk multipliers and there's a safe condition mentioned.\n\nThen the final severity. Baseline was medium, and we lower it, so severity becomes low. The action would be \"Log and continue; no immediate action needed.\"\n\nWait, but the traffic pattern was elevated velocity variance. The rules for baseline severity mention traffic pattern only in the cases where it's severe stop-and-go. Since this is elevated velocity variance, which isn't severe, the baseline is medium. Correct.\n\nSo putting it all together: baseline_severity is medium, risk_synthesis points to dispatch status and defensive maneuver as lowering factors, escalation is lower, final severity low, action log and continue.\n\n</think>\n\n{\n  \"baseline_severity\": \"medium\",\n  \"risk_synthesis\": \"dispatch status (ahead of schedule) and documented defensive maneuver indicate safe, controlled conditions, reducing baseline severity\",\n  \"escalation\": \"lower\",\n  \"severity\": \"low\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 436,
+   "tokens_evaluated": 1573,
+   "think_tokens": 354,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "medium",
+    "risk_synthesis": "dispatch status (ahead of schedule) and documented defensive maneuver indicate safe, controlled conditions, reducing baseline severity",
+    "escalation": "lower",
+    "severity": "low",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-volatile",
+   "latency_seconds": 39.66503916600777,
+   "content": "Okay, let's tackle this step by step. First, I need to determine the baseline severity based on the vehicle physics data provided. The peak deceleration is 0.3 g, which is between 0.22 g and 0.45 g. The ABS wasn't engaged. The traffic pattern is severe stop-and-go compaction. According to the rules, if the peak deceleration is above 0.22 g and up to 0.45 g, then it's high if the traffic pattern is severe stop-and-go, else medium. Since the traffic pattern here is severe, that makes the baseline severity high.\n\nNext, the escalation part. The operational context includes heavy rain (which degrades traction, so that's a risk multiplier), cargo is liquids/chemical tanker (hazardous, so another risk multiplier), and being 20 minutes behind schedule (a genuine risk factor). The rules say that if at least one field is a risk multiplier, we should raise. Here, both weather and cargo are risk multipliers. So the escalation decision is to raise.\n\nFor the final severity, since the baseline was high and we raised it, but high is the upper limit, so it stays high. The recommended action for raise is to escalate for driver/dispatcher review.\n\nWait, but the rules say that severity moves one level up for raise. But if baseline is already high, moving up isn't possible. So the severity remains high. The action is escalate. Let me check the rules again. Yes, severity is adjusted by moving one level up or down, but if it's already at the limit, it doesn't change. So the final severity is high, and the action is escalate.\n\n</think>\n\n{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Heavy rain (degrades traction), liquids/chemical tanker (hazardous cargo), and being 20 minutes behind schedule (operational pressure) all act as risk multipliers. The combination of hazardous cargo and poor weather conditions increases the potential for a critical event.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 470,
+   "tokens_evaluated": 1564,
+   "think_tokens": 355,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Heavy rain (degrades traction), liquids/chemical tanker (hazardous cargo), and being 20 minutes behind schedule (operational pressure) all act as risk multipliers. The combination of hazardous cargo and poor weather conditions increases the potential for a critical event.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-volatile",
+   "latency_seconds": 42.66945445800957,
+   "content": "Okay, let's tackle this step by step. First, I need to determine the baseline severity based on the vehicle physics data provided. The rules are pretty specific here. The peak deceleration is 0.3 g, which is between 0.22 g and 0.45 g. The ABS wasn't engaged. The traffic pattern is severe stop-and-go compaction. According to the rules, if the peak deceleration is above 0.22 g but below 0.45 g, then the severity is high if the traffic pattern is severe stop-and-go, else medium. Since the traffic pattern here is severe, that makes the baseline severity high.\n\nNext, the escalation part. The operational context includes weather (clear and dry), cargo (dry goods), and dispatch status (on schedule). The rules say that cargo is only a risk multiplier if it's hazardous, liquid, etc. Here, it's dry goods, so no risk. Weather is clear and dry, which isn't a risk multiplier. Dispatch status is on schedule, which isn't a risk factor. However, the rules mention that being behind schedule under pressure is a risk, but on schedule isn't. So none of the fields are risk multipliers. Also, there's no indication of safe conditions that would lower the severity. So the escalation decision should be hold because the fields are neutral.\n\nFor the final severity, since the escalation is hold, the baseline severity remains high. The recommended action for hold is \"Continue monitoring; no status change.\"\n\nWait, but let me double-check. The traffic pattern is severe stop-and-go, which in the baseline rules would push the severity to high. The escalation step doesn't have any factors that would raise or lower it, so it stays high. The action is to continue monitoring. That seems right.\n\n</think>\n\n{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Traffic pattern is severe stop-and-go compaction, which under the vehicle physics rules (peak deceleration 0.3 g, ABS not engaged) triggers the 'high' baseline severity. Operational context has no risk multipliers (non-hazardous cargo, clear weather, on-schedule dispatch), and no factors indicating safe control to lower severity.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 506,
+   "tokens_evaluated": 1573,
+   "think_tokens": 376,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Traffic pattern is severe stop-and-go compaction, which under the vehicle physics rules (peak deceleration 0.3 g, ABS not engaged) triggers the 'high' baseline severity. Operational context has no risk multipliers (non-hazardous cargo, clear weather, on-schedule dispatch), and no factors indicating safe control to lower severity.",
+    "escalation": "hold",
+    "severity": "high",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-volatile",
+   "latency_seconds": 38.25918166700285,
+   "content": "Okay, let's tackle this step by step. First, the baseline severity. The rules say that if ABS is engaged or peak deceleration is above 0.45g, it's high. Here, peak deceleration is 0.3g, which is between 0.22 and 0.45. The traffic pattern is severe stop-and-go compaction. According to the rules, if peak deceleration is above 0.22g and up to 0.45g, then it's high if traffic pattern is severe. So baseline severity is high.\n\nNext, the escalation. Operational context: weather is clear, so no risk multiplier. Cargo is empty, not hazardous, so no risk. Dispatch status is ahead of schedule and the driver did a defensive maneuver. The rules say that being ahead of schedule isn't a risk, and a defensive maneuver indicates safe control. So, no risk multipliers here. Since there's a documented safe maneuver, that's a reason to lower. So escalation is lower.\n\nFinal severity: baseline was high, and we lower it. High minus one level would be medium. Recommended action for lower is \"Log and continue; no immediate action needed.\"\n\nWait, but the rules for escalation say that if none are risk multipliers and at least one indicates safe conditions, then lower. Here, the dispatch status has a defensive maneuver, which is a positive indicator. So that's why we lower. So the risk synthesis should mention the dispatch status and the defensive maneuver as the reason for lowering. All steps need to align. Let me check again.\n\nBaseline severity: high. Escalation: lower. Final severity: medium. Recommended action: log and continue. All fields agree. Okay, that seems right.\n\n</think>\n\n{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Dispatch status indicates a documented defensive maneuver for a merging vehicle, which positively signals controlled conditions and reduces risk. Weather and cargo are not risk factors.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 454,
+   "tokens_evaluated": 1589,
+   "think_tokens": 364,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Dispatch status indicates a documented defensive maneuver for a merging vehicle, which positively signals controlled conditions and reduces risk. Weather and cargo are not risk factors.",
+    "escalation": "lower",
+    "severity": "medium",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-decel",
+   "latency_seconds": 49.110479707989725,
+   "content": "Okay, let's tackle this step by step. First, I need to figure out the baseline severity based on the vehicle physics data provided. The peak deceleration is 0.5 g, which is above 0.45 g. According to the rules, if ABS is engaged or peak deceleration is above 0.45 g, it's high severity. But here, ABS is not engaged. Wait, the first rule says \"high if ABS engaged is yes, or the peak deceleration is above 0.45 g.\" So even though ABS isn't engaged, the peak deceleration is 0.5 g, which is over 0.45, so baseline severity is high. Got that.\n\nNext, the escalation part. The operational context includes heavy rain and wet asphalt. Weather is a risk multiplier if it degrades traction or visibility. Heavy rain definitely does that. Then, the cargo is liquids/chemical tanker, which is hazardous and a risk multiplier. Dispatch status is running 20 minutes behind schedule, which is a genuine risk factor as per the rules. So both weather and cargo are risk multipliers. Since both are present, that's a reason to raise the severity. The dispatch status being behind schedule under pressure is a risk factor, so that adds to it. So the escalation decision is to raise.\n\nNow, the final severity. The baseline was high. Since we're raising, it moves up one level. But wait, high is the upper limit. So maybe it stays high? Wait, the rules say severity is the baseline moved one level up for raise and one level down for lower. But if baseline is high, raising would not go higher. So maybe it remains high. Then the recommended action is \"Escalate for driver/dispatcher review.\"\n\nLet me check again. The baseline severity is high. Escalation is raise, so severity would be high (since you can't go above high). The action is escalate. That makes sense. The risk synthesis would mention the weather (heavy rain) and cargo (hazardous) as the factors. The dispatch status being behind schedule is also a risk factor, but the rules say that being behind schedule under pressure is a genuine risk factor. So all three factors contribute to the escalation.\n\n</think>\n\n{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Weather (heavy rain, wet asphalt) degrades traction, and cargo (liquids/chemical tanker) is hazardous, both acting as risk multipliers. Dispatch status (20 minutes behind schedule) adds pressure as a genuine risk factor.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 582,
+   "tokens_evaluated": 1675,
+   "think_tokens": 472,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Weather (heavy rain, wet asphalt) degrades traction, and cargo (liquids/chemical tanker) is hazardous, both acting as risk multipliers. Dispatch status (20 minutes behind schedule) adds pressure as a genuine risk factor.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-decel",
+   "latency_seconds": 54.37007599999197,
+   "content": "Okay, let's tackle this step by step. First, I need to determine the baseline severity based on the vehicle physics data provided. The peak deceleration is 0.5 g, which is above 0.45 g. According to the rules, if the peak deceleration is above 0.45 g, it's high severity, regardless of ABS engagement. So baseline_severity is high.\n\nNext, the escalation part. The operational context includes weather (clear and dry), cargo (dry goods), and dispatch status (on schedule). The rules say that cargo is only a risk multiplier if it's hazardous, liquid, etc. Here, it's dry goods, so no risk. Weather is clear/dry, which isn't a risk multiplier. Dispatch status is on schedule, which isn't a risk factor. The rules mention that being on schedule isn't a risk, and there's no indication of the driver handling a hazard safely here. So none of the fields are risk multipliers. However, the dispatch status being on schedule might indicate safe conditions, but the rules say that being on schedule isn't a reason to lower. Wait, the rules state that a dispatch status describing the driver handling a hazard safely is evidence of control, which would lower. But here, the dispatch status is just \"on schedule,\" not indicating any defensive maneuvers. So maybe there's no evidence to lower. Therefore, the escalation decision is hold because the fields are mixed or not clearly pointing either way. Wait, the operational context fields don't have any risk multipliers, but also no positive indicators. The rules for escalation: raise if at least one field is a risk multiplier. Lower if none are risk multipliers and at least one indicates safe. Here, none are risk multipliers, but there's no field that positively indicates safe. So maybe it's hold? Because the fields are mixed or not clearly pointing either way. The dispatch status is on schedule, which isn't a risk factor. So the escalation is hold.\n\nThen, the final severity would be the baseline (high) unchanged because escalation is hold. The recommended action is \"Continue monitoring; no status change.\"\n\nWait, but the rules for escalation: if none of the fields are risk multipliers and at least one positively indicates safe, then lower. But in this case, the dispatch status is on schedule, which isn't a risk factor. The rules say that being on schedule is not a risk factor. So maybe there's no positive indicator. Therefore, the escalation is hold. So the final severity remains high, and the action is continue monitoring.\n\n</think>\n\n{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"No fields in operational context qualify as risk multipliers (weather is clear/dry, cargo is general freight, dispatch is on schedule). No positive indicators of safe conditions are explicitly documented (e.g., defensive maneuvers). Fields are neutral, so escalation is 'hold'.\",\n  \"escalation\": \"hold\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Continue monitoring; no status change.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 644,
+   "tokens_evaluated": 1722,
+   "think_tokens": 531,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "No fields in operational context qualify as risk multipliers (weather is clear/dry, cargo is general freight, dispatch is on schedule). No positive indicators of safe conditions are explicitly documented (e.g., defensive maneuvers). Fields are neutral, so escalation is 'hold'.",
+    "escalation": "hold",
+    "severity": "high",
+    "recommended_action": "Continue monitoring; no status change.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-decel",
+   "latency_seconds": 54.113643832999514,
+   "content": "Okay, let's tackle this step by step. First, the user wants me to assess a slowdown event using three steps. Let me start with Step 1: Baseline Severity based on vehicle physics.\n\nThe given vehicle physics data is: Peak deceleration is 0.5 g, ABS engaged is no, and traffic pattern is elevated velocity variance (frequent speed cycling). According to the rules, if ABS is engaged or peak deceleration is above 0.45g, it's high severity. Here, peak deceleration is 0.5g which is above 0.45g, so baseline severity should be high. Wait, but the traffic pattern is elevated velocity variance, not severe stop-and-go. The rules mention that if peak deceleration is above 0.45g, it's high regardless of traffic pattern. So even though the traffic pattern isn't severe stop-and-go, the peak deceleration alone makes it high. So baseline_severity is high.\n\nMoving to Step 2: Escalation. The operational context includes weather (clear, light traffic), cargo (empty trailer, non-hazardous), and dispatch status (ahead of schedule, driver executed a defensive maneuver). \n\nLooking at the rules for escalation: Cargo is only a risk multiplier if hazardous, which it's not. Weather is only a multiplier if degrading traction/visibility, which it's not (clear conditions). Dispatch status: being ahead of schedule isn't a risk factor. The driver executed a documented defensive maneuver, which is a positive indicator of control. So none of the fields are risk multipliers. However, the dispatch status has a positive indicator (safe handling), so according to the rules, this would be a reason to lower the severity. But the rules say that if none are risk multipliers and at least one positively indicates safe conditions, then lower. So the escalation decision here is lower.\n\nStep 3: Final severity and action. The baseline was high. Since escalation is lower, severity moves down one level. High to medium. The recommended action for lower is \"Log and continue; no immediate action needed.\"\n\nWait, but the rules for escalation say that if you lower, the severity moves down one level. So high becomes medium. Then the action is \"Log and continue...\" \n\nLet me check again. The baseline severity is high. Escalation decision is lower, so severity becomes medium. The recommended action for lower is \"Log and continue; no immediate action needed.\"\n\nSo putting it all together: baseline_severity is high, risk_synthesis mentions the dispatch status's defensive maneuver as the reason for lowering, escalation is lower, final severity is medium, and the action is to log and continue.\n\n</think>\n\n{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"Dispatch status indicates a documented defensive maneuver executed by the driver, which positively signals controlled conditions and reduces risk.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 641,
+   "tokens_evaluated": 1778,
+   "think_tokens": 559,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "Dispatch status indicates a documented defensive maneuver executed by the driver, which positively signals controlled conditions and reduces risk.",
+    "escalation": "lower",
+    "severity": "medium",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "escalate-worthy",
+   "profile": "high-abs",
+   "latency_seconds": 63.04069362500741,
+   "content": "Okay, let's tackle this step by step. First, I need to determine the baseline severity based on the vehicle physics data provided. The rules mention that if ABS is engaged or the peak deceleration is above 0.45g, it's high. Here, the peak deceleration is 0.15g, which is below 0.22g. But ABS is engaged. Wait, the first rule says if ABS is engaged is yes OR peak deceleration above 0.45g, then high. So even though the peak deceleration is low, since ABS is engaged, that makes the baseline severity high. Wait, but the peak deceleration is 0.15g, which is below 0.22g. Let me check the rules again.\n\nThe first condition: high if ABS engaged is yes OR peak deceleration above 0.45g. So if either of those is true, it's high. Here, ABS is engaged is yes, so regardless of the deceleration, it's high. So baseline severity is high. Wait, but the second part says if peak deceleration is 0.22g or below, then medium if traffic pattern is severe stop-and-go, else low. But the first condition takes precedence. So even if the deceleration is low, if ABS is engaged, it's high. So baseline severity is high.\n\nNow, moving to escalation. The operational context includes heavy rain (which degrades traction, so a risk multiplier), cargo is liquids/chemical tanker (hazardous, so risk multiplier), and dispatch status is 20 minutes behind schedule (genuine risk factor). According to the rules, cargo is a risk multiplier if hazardous, liquid, etc. So here, liquids/chemical tanker is a risk multiplier. Weather is heavy rain, which degrades traction, so that's a risk multiplier. Dispatch status being behind schedule is a genuine risk factor. So both cargo and weather are risk multipliers. Therefore, the decision is to raise.\n\nSo the baseline was high, and escalation is raise, so severity moves up. But wait, the baseline is already high, and raising would move it up, but the rules say severity can't go beyond high or low. So if baseline is high and escalation is raise, does it stay high? Wait, the rules for final severity say: severity is baseline moved one level up for raise and one level down for lower. But if baseline is high, moving up isn't possible. So maybe it stays high. But the rules might not allow exceeding the limits. So the final severity would remain high. Then the recommended action is \"Escalate for driver/dispatcher review.\"\n\nWait, but the baseline was high, and the escalation is raise. So according to the rules, severity would be baseline moved up. But since high is the maximum, it can't go higher. So the severity remains high. The action would be to escalate. So the final severity is high, and the action is escalate.\n\n</think>\n\n{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"ABS engaged (yes) triggers high baseline severity. Operational context includes heavy rain (degrades traction, risk multiplier) and hazardous cargo (liquids/chemical tanker, risk multiplier). Dispatch status being 20 minutes behind schedule adds pressure as a genuine risk factor.\",\n  \"escalation\": \"raise\",\n  \"severity\": \"high\",\n  \"recommended_action\": \"Escalate for driver/dispatcher review.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 744,
+   "tokens_evaluated": 1835,
+   "think_tokens": 630,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "ABS engaged (yes) triggers high baseline severity. Operational context includes heavy rain (degrades traction, risk multiplier) and hazardous cargo (liquids/chemical tanker, risk multiplier). Dispatch status being 20 minutes behind schedule adds pressure as a genuine risk factor.",
+    "escalation": "raise",
+    "severity": "high",
+    "recommended_action": "Escalate for driver/dispatcher review.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  },
+  {
+   "scenario": "benign",
+   "profile": "high-abs",
+   "latency_seconds": 64.14081024999905,
+   "content": "Okay, let's tackle this step by step. First, the baseline severity. The rules say that if ABS is engaged or peak deceleration is above 0.45g, it's high. Here, peak deceleration is 0.15g, which is below 0.22g. But ABS is engaged. Wait, the first condition says high if ABS is yes OR peak deceleration above 0.45g. So even though peak is low, since ABS is engaged, baseline severity is high. Wait, but the first rule says \"high if ABS engaged is yes, or the peak deceleration is above 0.45g.\" So in this case, ABS is yes, so baseline severity is high. But wait, the second part says if peak deceleration is 0.22g or below, then medium if traffic pattern is severe stop-and-go, else low. But the first condition takes precedence. Wait, the rules are structured as:\n\n- If ABS is yes OR peak deceleration >0.45g \u2192 high.\n\nElse, if peak deceleration is 0.22g or below \u2192 medium if traffic pattern is severe, else low.\n\nElse (peak between 0.22 and 0.45g) \u2192 high if traffic pattern is severe, else medium.\n\nSo in this case, peak deceleration is 0.15g, which is below 0.22g. But since ABS is engaged, the first condition applies. So baseline severity is high. Wait, but the first rule says \"high if ABS engaged is yes, or the peak deceleration is above 0.45g.\" So even if peak is low, if ABS is yes, it's high. So baseline severity is high.\n\nNow, step 2: escalation. Operational context: weather is clear, dry, so no risk multiplier. Cargo is dry goods, not a risk. Dispatch status is on schedule, which is not a risk factor. So none of the fields are risk multipliers. Also, dispatch status being on schedule is a positive indicator of safe conditions. So according to the rules, if none are risk multipliers and at least one indicates safe, then lower. So escalation decision is lower.\n\nThen, step 3: severity is baseline (high) moved down one level. High to medium. Recommended action is \"Log and continue; no immediate action needed.\"\n\nWait, but the baseline was high. If escalation is lower, then severity is high minus one level, which would be medium. So final severity is medium. The action would be \"Log and continue...\" for lower.\n\nBut let me check again. The baseline severity is high. Then, escalation decision is lower. So severity is high minus one level \u2192 medium. The action is \"Log and continue...\" for lower.\n\nSo putting it all together:\n\nBaseline severity: high (due to ABS engaged).\n\nRisk synthesis: None of the operational context fields are risk multipliers; dispatch status being on schedule indicates safe conditions.\n\nEscalation: lower.\n\nFinal severity: medium.\n\nRecommended action: Log and continue...\n\n</think>\n\n{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"ABS engaged is 'yes', which directly triggers high baseline severity per the rules. Operational context fields (weather, cargo, dispatch status) are not risk multipliers; dispatch status being 'on schedule' indicates safe, controlled conditions.\",\n  \"escalation\": \"lower\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 758,
+   "tokens_evaluated": 1844,
+   "think_tokens": 651,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "ABS engaged is 'yes', which directly triggers high baseline severity per the rules. Operational context fields (weather, cargo, dispatch status) are not risk multipliers; dispatch status being 'on schedule' indicates safe, controlled conditions.",
+    "escalation": "lower",
+    "severity": "medium",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": false,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": false,
+    "action_ok": false,
+    "all_ok": false
+   }
+  },
+  {
+   "scenario": "de-escalate-worthy",
+   "profile": "high-abs",
+   "latency_seconds": 44.74988216700149,
+   "content": "Okay, let's tackle this step by step. First, the baseline severity. The rules say that if ABS is engaged or peak deceleration is above 0.45g, it's high. Here, the peak deceleration is 0.15g, which is below 0.22g. But ABS is engaged. Wait, the first condition says if ABS is engaged is yes, then high. So even though peak deceleration is low, since ABS is engaged, baseline severity is high. Wait, the first rule says \"high if ABS engaged is yes, or the peak deceleration is above 0.45g.\" So either of those conditions makes it high. So here, ABS is yes, so baseline is high.\n\nNext, escalation. The operational context: weather is clear, light traffic. Cargo is empty trailer, non-hazardous. Dispatch status is ahead of schedule, and the driver did a documented defensive maneuver. So, looking at the rules for escalation. Cargo isn't a risk multiplier here because it's empty. Weather is clear, so not a multiplier. Dispatch status is ahead of schedule, which isn't a risk factor. The driver executed a defensive maneuver, which is a positive indicator of control. So according to the rules, if none of the fields are risk multipliers and at least one indicates safe conditions, we lower. So the escalation decision is lower.\n\nThen, final severity: baseline was high, and we lower it, so severity becomes medium. Recommended action for lower is \"Log and continue; no immediate action needed.\"\n\nWait, but the baseline was high. Let me check again. The baseline severity is high because ABS is engaged. Then, in escalation, since the operational context has no risk multipliers and a safe condition (defensive maneuver), we lower the baseline. So high becomes medium. Then the action is log and continue.\n\nSo putting it all together: baseline_severity is high, risk_synthesis mentions ABS engaged and the defensive maneuver, escalation is lower, severity is medium, action is log and continue.\n\n</think>\n\n{\n  \"baseline_severity\": \"high\",\n  \"risk_synthesis\": \"ABS engaged (yes) triggers high baseline severity. Operational context includes a documented defensive maneuver (safe driver control) and no risk multipliers (clear weather, non-hazardous cargo, ahead of schedule).\",\n  \"escalation\": \"lower\",\n  \"severity\": \"medium\",\n  \"recommended_action\": \"Log and continue; no immediate action needed.\",\n  \"truck_id\": \"truck-47\"\n}",
+   "tokens_predicted": 530,
+   "tokens_evaluated": 1648,
+   "think_tokens": 427,
+   "stop_type": "eos",
+   "think_forced": false,
+   "card": {
+    "baseline_severity": "high",
+    "risk_synthesis": "ABS engaged (yes) triggers high baseline severity. Operational context includes a documented defensive maneuver (safe driver control) and no risk multipliers (clear weather, non-hazardous cargo, ahead of schedule).",
+    "escalation": "lower",
+    "severity": "medium",
+    "recommended_action": "Log and continue; no immediate action needed.",
+    "truck_id": "truck-47"
+   },
+   "error": null,
+   "scores": {
+    "format_ok": true,
+    "escalation_ok": true,
+    "baseline_ok": true,
+    "consistent": true,
+    "severity_ok": true,
+    "action_ok": true,
+    "all_ok": true
+   }
+  }
+ ]
+}

@@ -35,7 +35,7 @@ variable "enabled_proxies" {
     (and can't destroy a proxy mid-run); keep it in step when enabling or removing one.
   EOT
   type        = list(string)
-  default     = ["iphone-older", "iphone-flagship"] # pi5 removed 2026-10-03; Android proxies removed and mac-m4 added 2026-10-04
+  default     = [] # pi5 removed 2026-10-03; Android proxies removed and mac-m4 added 2026-10-04; mac-m4 (iphone-flagship) and mac2 (iphone-older) torn down 2026-10-05 after collection. Enable a proxy again by listing its key here
 }
 
 variable "proxies" {

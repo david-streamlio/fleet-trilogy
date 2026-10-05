@@ -106,12 +106,12 @@ Every slide has the same four parts: **I assumed**, **what happened** (one numbe
 
 **A1. "A small device will use less energy." It used more.** Chart: **Fig. 2** (a: energy vs latency per decision; b: CPU vs GPU on the same M1).
 - **What happened:** per triage decision, the Pi 4 used ~154 J above idle (288 J at the wall); iPhone-class and newer Apple GPUs 15-20 J. On the same M1 chip, the CPU used ~4× the energy per token reading the prompt and 1.4-1.6× generating, for 3-9B models.
-- **Why:** energy is power × time. The slow device burns power for longer, and reading the prompt (~700 tokens against a 50-250-token answer) is compute-heavy work that GPUs do far better.
+- **Why:** energy is power × time, and the slow device burns power for longer. On the same chip the CPU loses most when reading the prompt (~4× the GPU's energy per token) and still loses when writing the answer (1.4-1.6×).
 - **Do this:** run on the accelerator (GPU/NPU), not the CPU. Compare joules per job, not watts.
 
 **A2. "Thinking mode will make it more accurate." It didn't, and sometimes it never answered.** Chart: **Fig. 3** (correctness vs latency by prompt mode).
 - **What happened:** thinking on vs off made no measurable accuracy difference: Qwen3-14B 72% → 78%, Qwen3-8B 44% → 47%, Qwen3.8-27B 67% → 67%, all within each other's ranges. It cost 4-11× the time per call and, on the iPhone-class M1, 4-7× the energy (Qwen3-14B 202 → 817 J). Qwen3.5-9B on the hard task never finished thinking: 36 of 36 calls truncated at 2,048 tokens, and 35 of 36 at 4,096 (128 s each, 0% correct). On the easy task, 4,096 was enough for most calls (61%).
-- Capped thinking (budget forcing, 1,024 tokens): [PLACEHOLDER: accuracy, time and energy per call on M1, M4, M4 Max]. So far on the M1: Qwen3-8B 89% (easy) and 50% (hard), at 40-56 s per call against 5.8-8.5 s with thinking off.
+- Capped thinking (budget forcing, 1,024 tokens; all three machines): every call finished (Qwen3.5-9B hit the cap every time but answered), accuracy within range of thinking off (e.g. Qwen3-14B 72-83% vs 72%), at 3-10× the energy and 3.5-17× the time. On the M1: Qwen3-14B 202 → 768 J; Qwen3.5-9B 99 → 960 J at 105 s.
 - **Why:** a short, bounded judgment doesn't need multi-step reasoning, and some models don't know when to stop.
 - **Do this:** turn thinking off for short structured tasks. If you need it, cap it, and measure the completion rate, not just accuracy.
 
@@ -124,7 +124,7 @@ Every slide has the same four parts: **I assumed**, **what happened** (one numbe
 - **What happened:** the same prompt in the model's own chat format, thinking off, took Qwen3.5-9B from 22% to 72% on the hard task (the M1 replicates it: 19% → 61%). Same model, same compute.
 - **Why:** instruct models are trained on their template; a bare prompt is out of distribution.
 - **Do this:** use the model's chat template (the runtime can apply it for you), and check it before blaming the model.
-- [PLACEHOLDER: prompt ablation result (lookup tables, worked examples, temperature 0, grammar-computed fields); add one line if a variant clearly helps or clearly costs energy.]
+- **Prompt ablation** (M4 Max and M4 agree; filled in 2026-10-04): lookup tables + the model's own chat template lifted Phi-3.5, Llama-3.1-8B and Qwen3-14B by 36-42 points; worked examples helped Gemma-3-4B but nearly doubled the prompt; temperature 0 and grammar-computed fields added nothing measurable. On the M1, the template variant cost 9-52% more energy per call; worked examples nearly doubled the prompt yet cost −12% to +7%, because answers got shorter.
 
 **A5. "Run each test enough times and the result is solid." The die was loaded.**
 - **What happened:** at temperature 0.2 the wording changed every call, but the verdict mostly didn't: repeats of a test case agreed 80-90% of the time. The production check's 3 test cases × 6 repeats is closer to 3 data points than 18, so "18 of 18 correct" really means somewhere between 44% and 100%.
@@ -229,8 +229,8 @@ Speaker-note material, not slides: below ~1B parameters models echo the prompt o
 
 | Placeholder | Slide | Expected |
 |---|---|---|
-| Budget-forced thinking: accuracy, time, energy (M1, M4, M4 Max) | A2 (and Fig. 3) | 2026-10-05 |
-| Prompt ablation (M4 Max, M4; reduced set on M1) | A4 | 2026-10-05 |
-| Context-size check for the 12-27B models | A7 (confirms "same speed") | 2026-10-05 |
+| ~~Budget-forced thinking~~ (filled in 2026-10-05) | A2 (and Fig. 3) | done |
+| ~~Energy cost of worked examples on the M1~~ (filled in 2026-10-05) | A4 | done |
+| ~~Context-size check for the larger models~~ (up to 14B: no measurable effect; 27B not re-checked) | A7 | done |
 | Datadog dashboard screenshot | C3 | after the slides (TODO) |
 | Paper link | Closing | when available |
