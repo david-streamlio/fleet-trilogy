@@ -40,7 +40,12 @@ import os
 from collections import defaultdict
 
 from fleet_telemetry_model import EnrichmentCard, from_json, to_json
-from llm_inference import SubprocessLlmBackend
+from llm_inference import (
+    InProcessLlmBackend,
+    LlmBackend,
+    LlmGenerationConfig,
+    SubprocessLlmBackend,
+)
 
 from talk3_pulsar_speaks_english.synthesizer import synthesize
 
@@ -56,7 +61,8 @@ class GlobalSynthesisFunction:
     """
 
     def __init__(self, *, corridor_threshold: int = DEFAULT_CORRIDOR_THRESHOLD) -> None:
-        self._backend: SubprocessLlmBackend | None = None
+        self._backend: LlmBackend | None = None
+        self._config: LlmGenerationConfig | None = None
         self._corridor_threshold = corridor_threshold
         self._accumulator: dict[str, list[EnrichmentCard]] = defaultdict(list)
 
@@ -69,11 +75,11 @@ class GlobalSynthesisFunction:
         if len(cards) < self._corridor_threshold:
             return None
 
-        synthesis = synthesize(cards, backend)
+        synthesis = synthesize(cards, backend, config=self._config)
         self._accumulator[card.corridor] = []
         return to_json(synthesis) if synthesis is not None else None
 
-    def _build_backend(self, context) -> SubprocessLlmBackend:
+    def _build_backend(self, context) -> LlmBackend:
         """One-time setup on the first message, from the Function's --user-config.
 
         `llm_extra_args` (space-separated, e.g. "-no-cnv") carries the model's
@@ -81,19 +87,53 @@ class GlobalSynthesisFunction:
         Gemma's prompt in its chat template, which isn't the configuration the
         Tier 2 gates measured. `corridor_threshold` overrides how many cards a
         corridor needs before it's synthesized (e.g. 3 for a three-truck demo).
+        `threads` (llama.cpp's -t, default 4) and `timeout_seconds` (default 60)
+        override the generation settings, e.g. threads=1 to run the model on a
+        single CPU core.
+
+        `llm_backend` picks how the model runs:
+        - `subprocess` (default): a fresh llama.cpp process per call
+          (`llm_binary_path`, `llm_extra_args`), reloading the model every time.
+        - `inprocess`: llama-cpp-python inside this Function instance. The model
+          loads once and stays on `self` with the accumulator, and each call
+          reuses the prompt prefix the previous one already read. `llm_gpu_layers`
+          (default 0, CPU only) offloads layers to a GPU; the binary path and
+          extra args don't apply.
         """
         user_config = context.get_user_config_map() if context is not None else {}
-        extra_args = user_config.get("llm_extra_args") or os.environ.get(
-            "LLM_EXTRA_ARGS", ""
+        model_path = user_config.get("llm_model_path") or os.environ.get(
+            "LLM_MODEL_PATH"
         )
-        backend = SubprocessLlmBackend(
-            binary_path=user_config.get("llm_binary_path")
-            or os.environ.get("LLM_BINARY_PATH"),
-            model_path=user_config.get("llm_model_path")
-            or os.environ.get("LLM_MODEL_PATH"),
-            extra_args=tuple(extra_args.split()),
-        )
+        threads = user_config.get("threads")
+        kind = user_config.get("llm_backend") or "subprocess"
+        if kind == "inprocess":
+            backend = InProcessLlmBackend(
+                model_path,
+                threads=int(threads) if threads else 4,
+                gpu_layers=int(user_config.get("llm_gpu_layers") or 0),
+            )
+        elif kind == "subprocess":
+            extra_args = user_config.get("llm_extra_args") or os.environ.get(
+                "LLM_EXTRA_ARGS", ""
+            )
+            backend = SubprocessLlmBackend(
+                binary_path=user_config.get("llm_binary_path")
+                or os.environ.get("LLM_BINARY_PATH"),
+                model_path=model_path,
+                extra_args=tuple(extra_args.split()),
+            )
+        else:
+            raise ValueError(
+                f"llm_backend must be 'subprocess' or 'inprocess', got {kind!r}"
+            )
         if user_config.get("corridor_threshold"):
             self._corridor_threshold = int(user_config["corridor_threshold"])
+        overrides = {}
+        if threads:
+            overrides["threads"] = int(threads)
+        if user_config.get("timeout_seconds"):
+            overrides["timeout_seconds"] = float(user_config["timeout_seconds"])
+        if overrides:
+            self._config = LlmGenerationConfig(**overrides)
         self._backend = backend
         return backend

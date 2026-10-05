@@ -61,6 +61,16 @@ never decides, it only narrates.
   `IncidentSynthesis` per corridor that produced any cards. This is the only
   module in this package that touches `FleetSimulator` or stdout.
 
+## How the model runs
+
+`GlobalSynthesisFunction` picks its LLM backend from `--user-config`
+(`llm_backend`): `subprocess` (default) starts a `llama-completion` process per
+call; `inprocess` loads Gemma into the Function itself with llama-cpp-python
+(`llm_inference.InProcessLlmBackend`) and keeps it for every call. The Talk 3 demo
+uses `inprocess` on one CPU thread (`deploy/talk3-windows/tier2.sh`): about 12 s
+per warning on an M4 Max, vs. 15.5 s reloading the model each call on the same
+build — see `eval-results/talk3-single-core-m4max-20261004/`.
+
 ## Running it
 
 ```bash

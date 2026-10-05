@@ -15,8 +15,13 @@
 # LLM_MODEL_PATH pointing at a built llama.cpp-family binary and model on this machine.
 # Unset both (or set LLM_MOCK=1) to run the function in mock mode without an LLM runtime.
 # Optional: LLM_EXTRA_ARGS (the model's one-shot flags from models.toml, e.g. "-no-cnv"
-# for Gemma-3-4B-it) and CORRIDOR_THRESHOLD (cards per corridor before synthesizing;
-# the function's default is 2) -- both passed through --user-config.
+# for Gemma-3-4B-it), CORRIDOR_THRESHOLD (cards per corridor before synthesizing;
+# the function's default is 2), LLM_THREADS (llama.cpp -t; default 4, 1 = one CPU
+# core), LLM_TIMEOUT_SECONDS (per call; default 60), LLM_BACKEND (`subprocess`, the
+# default: a llama.cpp process per call; or `inprocess`: llama-cpp-python inside the
+# Function, model loaded once -- LLM_BINARY_PATH/LLM_EXTRA_ARGS then don't apply) and
+# LLM_GPU_LAYERS (inprocess only; default 0 = CPU only) -- all passed through
+# --user-config.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -29,7 +34,7 @@ SERVICE_URL="${1:-pulsar://localhost:6650}"
 ADMIN_URL="${2:-http://localhost:8080}"
 
 USER_CONFIG=$(cat <<EOF
-{"llm_binary_path": "${LLM_BINARY_PATH:-}", "llm_model_path": "${LLM_MODEL_PATH:-}", "llm_extra_args": "${LLM_EXTRA_ARGS:-}", "corridor_threshold": "${CORRIDOR_THRESHOLD:-}"}
+{"llm_binary_path": "${LLM_BINARY_PATH:-}", "llm_model_path": "${LLM_MODEL_PATH:-}", "llm_extra_args": "${LLM_EXTRA_ARGS:-}", "corridor_threshold": "${CORRIDOR_THRESHOLD:-}", "threads": "${LLM_THREADS:-}", "timeout_seconds": "${LLM_TIMEOUT_SECONDS:-}", "llm_backend": "${LLM_BACKEND:-}", "llm_gpu_layers": "${LLM_GPU_LAYERS:-}"}
 EOF
 )
 

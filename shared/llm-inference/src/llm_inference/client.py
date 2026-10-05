@@ -1,7 +1,7 @@
 """LLM inference backends, behind a common LlmBackend interface.
 
-Per docs/CANON.md: the on-stage model runtime (edge/cloud tiers) is accessed by
-subprocess. LlmBackend is an abstract interface so other transports can be added
+Per docs/CANON.md: the model runtime is mainline llama.cpp, run either as a
+subprocess per call or in-process (llama-cpp-python). LlmBackend is an abstract interface so other transports can be added
 without changing callers. SubprocessLlmBackend wraps any llama.cpp-family CLI
 binary (mainline llama.cpp's `llama-completion`, or bitnet.cpp's fork) via the same
 `-m -p -n -t --temp` style flags, plus optional extra one-shot flags (e.g.
@@ -15,13 +15,15 @@ lifecycle itself (starts llama-server, waits for it to become healthy, shuts it
 down); see its own docstring for why this exists (SubprocessLlmBackend reloads the
 whole model from scratch on every single generate() call, measured as the dominant
 cost for any workload that calls it many times against the same model).
-InProcessLlmBackend remains reserved/unimplemented.
+InProcessLlmBackend runs llama.cpp inside this Python process via llama-cpp-python,
+loading the model once and keeping it for every call (see its own docstring).
 """
 
 from __future__ import annotations
 
 import json
 import os
+import random
 import socket
 import subprocess
 import time
@@ -80,8 +82,9 @@ class SubprocessLlmBackend(LlmBackend):
     """Shells out to a llama.cpp-family CLI binary (e.g. mainline llama.cpp's
     `llama-completion`, or bitnet.cpp's `main`) per call.
 
-    This is the only real backend implemented today. CPU-only, no GPU flags are ever
-    passed. Pass `mock=True` (or set the `LLM_MOCK=1` environment variable) to get
+    No GPU flags are passed by default, but that does NOT make it CPU-only: a
+    llama.cpp built with a GPU backend (Metal, on a Mac) offloads to it unless the
+    model's extra args say otherwise (`-dev none -ngl 0` for CPU only). Pass `mock=True` (or set the `LLM_MOCK=1` environment variable) to get
     canned completions without any runtime/model installed at all — useful for
     developing the rest of the pipeline before the Pi/model are set up, and for CI.
     """
@@ -417,17 +420,129 @@ def _find_free_port() -> int:
 
 
 class InProcessLlmBackend(LlmBackend):
-    """Reserved for a future in-process binding (e.g. ctypes/pybind11 around llama.cpp).
+    """Runs llama.cpp inside this Python process via llama-cpp-python
+    (https://github.com/abetlen/llama-cpp-python, MIT): the model loads once, on the
+    first generate() call, and stays loaded for every call after it.
 
-    Not implemented yet — see docs/CANON.md. Kept here so callers can be written
-    against LlmBackend today and switch transports later without changes.
+    This is what "embed the LLM inside the Pulsar Function" means literally: a
+    Function instance that holds this backend on `self` keeps the model in its own
+    memory, the same way it keeps its per-corridor accumulator. Two costs
+    SubprocessLlmBackend pays on every call go away:
+
+    1. Loading the model (~1 s per call for Gemma-3-4B-it Q4_K_M on an M4 Max, CPU
+       only; eval-results/talk3-single-core-m4max-20261004/).
+    2. Re-reading the prompt's fixed instructions. llama-cpp-python keeps the
+       previous call's tokens in its KV cache and only evaluates the part of a new
+       prompt that differs from it, so every Tier 2 call after the first skips its
+       shared instruction prefix — with no extra code here.
+
+    Same raw-completion contract as SubprocessLlmBackend's `-no-cnv`: the prompt goes
+    in exactly as given (plus BOS), no chat template.
+
+    `threads` and `gpu_layers` are load-time settings, passed once to the
+    constructor; `LlmGenerationConfig.threads` and `.extra_args` are ignored, the
+    same as LlmServerBackend. `gpu_layers=0` (the default) keeps the model's weights
+    on the CPU and turns off llama.cpp's automatic GPU offloads too. `timeout_seconds` is enforced between generated tokens only: prompt
+    evaluation can't be interrupted in-process, so a call can overrun the timeout by
+    up to one prompt evaluation before it's stopped. `seed` pins sampling (the same
+    prompts then give the same text in every process); the default is random, like
+    `llama-completion`.
+
+    llama-cpp-python is an optional dependency (the root `inprocess` dependency
+    group): it's imported on first use, never at module import, so mock mode and
+    every other backend work without it installed.
     """
 
-    def generate(self, prompt: str, config: LlmGenerationConfig | None = None) -> str:
-        raise NotImplementedError(
-            "In-process LLM binding is reserved for a future session; "
-            "use SubprocessLlmBackend for now."
+    def __init__(
+        self,
+        model_path: str | Path | None = None,
+        *,
+        threads: int = 4,
+        gpu_layers: int = 0,
+        context_size: int = 2048,
+        seed: int | None = None,
+        mock: bool | None = None,
+    ) -> None:
+        self._model_path = Path(model_path).expanduser() if model_path else None
+        self._seed = seed
+        self._threads = threads
+        self._gpu_layers = gpu_layers
+        self._context_size = context_size
+        self._mock = mock if mock is not None else _mock_enabled_via_env()
+        self._llama = None
+
+    def load(self) -> Self:
+        """Load the model now rather than on the first generate() call. Idempotent."""
+        if self._mock or self._llama is not None:
+            return self
+        if self._model_path is None or not self._model_path.exists():
+            raise LlmInferenceError(
+                f"Model not found at {self._model_path!r}. Point model_path at a GGUF "
+                "weights file, or construct with mock=True / set LLM_MOCK=1 to develop "
+                "without it."
+            )
+        try:
+            from llama_cpp import Llama
+        except ImportError as exc:
+            raise LlmInferenceError(
+                "llama-cpp-python is not installed. Install the `inprocess` dependency "
+                "group (`uv sync --group inprocess`), or construct with mock=True / set "
+                "LLM_MOCK=1 to develop without it."
+            ) from exc
+        self._llama = Llama(
+            model_path=str(self._model_path),
+            n_threads=self._threads,
+            n_threads_batch=self._threads,
+            n_gpu_layers=self._gpu_layers,
+            # With no layers on the GPU, also stop llama.cpp moving individual big
+            # operations (prompt-processing matmuls, the KV cache) onto a GPU it found
+            # anyway (Metal on a Mac): otherwise "CPU only" still uses the GPU.
+            op_offload=self._gpu_layers != 0,
+            offload_kqv=self._gpu_layers != 0,
+            n_ctx=self._context_size,
+            # llama-cpp-python's default seed gives every process the same sampling
+            # sequence (measured: two processes, same prompts, identical warnings),
+            # unlike llama-completion's random one. Random unless pinned.
+            seed=self._seed if self._seed is not None else random.randrange(2**31),
+            verbose=False,
         )
+        return self
+
+    def generate(self, prompt: str, config: LlmGenerationConfig | None = None) -> str:
+        config = config or LlmGenerationConfig()
+        if self._mock:
+            return _mock_complete(prompt)
+        self.load()
+        from llama_cpp import StoppingCriteriaList
+
+        deadline = time.monotonic() + config.timeout_seconds
+        timed_out = False
+
+        def past_deadline(_input_ids, _logits) -> bool:
+            nonlocal timed_out
+            timed_out = time.monotonic() > deadline
+            return timed_out
+
+        kwargs: dict = {
+            "max_tokens": config.max_tokens,
+            "temperature": config.temperature,
+            "stopping_criteria": StoppingCriteriaList([past_deadline]),
+        }
+        if config.stop:
+            kwargs["stop"] = list(config.stop)
+        if config.grammar:
+            from llama_cpp import LlamaGrammar
+
+            kwargs["grammar"] = LlamaGrammar.from_string(config.grammar, verbose=False)
+        try:
+            result = self._llama.create_completion(prompt, **kwargs)
+        except Exception as exc:  # surface any llama.cpp runtime failure uniformly
+            raise LlmInferenceError(f"in-process LLM call failed: {exc}") from exc
+        if timed_out:
+            raise LlmInferenceError(
+                f"LLM runtime did not finish within {config.timeout_seconds}s"
+            )
+        return result["choices"][0]["text"].strip()
 
 
 def _mock_enabled_via_env() -> bool:

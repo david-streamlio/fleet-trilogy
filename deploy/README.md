@@ -119,10 +119,22 @@ consumes `enrichment-cards`, accumulates cards per corridor, and publishes an
 to synthesize — see `talk3_pulsar_speaks_english.function.GlobalSynthesisFunction`'s
 docstring for exactly how that threshold works and why (Pulsar Functions are
 per-message, but Tier 2 needs multiple trucks' cards before it can decide
-anything). Two optional settings pass through `--user-config`: `LLM_EXTRA_ARGS`
-(the model's one-shot flags from `models.toml` — `-no-cnv` for Gemma-3-4B-it,
-otherwise llama.cpp wraps the prompt in its chat template) and
-`CORRIDOR_THRESHOLD` (cards per corridor before synthesizing; default 2).
+anything). Optional settings pass through `--user-config`:
+
+- `LLM_BACKEND`: `subprocess` (default; a fresh `llama-completion` process per
+  call, reloading the model each time) or `inprocess` (llama-cpp-python inside the
+  Function: the model loads once and stays, and each call reuses the prompt prefix
+  the last one read). The Talk 3 demo (`deploy/talk3-windows/tier2.sh`) uses
+  `inprocess`.
+- `LLM_THREADS` (default 4; `1` = one CPU core) and `LLM_TIMEOUT_SECONDS`
+  (default 60).
+- `LLM_GPU_LAYERS` (`inprocess` only; default 0 = CPU only, with llama.cpp's
+  automatic GPU offloads off too).
+- `LLM_EXTRA_ARGS` (`subprocess` only): the model's one-shot flags from
+  `models.toml` — `-no-cnv` for Gemma-3-4B-it, otherwise llama.cpp wraps the prompt
+  in its chat template. On a Mac, add `-dev none -ngl 0` for CPU only: without
+  them a Metal build of llama.cpp runs on the GPU.
+- `CORRIDOR_THRESHOLD` (cards per corridor before synthesizing; default 2).
 
 **Every `*localrun*.sh` script needs the `functions` dependency group** — the
 imports of `pulsar-admin functions localrun`'s Python instance (protobuf 6.x,
@@ -148,7 +160,7 @@ talk1's `test_uplinked_card_is_a_valid_tier2_enrichment_card`.)
 By hand, one window per script (`deploy/talk3-windows/`), in this order:
 
 ```bash
-./deploy/talk3-windows/tier2.sh      # Tier 2 Function (log; defaults: Gemma, -no-cnv, threshold 3)
+./deploy/talk3-windows/tier2.sh      # Tier 2 Function (log; defaults: Gemma in-process, 1 CPU thread, threshold 3)
 ./deploy/talk3-windows/cards.sh      # cards arriving
 ./deploy/talk3-windows/decision.sh   # "[Decided by code]" + "[Worded by the LLM]"
 ./deploy/talk3-windows/spoken.sh     # the voice (norman); WAVs + playback.log -> $DEMO_AUDIO_DIR

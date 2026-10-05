@@ -21,7 +21,7 @@ import uuid
 from collections import defaultdict
 
 from fleet_telemetry_model import EnrichmentCard, IncidentSynthesis
-from llm_inference.client import LlmBackend
+from llm_inference.client import LlmBackend, LlmGenerationConfig
 
 from talk3_pulsar_speaks_english.prompting import generate_spoken_warning
 
@@ -88,6 +88,7 @@ def synthesize(
     backend: LlmBackend,
     *,
     incident_id: str | None = None,
+    config: LlmGenerationConfig | None = None,
 ) -> IncidentSynthesis | None:
     """Aggregate one corridor's worth of enrichment cards into an IncidentSynthesis.
 
@@ -115,6 +116,7 @@ def synthesize(
         scope=scope,
         reroute_recommended=reroute_recommended,
         reroute_detail=reroute_detail,
+        config=config,
     )
 
     return IncidentSynthesis(
