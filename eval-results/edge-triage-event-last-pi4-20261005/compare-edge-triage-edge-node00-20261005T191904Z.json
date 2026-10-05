@@ -1,0 +1,192 @@
+{
+  "host": "edge-node00",
+  "arch": "aarch64",
+  "platform": "Linux-6.18.50+rpt-rpi-v8-aarch64-with-glibc2.41",
+  "decision_grade": "full (Pi 4 target)",
+  "timestamp": "2026-10-05T19:19:04Z",
+  "seed_config": {
+    "model_eval_runs": 9,
+    "model_timeout_seconds": 600.0,
+    "model_backend": "inprocess",
+    "model_gpu_layers": 0,
+    "model_threads": 4,
+    "vary_events": true,
+    "triage_prompt": "event-last",
+    "model_server_args": ""
+  },
+  "models": {
+    "phi-3.5-mini-instruct-q4km": {
+      "id": "phi-3.5-mini-instruct-q4km",
+      "display_name": "Phi-3.5-mini-instruct (Q4_K_M)",
+      "available": true,
+      "binary_path": "/mnt/data/tools/llama.cpp/build/bin/llama-completion",
+      "model_path": "/mnt/data/models/Phi-3.5-mini-instruct-GGUF/Phi-3.5-mini-instruct-Q4_K_M.gguf",
+      "extra_args": [
+        "-no-cnv"
+      ],
+      "backend": "inprocess",
+      "gpu_layers": 0,
+      "threads": 4,
+      "vary_events": true,
+      "triage_prompt": "event-last",
+      "server_args": null,
+      "trial_window": {
+        "started_utc": "2026-10-05T18:50:09Z",
+        "ended_utc": "2026-10-05T19:19:04Z",
+        "wall_seconds": 1734.587773198,
+        "calls": 18
+      },
+      "prompt_vs_generation": {
+        "median_prompt_tokens": 514.0,
+        "median_prompt_tokens_evaluated": 148.0,
+        "median_prompt_ms": 51603.228,
+        "median_generated_tokens": 41.0,
+        "median_generation_ms": 31403.777999999962,
+        "total_prompt_ms": 1044028.464,
+        "total_generation_ms": 673823.266,
+        "n": 18
+      },
+      "format_reliability": {
+        "total": 9,
+        "parsed": 9,
+        "rate": 1.0,
+        "sample_failures": []
+      },
+      "escalation_calibration": {
+        "per_scenario": {
+          "escalate-worthy": {
+            "expected_direction": "raise",
+            "escalation_tally": {
+              "raise": 3
+            },
+            "total": 3,
+            "matched": 3,
+            "match_rate": 1.0
+          },
+          "benign": {
+            "expected_direction": "hold",
+            "escalation_tally": {
+              "lower": 3
+            },
+            "total": 3,
+            "matched": 0,
+            "match_rate": 0.0
+          },
+          "de-escalate-worthy": {
+            "expected_direction": "lower_or_hold",
+            "escalation_tally": {
+              "lower": 3
+            },
+            "total": 3,
+            "matched": 3,
+            "match_rate": 1.0
+          }
+        },
+        "total": 9,
+        "matched": 6,
+        "mismatches": 3,
+        "mismatch_rate": 0.33333333333333337,
+        "sample_mismatches": [
+          {
+            "scenario": "benign",
+            "expected_direction": "hold",
+            "escalation": "lower"
+          },
+          {
+            "scenario": "benign",
+            "expected_direction": "hold",
+            "escalation": "lower"
+          },
+          {
+            "scenario": "benign",
+            "expected_direction": "hold",
+            "escalation": "lower"
+          }
+        ],
+        "gate2_confirmed": true,
+        "gate2_per_scenario_n": 3,
+        "gate2_format_threshold": 0.8
+      },
+      "latency": {
+        "p50_seconds": 87.17775866250031,
+        "p95_seconds": 135.66496146815086,
+        "mean_seconds": 96.36575403161117,
+        "total_seconds": 1734.5835725690013,
+        "n": 18
+      },
+      "tokens_per_sec_approx": 0.3419251297539638,
+      "tokens_per_sec_note": "approximate \u2014 whitespace word count / latency over parsed trials, not an exact tokenizer count",
+      "load_time_seconds": 2.950798058000146,
+      "resident_ram_mb_before": 53.0390625,
+      "resident_ram_mb_after": 4004.81640625,
+      "resident_ram_mb_note": "ru_maxrss is a cumulative max for the whole test session and isn't resettable per model; this is exact for the first model in a run (or when a model is run alone) and otherwise a floor \u2014 not a true peak \u2014 for models measured later in the same run. Server backend: RUSAGE_CHILDREN (llama-server alone). In-process: RUSAGE_SELF, so it also counts the test process's own Python heap."
+    }
+  },
+  "comparison": {
+    "format_parse_rate": {
+      "direction": "higher",
+      "values": {
+        "phi-3.5-mini-instruct-q4km": 1.0
+      },
+      "best": "phi-3.5-mini-instruct-q4km"
+    },
+    "escalation_mismatch_rate": {
+      "direction": "lower",
+      "values": {
+        "phi-3.5-mini-instruct-q4km": 0.33333333333333337
+      },
+      "best": "phi-3.5-mini-instruct-q4km"
+    },
+    "latency_p50_seconds": {
+      "direction": "lower",
+      "values": {
+        "phi-3.5-mini-instruct-q4km": 87.17775866250031
+      },
+      "best": "phi-3.5-mini-instruct-q4km"
+    },
+    "latency_p95_seconds": {
+      "direction": "lower",
+      "values": {
+        "phi-3.5-mini-instruct-q4km": 135.66496146815086
+      },
+      "best": "phi-3.5-mini-instruct-q4km"
+    },
+    "tokens_per_sec_approx": {
+      "direction": "higher",
+      "values": {
+        "phi-3.5-mini-instruct-q4km": 0.3419251297539638
+      },
+      "best": "phi-3.5-mini-instruct-q4km"
+    },
+    "load_time_seconds": {
+      "direction": "lower",
+      "values": {
+        "phi-3.5-mini-instruct-q4km": 2.950798058000146
+      },
+      "best": "phi-3.5-mini-instruct-q4km"
+    },
+    "resident_ram_mb_after": {
+      "direction": "lower",
+      "values": {
+        "phi-3.5-mini-instruct-q4km": 4004.81640625
+      },
+      "best": "phi-3.5-mini-instruct-q4km"
+    }
+  },
+  "recommendation": "format_parse_rate: Phi-3.5-mini-instruct (Q4_K_M) leads (1.000)\nescalation_mismatch_rate: Phi-3.5-mini-instruct (Q4_K_M) leads (0.333)\nlatency_p50_seconds: Phi-3.5-mini-instruct (Q4_K_M) leads (87.178)\nlatency_p95_seconds: Phi-3.5-mini-instruct (Q4_K_M) leads (135.665)\ntokens_per_sec_approx: Phi-3.5-mini-instruct (Q4_K_M) leads (0.342)\nload_time_seconds: Phi-3.5-mini-instruct (Q4_K_M) leads (2.951)\nresident_ram_mb_after: Phi-3.5-mini-instruct (Q4_K_M) leads (4004.816)\nThis note does not pick a stage model. Quality axes above are decision-relevant on any host; speed/RAM axes only count when measured on the Pi 4 target.",
+  "production_candidates": {
+    "format_threshold": 0.8,
+    "escalation_threshold": 0.5,
+    "passed": [
+      {
+        "id": "phi-3.5-mini-instruct-q4km",
+        "display_name": "Phi-3.5-mini-instruct (Q4_K_M)",
+        "format_parse_rate": 1.0,
+        "gate2_confirmed": true,
+        "escalation_mismatch_rate": 0.33333333333333337,
+        "escalation_sample_n": 9
+      }
+    ],
+    "rejected": []
+  }
+}

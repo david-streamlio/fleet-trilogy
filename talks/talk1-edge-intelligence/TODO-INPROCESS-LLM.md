@@ -47,12 +47,22 @@ same build.
   recording uses.
 - Item 3: llama-cpp-python 0.3.36 is already built on the Pi
   (`/mnt/data/fleet-trilogy-talk3wip`, from Talk 3's Pi run).
-- Item 2 is still open. Talk 2's real-stream re-measure on the Pi (2026-10-05) ran
-  `LlmTriageFunction` through llama-server, not in-process, to match its published
-  row's build: 82 s and 416 J per changed-prompt call with the event-last prompt
-  (`eval-results/edge-triage-event-last-pi4-20261005/`). An in-process run on the
-  same Pi would compare the two backends; Talk 3's Tier 2 run there found
-  llama-cpp-python faster than the Pi's own llama.cpp build.
+- Item 2, `LlmTriageFunction` measured on the Pi both ways (2026-10-05,
+  `eval-results/edge-triage-event-last-pi4-20261005/`, runs A and C; event-last
+  prompt, a different event per call, inline meter): llama-server 82 s / 416 J per
+  call, in-process 87 s / 429 J. Same cost within noise, in-process with less memory
+  (4.0 vs 6.7 GB). Unlike Talk 3's Tier 2 run, llama-cpp-python wasn't faster here.
+- **But the backends decide differently in borderline cases**
+  (`eval-results/edge-triage-backend-accuracy-m4max-20261005/`, 45 escalation calls
+  per cell): in-process leans to "lower". With the published prompt
+  (`DEFAULT_PROMPT_TEMPLATE`, what the demo uses) it stays correct (0/45; the
+  de-escalate-worthy case goes hold → lower, which is accepted). With
+  `EVENT_LAST_PROMPT_TEMPLATE` it flips the benign case to "lower" (15/45). So keep the
+  published prompt with the in-process default, or re-validate before combining them.
+
+## Still open
+- Item 4 (the slides' "hosts the small LLM on a CPU runtime" claim): now literally true
+  by default.
 
 ## Done when
 - Both Functions have been measured on the Pi with the current backend and

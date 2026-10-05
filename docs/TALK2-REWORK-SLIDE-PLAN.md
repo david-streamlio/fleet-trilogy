@@ -171,7 +171,7 @@
   - Why: energy is power × time. The Pi draws ~7 W but takes 17-90× longer, so it pays for every second.
   - On the same chip the CPU loses most when reading the prompt (~4× the GPU's energy per token) and still loses when writing the answer (1.4-1.6×).
   - Pi 4 measured at the wall, the Macs at the chip; even doubling the Mac figures leaves the Pi several times higher.
-  - These are repeated-prompt numbers: the benchmark sent the same event again, so the prompt was cached. Slide 19 shows what a changed prompt costs (on the Pi, 2.7× more).
+  - These are repeated-prompt numbers: the benchmark sent the same event again, so the prompt was cached. Slide 19 shows what a changed prompt costs (on the Pi, up to 5× more).
   - Forward: if the hardware choice cost energy, what about the model's settings?
 - **Time:** Section 3, ~2.25 min.
 
@@ -304,17 +304,17 @@
 
 ### Slide 19 — I assumed my benchmark measured the cost of a call. It measured the cost of a repeat.
 - **Core Message:** a prompt cache reuses only what hasn't changed, so put the fixed instructions first and the per-request data last, and benchmark with inputs that change.
-- **Visual Manifest:** Type `Bar_Comparison`. Spec: before ("my benchmark repeated one event: the server read 1 of 514 prompt tokens per call") vs after (a changed event re-reads ~400 tokens with the event fields before the rules, 148 with them last; Pi 4 82 s / 416 J per changed call against 31.7 s / 154 J repeated; M4 Max GPU 25.0 → 18.5 J with the fields last).
+- **Visual Manifest:** Type `Bar_Comparison`. Spec: before ("my benchmark repeated one event: the server read 1 of 514 prompt tokens per call") vs after (a changed event re-reads ~400 tokens with the event fields before the rules, 148 with them last; Pi 4 per changed call 160 s / 772 J, or 82 s / 416 J with the fields last, against 31.7 s / 154 J repeated; M4 Max GPU 25.0 → 18.5 J with the fields last).
 - **Suggested Layout:** `Comparison`.
 - **On-Screen Text:**
   - Before column: "My benchmark sent the same event again: the server re-read 1 of 514 prompt tokens"
-  - After column: "A new event re-read ~400. Rules first, event last: 148. Pi 4: 82 s and 416 J per new event, vs 31.7 s and 154 J repeated"
-  - Footer: "Do this: fixed instructions first, per-request data last; benchmark with inputs that change"
+  - After column: "A new event re-read ~400 tokens: 160 s and 772 J on the Pi 4. Rules first, event last: 148 tokens, 82 s, 416 J"
+  - Footer: "Do this: fixed instructions first, per-request data last, then re-check accuracy; benchmark with inputs that change"
 - **Speaker Notes:**
   - Found while preparing this talk. A server's prompt cache reuses a prompt up to the first token that changed since the last call.
   - During one incident, one truck's calls repeat the prompt (it carries the trip context, not the sensor readings), so the earlier numbers are right for those calls. A new incident, a changed field, or one device serving several trucks pays the full read.
-  - My prompt put the event's fields before the rules, so a new event re-read ~400 of 514 tokens. Moving them after the rules, same words otherwise: 148. Accuracy unchanged, 100% format and 0% wrong escalations.
-  - On the Pi's CPU, reading even 148 tokens took 50 s, longer than writing the answer (31 s). The original order would need ~170 s per new event (estimated from that rate). On the laptop GPU, reordering saved 26% of the energy per new event: a small lever on a GPU, a big one on a CPU.
+  - My prompt put the event's fields before the rules, so a new event re-read ~400 of 514 tokens. Moving them after the rules, same words otherwise: 148. Accuracy unchanged on llama-server, 100% format and 0% wrong escalations. But through llama-cpp-python the reordered prompt tipped the benign case from hold to lower on every call: a reorder is a prompt change, so re-check it on the runtime you ship.
+  - On the Pi's CPU, my original order took 160 s and 772 J per new event, 5× the repeated cost: 129 s of it was reading the prompt, four times as long as writing the answer (31 s). Fields last: 82 s and 416 J, about half. On the laptop GPU, reordering saved 26% of the energy per new event: a small lever on a GPU, a big one on a CPU.
   - And check what your benchmark server caches: llama-server's memory cache of earlier prompts served my recurring test events whole until I turned it off.
   - Forward: those ten, as a checklist.
 - **Time:** Section 3, ~1.75 min.
@@ -381,7 +381,7 @@
   - "Energy = calls × joules per call"
 - **Speaker Notes:**
   - The invocation policy moved the total by 3-4 orders of magnitude, the device by about one.
-  - Calling once per incident instead of every 5 s would cut another ~20×. The bars use the repeated-prompt cost per call; a once-per-incident call always meets a new prompt, so on the Pi it costs up to 2.7× more (slide 19). That bar is still ~8× below the gated one.
+  - Calling once per incident instead of every 5 s would cut another ~20×. The bars use the repeated-prompt cost per call; a once-per-incident call always meets a new prompt, so on the Pi it costs 5× more with my original prompt (2.7× with the fields last; slide 19). That bar is still ~5× below the gated one.
   - How much not transmitting saves depends on the radio: an old LTE radio streaming every 5 s stays on all day (~92 kJ); a modern low-power modem uses ~2.5 kJ.
   - Hardware that's already on: the Pi's 3.4 W idle is 294 kJ a day, more than everything else. A phone that's on anyway only adds marginal energy, the strongest argument for phones.
   - Forward: how you'd watch for all of this in production.

@@ -1,0 +1,31 @@
+
+=== Tier 3 Edge Triage Pipeline model COMPARISON ===
+artifact: /Users/david.kjerrumgaard/clone-zone/davidkj-datadog/fleet-trilogy/eval-results/compare-edge-triage-COMP-J2D9D71YNJ-20261005T192926Z.json
+host: COMP-J2D9D71YNJ (arm64, macOS-26.7.1-arm64-arm-64bit-Mach-O)
+decision_grade: quality-only (non-target hardware)
+backend: inprocess, vary_events: True, triage_prompt: default, server_args: -
+axis                      Phi-3.5-mini-instruct (Q4_K_M)
+------------------------  ------------------------------
+format_parse_rate         1.000                         
+escalation_mismatch_rate  0.000                         
+latency_p50_seconds       2.593                         
+latency_p95_seconds       4.256                         
+tokens_per_sec_approx     13.744                        
+load_time_seconds         1.134                         
+resident_ram_mb_after     6365.141                      
+
+--- recommendation (does not auto-pick — human decides) ---
+format_parse_rate: Phi-3.5-mini-instruct (Q4_K_M) leads (1.000)
+escalation_mismatch_rate: Phi-3.5-mini-instruct (Q4_K_M) leads (0.000)
+[informational — non-target hardware] latency_p50_seconds: Phi-3.5-mini-instruct (Q4_K_M) leads (2.593)
+[informational — non-target hardware] latency_p95_seconds: Phi-3.5-mini-instruct (Q4_K_M) leads (4.256)
+[informational — non-target hardware] tokens_per_sec_approx: Phi-3.5-mini-instruct (Q4_K_M) leads (13.744)
+[informational — non-target hardware] load_time_seconds: Phi-3.5-mini-instruct (Q4_K_M) leads (1.134)
+[informational — non-target hardware] resident_ram_mb_after: Phi-3.5-mini-instruct (Q4_K_M) leads (6365.141)
+This note does not pick a stage model. Quality axes above are decision-relevant on any host; speed/RAM axes only count when measured on the Pi 4 target.
+
+--- production candidates (format_parse_rate>=80%, gate-2-confirmed escalation_mismatch_rate<=50%) ---
+  PASS   Phi-3.5-mini-instruct (Q4_K_M): escalation_mismatch=0.0% (n=45, gate-2 confirmed)
+Evidence for/against production use on THIS task — not a final pick. Pi 4 latency/RAM footprint still applies to any PASS entry before it ships.
+.
+1 passed in 177.48s (0:02:57)

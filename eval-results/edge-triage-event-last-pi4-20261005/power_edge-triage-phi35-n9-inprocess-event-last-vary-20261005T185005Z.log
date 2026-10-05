@@ -1,0 +1,38 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.5, pytest-9.1.1, pluggy-1.6.0
+rootdir: /mnt/data/fleet-trilogy-talk3wip
+configfile: pyproject.toml
+collected 1 item
+
+tests/model/test_compare_edge_triage_models.py 
+=== Tier 3 Edge Triage Pipeline model COMPARISON ===
+artifact: /mnt/data/fleet-trilogy-talk3wip/eval-results/compare-edge-triage-edge-node00-20261005T191904Z.json
+host: edge-node00 (aarch64, Linux-6.18.50+rpt-rpi-v8-aarch64-with-glibc2.41)
+decision_grade: full (Pi 4 target)
+backend: inprocess, vary_events: True, triage_prompt: event-last, server_args: -
+axis                      Phi-3.5-mini-instruct (Q4_K_M)
+------------------------  ------------------------------
+format_parse_rate         1.000                         
+escalation_mismatch_rate  0.333                         
+latency_p50_seconds       87.178                        
+latency_p95_seconds       135.665                       
+tokens_per_sec_approx     0.342                         
+load_time_seconds         2.951                         
+resident_ram_mb_after     4004.816                      
+
+--- recommendation (does not auto-pick — human decides) ---
+format_parse_rate: Phi-3.5-mini-instruct (Q4_K_M) leads (1.000)
+escalation_mismatch_rate: Phi-3.5-mini-instruct (Q4_K_M) leads (0.333)
+latency_p50_seconds: Phi-3.5-mini-instruct (Q4_K_M) leads (87.178)
+latency_p95_seconds: Phi-3.5-mini-instruct (Q4_K_M) leads (135.665)
+tokens_per_sec_approx: Phi-3.5-mini-instruct (Q4_K_M) leads (0.342)
+load_time_seconds: Phi-3.5-mini-instruct (Q4_K_M) leads (2.951)
+resident_ram_mb_after: Phi-3.5-mini-instruct (Q4_K_M) leads (4004.816)
+This note does not pick a stage model. Quality axes above are decision-relevant on any host; speed/RAM axes only count when measured on the Pi 4 target.
+
+--- production candidates (format_parse_rate>=80%, gate-2-confirmed escalation_mismatch_rate<=50%) ---
+  PASS   Phi-3.5-mini-instruct (Q4_K_M): escalation_mismatch=33.3% (n=9, gate-2 confirmed)
+Evidence for/against production use on THIS task — not a final pick. Pi 4 latency/RAM footprint still applies to any PASS entry before it ships.
+.
+
+======================== 1 passed in 1737.92s (0:28:57) ========================

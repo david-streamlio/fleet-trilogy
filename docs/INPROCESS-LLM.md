@@ -86,6 +86,13 @@ eval harness; the old backends stay available as options:
   --cache-ram 0"`: llama-server's slots and host-RAM prompt cache otherwise restore
   each of the three recurring test events whole (1 token read). Results: the test
   log's "Real-stream re-measure" section and the paper's Table IV.
+- **The backends don't always agree** (`eval-results/edge-triage-backend-accuracy-m4max-20261005/`):
+  same model file and sampling settings, but llama-cpp-python's own llama.cpp build
+  moves Phi-3.5's borderline escalations from hold to lower, every call, on the M4 Max
+  CPU and the Pi 4 alike. With the published triage prompt that stays correct (0/45);
+  with the event-last prompt it flips the benign case (15/45). Re-check accuracy when
+  switching backends, as for a quantization. Speed: in-process ~20% slower than
+  llama-server on the M4 Max CPU, ~6% on the Pi 4, at the same energy.
 
 ## To review in Talks 1 and 2
 - Talk 1: `talks/talk1-edge-intelligence/TODO-INPROCESS-LLM.md`

@@ -21,8 +21,13 @@ Talk 3's numbers: `docs/INPROCESS-LLM.md`.
 - **Re-measured as a stream (2026-10-05).** Each device kept its published row's
   backend and build (llama-server), so only the event variation and the prompt order
   changed. The prompt became the cache-friendly `event-last` variant (event fields after
-  the rules; same accuracy). Pi 4: **416 J, p50 82 s per call** against the best case's
-  154 J, 31.7 s. M4 Max GPU: published prompt 25.0 J / 0.70 s, event-last 18.5 J /
+  the rules; same accuracy on llama-server, not in-process: see the backend check below). Pi 4: **416 J, p50 82 s per call** against the best case's
+  154 J, 31.7 s; with the published prompt order, **772 J, 160 s** (5×).
+- **Backend check (2026-10-05):** in-process on the Pi 4 costs the same as llama-server
+  (429 J, 87 s vs 416 J, 82 s) but decides differently in borderline cases: it leans
+  to "lower" (`eval-results/edge-triage-backend-accuracy-m4max-20261005/`). With the
+  published prompt that stays correct (0/45); with event-last it flips the benign case
+  (15/45). The paper and A10 now say "re-check accuracy after reordering". M4 Max GPU: published prompt 25.0 J / 0.70 s, event-last 18.5 J /
   0.49 s, against ~15 J / 0.36 s. In-process wasn't used for these: on the Pi it is a
   different llama.cpp build, which would have confounded the comparison with the
   published row.

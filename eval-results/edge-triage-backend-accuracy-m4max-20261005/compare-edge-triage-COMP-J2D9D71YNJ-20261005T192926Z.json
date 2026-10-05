@@ -1,0 +1,176 @@
+{
+  "host": "COMP-J2D9D71YNJ",
+  "arch": "arm64",
+  "platform": "macOS-26.7.1-arm64-arm-64bit-Mach-O",
+  "decision_grade": "quality-only (non-target hardware)",
+  "timestamp": "2026-10-05T19:29:26Z",
+  "seed_config": {
+    "model_eval_runs": 15,
+    "model_timeout_seconds": 180.0,
+    "model_backend": "inprocess",
+    "model_gpu_layers": 0,
+    "model_threads": null,
+    "vary_events": true,
+    "triage_prompt": "default",
+    "model_server_args": ""
+  },
+  "models": {
+    "phi-3.5-mini-instruct-q4km": {
+      "id": "phi-3.5-mini-instruct-q4km",
+      "display_name": "Phi-3.5-mini-instruct (Q4_K_M)",
+      "available": true,
+      "binary_path": "/Users/david.kjerrumgaard/tools/llama.cpp-v0.5.0/build/bin/llama-completion",
+      "model_path": "/Users/david.kjerrumgaard/tools/models/Phi-3.5-mini-instruct-GGUF/Phi-3.5-mini-instruct-Q4_K_M.gguf",
+      "extra_args": [
+        "-no-cnv"
+      ],
+      "backend": "inprocess",
+      "gpu_layers": 0,
+      "threads": 12,
+      "vary_events": true,
+      "triage_prompt": "default",
+      "server_args": null,
+      "trial_window": {
+        "started_utc": "2026-10-05T19:26:30Z",
+        "ended_utc": "2026-10-05T19:29:26Z",
+        "wall_seconds": 176.2917235000059,
+        "calls": 60
+      },
+      "prompt_vs_generation": {
+        "median_prompt_tokens": 514.0,
+        "median_prompt_tokens_evaluated": 400.0,
+        "median_prompt_ms": 1868.3529999999992,
+        "median_generated_tokens": 41.0,
+        "median_generation_ms": 609.5529999999999,
+        "total_prompt_ms": 111974.83200000001,
+        "total_generation_ms": 56420.278,
+        "n": 60
+      },
+      "format_reliability": {
+        "total": 15,
+        "parsed": 15,
+        "rate": 1.0,
+        "sample_failures": []
+      },
+      "escalation_calibration": {
+        "per_scenario": {
+          "escalate-worthy": {
+            "expected_direction": "raise",
+            "escalation_tally": {
+              "raise": 15
+            },
+            "total": 15,
+            "matched": 15,
+            "match_rate": 1.0
+          },
+          "benign": {
+            "expected_direction": "hold",
+            "escalation_tally": {
+              "hold": 15
+            },
+            "total": 15,
+            "matched": 15,
+            "match_rate": 1.0
+          },
+          "de-escalate-worthy": {
+            "expected_direction": "lower_or_hold",
+            "escalation_tally": {
+              "lower": 15
+            },
+            "total": 15,
+            "matched": 15,
+            "match_rate": 1.0
+          }
+        },
+        "total": 45,
+        "matched": 45,
+        "mismatches": 0,
+        "mismatch_rate": 0.0,
+        "sample_mismatches": [],
+        "gate2_confirmed": true,
+        "gate2_per_scenario_n": 15,
+        "gate2_format_threshold": 0.8
+      },
+      "latency": {
+        "p50_seconds": 2.593110520989285,
+        "p95_seconds": 4.255703177378745,
+        "mean_seconds": 2.938174002732073,
+        "total_seconds": 176.29044016392436,
+        "n": 60
+      },
+      "tokens_per_sec_approx": 13.743671458803513,
+      "tokens_per_sec_note": "approximate \u2014 whitespace word count / latency over parsed trials, not an exact tokenizer count",
+      "load_time_seconds": 1.1339238340151496,
+      "resident_ram_mb_before": 58.5,
+      "resident_ram_mb_after": 6365.140625,
+      "resident_ram_mb_note": "ru_maxrss is a cumulative max for the whole test session and isn't resettable per model; this is exact for the first model in a run (or when a model is run alone) and otherwise a floor \u2014 not a true peak \u2014 for models measured later in the same run. Server backend: RUSAGE_CHILDREN (llama-server alone). In-process: RUSAGE_SELF, so it also counts the test process's own Python heap."
+    }
+  },
+  "comparison": {
+    "format_parse_rate": {
+      "direction": "higher",
+      "values": {
+        "phi-3.5-mini-instruct-q4km": 1.0
+      },
+      "best": "phi-3.5-mini-instruct-q4km"
+    },
+    "escalation_mismatch_rate": {
+      "direction": "lower",
+      "values": {
+        "phi-3.5-mini-instruct-q4km": 0.0
+      },
+      "best": "phi-3.5-mini-instruct-q4km"
+    },
+    "latency_p50_seconds": {
+      "direction": "lower",
+      "values": {
+        "phi-3.5-mini-instruct-q4km": 2.593110520989285
+      },
+      "best": "phi-3.5-mini-instruct-q4km"
+    },
+    "latency_p95_seconds": {
+      "direction": "lower",
+      "values": {
+        "phi-3.5-mini-instruct-q4km": 4.255703177378745
+      },
+      "best": "phi-3.5-mini-instruct-q4km"
+    },
+    "tokens_per_sec_approx": {
+      "direction": "higher",
+      "values": {
+        "phi-3.5-mini-instruct-q4km": 13.743671458803513
+      },
+      "best": "phi-3.5-mini-instruct-q4km"
+    },
+    "load_time_seconds": {
+      "direction": "lower",
+      "values": {
+        "phi-3.5-mini-instruct-q4km": 1.1339238340151496
+      },
+      "best": "phi-3.5-mini-instruct-q4km"
+    },
+    "resident_ram_mb_after": {
+      "direction": "lower",
+      "values": {
+        "phi-3.5-mini-instruct-q4km": 6365.140625
+      },
+      "best": "phi-3.5-mini-instruct-q4km"
+    }
+  },
+  "recommendation": "format_parse_rate: Phi-3.5-mini-instruct (Q4_K_M) leads (1.000)\nescalation_mismatch_rate: Phi-3.5-mini-instruct (Q4_K_M) leads (0.000)\n[informational \u2014 non-target hardware] latency_p50_seconds: Phi-3.5-mini-instruct (Q4_K_M) leads (2.593)\n[informational \u2014 non-target hardware] latency_p95_seconds: Phi-3.5-mini-instruct (Q4_K_M) leads (4.256)\n[informational \u2014 non-target hardware] tokens_per_sec_approx: Phi-3.5-mini-instruct (Q4_K_M) leads (13.744)\n[informational \u2014 non-target hardware] load_time_seconds: Phi-3.5-mini-instruct (Q4_K_M) leads (1.134)\n[informational \u2014 non-target hardware] resident_ram_mb_after: Phi-3.5-mini-instruct (Q4_K_M) leads (6365.141)\nThis note does not pick a stage model. Quality axes above are decision-relevant on any host; speed/RAM axes only count when measured on the Pi 4 target.",
+  "production_candidates": {
+    "format_threshold": 0.8,
+    "escalation_threshold": 0.5,
+    "passed": [
+      {
+        "id": "phi-3.5-mini-instruct-q4km",
+        "display_name": "Phi-3.5-mini-instruct (Q4_K_M)",
+        "format_parse_rate": 1.0,
+        "gate2_confirmed": true,
+        "escalation_mismatch_rate": 0.0,
+        "escalation_sample_n": 45
+      }
+    ],
+    "rejected": []
+  }
+}
