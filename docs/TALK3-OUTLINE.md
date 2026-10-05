@@ -35,8 +35,8 @@ Q4_K_M, median of 10 calls).
   (in-process, one CPU thread). No title, no setup.
 - *"That was a Pulsar Function talking. A small LLM inside it wrote that
   sentence, on one CPU core, no GPU."*
-- Backing: the new take (to record; take 4 ran on the GPU through the old
-  subprocess path).
+- Backing: take 5, `deploy/recordings/talk3-demo-20261004-182716.mp4` and its
+  WAV (take 4 ran on the GPU through the old subprocess path).
 
 ## Act 1 — Where the words come from (~5 min, 4 slides incl. divider)
 
@@ -135,8 +135,9 @@ call). Backing: `gating_counts.txt`; `docs/TALK1-SLIDE-PLAN.md` 19–21.
 
 ## Not yet decided / needs your input
 
-- **New demo take** with the current `tier2.sh` defaults (in-process, one CPU
-  thread, no GPU), for the fallback and the cold-open audio.
+- **Sign off on take 5** (`deploy/recordings/talk3-demo-20261004-182716.mp4`,
+  recorded on the M4 Max with the current defaults), or re-take it on the
+  external-display machine.
 - **Pi run**: in-process, one thread, `LLM_TIMEOUT_SECONDS=600`, so slide 22
   can say "I tried it" with the real result.
 - **Real gating ratio** from a live Edge Triage run, to replace the simulator's

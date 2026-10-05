@@ -75,10 +75,14 @@ minutes of slack for the live demo, plus untimed Waitroom, Title and Thank You.
 - **Title** is the accepted one; the subtitle open item is gone.
 
 ## Open items
-- **New demo take.** Take 4 (`deploy/recordings/talk3-demo-20261002-174855.mp4`)
-  ran on the GPU through the old subprocess path. Record a backup take with the
-  current `tier2.sh` defaults (in-process, one CPU thread), and use its audio
-  for the cold open. [NEEDS: new take + its transcript]
+- **New demo take: recorded, needs sign-off.** Take 4
+  (`deploy/recordings/talk3-demo-20261002-174855.mp4`) ran on the GPU through
+  the old subprocess path. Take 5 (`talk3-demo-20261004-182716.mp4`, 54.6 s,
+  recorded on the M4 Max with the current defaults: in-process, one CPU thread)
+  replaces it; transcript in `talk3-demo-20261004-182716.txt` beside it and in
+  `talks/talk3-pulsar-speaks-english/TODO-DEMO-RECORDING.md`. Recordings are
+  gitignored, so the file is only on the M4 Max. [NEEDS: your review of take 5,
+  or a re-take on the external-display machine]
 - **Pi run.** Slide 22's Pi-class number is a prediction from benchmarks. A
   real run on a Pi, in-process on one thread, turns it into "I tried it" —
   whatever it shows. [NEEDS: Pi run, `LLM_TIMEOUT_SECONDS=600`]
@@ -127,8 +131,12 @@ plate, since it follows the Title plate) with an embedded audio player.
 **Visual Manifest:**
 - Type: `Typography_Only`
 - Spec: white slide, a single audio control centered; after playback, one
-  line fades in. Audio: the I-95N warning from the new one-core take.
-  [NEEDS: new take's WAV — see Open items]
+  line fades in. Audio: the I-95N warning from take 5 (one CPU core),
+  `deploy/recordings/.talk3-audio-20261004-182716/001-I-95N.wav` (18.6 s):
+  "Drivers approaching I-95 North, be advised that there's a slowdown affecting
+  multiple trucks within the corridor. We're recommending you reroute traffic
+  around I-95 North due to a correlated slowdown, particularly with trucks 47,
+  12, and 31, who are experiencing significant delays."
 
 **On-screen text:**
 ```
@@ -804,7 +812,8 @@ model on one CPU core, a voice out — live.
   screen share of the three windows (`deploy/talk3-windows/cards.sh`,
   `decision.sh`, `spoken.sh`), plus a CPU meter showing one core busy
   [NEEDS: pick the meter — Activity Monitor's CPU history or `htop`].
-  Fallback: the new recorded take, embedded video.
+  Fallback: take 5, `deploy/recordings/talk3-demo-20261004-182716.mp4`
+  (54.6 s, 1314×876, with audio), embedded video.
 
 **On-screen text:**
 ```
