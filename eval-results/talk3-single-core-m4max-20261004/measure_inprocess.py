@@ -1,6 +1,7 @@
 """Time Tier 2's LLM call through InProcessLlmBackend (llama-cpp-python), one setup
 per process so each setup's peak memory is its own. Run from the repo root:
     uv run --no-sync python eval-results/talk3-single-core-m4max-20261004/measure_inprocess.py <setup> <N> <out.jsonl>
+(LLM_MODEL_PATH overrides the model location, e.g. on the Pi.)
 
 Setups:
   fresh_t1 / fresh_t4  a new backend (model load, empty cache) for every call -- the
@@ -20,7 +21,9 @@ from llm_inference.structured import extract_json_object
 from talk3_pulsar_speaks_english.prompting import render_synthesis_prompt
 from talk3_pulsar_speaks_english.synthesizer import decide_reroute, decide_scope
 
-MODEL = os.path.expanduser("~/tools/models/gemma-3-4b-it-GGUF/gemma-3-4b-it-Q4_K_M.gguf")
+MODEL = os.path.expanduser(
+    os.environ.get("LLM_MODEL_PATH", "~/tools/models/gemma-3-4b-it-GGUF/gemma-3-4b-it-Q4_K_M.gguf")
+)
 SETUPS = {
     "fresh_t1": dict(threads=1, gpu_layers=0, keep=False),
     "fresh_t4": dict(threads=4, gpu_layers=0, keep=False),

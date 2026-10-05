@@ -81,9 +81,11 @@ call). Backing: `gating_counts.txt`; `docs/TALK1-SLIDE-PLAN.md` 19–21.
   loud.
 - **Narrating isn't the same as getting it right**: our `reroute_detail` bug
   (row 27, fixed), and Gemma's own slips — about 1 in 4 warnings, hand-checked
-  (7/30 and 6/25), e.g. "9 to 12 minutes" (no input says 12; truck-12?).
-  Talk 2's string checks passed all of them. Next step to name: check every
-  number in the sentence against the facts.
+  (7/30 and 6/25), e.g. "9 to 12 minutes" (no input says 12; truck-12?), a
+  dropped reroute. Talk 2's string checks passed all of them. Now plain code
+  checks every number against the facts (`fact_check.py`): fail → retry once →
+  plain-code warning. Caught 14 of 62 real warnings; misses claims without a
+  number ("impacting all lanes").
 
 ## Act 4 — On one CPU core (~5 min, 3 slides incl. divider)
 
@@ -141,7 +143,5 @@ call). Backing: `gating_counts.txt`; `docs/TALK1-SLIDE-PLAN.md` 19–21.
   28–33%.
 - **"Before" audio clips** for the I-95N/ETA slide (raw Piper, normalization
   off).
-- **Whether to build the number check** slide 19 names as the next step —
-  then it becomes a fix you show, not a plan.
 - **"1-bit" language check** (carried over from Talk 2's open items): this
   outline avoids 1-bit framing; keep it that way in the deck.

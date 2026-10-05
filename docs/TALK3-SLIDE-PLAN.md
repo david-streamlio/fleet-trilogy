@@ -26,7 +26,7 @@ stream speed."
 | On a single CPU core | 21, 22, 25 |
 | Demo it live | 25 |
 | Show the resource profile | 21, 22 |
-| Prompt patterns that work at stream speed | 16, 19 |
+| Prompt patterns that work at stream speed | 16, 19 (and checking the output) |
 
 "Speaks English" is kept by the LLM writing English inside the Function; the
 voice (slides 23–24) is a bonus the abstract doesn't promise. Gemma-3-4B-it is
@@ -83,6 +83,8 @@ minutes of slack for the live demo, plus untimed Waitroom, Title and Thank You.
   real run on a Pi, in-process on one thread, turns it into "I tried it" —
   whatever it shows. [NEEDS: Pi run, `LLM_TIMEOUT_SECONDS=600`]
 - **"Before" audio clips** for slide 24 (raw Piper, normalization off).
+- **Fact check in the take.** If the new take's log shows a retry or the
+  plain-code fallback, slide 25's narration should say so.
 - **Gating ratio on real data.** Slide 5's 28–33% comes from a simulator built
   to be incident-heavy; Talk 1 calls its bandwidth claim "inferred, not
   measured." A real ratio needs a live Edge Triage run's counts.
@@ -597,41 +599,48 @@ picked. Backing: `docs/TALK2-350M-PROMPT-ECHO.md`;
 **Time:** Act 3, ~1.25 min.
 
 ### Slide 19 — Narrating Isn't the Same as Getting It Right
-**Label:** Blooper Reel: What the Checks Missed
+**Label:** Check What It Says
 **Suggested Layout:** Comparison
 **Core Message:** Keeping the LLM out of the decision keeps it from
-deciding wrong; it doesn't stop it from saying something wrong — check the
-facts you hand it, and the facts it hands back.
+deciding wrong, not from saying something wrong — so plain code checks
+every number it says against the facts, and words the warning itself if
+the model gets it wrong twice.
 **Visual Manifest:**
 - Type: `Bar_Comparison`
-- Spec: left "Our bug": `reroute_detail` said "3 trucks reporting a
-  correlated high-severity slowdown" → Gemma: "three trucks are
-  experiencing high-severity delays." Fixed: "…, 2 at high severity."
-  Right "Its slips (hand-checked, ~1 in 4)": "9 to 12 minutes" (no input
-  says 12 — truck-12?); "one reporting high severity" (two were); "three
-  trucks … high severity" (one was medium).
+- Spec: left "What it said (hand-checked, ~1 in 4)": "9 to 12 minutes" (no
+  card says 12 — truck-12?); "one reporting high severity" (two were); a
+  recommended reroute left out. Right "What code does now": the three checks
+  (minutes ∈ the cards' delays; high-severity count; reroute and corridor
+  named) → retry once → plain-code warning. Footer: "Caught 14 of 62 real
+  warnings; missed 'impacting all lanes'."
 
 **On-screen text:**
 ```
-Our bug                                   Its slips — about 1 in 4 warnings
-"3 trucks ... high-severity slowdown"     "9 to 12 minutes"     (truck-12?)
-→ fixed: "3 trucks ..., 2 at high"        "one ... high severity" (two were)
+What it said — about 1 in 4            What code does now
+"9 to 12 minutes"   (truck-12?)        every number checked against the facts
+"one ... high severity" (two were)     fail → ask again → fail → plain code says it
+reroute left out                       caught 14 of 62; not "all lanes"
 ```
 
-**Speaker notes:** Two kinds of wrong. Ours first: our reroute code said
-"high-severity" for all three trucks whenever any one was high, and Gemma
-read it out faithfully. The model narrated our bug; we fixed the code. Then
-its own: reading every warning by hand, about one in four has a factual
-slip — 7 of 30 in one run, 6 of 25 in another. The best one: "9 to 12
-minutes." No card says 12. One of the trucks is called truck-12. Talk 2's
-accuracy check scored all of these as fine, because it matched strings.
-So "narrate, don't decide" makes the model's mistakes smaller — it never
-gets the reroute wrong — but it doesn't make them zero. What I'd add next:
-a cheap check that every number in the sentence appears in the facts we
-handed over. Now: what all this costs on one core. Backing:
+**Speaker notes:** Two kinds of wrong. Ours first, briefly: our reroute
+code once said "high-severity" for all three trucks when any one was high,
+and Gemma read it out faithfully — we fixed the code. Then the model's own:
+reading every warning by hand, about one in four has a factual slip — 7 of
+30 in one run, 6 of 25 in another. The best one: "9 to 12 minutes." No card
+says 12. One of the trucks is called truck-12. Twice it dropped the reroute
+code had recommended. Talk 2's accuracy check passed all of these, because
+it matched strings. So now plain code checks what the model says, the same
+way plain code made the decision: every number of minutes has to be one of
+the cards' delays, a count of high-severity trucks has to match, the reroute
+and the corridor have to be there. Fail, and the Function asks once more —
+another 12 seconds on one core. Fail again, and code words the warning
+itself: stiffer, never wrong. Against the 62 different warnings from today's
+runs, it caught 14, every one a real slip, and it misses what has no number
+in it — "impacting all lanes." Now: what all this costs on one core.
+Backing: `fact_check.py`; `tests/test_fact_check.py`;
 `docs/TALK2-DATA-ENGINEERING-IMPACT-TRACK.md` rows 14, 27;
 `eval-results/talk3-single-core-m4max-20261004/README.md` (both accuracy
-sections).
+sections; "Fact check").
 
 **Time:** Act 3, ~1.75 min.
 

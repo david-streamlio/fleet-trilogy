@@ -7,7 +7,9 @@ Tier 1 (see talk1_edge_intelligence.processor.process_event), the *decision* her
 is cheap code/math over already-structured data — grouping by corridor, counting
 distinct trucks, thresholding severity. The LLM's only job is turning the
 already-decided facts into the spoken_warning text (see prompting.py); it never
-decides scope or reroute itself.
+decides scope or reroute itself. And what it says is checked against those facts
+(fact_check.py): a warning with an unsupported number is regenerated, and if the
+model gets it wrong again, plain code words the warning instead.
 
 synthesize() has no Pulsar dependency and no I/O of its own — a plain function of
 (cards, backend), just like talk1's process_event. See report.py for the runtime
@@ -16,6 +18,7 @@ shell that pulls cards off a simulated/real fleet.
 
 from __future__ import annotations
 
+import logging
 import time
 import uuid
 from collections import defaultdict
@@ -23,7 +26,15 @@ from collections import defaultdict
 from fleet_telemetry_model import EnrichmentCard, IncidentSynthesis
 from llm_inference.client import LlmBackend, LlmGenerationConfig
 
+from talk3_pulsar_speaks_english.fact_check import check_warning, fallback_warning
 from talk3_pulsar_speaks_english.prompting import generate_spoken_warning
+
+logger = logging.getLogger("talk3_pulsar_speaks_english.synthesizer")
+
+# One LLM call, plus one retry if the fact check fails. Each attempt is a full
+# call (~12 s on one CPU core), so retries are kept to one; after that the
+# plain-code fallback is used.
+DEFAULT_WARNING_ATTEMPTS = 2
 
 SCOPE_SINGLE_TRUCK = "single_truck"
 SCOPE_CORRIDOR_WIDE = "corridor_wide"
@@ -89,6 +100,7 @@ def synthesize(
     *,
     incident_id: str | None = None,
     config: LlmGenerationConfig | None = None,
+    max_attempts: int = DEFAULT_WARNING_ATTEMPTS,
 ) -> IncidentSynthesis | None:
     """Aggregate one corridor's worth of enrichment cards into an IncidentSynthesis.
 
@@ -99,7 +111,9 @@ def synthesize(
 
     Decision (scope, reroute) is cheap code, computed before the backend is ever
     invoked; the backend is only asked to phrase the spoken_warning, per
-    docs/CANON.md's "LLM interprets/narrates, never decides" rule.
+    docs/CANON.md's "LLM interprets/narrates, never decides" rule. Each phrasing is
+    checked against the facts (fact_check.check_warning); after `max_attempts`
+    failed phrasings, fact_check.fallback_warning() words it in plain code.
     """
     if not cards:
         return None
@@ -109,15 +123,41 @@ def synthesize(
 
     scope = decide_scope(corridor_cards)
     reroute_recommended, reroute_detail = decide_reroute(corridor_cards, scope)
-    spoken_warning = generate_spoken_warning(
-        backend,
-        corridor=corridor,
-        cards=corridor_cards,
-        scope=scope,
-        reroute_recommended=reroute_recommended,
-        reroute_detail=reroute_detail,
-        config=config,
-    )
+    spoken_warning = None
+    for attempt in range(1, max_attempts + 1):
+        candidate = generate_spoken_warning(
+            backend,
+            corridor=corridor,
+            cards=corridor_cards,
+            scope=scope,
+            reroute_recommended=reroute_recommended,
+            reroute_detail=reroute_detail,
+            config=config,
+        )
+        problems = check_warning(
+            candidate,
+            corridor=corridor,
+            cards=corridor_cards,
+            reroute_recommended=reroute_recommended,
+        )
+        if not problems:
+            spoken_warning = candidate
+            break
+        logger.warning(
+            "%s warning attempt %d/%d failed the fact check (%s): %r",
+            corridor,
+            attempt,
+            max_attempts,
+            "; ".join(problems),
+            candidate,
+        )
+    if spoken_warning is None:
+        spoken_warning = fallback_warning(
+            corridor=corridor,
+            cards=corridor_cards,
+            reroute_recommended=reroute_recommended,
+        )
+        logger.warning("%s: using the plain-code warning instead", corridor)
 
     return IncidentSynthesis(
         incident_id=incident_id or str(uuid.uuid4()),

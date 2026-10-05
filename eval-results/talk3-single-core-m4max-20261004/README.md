@@ -109,6 +109,17 @@ per setup; 1 untimed first call (includes the model load for `kept_*`), then 10.
   severity" (2); one warning has two. Files: `runs_inprocess.jsonl`,
   `summary_inprocess.txt` (from `summarize_inprocess.py`).
 
+## Fact check (`fact_check_replay.py`)
+
+`talks/talk3-pulsar-speaks-english/.../fact_check.py`, built after the hand checks
+above, run over every distinct warning in this folder (62, counting each
+corridor's version separately and including warm-ups and smoke calls): **14 fail**,
+every one a real slip — "9 to 12 minutes" (8), a wrong high-severity count (6),
+the recommended reroute left out (3); some have more than one. No false flags
+(truck IDs like "trucks 47 and 12" are stripped before counting). Not caught:
+"impacting all lanes" — the check only covers numbers, the reroute and the
+corridor. Output: `fact_check_replay.txt`.
+
 ## Gating counts (`gating_counts.py`)
 
 12 trucks × 60 ticks with an incident forced on I-95N (report.py's scenario), 5
@@ -126,5 +137,6 @@ incident-heavy, so this is not a real-road ratio.
 - `smoke.jsonl` — the first single-call check of each setup (before the
   `eval time` parsing fix, so its `eval_*` fields repeat the prompt numbers).
 - `gating_counts.py` → `gating_counts.txt`.
+- `fact_check_replay.py` → `fact_check_replay.txt`.
 - `measure_inprocess.py`, `summarize_inprocess.py` → `runs_inprocess.jsonl`,
   `summary_inprocess.txt`, `runs_inprocess.log`.
