@@ -1,214 +1,147 @@
-# Talk outline — "Pulsar Speaks English": giving a streaming pipeline a voice
-# with Pulsar Functions, a small LLM, and Piper
+# Talk outline — "When Your Pulsar Function Speaks English: Inline LLM Inference for Real-Time Stream Enrichment"
 
-*(Working title — see "Not yet decided" below.)*
+**Accepted abstract (verbatim — the talk keeps every promise in it):**
+
+> "Here's a trick: if you embed a tiny LLM inside a stream processing function
+> and only fire it on the interesting events, you get AI-enriched streams on a
+> single CPU core. I'll demo it live, show the resource profile, and share the
+> prompt patterns that actually work at stream speed."
 
 **The thesis line (cold open and closer):**
 
 > "That was a Pulsar Function talking."
 
-This is a showcase talk, not a postmortem or a pivot story: the spine is
-*"hey, that's cool — and here's how little it took."* Three ordinary pieces,
-each doing one job, chained on Pulsar topics: a **Pulsar Function** that
-aggregates the fleet's edge cards, **plain code** that decides, a **small
-quantized LLM** that only words the decision, and **Piper** that speaks it.
-The "narrate, don't decide" rule and the small-model blooper reel are
-supporting segments that explain *why* it's trustworthy — they are not the
-plot.
+True as said: a small LLM *inside* the Function wrote the sentence, on one CPU
+core. Piper, downstream, only reads it out, and the talk says so (Act 5).
 
-Open cold on the voice with zero context, say the thesis line, then spend
-the talk taking it apart. Say the line again at the close, now meaning
-"…and you've seen every line of code that made it talk."
+The spine: *"hey, that's cool — and here's how little it took."* Cheap math
+gates the events, a **Pulsar Function** aggregates them, **plain code**
+decides, a **small quantized LLM loaded inside the Function** words the
+decision on one CPU core, and **Piper** speaks it. The resource profile and the
+honest admissions (first attempt 29 s, Pi not yet run, ~1 in 4 warnings with a
+factual slip) are part of the plot, not footnotes: the abstract promised them.
 
-Standalone, but rewards Talks 1 and 2: one-slide Talk 1 recap (where the
-cards come from), and one optional callback to Talk 2's model pick and Pi
-numbers. 40-minute slot at ~2 min/slide → ~20 narrative slides plus
-Waitroom/Title/Thank You, same shape as Talks 1 and 2.
+Standalone, but rewards Talks 1 and 2. 40-minute slot: 25 narrative slides at
+38 minutes plus 2 minutes of slack for the live demo; untimed Waitroom, Title
+and Thank You. Full slide-by-slide plan: `docs/TALK3-SLIDE-PLAN.md`.
 
-Every beat below cites the artifact that already backs it — drawn from what's
-in the repo, not invented for the outline.
+Every beat cites the artifact that backs it. The one-core numbers all come
+from `eval-results/talk3-single-core-m4max-20261004/` (M4 Max, Gemma-3-4B-it
+Q4_K_M, median of 10 calls).
 
 ## Cold open — the voice first (~2 min, 1 slide)
 
-- Black slide, play the audio from the demo take: the I-95N corridor warning
-  in the `norman` voice. No title, no setup.
-- Then: *"That was a Pulsar Function talking. By the end of this talk you'll
-  have seen every piece that made it say that — and it's less than you think."*
-- Backing: `deploy/recordings/talk3-demo-20261002-174855.mp4` (audio track),
-  `deploy/recordings/.talk3-audio-20261002-174855/001-I-95N.wav`.
+- Play the I-95N warning from a take recorded with the current defaults
+  (in-process, one CPU thread). No title, no setup.
+- *"That was a Pulsar Function talking. A small LLM inside it wrote that
+  sentence, on one CPU core, no GPU."*
+- Backing: the new take (to record; take 4 ran on the GPU through the old
+  subprocess path).
 
-## Act 1 — Where the words come from (~6 min, 3 slides)
+## Act 1 — Where the words come from (~5 min, 4 slides incl. divider)
 
-**Slide: Previously, at the edge (Talk 1 recap, one slide).**
-- Trucks run the Edge Triage Pipeline on a Pi-class device: cheap math gates
-  the noise, a small LLM writes an enrichment card, and only `high` severity
-  crosses the cellular link (`uplink_min_severity`).
-- If you missed Talk 1: "each truck sends a short, structured note when
-  something's actually wrong." That's all Talk 3 needs.
-- Backing: `docs/TALK1-SLIDE-PLAN.md` slides 19–21; `deploy/README.md`
-  "Edge Triage Pipeline" section.
+**Only the interesting events.** Talk 1's cheap math gates the readings: in a
+simulated run, 720 readings → 201–241 pass (28–33%; the simulator is
+incident-heavy, so a real road would be quieter — unmeasured). Only `high`
+cards leave the truck. Tier 2 calls its LLM once per incident (3 cards → 1
+call). Backing: `gating_counts.txt`; `docs/TALK1-SLIDE-PLAN.md` 19–21.
 
-**Slide: One truck is an anecdote, three trucks are an incident.**
-- The Tier 2 question: is this one truck's bad day, or the whole corridor?
-  And should we reroute?
-- Show the three demo cards side by side: truck-47 (high, 9 min),
-  truck-12 (high, 7 min), truck-31 (medium, 6 min), all I-95N.
-- Backing: `deploy/talk3-demo-cards.jsonl`.
+**One truck is an anecdote, three trucks are an incident.** truck-47 (high,
+9 min), truck-12 (high, 7 min), truck-31 (medium, 6 min), all I-95N. Backing:
+`deploy/talk3-demo-cards.jsonl`.
 
-**Slide: The whole system on one slide.**
-- `enrichment-cards` → `GlobalSynthesisFunction` → `incidents` → speaker →
-  speaker/WAV. Two topics, one Function, one consumer.
-- Plant the payoff: every box is something you can run on a laptop today.
-- Backing: `deploy/README.md` topology diagram.
+**The whole system on one slide.** `enrichment-cards` → `GlobalSynthesisFunction`
+[code decides · LLM inside words it] → `incidents` → speaker → Piper.
 
-## Act 2 — The Pulsar Function (~8 min, 4 slides)
+## Act 2 — The Pulsar Function (~8 min, 6 slides incl. divider)
 
-**Slide: What a Pulsar Function is (for this room).**
-- `process(self, input, context) -> output`. One message in, zero or one out.
-  Deployed with `pulsar-admin functions localrun` today, managed mode later.
-- Config through `--user-config` (model path, `-no-cnv`, corridor threshold) —
-  no rebuild to swap models.
-- Backing: `function.py` module docstring, `deploy/run_tier2_localrun.sh`.
+- **One message in, zero or one out**; config through `--user-config`
+  (`llm_backend`, `threads`, `corridor_threshold`).
+- **The accumulator trick**: a per-corridor tally on `self`; two of every
+  three messages never touch the LLM.
+- **`process()` in full** (12 lines).
+- **The model lives inside the Function** (new): `InProcessLlmBackend`
+  (llama-cpp-python) loads once and stays on `self`; each call skips the load
+  and reuses the prompt's fixed instructions (98 of 361 tokens). One core,
+  same build: 15.5 s reloaded → 12.0 s kept. Backing: `function.py`,
+  `client.py`, `docs/CANON.md`, round 2 of the measurement.
+- **Honest about the shortcut**: no windows, no watermarks, lost on restart —
+  and each instance holds its own 5.3 GB model.
 
-**Slide: The tension — Functions are per-message, Tier 2 needs a crowd.**
-- You can't decide "corridor-wide" from one card. The trick: Function
-  instances are long-lived, so keep a per-corridor accumulator on `self`;
-  return `None` (publish nothing) until the corridor hits the threshold.
-- Backing: `GlobalSynthesisFunction.process()` in `function.py`.
+## Act 3 — Code decides, the LLM narrates (~8 min, 6 slides incl. divider)
 
-**Slide: Honest about the shortcut.**
-- No event-time windows, no watermarks, accumulator lost on restart, no
-  wall-clock flush. Fine for a stage demo; name what production would need
-  (Pulsar Functions state, or windowed functions).
-- Contrast: `pulsar_adapter.py` has the time-based flush.
-- Backing: `function.py` docstring, `pulsar_adapter.py`.
+- **The rule**: `decide_scope()`, `decide_reroute()` — plain code, 0 LLM calls.
+- **Prompt patterns for stream speed**: "already decided" facts; a
+  placeholder, never an example; fixed instructions first (reused in-process);
+  bounded output ("2-3 sentences", ~60 tokens). On one core, reading the prompt
+  is ~3/4 of a call.
+- **Why Gemma-3-4B-it** (Talk 2 callback): Phi-3.5-mini is 4x slower on this
+  task because it writes ~115 words to Gemma's ~33.
+- **Blooper reel, the models**: the echo, the silent corridor, thinking out
+  loud.
+- **Narrating isn't the same as getting it right**: our `reroute_detail` bug
+  (row 27, fixed), and Gemma's own slips — about 1 in 4 warnings, hand-checked
+  (7/30 and 6/25), e.g. "9 to 12 minutes" (no input says 12; truck-12?).
+  Talk 2's string checks passed all of them. Next step to name: check every
+  number in the sentence against the facts.
 
-**Slide: The whole Function fits on a slide.**
-- Show `process()` in full (~12 lines). The point: the Pulsar part is the
-  smallest part of this system.
+## Act 4 — On one CPU core (~5 min, 3 slides incl. divider)
 
-## Act 3 — Code decides, the LLM narrates (~10 min, 5 slides)
+- **The resource profile** (M4 Max, model kept in the Function): GPU 0.7 s;
+  4 CPU threads 3.5 s; **1 CPU thread 12.0 s, cores busy 1.00, 5.3 GB**.
+  Piper: 11 s of audio in 0.16 s (measured earlier, on an M4).
+- **What one core buys you**: ~5 warnings a minute — enough because the gates
+  keep the LLM rare. Honest numbers: the first one-core attempt (subprocess per
+  call, Homebrew build) took 29 s; a Pi 5-class core is predicted at ~1 min, not
+  yet run. Replace the prediction with the real result, slow or failed.
 
-**Slide: The rule.**
-- Same rule as Talk 1's edge: cheap code decides, the LLM only puts it into
-  words. Here: `decide_scope()` is set-counting over `truck_id`;
-  `decide_reroute()` is "corridor-wide AND at least one high." Both are
-  explainable, testable, and free.
-- Backing: `synthesizer.py`; `docs/CANON.md`.
+## Act 5 — Giving it a voice (~3 min, 2 slides)
 
-**Slide: The prompt hands the model a finished verdict.**
-- Show the prompt: "already decided" on every fact, "always name the
-  corridor," a *placeholder* JSON shape — never a realistic example sentence.
-- Why the placeholder: small models copy realistic examples word for word.
-- Backing: `prompting.py` `SYNTHESIS_WARNING_PROMPT`.
+- **Piper, at arm's length**: "the Function wrote it, Piper reads it." A plain
+  consumer, GPL-3.0 Piper in its own venv as a subprocess; `norman` voice
+  (public domain).
+- **TTS doesn't know what I-95N means**: `normalize_for_speech()`.
 
-**Slide: Why Gemma-3-4B-it (Talk 2 callback, optional).**
-- Same funnel as Talk 2, run on this task: Gemma-3-4B-it 0%/0% grounding/
-  speakability violations, 43.7s Pi p50. The Edge Triage Pipeline's winner,
-  Phi-3.5-mini, is the *slowest* here (186.0s) because it pads "2-3
-  sentences." The model choice depends on the task.
-- Backing: `docs/TALK2-OUTLINE.md` "Final model recommendation."
+## Act 6 — See it live (~4 min, 1 slide)
 
-**Slide: Blooper reel — what small models say when you let them.**
-(Lighter, fast-paced; one line each, real output where available.)
-- **The echo:** the 350M models hand back the prompt, placeholder and all.
-  (`docs/TALK2-350M-PROMPT-ECHO.md`)
-- **The silent corridor:** Qwen2.5-3B drops "I-95N" whenever it decides the
-  situation is minor — 100% on single-truck, 0% once a reroute is involved.
-  Fixed by one blunt prompt line. (impact track row 17)
-- **Thinking out loud:** Qwen3-8B reasons in prose and runs out of tokens
-  before the JSON. (row 22)
+- Live: replay the three cards → "[Decided by code]" → "[Worded by the LLM]"
+  → the voice, with a CPU meter showing one core busy (~15 s for the first
+  incident). Recorded take as the fallback. Inputs replayed (disclosed); the
+  rest live.
 
-**Slide: …and the bloopers that weren't the model.**
-- **The harness was wrong:** "I-95 North" and "No reroute is recommended"
-  were scored as violations by naive string checks. (row 14)
-- **The code was wrong:** `decide_reroute` said "high-severity" for all three
-  trucks when only two were; Gemma faithfully said it aloud. The LLM
-  narrated a bug in *our* code. (row 27, fixed in `synthesizer.py`)
-- The line: *if the model only narrates, check the facts you hand it.*
+## Close (~3 min, 2 slides)
 
-## Act 4 — Giving it a voice (~6 min, 3 slides)
-
-**Slide: Piper, at arm's length.**
-- Piper (`piper-tts`, OHF-Voice/piper1-gpl) is GPL-3.0, so it's never a
-  dependency: its own venv, invoked as a subprocess — the same way
-  `llm_inference` calls llama.cpp.
-- Voices have their own licenses: the demo uses `norman` (public domain,
-  LibriVox); avoid `ryan`/`hfc_*` (NC-SA) and `lessac`.
-- Backing: `speech.py` docstring; package README "Speaking the warning."
-
-**Slide: TTS doesn't know what I-95N means.**
-- Play both versions: raw "eye ninety-five *en*" vs. normalized "I-95 North";
-  "ee-ta" vs. "E T A." The fix is a dozen lines of regex, checked against
-  Piper's phonemizer — more plain code.
-- Backing: `normalize_for_speech()` in `speech.py`.
-- Needs: record the two "before" clips (see "Not yet decided").
-
-**Slide: The voice is the fast part.**
-- Piper: ~70x real time on an M4 (0.16s for 11s of audio). The LLM is the slow
-  hop, not the voice.
-- Backing: package README.
-
-## Act 5 — See it run (~4 min, 2 slides)
-
-**Slide: The demo, end to end.**
-- Play the take: cards arrive (3s apart) → "[Decided by code]" panel →
-  "[Worded by the LLM]" panel → the voice. Narrate over it, pointing at
-  which window is code and which is model.
-- Be upfront: the input cards are replayed (only truck-47 has trip
-  context that reaches `high` in a live run); everything after the replay is
-  live on every take.
-- Backing: `deploy/README.md` "Talk 3 demo"; the take above.
-
-**Slide: Could it run on the Pi?** *(optional — only if the Pi run happens)*
-- Same Function, same model: Tier 2's Pi p50 is ~44s per warning — slow
-  enough to notice, fast enough for a traffic warning.
-- Backing: `docs/TALK2-OUTLINE.md` Tier 2 table; a Pi take if recorded.
-
-## Close — what you could build (~4 min, 2 slides)
-
-**Slide: The recipe, generalized.**
-- Pulsar Function to aggregate → plain code to decide → small LLM to word →
-  TTS to speak. Swap the domain: factory floor alarms, on-call pages read
-  aloud, building sensors, in-cab driver alerts.
-- Everything here is commodity: no GPU, no cloud LLM API.
-
-**Slide: Trilogy closer.**
-- Talk 1: the edge decides what's worth sending. Talk 2: how to prove which
-  model deserves the job. Talk 3: the fleet tells you about it, out loud.
-- Replay the cold-open clip, then the thesis line, fully loaded: *"That was
-  a Pulsar Function talking — and now you've seen every line that made it
-  talk."*
+- **The recipe**: gate, aggregate, decide, word, speak. "One CPU core. No
+  GPU. No cloud LLM API."
+- **Trilogy closer**, then the line fully loaded: *"That was a Pulsar
+  Function talking — a small model inside it, on one CPU core — and now you've
+  seen every line that made it talk."*
 
 ## Timing summary
 
 | Section | Slides | Minutes |
 |---|---|---|
-| Cold open | 1 | 2 |
-| Act 1 — Where the words come from | 3 | 6 |
-| Act 2 — The Pulsar Function | 4 | 8 |
-| Act 3 — Code decides, the LLM narrates | 5 | 10 |
-| Act 4 — Giving it a voice | 3 | 6 |
-| Act 5 — See it run | 2 (1 if no Pi) | 4 |
-| Close | 2 | 4 |
-| **Total** | **20** | **40** |
-
-Plus untimed Waitroom, Title and Thank You slides.
+| Cold open | 1 | 2.0 |
+| Act 1 — Where the words come from | 4 | 5.25 |
+| Act 2 — The Pulsar Function | 6 | 8.0 |
+| Act 3 — Code decides, the LLM narrates | 6 | 8.0 |
+| Act 4 — On one CPU core | 3 | 4.75 |
+| Act 5 — Giving it a voice | 2 | 2.75 |
+| Act 6 — See it live | 1 | 4.0 |
+| Close | 2 | 3.25 |
+| **Total** | **25** | **38 + 2 slack** |
 
 ## Not yet decided / needs your input
 
-- **Title.** Working: "Pulsar Speaks English." Needs a subtitle in the style
-  of Talks 1–2.
-- **Demo take sign-off.** Take 4 (42.6s) is the only take; not yet reviewed.
-  Also check whether its spoken text should be quoted on the cold-open slide.
-- **Pi slide.** Keep only if the optional Pi run happens; otherwise fold the
-  ~44s number into the Talk 2 callback slide and give Act 3 the extra time.
-- **"Before" audio clips** for the I-95N/ETA slide — need recording with
-  normalization off (raw Piper call via `~/tools/piper/.venv/bin/piper`).
-- **Blooper reel format** — read-aloud quotes, or actually *speak* the bad
-  outputs with Piper (funnier; needs the raw completions pulled from
-  `eval-results/`).
-- **How much Talk 2 to lean on** — one callback slide as written, or cut it
-  to keep the talk fully standalone.
+- **New demo take** with the current `tier2.sh` defaults (in-process, one CPU
+  thread, no GPU), for the fallback and the cold-open audio.
+- **Pi run**: in-process, one thread, `LLM_TIMEOUT_SECONDS=600`, so slide 22
+  can say "I tried it" with the real result.
+- **Real gating ratio** from a live Edge Triage run, to replace the simulator's
+  28–33%.
+- **"Before" audio clips** for the I-95N/ETA slide (raw Piper, normalization
+  off).
+- **Whether to build the number check** slide 19 names as the next step —
+  then it becomes a fix you show, not a plan.
 - **"1-bit" language check** (carried over from Talk 2's open items): this
   outline avoids 1-bit framing; keep it that way in the deck.
