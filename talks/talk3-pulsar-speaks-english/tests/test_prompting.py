@@ -2,6 +2,9 @@ from fleet_telemetry_model import EnrichmentCard
 from llm_inference import SubprocessLlmBackend
 
 from talk3_pulsar_speaks_english.prompting import (
+    PUBLISHED_SYNTHESIS_WARNING_PROMPT,
+    REROUTE_RULE,
+    SYNTHESIS_WARNING_PROMPT,
     generate_spoken_warning,
     render_synthesis_prompt,
 )
@@ -98,3 +101,33 @@ def test_generate_spoken_warning_prefers_structured_spoken_warning_key():
         reroute_detail="Reroute around I-95N.",
     )
     assert warning == "Slow traffic ahead on I-95N, please use caution."
+
+
+def _render(reroute_recommended: bool, **kwargs) -> str:
+    return render_synthesis_prompt(
+        corridor="I-95N",
+        cards=_CARDS,
+        scope=SCOPE_CORRIDOR_WIDE,
+        reroute_recommended=reroute_recommended,
+        reroute_detail="Reroute around I-95N." if reroute_recommended else None,
+        **kwargs,
+    )
+
+
+def test_a_recommended_reroute_is_stated_as_a_recommendation():
+    prompt = _render(True)
+    assert "A reroute is only ever a recommendation, never already happening" in prompt
+    assert "never that traffic is being, or has been, rerouted" in prompt
+    assert prompt.replace(REROUTE_RULE, "") == _render(True, template=PUBLISHED_SYNTHESIS_WARNING_PROMPT)
+
+
+def test_without_a_reroute_the_prompt_is_the_published_one():
+    # The rule's "drivers should consider it" made the model suggest alternative routes
+    # when none was recommended, so it is only added when one is.
+    assert _render(False) == _render(False, template=PUBLISHED_SYNTHESIS_WARNING_PROMPT)
+    assert "reroute is only ever a recommendation" not in _render(False)
+
+
+def test_published_template_has_no_reroute_rule():
+    assert "{reroute_rule}" not in PUBLISHED_SYNTHESIS_WARNING_PROMPT
+    assert "{reroute_rule}" in SYNTHESIS_WARNING_PROMPT

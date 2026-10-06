@@ -34,6 +34,10 @@
 #   --tail SEC          seconds recorded after the last warning finishes playing (default: 4)
 #   --teardown          kill everything this script started and close its windows afterwards
 #
+# Environment: LLM_GPU_LAYERS and LLM_THREADS pass through to the Tier 2 Function
+# (deploy/talk3-windows/tier2.sh: default one CPU thread, no GPU; LLM_GPU_LAYERS=99
+# runs the model on a Mac's GPU).
+#
 # Requires: Docker (local broker) or a reachable broker,
 # pulsar-admin/pulsar-client, uv, jq, ffmpeg/ffprobe, Piper + the norman voice
 # (talks/talk3-pulsar-speaks-english/README.md), Gemma-3-4B-it under ~/tools
@@ -217,7 +221,13 @@ for sub in "enrichment-cards public/default/GlobalSynthesisFunction" "enrichment
 done
 
 log "opening the Tier 2 Function window (not recorded)..."
-TIER2_WID="$(open_window "cd '${REPO_ROOT}' && bash deploy/talk3-windows/tier2.sh '${BROKER_URL}' '${ADMIN_URL}'")"
+# The window's shell doesn't inherit this one's environment, so pass through the two
+# model settings tier2.sh reads (e.g. LLM_GPU_LAYERS=99 runs the model on the GPU).
+TIER2_ENV=""
+[[ -n "${LLM_GPU_LAYERS:-}" ]] && TIER2_ENV+="LLM_GPU_LAYERS='${LLM_GPU_LAYERS}' "
+[[ -n "${LLM_THREADS:-}" ]] && TIER2_ENV+="LLM_THREADS='${LLM_THREADS}' "
+[[ -n "$TIER2_ENV" ]] && log "Tier 2 settings: ${TIER2_ENV}"
+TIER2_WID="$(open_window "cd '${REPO_ROOT}' && ${TIER2_ENV}bash deploy/talk3-windows/tier2.sh '${BROKER_URL}' '${ADMIN_URL}'")"
 WINDOW_IDS+=("$TIER2_WID")
 place_window "$TIER2_WID" "$EXCLUDED_FONT_SIZE" "${TIER2_BOUNDS[@]}"
 wait_for_consumer enrichment-cards public/default/GlobalSynthesisFunction "Tier 2 Function" 120

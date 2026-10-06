@@ -72,9 +72,9 @@ run() {  # run <label> <pytest file> <ids> <eval runs>: one pytest session in it
   echo "== $label"
   before=$(ls -1 eval-results/ | sort)
   # No --model-threads: the default (12, tuned for this machine) is what the 2026-10-02 runs used.
-  # --model-backend server: what the published runs used; the harness default is in-process since 2026-10-05.
+  # --model-backend server --tier2-prompt published: what the published runs used (harness defaults since 2026-10-05: in-process, the current Tier 2 prompt).
   window "$label" uv run --no-sync pytest "tests/model/$test" -m model -s -q \
-    --only-model-ids "$ids" --model-eval-runs "$runs" --model-backend server < /dev/null > "$OUT/pytest_$label.log" 2>&1
+    --only-model-ids "$ids" --model-eval-runs "$runs" --model-backend server --tier2-prompt published < /dev/null > "$OUT/pytest_$label.log" 2>&1
   tail -n 2 "$OUT/pytest_$label.log"
   echo "$label $(comm -13 <(echo "$before") <(ls -1 eval-results/ | sort) | tr '\n' ' ')" >> "$OUT/artifacts.txt"
   window "idle-gap_$label" sleep 20

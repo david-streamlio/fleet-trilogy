@@ -1,8 +1,47 @@
 # TODO: record a new take of the Talk 3 demo
 
-**Status:** take 6 recorded (2026-10-05) on the external-display machine;
-needs review. Take 5 won't be used. Slide 24's raw/normalized clips are done
-too (`deploy/recordings/.talk3-slide24-clips/`).
+**Status:** take 8 recorded (2026-10-05 evening) on the M4 Max's **GPU**, with
+the spoken-warning prompt's reroute fix; needs review, and a decision on the
+talk's "one CPU core, no GPU" claim (below). Takes 5-7 won't be used unless
+that claim stays: then re-take on the CPU (the fix works there too). Slide 24's
+raw/normalized clips are done too (`deploy/recordings/.talk3-slide24-clips/`).
+
+## Take 8 (M4 Max + external display, GPU, reroute fix)
+- `deploy/recordings/talk3-demo-20261005-174611.mp4`: 36.8 s, 1890×1006, H.264 +
+  AAC; transcript `talk3-demo-20261005-174611.txt` beside it; raw capture and WAV
+  in `.raw-talk3-…` / `.talk3-audio-20261005-174611/`. **Gitignored: only on the
+  M4 Max.**
+- Recorded with `LLM_GPU_LAYERS=99 ./deploy/record-talk3-demo.sh --teardown`
+  (the script now passes `LLM_GPU_LAYERS` / `LLM_THREADS` to the Tier 2 window).
+  Function config from its log: `llm_backend=inprocess`, `threads=1`,
+  `llm_gpu_layers=99`, `corridor_threshold=3`.
+- Model loaded at 17:47:04; incident published ~1 s later. No fact-check
+  failures, no plain-code warning.
+- Transcript:
+  > Drivers approaching I-95N, we're seeing a slowdown affecting multiple trucks.
+  > It is recommended that you consider rerouting around I-95N as three trucks are
+  > experiencing significant delays, with an estimated impact of up to 9 minutes.
+- **The reroute is now a recommendation**, matching `reroute_recommended: true`.
+  The prompt adds "A reroute is only ever a recommendation, never already
+  happening…" when a reroute is recommended (`prompting.py`); measured 0 of 30
+  warnings stating it as done, against 8-9 with the old prompt, on CPU and GPU
+  (`eval-results/talk3-reroute-wording-20261005/`).
+- **To decide:** the talk promises one CPU core, no GPU (see "Why a new take"
+  below). This take used the GPU: either the slides change, or re-take with the
+  default `./deploy/record-talk3-demo.sh --teardown` (one CPU core, ~15 s to the
+  warning). No truck numbers, like take 6.
+
+## Take 7 (M4 Max + external display, one CPU core)
+- `deploy/recordings/talk3-demo-20261005-172916.mp4`: 52.9 s, 1890×1006;
+  transcript beside it. Gitignored. `llm_backend=inprocess`, `threads=1`, no GPU.
+  Warning ~15 s after the model load; fact check passed first time.
+- Transcript:
+  > Drivers approaching I-95 North, we're seeing a slowdown affecting multiple
+  > trucks. Traffic is rerouted around the corridor due to a correlated slowdown
+  > with three trucks reporting significant delays. Please proceed with caution and
+  > expect potential congestion.
+- "Traffic is rerouted" again, the second take in a row: what led to the prompt
+  fix used in take 8. It said "I-95 North" (Piper speaks it naturally).
 
 ## Take 6 (external-display machine, two displays)
 - `deploy/recordings/talk3-demo-20261005-090519.mp4`: 52.5 s, 1890×1006, H.264 +

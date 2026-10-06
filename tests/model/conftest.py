@@ -102,6 +102,18 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         ),
     )
     group.addoption(
+        "--tier2-prompt",
+        default="current",
+        choices=("current", "published"),
+        help=(
+            "Tier 2 evals only: the spoken-warning prompt -- `current` "
+            "(prompting.SYNTHESIS_WARNING_PROMPT) or `published` "
+            "(PUBLISHED_SYNTHESIS_WARNING_PROMPT, without the 2026-10-05 reroute-tense "
+            "line), which every Tier 2 measurement before that date used; pass it to "
+            "reproduce them."
+        ),
+    )
+    group.addoption(
         "--vary-events",
         action="store_true",
         help=(

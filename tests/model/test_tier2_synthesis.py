@@ -15,6 +15,7 @@ from llm_inference import InProcessLlmBackend, LlmServerBackend, SubprocessLlmBa
 
 from tests.model.tier2_eval_lib import (
     DEFAULT_THREADS,
+    TIER2_PROMPTS,
     TIER2_SCENARIOS,
     check_speakability,
     check_tier2_format_reliability,
@@ -59,7 +60,12 @@ def test_tier2_synthesis_format_speakability_and_grounding(
         all_trials = []
         grounding_by_scenario = {}
         for name, scenario in TIER2_SCENARIOS.items():
-            trials = run_tier2_trials(backend, scenario, per_scenario_n)
+            trials = run_tier2_trials(
+                backend,
+                scenario,
+                per_scenario_n,
+                prompt_template=TIER2_PROMPTS[request.config.getoption("--tier2-prompt")],
+            )
             all_trials.extend(trials)
             tier2_report.add_latencies([t.latency_seconds for t in trials])
             grounding_by_scenario[name] = check_tier2_grounding(trials, scenario)

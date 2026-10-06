@@ -43,6 +43,7 @@ from tests.model.models_manifest import (
 from tests.model.test_compare_edge_triage_models import _server_binary_path
 from tests.model.tier2_eval_lib import (
     DEFAULT_THREADS,
+    TIER2_PROMPTS,
     TIER2_SCENARIOS,
     _percentile,
     check_speakability,
@@ -157,7 +158,13 @@ def _run_one_model(entry: ModelEntry, request: pytest.FixtureRequest) -> dict:
         all_trials = []
         grounding_by_scenario = {}
         for name, scenario in TIER2_SCENARIOS.items():
-            trials = run_tier2_trials(backend, scenario, per_scenario_n, timeout_seconds=timeout_seconds)
+            trials = run_tier2_trials(
+                backend,
+                scenario,
+                per_scenario_n,
+                timeout_seconds=timeout_seconds,
+                prompt_template=TIER2_PROMPTS[request.config.getoption("--tier2-prompt")],
+            )
             all_trials.extend(trials)
             grounding_by_scenario[name] = check_tier2_grounding(trials, scenario)
     finally:
@@ -405,6 +412,7 @@ def test_compare_tier2_models(request: pytest.FixtureRequest) -> None:
             "model_timeout_seconds": request.config.getoption("--model-timeout-seconds"),
             "model_backend": request.config.getoption("--model-backend"),
             "model_gpu_layers": request.config.getoption("--model-gpu-layers"),
+            "tier2_prompt": request.config.getoption("--tier2-prompt"),
         },
         "models": results,
         "comparison": comparison,

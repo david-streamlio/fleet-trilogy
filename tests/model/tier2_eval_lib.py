@@ -32,7 +32,11 @@ from dataclasses import dataclass, field
 from fleet_telemetry_model import EnrichmentCard
 from llm_inference import LlmBackend, LlmGenerationConfig
 from llm_inference.structured import extract_json_object
-from talk3_pulsar_speaks_english.prompting import render_synthesis_prompt
+from talk3_pulsar_speaks_english.prompting import (
+    PUBLISHED_SYNTHESIS_WARNING_PROMPT,
+    SYNTHESIS_WARNING_PROMPT,
+    render_synthesis_prompt,
+)
 
 DEFAULT_EVAL_TIMEOUT_SECONDS = 180.0
 
@@ -152,12 +156,17 @@ class Tier2Trial:
     error: str | None = None
 
 
+# --tier2-prompt's value -> the template it names (conftest.py).
+TIER2_PROMPTS = {"current": SYNTHESIS_WARNING_PROMPT, "published": PUBLISHED_SYNTHESIS_WARNING_PROMPT}
+
+
 def run_tier2_trials(
     backend: LlmBackend,
     scenario: Tier2Scenario,
     n: int,
     timeout_seconds: float = DEFAULT_EVAL_TIMEOUT_SECONDS,
     max_tokens: int = DEFAULT_MAX_TOKENS,
+    prompt_template: str = SYNTHESIS_WARNING_PROMPT,
 ) -> list[Tier2Trial]:
     """Calls the real Tier 2 synthesis prompt against `scenario` n times.
 
@@ -174,6 +183,7 @@ def run_tier2_trials(
         scope=scenario.scope,
         reroute_recommended=scenario.reroute_recommended,
         reroute_detail=scenario.reroute_detail,
+        template=prompt_template,
     )
     config = LlmGenerationConfig(timeout_seconds=timeout_seconds, max_tokens=max_tokens)
     trials: list[Tier2Trial] = []

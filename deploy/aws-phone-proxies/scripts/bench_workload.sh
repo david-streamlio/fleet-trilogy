@@ -91,9 +91,9 @@ echo "$PAIRS" | while read -r test id runs; do
   for r in $(seq 1 "$REPS"); do
     echo "== $task $id rep $r"
     before=$(ls -1 eval-results/ 2>/dev/null | sort)
-    # --model-backend server: what the published runs used; the harness default is in-process since 2026-10-05.
+    # --model-backend server --tier2-prompt published: what the published runs used (harness defaults since 2026-10-05: in-process, the current Tier 2 prompt).
     window "${task}_${id}_r$r" /opt/homebrew/bin/uv run --no-sync pytest "tests/model/$test" -m model -s -q \
-      --only-model-ids "$id" --model-eval-runs "$runs" --model-threads 4 --model-backend server < /dev/null > "$OUT/pytest_${task}_${id}_r$r.log" 2>&1
+      --only-model-ids "$id" --model-eval-runs "$runs" --model-threads 4 --model-backend server --tier2-prompt published < /dev/null > "$OUT/pytest_${task}_${id}_r$r.log" 2>&1
     tail -n 3 "$OUT/pytest_${task}_${id}_r$r.log"
     new=$(comm -13 <(echo "$before") <(ls -1 eval-results/ | sort) | tr '\n' ' ')
     echo "${task}_${id}_r$r $new" >> "$OUT/artifacts.txt"

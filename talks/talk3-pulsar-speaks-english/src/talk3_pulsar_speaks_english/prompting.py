@@ -27,6 +27,19 @@ this literal fact" instruction, not a "reason about a nuanced tradeoff" one -- t
 kind smaller models tend to follow far more reliably (contrast with talk1's
 escalation-task prompt tuning, which repeatedly hit an overcorrection wall trying to
 teach models to weigh multiple risk factors, not just always state one fact).
+
+Reroute-tense finding (2026-10-05): the reroute detail is phrased as an instruction
+("Reroute traffic around I-95N -- ..."), and Gemma-3-4B-it often narrated it as
+already happening ("Traffic is rerouted around the corridor"), stating as done what
+the decision only recommends -- in two demo takes running, and in 8 of 30 measured
+warnings (eval-results/talk3-reroute-wording-20261005/). The prompt now says so in one
+more narrow instruction, the same kind as the corridor rule, added only when a reroute
+is recommended: in every prompt, its "drivers should consider it" made the model
+suggest alternative routes when none was recommended (3 of 20). Without a reroute, the
+prompt is exactly the published one.
+PUBLISHED_SYNTHESIS_WARNING_PROMPT is the prompt before that line, which every Tier 2
+measurement up to 2026-10-05 used (Talk 2's Tier 2 rows, Talk 3's single-core runs);
+pass it as render_synthesis_prompt(template=...) to reproduce them.
 """
 
 from __future__ import annotations
@@ -35,7 +48,7 @@ from fleet_telemetry_model import EnrichmentCard
 from llm_inference.client import LlmBackend, LlmGenerationConfig
 from llm_inference.structured import extract_json_object
 
-SYNTHESIS_WARNING_PROMPT = """You are generating a short, calm, spoken-style proactive \
+PUBLISHED_SYNTHESIS_WARNING_PROMPT = """You are generating a short, calm, spoken-style proactive \
 traffic warning (2-3 sentences) for text-to-speech, aimed at drivers approaching a \
 corridor. Cheap math and fleet logic have already made every decision below — your \
 only job is to phrase the warning in natural language. Do not change the scope or \
@@ -58,6 +71,17 @@ no markdown fences, no extra keys.
 Shape (a placeholder, not a real answer): {{"spoken_warning": "<your warning text \
 here>"}}"""
 
+# {reroute_rule} is REROUTE_RULE when a reroute is recommended, empty otherwise.
+SYNTHESIS_WARNING_PROMPT = PUBLISHED_SYNTHESIS_WARNING_PROMPT.replace(
+    "never omit it, even when the situation seems minor.\n",
+    "never omit it, even when the situation seems minor.\n{reroute_rule}",
+)
+REROUTE_RULE = (
+    "\nA reroute is only ever a recommendation, never already happening: say that "
+    "drivers should consider it or that it is recommended -- never that traffic is "
+    "being, or has been, rerouted.\n"
+)
+
 
 def render_synthesis_prompt(
     *,
@@ -66,22 +90,25 @@ def render_synthesis_prompt(
     scope: str,
     reroute_recommended: bool,
     reroute_detail: str | None,
+    template: str = SYNTHESIS_WARNING_PROMPT,
 ) -> str:
     """Build the Tier 2 spoken-warning prompt from already-decided scope/reroute
-    facts plus the enrichment cards that fed those decisions.
+    facts plus the enrichment cards that fed those decisions. `template` defaults to
+    the current prompt; PUBLISHED_SYNTHESIS_WARNING_PROMPT reproduces earlier runs.
     """
     card_lines = "\n".join(
         f"- ({card.truck_id}) {card.event}, severity={card.severity}, "
         f"signals={card.signals}, eta_impact={card.eta_impact:.1f}min"
         for card in cards
     )
-    return SYNTHESIS_WARNING_PROMPT.format(
+    return template.format(
         corridor=corridor,
         truck_count=len({card.truck_id for card in cards}),
         scope=scope,
         reroute_recommended=reroute_recommended,
         reroute_detail=reroute_detail or "none",
         cards=card_lines,
+        reroute_rule=REROUTE_RULE if reroute_recommended else "",  # unused by the published template
     )
 
 
