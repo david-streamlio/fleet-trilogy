@@ -362,15 +362,22 @@ so the default shows one window at a time:
 - `deploy/spotlight_edit.py` composes one 1920x1080 video:
   - it switches to a window when it prints a new message, using the event log
     the window scripts write (`EVENT_LOG`);
-  - it holds each window at least 3 s of output time, with a 0.3 s cross-fade,
-    and when several windows have news, it picks the next in pipeline order;
+  - it holds each window at least 5 s, and when several windows have news, it
+    picks the next in pipeline order;
+  - before each switch it pauses: the window freezes on its last frame for 3 s
+    so the audience can read it, then cross-fades (0.3 s) to the next window,
+    which picks up where the take left off;
   - it burns a stage label into the top-left corner ("1 · Telemetry",
     "2 · Co-processor", "3 · LLM → uplink", "4 · Stays on truck"), white SF Pro
     Semibold at 40px on a translucent bar. macOS renders the label, because
     Homebrew's ffmpeg has no `drawtext`;
-  - it then speeds the video up 4x, after the composition, so the hold is
-    measured in output time. No speed label is burned in, since the slide
-    says "4× speed".
+  - it plays at real speed. `--speed N` speeds it up after the composition, so
+    the hold and pause stay in output time; no speed label is burned in, so a
+    sped-up video needs the slide to say so.
+- The simulator runs at 2 events/s, half the live demo's 4, so a message can be
+  read before the next arrives. The scenario is 120 ticks (25 of warmup, then
+  the incident), so at 2 events/s it runs 60 s instead of 30. With the 5 s holds
+  and 3 s pauses, the video comes to about 120 s.
 - `--compact` (spotlight's default) trims each window's message to the fields
   the slides point at, so one fits in ~12 rows at 28pt without wrapping:
   - telemetry: six fields plus "… +N more fields";
@@ -383,12 +390,14 @@ so the default shows one window at a time:
 | Flag | Default | Meaning |
 |---|---|---|
 | `--spotlight` / `--grid` / `--per-window` | spotlight | one window at a time / the original 2x2 grid (one rectangle, 12pt) / the four full-display windows as four clips |
-| `--speed N` | 4 | spotlight: speed-up after composition (`setpts=PTS/N`) |
-| `--hold SEC` | 3 | spotlight: minimum output seconds per window |
+| `--rate EPS` | 2 | the simulator's events/sec; the scenario's 120 ticks are kept, so it runs 120/EPS seconds |
+| `--speed N` | 1 | spotlight: speed-up after composition (`setpts=PTS/N`) |
+| `--hold SEC` | 5 | spotlight: minimum output seconds per window |
+| `--pause SEC` | 3 | spotlight: freeze on a window's last frame before each switch (0 for none) |
 | `--fade SEC` | 0.3 | spotlight: cross-fade, output seconds |
 | `--compact` / `--compact=off` | on in spotlight | short messages, or the full JSON for troubleshooting |
 | `--font-size N` | 28 (12 with `--grid`) | the output windows' font |
-| `--rate EPS`, `--lead-in SEC`, `--wait-extra SEC`, `--output PATH`, `--teardown` | | as before (see the script's header) |
+| `--lead-in SEC`, `--wait-extra SEC`, `--output PATH`, `--teardown` | | as before (see the script's header) |
 
 Things that bit, and their fixes:
 - **Timing.** `screencapture -v` writes variable-frame-rate video that ends at
@@ -397,6 +406,11 @@ Things that bit, and their fixes:
   title 4 times a second (`HEARTBEAT=1`; the title bar is cropped out), so
   every clip runs to the stop. Clips are then aligned on stop time minus
   duration.
+- **`--rate`.** It used to do nothing: `demo-scenario.env` was read after the
+  flags, so its `RATE=4` replaced the value. Even when passed through, the
+  scenario's fixed 30 s would have stopped a slower simulator a few ticks into
+  the incident. Now the flag wins and the duration follows it
+  (`deploy/windows/simulator.sh` does the same for a manual run).
 - **Environment.** The windows' shells don't inherit the caller's
   environment, so `LLM_BACKEND`, `LLM_BINARY_PATH`, `LLM_MODEL_PATH`,
   `LLM_THREADS`, `LLM_GPU_LAYERS` and `UPLINK_MIN_SEVERITY` are passed through

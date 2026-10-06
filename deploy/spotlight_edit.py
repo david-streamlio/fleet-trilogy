@@ -12,11 +12,14 @@ frame, switching to a window when it prints a new message:
   an uplinked card goes first (the climax, and rare), then the next window in
   pipeline order (telemetry -> co-processor -> uplink -> local-only), with
   telemetry last; no window appears before the stage feeding it has been shown.
+- Before each switch the window pauses: it freezes on its last frame for --pause
+  seconds (output time), so the audience can read it, and the take resumes where it
+  left off in the next window.
 - A --fade second cross-fade (output time) between windows, and a stage label in the
   top-left corner ("1 · Telemetry" ...), rendered by macOS (this Homebrew ffmpeg has
   no drawtext) and overlaid.
-- The speed-up is applied after the composition (setpts=PTS/N), so the hold rule is
-  measured in output time.
+- The speed-up, if any, is applied after the composition (setpts=PTS/N), so the hold
+  and pause are measured in output time.
 - A sidecar .txt lists every switch as "mm:ss  stage  truck_id  summary".
 
 Clips are aligned on wall-clock time: each clip's first frame is its stop time minus
@@ -27,7 +30,7 @@ changing each title bar (cropped out here) 4 times a second.
 
     python3 deploy/spotlight_edit.py --events EVENTS.tsv --output OUT.mp4 \
         --clip telemetry=RAW.mov:STOP_EPOCH:WINDOW_HEIGHT_PT ... (all four roles) \
-        [--title-bar 32] [--speed 4] [--hold 3] [--fade 0.3]
+        [--title-bar 32] [--speed 1] [--hold 5] [--pause 3] [--fade 0.3]
 """
 
 from __future__ import annotations
@@ -221,8 +224,9 @@ def main() -> None:
     ap.add_argument("--output", type=Path, required=True)
     ap.add_argument("--clip", action="append", required=True, help="role=path:stop_epoch:window_height_pt")
     ap.add_argument("--title-bar", type=float, default=32.0, help="title bar height, points (cropped out)")
-    ap.add_argument("--speed", type=float, default=4.0)
-    ap.add_argument("--hold", type=float, default=3.0, help="minimum seconds per window, output time")
+    ap.add_argument("--speed", type=float, default=1.0)
+    ap.add_argument("--hold", type=float, default=5.0, help="minimum seconds per window, output time")
+    ap.add_argument("--pause", type=float, default=3.0, help="freeze before each switch, seconds of output time")
     ap.add_argument("--fade", type=float, default=0.3, help="cross-fade, seconds of output time")
     ap.add_argument("--pre-roll", type=float, default=0.5, help="input seconds shown before the first message")
     ap.add_argument("--tail", type=float, default=2.0, help="output seconds kept after the last message")
@@ -239,7 +243,7 @@ def main() -> None:
     for clip in clips.values():
         probe(clip)
 
-    hold_in, fade_in = args.hold * args.speed, args.fade * args.speed
+    hold_in, pause_in, fade_in = args.hold * args.speed, args.pause * args.speed, args.fade * args.speed
     events = read_events(args.events)
     avail_start = max(c.first for c in clips.values())
     avail_end = min(c.stop for c in clips.values())
@@ -275,8 +279,11 @@ def main() -> None:
         seen[seg.role] += 1
         last = k == len(segments) - 1
         a = seg.start - clip.first
-        b = seg.end - clip.first + (0 if last else fade_in)
-        durations.append(seg.end - seg.start)
+        b = seg.end - clip.first
+        # The pause: freeze the window's last frame, then cross-fade from the frozen
+        # frame into the next window, which picks up at this segment's end time.
+        freeze = 0 if last else pause_in + fade_in
+        durations.append(seg.end - seg.start + (0 if last else pause_in))
         # The content at 1 pixel per point (so a 28pt font is 28px), under the label band;
         # shrunk only if it wouldn't fit.
         pt = clip.window_h_pt / clip.height
@@ -286,7 +293,8 @@ def main() -> None:
             f"[c{idx}_{j}]trim=start={a:.3f}:end={b:.3f},setpts=PTS-STARTPTS,"
             f"crop=iw:ih-{tb[seg.role]}:0:{tb[seg.role]},"
             f"scale={w}:{h}:force_original_aspect_ratio=decrease,"
-            f"pad={FRAME_W}:{FRAME_H}:(ow-iw)/2:{LABEL_BAND}:color={bg},fps=60,setsar=1[b{k}]"
+            f"pad={FRAME_W}:{FRAME_H}:(ow-iw)/2:{LABEL_BAND}:color={bg},fps=60,setsar=1"
+            + (f",tpad=stop_mode=clone:stop_duration={freeze:.3f}" if freeze else "") + f"[b{k}]"
         )
         lines.append(f"[b{k}][l{idx}_{j}]overlay=x={LABEL_XY[0]}:y={LABEL_XY[1]}:eof_action=repeat,format=yuv420p,settb=AVTB[s{k}]")
     if len(segments) == 1:
@@ -309,7 +317,8 @@ def main() -> None:
         cmd += ["-i", str(labels[role])]
     cmd += ["-/filter_complex", str(graph), "-map", "[out]",
             "-c:v", "libx264", "-crf", "18", "-preset", "slow", "-pix_fmt", "yuv420p", "-an", str(args.output)]
-    print(f"[spotlight] {len(segments)} segments, {sum(durations):.1f}s of input -> ~{sum(durations) / args.speed:.1f}s at {args.speed:g}x")
+    print(f"[spotlight] {len(segments)} segments, {sum(durations) - pause_in * (len(segments) - 1):.1f}s of input"
+          f" + {len(segments) - 1} pauses of {args.pause:g}s -> ~{sum(durations) / args.speed:.1f}s at {args.speed:g}x")
     subprocess.run(cmd, check=True)
 
     sidecar = args.output.with_suffix(".txt")

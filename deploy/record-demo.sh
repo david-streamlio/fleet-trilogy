@@ -13,8 +13,9 @@
 #   28pt font, the 4 are captured as separate clips, and the export composes
 #   one 1920x1080 video that shows one terminal at a time, full frame,
 #   switching whenever a window prints a new message (deploy/spotlight_edit.py),
-#   sped up 4x, with a stage label burned into the top-left corner and a
-#   sidecar .txt listing every switch.
+#   at real speed, with a pause on each window before it switches away, a stage
+#   label burned into the top-left corner, and a sidecar .txt listing every
+#   switch. The defaults (2 events/s, 5 s holds, 3 s pauses) come to about 120 s.
 # - --grid: the original 2x2 grid of the 4 windows at 12pt, recorded as one
 #   rectangle.
 # - --per-window: the 4 windows full-display at 28pt, exported as 4 separate
@@ -59,11 +60,15 @@
 #                         (which shows the macOS account name) is cropped
 #                         out of its clip.
 #   --speed N             Spotlight only: speed-up applied after the
-#                         composition (setpts=PTS/N), so --hold is measured in
-#                         output time (default: 4). No speed label is burned
-#                         in; the slide says it.
+#                         composition (setpts=PTS/N), so --hold and --pause
+#                         are measured in output time (default: 1, real
+#                         speed). No speed label is burned in; if you speed
+#                         it up, the slide should say so.
 #   --hold SEC            Spotlight only: minimum output seconds a window is
-#                         shown before switching away (default: 3)
+#                         shown before switching away (default: 5)
+#   --pause SEC           Spotlight only: the window freezes on its last frame
+#                         for this many output seconds before each switch, so
+#                         the audience can read it (default: 3; 0 for none)
 #   --fade SEC            Spotlight only: cross-fade between windows, output
 #                         seconds (default: 0.3)
 #   --compact / --compact=off
@@ -71,10 +76,12 @@
 #                         slides point at, ~12 rows at 28pt) or the full JSON
 #                         (default: on in spotlight, off otherwise; off is for
 #                         troubleshooting)
-#   --rate EPS            Events/sec override for the simulator, slower
-#                          than deploy/demo-scenario.env's live-demo default
-#                          so each pretty-printed message is readable
-#                          before the next arrives (default: 1)
+#   --rate EPS            The simulator's events/sec, slower than
+#                          deploy/demo-scenario.env's live-demo 4 so each
+#                          pretty-printed message is readable before the
+#                          next arrives (default: 2). The scenario's 120
+#                          ticks are kept, so the simulator runs 120/EPS
+#                          seconds (60 s at 2, 120 s at 1).
 #   --font-size N         Output windows' terminal font size, points
 #                         (default: 28 in spotlight and per-window, where each
 #                         window fills the display; in --grid, 12 -- TODO-DEMO-RECORDING.md's ">= 20pt"
@@ -135,10 +142,11 @@ BROKER_URL="pulsar://localhost:6650"
 OUTPUT_PATH=""
 MODE="spotlight"
 PER_WINDOW=""
-RATE="1"
+SIM_RATE="2"
 FONT_SIZE=""  # set below from MODE unless --font-size is given
-SPEED="4"
-HOLD="3"
+SPEED="1"
+HOLD="5"
+PAUSE="3"
 FADE="0.3"
 COMPACT=""  # on/off; set below from MODE unless --compact[=off] is given
 EXCLUDED_FONT_SIZE="12"
@@ -166,12 +174,14 @@ while [[ $# -gt 0 ]]; do
     --speed=*) SPEED="${1#*=}"; shift ;;
     --hold) HOLD="${2:?--hold requires a value}"; shift 2 ;;
     --hold=*) HOLD="${1#*=}"; shift ;;
+    --pause) PAUSE="${2:?--pause requires a value}"; shift 2 ;;
+    --pause=*) PAUSE="${1#*=}"; shift ;;
     --fade) FADE="${2:?--fade requires a value}"; shift 2 ;;
     --fade=*) FADE="${1#*=}"; shift ;;
     --compact|--compact=on) COMPACT="on"; shift ;;
     --compact=off) COMPACT="off"; shift ;;
-    --rate) RATE="${2:?--rate requires a value}"; shift 2 ;;
-    --rate=*) RATE="${1#*=}"; shift ;;
+    --rate) SIM_RATE="${2:?--rate requires a value}"; shift 2 ;;
+    --rate=*) SIM_RATE="${1#*=}"; shift ;;
     --font-size) FONT_SIZE="${2:?--font-size requires a value}"; shift 2 ;;
     --font-size=*) FONT_SIZE="${1#*=}"; shift ;;
     --lead-in) LEAD_IN="${2:?--lead-in requires a value}"; shift 2 ;;
@@ -193,6 +203,10 @@ if [[ -z "$COMPACT" ]]; then
   if [[ "$MODE" == "spotlight" ]]; then COMPACT="on"; else COMPACT="off"; fi
 fi
 COMPACT_ARG="--compact=${COMPACT}"
+if ! awk -v r="$SIM_RATE" 'BEGIN { exit !(r + 0 > 0) }'; then
+  echo "[record-demo] --rate must be a positive number of events/sec, got '${SIM_RATE}'" >&2
+  exit 1
+fi
 
 if [[ "$(uname)" != "Darwin" ]]; then
   echo "[record-demo] this script is macOS-only (osascript/screencapture)" >&2
@@ -237,7 +251,12 @@ echo "[record-demo] broker reachable."
 
 # shellcheck source=demo-scenario.env
 . "${SCENARIO_FILE}"
-TOTAL_WAIT=$(( DURATION + WAIT_EXTRA ))
+# The scenario is its RATE x DURATION ticks (4 x 30 = 120: 25 of warmup, then the
+# incident), not its seconds. --rate stretches those same ticks over more time, so
+# the simulator gets a matching duration; at the scenario's 30 s, a slower rate
+# would stop it a few ticks into the incident.
+SIM_DURATION="$(awk -v r="$RATE" -v d="$DURATION" -v n="$SIM_RATE" 'BEGIN { printf "%g", r * d / n }')"
+TOTAL_WAIT="$(awk -v d="$SIM_DURATION" -v w="$WAIT_EXTRA" 'BEGIN { printf "%d", d + w + 0.999 }')"
 
 TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
 RECORDINGS_DIR="${REPO_ROOT}/deploy/recordings"
@@ -663,9 +682,9 @@ fi
 sleep "$LEAD_IN"
 
 echo "[record-demo] starting the simulator..."
-osascript -e "tell application \"Terminal\" to do script \"cd '${REPO_ROOT}' && bash deploy/windows/simulator.sh '${BROKER_URL}' '${RATE}'\" in window id ${SIM_WID}" >/dev/null
+osascript -e "tell application \"Terminal\" to do script \"cd '${REPO_ROOT}' && bash deploy/windows/simulator.sh '${BROKER_URL}' '${SIM_RATE}' '${SIM_DURATION}'\" in window id ${SIM_WID}" >/dev/null
 
-echo "[record-demo] scenario duration ${DURATION}s + ${WAIT_EXTRA}s trailing-card wait => recording ~${TOTAL_WAIT}s after lead-in..."
+echo "[record-demo] scenario at ${SIM_RATE} events/s: ${SIM_DURATION}s + ${WAIT_EXTRA}s trailing-card wait => recording ~${TOTAL_WAIT}s after lead-in..."
 sleep "$TOTAL_WAIT"
 
 echo "[record-demo] stopping recording..."
@@ -740,9 +759,9 @@ if [[ "$MODE" == "spotlight" ]]; then
     read -r bx1 by1 bx2 by2 <<< "${PW_BOUNDS[$i]}"
     CLIP_ARGS+=(--clip "${GRID_ROLES[$i]}=${raw}:${STOP_EPOCHS[$i]}:$(( by2 - by1 ))")
   done
-  echo "[record-demo] composing the spotlight edit (${SPEED}x, hold ${HOLD}s, fade ${FADE}s) -> ${OUTPUT_PATH}"
+  echo "[record-demo] composing the spotlight edit (${SPEED}x, hold ${HOLD}s, pause ${PAUSE}s, fade ${FADE}s) -> ${OUTPUT_PATH}"
   EDIT_CMD=(python3 "${SCRIPT_DIR}/spotlight_edit.py" --events "$EVENT_LOG" --output "$OUTPUT_PATH" "${CLIP_ARGS[@]}"
-            --title-bar "$TITLE_BAR_HEIGHT" --speed "$SPEED" --hold "$HOLD" --fade "$FADE")
+            --title-bar "$TITLE_BAR_HEIGHT" --speed "$SPEED" --hold "$HOLD" --pause "$PAUSE" --fade "$FADE")
   # The raw clips are kept (gitignored, like record-talk3-demo.sh's raw capture), with
   # the exact command, so the edit can be re-run -- e.g. at another --speed -- without
   # a new take: the LLM's decisions differ from take to take.
@@ -753,8 +772,8 @@ if [[ "$MODE" == "spotlight" ]]; then
   echo "[record-demo] switches: ${OUTPUT_PATH%.*}.txt (raw clips and event log kept; re-edit: bash ${RECORDINGS_DIR}/.spotlight-edit-${TIMESTAMP}.sh)"
   ffprobe -v error -show_entries stream=codec_name,width,height,pix_fmt:format=duration -of default=noprint_wrappers=1 "$OUTPUT_PATH" 2>/dev/null || true
   out_s="$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$OUTPUT_PATH" 2>/dev/null | cut -d. -f1)"
-  if [[ -n "$out_s" && "$out_s" -ge 90 ]]; then
-    echo "[record-demo] WARNING: ${out_s}s is over the 90s target -- raise --speed" >&2
+  if [[ -n "$out_s" && ( "$out_s" -gt 150 || "$out_s" -lt 90 ) ]]; then
+    echo "[record-demo] WARNING: ${out_s}s is far from the ~120s target -- adjust --rate, --pause or --hold" >&2
   fi
 elif [[ -n "$PER_WINDOW" ]]; then
   FAILED=""
