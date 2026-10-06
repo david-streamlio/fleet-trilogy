@@ -338,29 +338,81 @@ why plain `Ctrl-C` doesn't do that here the way it does in `demo.sh`.
 
 ### Automated screen recording: `deploy/record-demo.sh`
 
-Watch a `demo-tmux.sh` take first (rehearse it, or `tmux attach -t
-edge-triage-demo`) before recording the one you'll actually keep — once you're
-happy with it, this script automates the capture end to end: it opens a
-fresh, sized Terminal.app window, runs `demo-tmux.sh` inside it with a real
-tty (so its own `tmux attach` works, unlike running the script from a
-non-interactive context), records exactly that window with `screencapture
--v` for the scenario's duration plus an LLM-catch-up buffer, then trims the
-lead-in and exports a clean H.264 `.mp4` via `ffmpeg` — satisfying
-`talks/talk1-edge-intelligence/TODO-DEMO-RECORDING.md`'s resolution/codec
-spec.
+Records Talk 1's Edge Triage Pipeline demo end to end. It opens all six
+Terminal windows itself (setup log and simulator on the main display, never
+recorded; the four output windows on the external display), starts the
+simulator once the layout has settled, records, and exports H.264 to
+`deploy/recordings/` (gitignored).
 
 ```bash
-./deploy/record-demo.sh                              # local rehearsal
-./deploy/record-demo.sh pulsar://localhost:6650 --simulator-host <pi-hostname-or-ip>
+LLM_BACKEND=server ./deploy/record-demo.sh --teardown                      # spotlight, local broker
+LLM_BACKEND=server ./deploy/record-demo.sh pulsar://<pi-host>:6650 --teardown
+./deploy/record-demo.sh --grid --teardown                                  # the original 2x2 grid
 ```
 
-macOS-only (`osascript` + `screencapture`); needs `ffmpeg` on `PATH`
-(`brew install ffmpeg`) for the export step, and one-time Screen Recording +
-Automation permission grants for Terminal.app (System Settings > Privacy &
-Security) — a blank/black export almost always means one of those two is
-missing. Output lands in `deploy/recordings/` (gitignored). See the
-script's header for all flags (`--output`, `--window-size`, `--font-size`,
-`--wait-extra`, `--fullscreen`, `--teardown`).
+**Why spotlight is the default.** Reviewers found the 2x2 grid of four
+windows at 12pt unreadable from the back of a room. The bar is text about the
+size of your hand at arm's length: terminal text at 28px or more in the final
+1080p frame. A quarter of a 1080p screen can't hold a message at that size,
+so the default shows one window at a time:
+
+- Each output window fills the external display at a 28pt font, and the four
+  are captured as separate clips, **by window id** (`screencapture -l`), which
+  records a window's own content even while the others cover it.
+- `deploy/spotlight_edit.py` composes one 1920x1080 video:
+  - it switches to a window when it prints a new message, using the event log
+    the window scripts write (`EVENT_LOG`);
+  - it holds each window at least 3 s of output time, with a 0.3 s cross-fade,
+    and when several windows have news, it picks the next in pipeline order;
+  - it burns a stage label into the top-left corner ("1 · Telemetry",
+    "2 · Co-processor", "3 · LLM → uplink", "4 · Stays on truck"), white SF Pro
+    Semibold at 40px on a translucent bar. macOS renders the label, because
+    Homebrew's ffmpeg has no `drawtext`;
+  - it then speeds the video up 4x, after the composition, so the hold is
+    measured in output time. No speed label is burned in, since the slide
+    says "4× speed".
+- `--compact` (spotlight's default) trims each window's message to the fields
+  the slides point at, so one fits in ~12 rows at 28pt without wrapping:
+  - telemetry: six fields plus "… +N more fields";
+  - co-processor: the baseline severity plus the three context fields;
+  - cards: escalation, severity and the first sentence of `risk_synthesis`,
+    cut to the window's width.
+- Beside the video, `<name>.txt` lists every switch as
+  `mm:ss  stage  truck_id  summary`, for matching speaker notes.
+
+| Flag | Default | Meaning |
+|---|---|---|
+| `--spotlight` / `--grid` / `--per-window` | spotlight | one window at a time / the original 2x2 grid (one rectangle, 12pt) / the four full-display windows as four clips |
+| `--speed N` | 4 | spotlight: speed-up after composition (`setpts=PTS/N`) |
+| `--hold SEC` | 3 | spotlight: minimum output seconds per window |
+| `--fade SEC` | 0.3 | spotlight: cross-fade, output seconds |
+| `--compact` / `--compact=off` | on in spotlight | short messages, or the full JSON for troubleshooting |
+| `--font-size N` | 28 (12 with `--grid`) | the output windows' font |
+| `--rate EPS`, `--lead-in SEC`, `--wait-extra SEC`, `--output PATH`, `--teardown` | | as before (see the script's header) |
+
+Things that bit, and their fixes:
+- **Timing.** `screencapture -v` writes variable-frame-rate video that ends at
+  a window's last changed frame, which would misalign a quiet window's clip.
+  In spotlight and per-window takes, each window script keeps changing its
+  title 4 times a second (`HEARTBEAT=1`; the title bar is cropped out), so
+  every clip runs to the stop. Clips are then aligned on stop time minus
+  duration.
+- **Environment.** The windows' shells don't inherit the caller's
+  environment, so `LLM_BACKEND`, `LLM_BINARY_PATH`, `LLM_MODEL_PATH`,
+  `LLM_THREADS`, `LLM_GPU_LAYERS` and `UPLINK_MIN_SEVERITY` are passed through
+  to the setup window explicitly. `LLM_BACKEND=server` gives llama-server on a
+  Mac's GPU, as the 2026-10-02 take ran; the Function's default is in-process
+  on the CPU.
+- **Grid mode.** The grid keeps its geometry workarounds (Terminal's row
+  snapping, the row-2 drift watchdog, bounds applied twice against the
+  cascade). Spotlight and per-window reuse the same placement safeguards for
+  their full-display windows.
+
+macOS-only (`osascript`, `screencapture`); needs `ffmpeg`/`ffprobe`
+(`brew install ffmpeg`), `python3`, a second display, and one-time Screen
+Recording + Automation permission for Terminal.app (System Settings > Privacy
+& Security). A blank or black export almost always means one of those is
+missing.
 
 ## Raspberry Pi provisioning
 
