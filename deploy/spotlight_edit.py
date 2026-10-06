@@ -8,10 +8,11 @@ frame, switching to a window when it prints a new message:
 - Switch times come from the take's event log: every deploy/windows/*.sh appends
   "epoch<TAB>role<TAB>truck_id<TAB>summary" as it prints a message (EVENT_LOG).
 - Each shown window is held at least --hold seconds of OUTPUT time (after the
-  --speed speed-up) before another switch. When several windows have new messages,
-  an uplinked card goes first (the climax, and rare), then the next window in
-  pipeline order (telemetry -> co-processor -> uplink -> local-only), with
-  telemetry last; no window appears before the stage feeding it has been shown.
+  --speed speed-up) before another switch. The edit rotates through the pipeline:
+  telemetry, the co-processor, then the LLM's decision (an uplinked card over one
+  kept on the truck), so each cycle shows cause, flag and decision. A stage with
+  nothing new is skipped, and no window appears before the stage feeding it has
+  been shown.
 - Before each switch the window pauses: it freezes on its last frame for --pause
   seconds (output time), so the audience can read it, and the take resumes where it
   left off in the next window.
@@ -47,8 +48,8 @@ from pathlib import Path
 STAGES = [
     ("telemetry", "1 · Telemetry"),
     ("coproc-out", "2 · Co-processor"),
-    ("uplink", "3 · LLM → uplink"),
-    ("local-only", "4 · Stays on truck"),
+    ("local-only", "3 · Stays on truck"),
+    ("uplink", "4 · LLM → uplink"),
 ]
 ROLES = [role for role, _ in STAGES]
 LABELS = dict(STAGES)
@@ -112,7 +113,7 @@ def read_events(path: Path) -> list[Event]:
 
 def plan(events: list[Event], start: float, end: float, hold_in: float) -> list[Segment]:
     """Switch to a window when it has a new message, holding each one hold_in
-    seconds of input time; ties go to the next window in pipeline order."""
+    seconds of input time; the next window is the next pipeline stage with news."""
     events = [e for e in events if start <= e.t <= end]
     if not events:
         return [Segment("telemetry", start, end, None)]
@@ -136,14 +137,13 @@ def plan(events: list[Event], start: float, end: float, hold_in: float) -> list[
         return counts
 
     def next_in_order(cands: dict[str, int]) -> str:
-        # An uplinked card pre-empts: it's the story's climax and rare (a take's only
-        # one was otherwise skipped for telemetry). Then pipeline order from the
-        # current window, with telemetry last, so the edit doesn't go back to raw
-        # telemetry while a downstream window has news.
-        i = ROLES.index(cur)
-        order = {ROLES[(i + k) % len(ROLES)]: k for k in range(1, len(ROLES) + 1)}
+        # Rotate telemetry -> co-processor -> decision, the two card windows sharing
+        # the decision stage, so a narrator can walk cause, flag and decision each
+        # cycle; skip a stage with nothing new. At the decision stage an uplinked
+        # card beats a kept one: it's the story's climax, and rare.
+        stage = {"telemetry": 0, "coproc-out": 1, "local-only": 2, "uplink": 2}
         eligible = [r for r in cands if upstream[r] is None or upstream[r] in shown] or list(cands)
-        return min(eligible, key=lambda r: (r != "uplink", r == "telemetry", order[r]))
+        return min(eligible, key=lambda r: ((stage[r] - stage[cur] - 1) % 3, r != "uplink"))
 
     while True:
         decide = seg_start + hold_in

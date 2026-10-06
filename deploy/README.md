@@ -362,13 +362,15 @@ so the default shows one window at a time:
 - `deploy/spotlight_edit.py` composes one 1920x1080 video:
   - it switches to a window when it prints a new message, using the event log
     the window scripts write (`EVENT_LOG`);
-  - it holds each window at least 5 s, and when several windows have news, it
-    picks the next in pipeline order;
+  - it rotates through the pipeline: telemetry, the co-processor, then the
+    LLM's decision (an uplinked card over one kept on the truck), so each cycle
+    shows cause, flag and decision. It holds each window at least 5 s and skips
+    a stage with nothing new;
   - before each switch it pauses: the window freezes on its last frame for 3 s
     so the audience can read it, then cross-fades (0.3 s) to the next window,
     which picks up where the take left off;
   - it burns a stage label into the top-left corner ("1 · Telemetry",
-    "2 · Co-processor", "3 · LLM → uplink", "4 · Stays on truck"), white SF Pro
+    "2 · Co-processor", "3 · Stays on truck", "4 · LLM → uplink"), white SF Pro
     Semibold at 40px on a translucent bar. macOS renders the label, because
     Homebrew's ffmpeg has no `drawtext`;
   - it plays at real speed. `--speed N` speeds it up after the composition, so
