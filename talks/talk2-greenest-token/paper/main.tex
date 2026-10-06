@@ -337,7 +337,7 @@ At temperature 0.2, generated wording varied from call to call, but correctness 
 \label{sec:observe}
 % =====================================================================
 
-Nearly every surprise in this study would have been invisible to monitoring that tracks only latency and error rate, and several moved energy or accuracy in the opposite direction from latency (Table~\ref{tab:signals}). Enabling reasoning quadrupled energy per call without changing accuracy; a server default reserved eight times the memory the task needed without changing latency; a throttled laptop was slower but cheaper per call; a cheaper quantization saved energy while silently breaking one model; and the invocation policy, not the model, set the daily energy budget. Energy and correctness need to be observed alongside latency, per decision.
+Nearly every surprise in this study would have been invisible to monitoring that tracks only latency and error rate, and several moved energy or accuracy in the opposite direction from latency (Table~\ref{tab:signals}). Enabling reasoning quadrupled energy per call without changing accuracy; a server default reserved eight times the memory the task needed without changing latency; a throttled laptop was slower but cheaper per call; a cheaper quantization saved energy while silently breaking one model; the invocation policy, not the model, set the daily energy budget; and a benchmark that repeated one input measured only the cached-prompt cost, a fifth of a changed call's on the Pi~4. Energy and correctness need to be observed alongside latency, per decision.
 
 \begin{table}[t]
 \caption{Signals to monitor, and the failure each would have caught in this study.}
@@ -355,6 +355,7 @@ Memory headroom & default context size & $\sim$50\,GB reserved; $\sim$6\,GB need
 Thermal state & sustained load (laptop) & cool: 24--77\% faster, 30--60\% more J/call \\
 Correctness, clustered by case & Q4\_0 on Gemma-3-4B & mismatch 0$\to$30\%; energy $-$10--41\% \\
 Invocation rate & no gate vs.\ gate & 17,280 vs.\ 23 calls per truck-day \\
+Prompt tokens read per call & a benchmark repeating one input & 1 vs.\ 400 of 514 tokens; Pi~4 154$\to$772\,J per call \\
 \bottomrule
 \end{tabular}
 \end{table}

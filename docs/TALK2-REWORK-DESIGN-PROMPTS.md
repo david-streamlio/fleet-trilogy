@@ -4,12 +4,13 @@ Paste-ready prompts that turn the slide plan into the deck. The talk is on 2026-
 
 **What to upload to the Claude design project first:**
 1. `docs/TALK2-REWORK-SLIDE-PLAN.md`: the locked content spec (28 slides).
-2. The six chart images from `talks/talk2-greenest-token/slides/charts/`:
+2. The seven chart images from `talks/talk2-greenest-token/slides/charts/`:
    - `slide_dice.png` (slide 7)
    - `slide_fig1_speed.png` (slide 8)
    - `slide_fig2_energy.png` (slide 10)
    - `slide_fig3_thinking.png` (slide 11)
    - `slide_fig5_task_scope.png` (slide 12)
+   - `slide_changed_prompt.png` (slide 19)
    - `slide_fig4_energy_per_day.png` (slide 24)
 
    SVG versions sit beside them if the tool prefers vector.
@@ -17,7 +18,7 @@ Paste-ready prompts that turn the slide plan into the deck. The talk is on 2026-
 
 **Order:** Prompt 0, then 1, 2 and 3 (one batch each), then 4 (QA). Prompt 5 is for later, when the pending data arrives.
 
-**Updated 2026-10-05:** the plan gained slide 19 (assumption 10, prompt order and caching), so slides 19-27 became 20-28. If you already built the deck from the 27-slide plan, send Prompt 6 instead of rebuilding. If you sent Prompt 6 before the evening of 2026-10-05, re-send it: slide 19's text and slides 18 and 20 changed since.
+**Updated 2026-10-05:** the plan gained slide 19 (assumption 10, prompt order and caching), so slides 19-27 became 20-28. If you already built the deck from the 27-slide plan, send Prompt 6 instead of rebuilding. If you sent Prompt 6 before the evening of 2026-10-05, re-send it: slide 19 became a chart slide, and slides 18, 20 and 25 changed since.
 
 **Why these rules exist:**
 - **Planning tags reached the slides last time.** The previous Talk 2 build put planning-doc tags and file names on slides (`docs/TALK2-DECK-BUILD-PROMPT.md`). This time pending data must be *visible*, but as a designed chip, never as raw bracket syntax.
@@ -50,7 +51,7 @@ You are building the slides for "The Greenest Token" (Talk 2 of a three-talk con
 
 6. Voice. First person ("I assumed…"), as written in the plan. That's the speaker's choice and overrides any template rule preferring "you/we". Sentence case; numbers in Roboto Mono; no emoji; no superlatives.
 
-7. Charts. Slides 7, 8, 10, 11, 12 and 24 use the uploaded chart images. Place each large in the content region with the slide's text beside or below it. Don't redraw a chart unless you can reproduce it exactly from the plan's Spec data in Roboto and the deck palette; never alter, round or extend its values.
+7. Charts. Slides 7, 8, 10, 11, 12, 19 and 24 use the uploaded chart images. Place each large in the content region with the slide's text beside or below it. Don't redraw a chart unless you can reproduce it exactly from the plan's Spec data in Roboto and the deck palette; never alter, round or extend its values.
 
 8. Names. The system is the "Edge Triage Pipeline" (never "Flow B"). Model names exactly as written (e.g. Qwen3.5-9B, Phi-3.5-mini, Gemma-3-4B).
 
@@ -96,7 +97,8 @@ The slides:
   - 12: slide_fig5_task_scope.png.
 
   Put the chart large, with the first two on-screen lines beside it and the "Do this:" line in its usual place.
-- Slides 13-19 (Comparison): left column = what I assumed (the plan's "Before column"), right column = what happened (the plan's "After column"), highlighted as the winning side, with the "Do this:" line in its usual place. Slide 13 also has two small lines under the right column, both from the plan: "Lookup tables + the chat template lifted 3 of 4 small models by 36-42 points" and "On the M1, worked examples nearly doubled the prompt but cost no more energy: answers got shorter".
+- Slide 19 (Content, chart slide): slide_changed_prompt.png large, with the plan's first two on-screen lines beside it and the "Do this:" line in its usual place; same eyebrow and accent treatment as the rest of the series.
+- Slides 13-18 (Comparison): left column = what I assumed (the plan's "Before column"), right column = what happened (the plan's "After column"), highlighted as the winning side, with the "Do this:" line in its usual place. Slide 13 also has two small lines under the right column, both from the plan: "Lookup tables + the chat template lifted 3 of 4 small models by 36-42 points" and "On the M1, worked examples nearly doubled the prompt but cost no more energy: answers got shorter".
 
 When done, list any judgment calls.
 ```
@@ -110,7 +112,7 @@ Build slides 20-28 from the attached plan, following the same rules.
 - Slide 22 (Section plate): "Does the thesis hold?" with the thesis as subtitle.
 - Slide 23 (Three-up): three cards with the plan's card titles and lines. Footnote (small, grey #787878, leading "*"): "*Google (2025), median Gemini text prompt including data-center overhead".
 - Slide 24 (Content): slide_fig4_energy_per_day.png large, three lines beside it. Make "Energy = calls × joules per call" the visual anchor of the text column.
-- Slide 25 (Content): a clean 6-row, 3-column table (Signal | Failure it caught | Effect) exactly as in the plan; numbers in Roboto Mono. A small "data pending" chip in a corner slot labeled "Datadog dashboard screenshot".
+- Slide 25 (Content): a clean 7-row, 3-column table (Signal | Failure it caught | Effect) exactly as in the plan; numbers in Roboto Mono. A small "data pending" chip in a corner slot labeled "Datadog dashboard screenshot".
 - Slide 26 (Comparison): left = "What I promised" (the abstract's three claims), right = "What I measured" (three findings). Each finding gets a verdict badge: "Untested" (grey), "Smaller in practice" (amber), "Confirmed" (green). Visually echo slide 3's quote styling on the left column, so the callback is obvious.
 - Slide 27 (Content): the three lines, then the closing line large and bold across the bottom: "The energy savings came from not calling the model, not from making each call cheaper." This is the line the talk ends on, so give it the most visual weight in the deck.
 - Slide 28 (Closing plate): "Thank you", the subtitle line with the paper link as a "data pending" chip, and the speaker line.
@@ -154,16 +156,17 @@ Replace the "data pending" chip on slide <N> with: <final text or number>. Keep 
 
 ## Prompt 6: insert assumption 10 into a deck built from the 27-slide plan (2026-10-05)
 
-Upload the updated `docs/TALK2-REWORK-SLIDE-PLAN.md` first, then send:
+Upload the updated `docs/TALK2-REWORK-SLIDE-PLAN.md` and `talks/talk2-greenest-token/slides/charts/slide_changed_prompt.png` first, then send:
 
 ```
 The attached plan has changed: it now has 28 slides. Update the existing deck without rebuilding it:
-1. Insert the plan's new slide 19 ("I assumed my benchmark measured the cost of a call. It measured the cost of a repeat.") after the current slide 18, in the same Comparison style as slides 13-18: eyebrow, before/after columns, "Do this:" footer, its own accent color. Use its On-Screen Text verbatim and its Speaker Notes as presenter notes.
+1. Insert the plan's new slide 19 ("I assumed my benchmark measured the cost of a call. It measured the cost of a repeat.") after the current slide 18 as a chart slide like slides 10-12: the uploaded slide_changed_prompt.png large, the plan's two on-screen lines beside it, the "ASSUMPTION 10 OF 10" eyebrow, the "Do this:" line in its usual place, its own accent color. Use its On-Screen Text verbatim and its Speaker Notes as presenter notes.
 2. Change every assumption eyebrow to "ASSUMPTION N OF 10" (slides 10-19), and slide 9's subtitle to "Ten assumptions, and what the data said".
 3. Renumber the slides after it (the old 19-27 become 20-28).
 4. On slide 21 ("Do this, not that: every LLM"), use the plan's four items per column: add "Fixed instructions first, per-request data last" to Do and "Benchmark one repeated input" to Don't, in the positions the plan gives.
 5. Update the presenter notes of slides 10 and 24 to the plan's new versions (a caveat about repeated prompts on each), and of slides 18 and 20 (a note that the runtime can change answers).
 6. On slide 20 ("Do this, not that: small LLMs"), change the Don't item "A quantization you haven't re-tested" to "A quantization or runtime you haven't re-tested".
+7. On slide 25, add the plan's seventh table row (prompt tokens read per call).
 Change nothing else. Then list what you changed.
 ```
 

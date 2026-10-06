@@ -1,7 +1,7 @@
 # Talk 2 rework outline: "The Greenest Token: can the phone in your pocket take work off the data center?"
 
 **Status:** draft 3, 2026-10-04. The talk is on 2026-10-08.
-- **Slide plan:** `docs/TALK2-REWORK-SLIDE-PLAN.md` (27 slides, `tech-slide-planner`, profile `DATADOG_MARKETING_DECK`).
+- **Slide plan:** `docs/TALK2-REWORK-SLIDE-PLAN.md` (28 slides, `tech-slide-planner`, profile `DATADOG_MARKETING_DECK`).
 - **Claude design prompts:** `docs/TALK2-REWORK-DESIGN-PROMPTS.md`.
 - **Slide charts:** `talks/talk2-greenest-token/slides/charts/` (`make_figures.py --slides`).
 - Built from the user's rough outline (the structure and the questions are theirs).
@@ -154,7 +154,7 @@ Every slide has the same four parts: **I assumed**, **what happened** (one numbe
 - **The limit (2026-10-05):** "same runtime" matters. The same model file and sampling settings through llama-cpp-python instead of llama-server moved Phi-3.5's borderline escalations from hold to lower, every call, on the M4 Max and the Pi 4 alike. So iterate on the fast machine, but with the runtime you'll ship.
 - **Do this:** iterate on accuracy on the fastest machine you have (the laptop ran 14 models in 25 minutes; a Pi 4 run took ~2 hours per model), using the runtime you'll ship, then measure speed and energy on the target.
 
-**A10. "My benchmark measured the cost of a call." It measured the cost of a repeat.** (Added 2026-10-05; data: paper Table IV, `docs/TALK2-HARDWARE-SPECTRUM-TEST-LOG.md` § "Real-stream re-measure".)
+**A10. "My benchmark measured the cost of a call." It measured the cost of a repeat.** (Added 2026-10-05; data: paper Table IV, `docs/TALK2-HARDWARE-SPECTRUM-TEST-LOG.md` § "Real-stream re-measure".) Chart: `slides/charts/slide_changed_prompt.png` (Table IV: Pi 4 and M4 Max, repeated vs changed as built vs changed with the fields last).
 - **What happened:** the benchmark sent the same event again, so the server read **1 of 514** prompt tokens per call; the rest came from its cache. A new event re-read **~400**, because my prompt put the event's fields before the rules. Moving them after the rules, same wording otherwise: **148**, with accuracy unchanged on llama-server (100% format, 0% wrong escalations), but not through llama-cpp-python, where the benign case tipped from hold to lower on every call. On the Pi 4 a new event cost **160 s and 772 J** with my original order, 5× the repeated 31.7 s and 154 J: reading 400 prompt tokens took 129 s, four times as long as writing the answer (31 s). Fields last: **82 s and 416 J**, about half. On the laptop GPU, 25.0 J → 18.5 J per new event (−26%), against ~15 J repeated.
 - **Why:** a prompt cache reuses a prompt only up to the first token that changed since the last call. Within one incident a truck's calls repeat the prompt (it carries the trip context, not the sensor readings), so the earlier numbers hold for those calls; a new incident, a changed field, or one device serving several trucks pays the full read. On a CPU, reading the prompt is the slow part; on a GPU, generation is.
 - **Do this:** put the fixed instructions first and the per-request data last, then re-check accuracy: a reorder is a prompt change, and a runtime change is too. Benchmark with inputs that change, and check what your server caches (llama-server's memory cache of earlier prompts served my recurring test events whole until I turned it off).
@@ -210,6 +210,7 @@ Speaker-note material, not slides: below ~1B parameters models echo the prompt o
 | Thermal state | sustained load | cool: 24-77% faster, 30-60% more energy per call |
 | Correctness, per case | Q4_0 on Gemma-3-4B | errors 0% → 30%, energy −10-41% |
 | Invocation rate | no gate vs gate | 17,280 vs 23 calls per truck-day |
+| Prompt tokens read per call | a benchmark repeating one input | 1 vs 400 of 514 tokens; Pi 4 154 → 772 J per call |
 
 - Speaker note: carbon per decision = energy × the grid's carbon intensity where and when the model ran.
 - [PLACEHOLDER: Datadog dashboard screenshot of these signals; demo on the TODO list.]

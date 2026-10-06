@@ -341,7 +341,37 @@ def fig_dice() -> None:
     save(fig, "dice")
 
 
+# --- Slide 19: a repeated prompt vs a changed one (the paper's Table IV) -------------------------
+def fig_changed_prompt() -> None:
+    # Phi-3.5-mini, Edge Triage, J/call above idle and p50. Pi 4: inline meter, whole board
+    # (eval-results/edge-triage-event-last-pi4-20261005/: runs A and B; repeated = Table II).
+    # M4 Max: powermetrics, chip only (eval-results/edge-triage-event-last-m4max-20261005/,
+    # run 2; repeated = Table II's ~15 J).
+    cases = ["Repeated\nprompt", "Changed,\nas built", "Changed,\nfields last"]
+    colors = ["#C9CFD7", C["full"], C["narrow"]]
+    # Inside each changed bar: as built vs repeated, fields last vs as built.
+    panels = [
+        ("Raspberry Pi 4 (CPU, at the wall)", [154, 772, 416], ["154 J · 31.7 s", "772 J · 160 s", "416 J · 82 s"], "5×", "−46%"),
+        ("M4 Max (GPU, chip only)", [15.2, 25.0, 18.5], ["~15 J · 0.36 s", "25.0 J · 0.70 s", "18.5 J · 0.49 s"], "1.6×", "−26%"),
+    ]
+    fig, axes = plt.subplots(1, 2, figsize=(W, H(2.3)))
+    for ax, (title, vals, labels, ratio, saving) in zip(axes, panels):
+        ax.bar(range(3), vals, 0.62, color=colors, linewidth=0)
+        for x, (v, lab) in enumerate(zip(vals, labels)):
+            ax.annotate(lab, (x, v), xytext=(0, 3), textcoords="offset points", ha="center", va="bottom", fontsize=6.5 * FS)
+        for x, text in ((1, ratio), (2, saving)):
+            ax.annotate(text, (x, vals[x] * 0.5), ha="center", va="center", fontsize=9 * FS, fontweight="bold", color="white")
+        ax.set_xticks(range(3), cases)
+        ax.set_ylim(0, max(vals) * 1.22)
+        ax.set_title(title, loc="left")
+        ax.set_ylabel("Energy per call above idle (J)")
+        ax.grid(axis="y", linewidth=0.4, alpha=0.3)
+    fig.tight_layout(w_pad=2.0)
+    save(fig, "changed_prompt")
+
+
 if __name__ == "__main__":
     fig1(); fig2(); fig3(); fig4(); fig5()
     if SLIDES:
         fig_dice()
+        fig_changed_prompt()
