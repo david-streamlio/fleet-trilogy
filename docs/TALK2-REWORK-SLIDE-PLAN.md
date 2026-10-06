@@ -177,17 +177,17 @@
 
 ### Slide 11 — I assumed thinking would make it more accurate. It didn't, and sometimes it never answered.
 - **Core Message:** reasoning added time and energy without measurable accuracy, and one model never finished thinking.
-- **Visual Manifest:** Type `Time_Series_Line_Chart`, overridden to a content slide with the chart. Spec: the paper's Fig. 3: correctness (%) vs median latency (s, log) for Qwen3-8B, Qwen3-14B, Qwen3.5-9B and Qwen3.8-27B in raw, chat-off and chat-on modes, plus thinking capped at 1,024 tokens (hollow diamonds); Qwen3.5-9B chat-on at 0%. File: `slides/charts/slide_fig3_thinking.png`.
+- **Visual Manifest:** Type `Time_Series_Line_Chart`, overridden to a content slide with the chart. Spec: the paper's Fig. 3: correctness (%) vs median latency (s, log) for Qwen3-8B, Qwen3-14B, Qwen3.5-9B and Qwen3.8-27B in raw, chat-off and chat-on modes, plus thinking capped at 1,024 tokens (hollow diamonds); Qwen3.5-9B's chat-on point is omitted (a harness artifact, test log incident 27). File: `slides/charts/slide_fig3_thinking.png`.
 - **Suggested Layout:** `Content`. Override: the affinity map's `Stats` can't show the trade-off curve.
 - **On-Screen Text:**
   - "No measurable gain, at 4-11× the time and 4-7× the energy per call"
-  - "Qwen3.5-9B: 36 of 36 calls never finished thinking"
+  - "Qwen3.5-9B on the simple task: 11 of 18 calls never finished thinking"
   - "Do this: thinking off for short tasks; if you need it, cap it and track completion"
   - Small line under the chart: "Capped at 1,024 tokens: every call finished, no better accuracy, 3-10× the energy"
 - **Speaker Notes:**
   - Qwen3-14B 72% → 78%, Qwen3-8B 44% → 47%, Qwen3.8-27B 67% → 67%: all within each other's ranges.
   - On the iPhone-class M1, thinking took Qwen3-14B from 202 to 817 J per call.
-  - Qwen3.5-9B on the hard task hit a 2,048-token budget on every call, and 35 of 36 still at 4,096 (128 s each, 0% correct). On the easy task, 4,096 was enough for most calls (61%).
+  - On the simple task, Qwen3.5-9B never finished thinking on 11 of 18 calls at a 2,048-token budget. Its hard-task result with thinking on isn't on the chart: my harness's grammar cut the thinking off at the first '<' the model wrote, and those calls never produced an answer. That was a bug in my harness, not the model. On the simple task, 4,096 was enough for most calls (61%).
   - Capped at 1,024 tokens, on all three machines: no call truncated, and Qwen3.5-9B hit the cap every time but still answered. Accuracy stayed within range of thinking off (Qwen3-14B 72-83% vs 72%), at 3-10× the energy and 3.5-17× the time.
   - On the iPhone-class M1: Qwen3-14B 202 → 768 J per call; Qwen3.5-9B 99 → 960 J at 105 s per call.
   - Why: a short, bounded judgment doesn't need multi-step reasoning, and some models don't know when to stop. Forward: what if the model gets more of the job?
@@ -232,11 +232,11 @@
 
 ### Slide 14 — I assumed more repeats made a result solid. The die was loaded.
 - **Core Message:** at low temperature, repeats of the same test case mostly agree, so you need many different cases, not many repeats.
-- **Visual Manifest:** Type `Bar_Comparison`. Spec: before ("18 runs = 18 data points") vs after ("repeats agreed 80-90% of the time: closer to 3 data points").
+- **Visual Manifest:** Type `Bar_Comparison`. Spec: before ("18 runs = 18 data points") vs after ("repeats agreed 73-92% of the time: closer to 3 data points").
 - **Suggested Layout:** `Comparison`.
 - **On-Screen Text:**
   - Before column: "18 runs of 3 test cases = 18 data points"
-  - After column: "Repeats agreed 80-90% of the time: closer to 3 data points. '18 of 18' = somewhere between 44% and 100%"
+  - After column: "Repeats agreed 73-92% of the time: closer to 3 data points. '18 of 18' = somewhere between 44% and 100%"
   - Footer: "Do this: test many different cases; compute ranges per case"
 - **Speaker Notes:**
   - Callback to the dice. At temperature 0.2 the wording changed every call but the verdict mostly didn't.
@@ -334,7 +334,7 @@
   - Do column: "One bounded judgment" · "Thinking off (cap it if needed)" · "The model's own chat template"
   - Don't column: "The whole job in one call" · "A quantization or runtime you haven't re-tested" · "The server's default context size"
 - **Speaker Notes:**
-  - The checklist to photograph. A runtime counts like a quantization: switching from llama-server to llama-cpp-python changed borderline answers. One more: below ~1B parameters, expect echoing and loops, not answers.
+  - The checklist to photograph. A runtime counts like a quantization: switching from llama-server to llama-cpp-python changed borderline answers. One more: below ~1B parameters, expect empty answers or loops: the 350M models stopped without writing anything, and the 0.5B model repeated the template until it ran out of tokens.
   - Forward: the rules that apply to any LLM, small or not.
 - **Time:** Section 4, ~1.5 min.
 
@@ -396,7 +396,7 @@
 - **Core Message:** most of these failures were invisible to latency monitoring; watch energy, completion, memory, heat, correctness, call rate and what the cache served.
 - **Visual Manifest:** Type `[NEEDS: new visual type not yet in the supported list]`. Spec: a 7-row table (Signal | Failure it caught | Effect), from the paper's Table VI:
   - energy per decision | thinking on | 202 → 817 J per call, accuracy unchanged
-  - completion rate | thinking runaway | 36/36 calls truncated
+  - completion rate | thinking runaway | 11/18 calls never finished thinking
   - memory headroom | default context size | ~50 GB reserved, ~6 GB needed
   - thermal state | sustained load | cool: 24-77% faster, 30-60% more energy per call
   - correctness, per case | Q4_0 on Gemma-3-4B | errors 0% → 30%, energy −10-41%

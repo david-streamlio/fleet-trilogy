@@ -1,6 +1,15 @@
 # Note: LFM2.5-350M and Granite-4.0-H-350M produced zero parseable output —
 # a third capability-cliff finding, distinct in shape from BitNet and 0.5B
 
+> **Correction (2026-10-06):** these two models did not echo the prompt. Every
+> stored `raw_output` is the prompt followed immediately by ` [end of text]`:
+> `llama-completion` prints the prompt for every model, and LFM2.5-350M and
+> Granite-4.0-H-350M ended their turn at once, writing nothing (the printed prompt
+> also keeps its single-quoted list, so nothing was "normalized"). The finding is
+> an empty answer, not an echo. Qwen2.5-0.5B's failure, by contrast, did generate
+> text: it repeated the placeholder template until the token cap. The record below
+> is kept as written. See `docs/TALK2-HARDWARE-SPECTRUM-TEST-LOG.md` §8, caveat 13.
+
 Factual record from the full-spectrum `make compare-models` run
 (`eval-results/compare-COMP-J2D9D71YNJ-20260925T165011Z.json`, all 9
 `models.toml` entries, M4, 2026-09-25). This is talk material about an honest

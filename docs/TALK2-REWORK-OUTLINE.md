@@ -111,7 +111,7 @@ Every slide has the same four parts: **I assumed**, **what happened** (one numbe
 - **Caveat (2026-10-05):** these per-call numbers repeat one event, so the prompt was cached. A changed prompt costs more: on the Pi 5× with my original prompt, 2.7× with the event fields last (A10).
 
 **A2. "Thinking mode will make it more accurate." It didn't, and sometimes it never answered.** Chart: **Fig. 3** (correctness vs latency by prompt mode).
-- **What happened:** thinking on vs off made no measurable accuracy difference: Qwen3-14B 72% → 78%, Qwen3-8B 44% → 47%, Qwen3.8-27B 67% → 67%, all within each other's ranges. It cost 4-11× the time per call and, on the iPhone-class M1, 4-7× the energy (Qwen3-14B 202 → 817 J). Qwen3.5-9B on the hard task never finished thinking: 36 of 36 calls truncated at 2,048 tokens, and 35 of 36 at 4,096 (128 s each, 0% correct). On the easy task, 4,096 was enough for most calls (61%).
+- **What happened:** thinking on vs off made no measurable accuracy difference: Qwen3-14B 72% → 78%, Qwen3-8B 44% → 47%, Qwen3.8-27B 67% → 67%, all within each other's ranges. It cost 4-11× the time per call and, on the iPhone-class M1, 4-7× the energy (Qwen3-14B 202 → 817 J). Qwen3.5-9B on the easy task never finished thinking on 11 of 18 calls at a 2,048-token budget; at 4,096 most calls finished (61% correct). Its hard-task result with thinking on isn't reported: my harness's grammar ended the thinking at the first "<" the model wrote, so 32 of 36 calls never produced an answer (corrected 2026-10-06; test log incident 27).
 - Capped thinking (budget forcing, 1,024 tokens; all three machines): every call finished (Qwen3.5-9B hit the cap every time but answered), accuracy within range of thinking off (e.g. Qwen3-14B 72-83% vs 72%), at 3-10× the energy and 3.5-17× the time. On the M1: Qwen3-14B 202 → 768 J; Qwen3.5-9B 99 → 960 J at 105 s.
 - **Why:** a short, bounded judgment doesn't need multi-step reasoning, and some models don't know when to stop.
 - **Do this:** turn thinking off for short structured tasks. If you need it, cap it, and measure the completion rate, not just accuracy.
@@ -128,7 +128,7 @@ Every slide has the same four parts: **I assumed**, **what happened** (one numbe
 - **Prompt ablation** (M4 Max and M4 agree; filled in 2026-10-04): lookup tables + the model's own chat template lifted Phi-3.5, Llama-3.1-8B and Qwen3-14B by 36-42 points; worked examples helped Gemma-3-4B but nearly doubled the prompt; temperature 0 and grammar-computed fields added nothing measurable. On the M1, the template variant cost 9-52% more energy per call; worked examples nearly doubled the prompt yet cost −12% to +7%, because answers got shorter.
 
 **A5. "Run each test enough times and the result is solid." The die was loaded.**
-- **What happened:** at temperature 0.2 the wording changed every call, but the verdict mostly didn't: repeats of a test case agreed 80-90% of the time. The production check's 3 test cases × 6 repeats is closer to 3 data points than 18, so "18 of 18 correct" really means somewhere between 44% and 100%.
+- **What happened:** at temperature 0.2 the wording changed every call, but the verdict mostly didn't: repeats of a test case agreed 73-92% of the time (90-92% on the full task, 73-79% on the narrow one). The production check's 3 test cases × 6 repeats is closer to 3 data points than 18, so "18 of 18 correct" really means somewhere between 44% and 100%.
 - **Why:** at low temperature a model is nearly deterministic for a given input. Repeats measure that one input.
 - **Do this:** test many *different* cases, not many repeats; compute ranges per case.
 
@@ -159,7 +159,7 @@ Every slide has the same four parts: **I assumed**, **what happened** (one numbe
 - **Why:** a prompt cache reuses a prompt only up to the first token that changed since the last call. Within one incident a truck's calls repeat the prompt (it carries the trip context, not the sensor readings), so the earlier numbers hold for those calls; a new incident, a changed field, or one device serving several trucks pays the full read. On a CPU, reading the prompt is the slow part; on a GPU, generation is.
 - **Do this:** put the fixed instructions first and the per-request data last, then re-check accuracy: a reorder is a prompt change, and a runtime change is too. Benchmark with inputs that change, and check what your server caches (llama-server's memory cache of earlier prompts served my recurring test events whole until I turned it off).
 
-Speaker-note material, not slides: below ~1B parameters models echo the prompt or loop instead of answering; the same evaluation picked different models for two adjacent tasks (Phi-3.5-mini for triage, Gemma-3-4B for the spoken summary); things that didn't surprise me (faster hardware is faster; small models can't do multi-step work; generation speed roughly follows memory bandwidth).
+Speaker-note material, not slides: below ~1B parameters models give empty answers or loop instead of answering (the 350M models ended their turn without writing anything; the 0.5B model repeated the template until the token cap); the same evaluation picked different models for two adjacent tasks (Phi-3.5-mini for triage, Gemma-3-4B for the spoken summary); things that didn't surprise me (faster hardware is faster; small models can't do multi-step work; generation speed roughly follows memory bandwidth).
 
 ---
 
@@ -171,7 +171,7 @@ Speaker-note material, not slides: below ~1B parameters models echo the prompt o
 - Use the model's chat template.
 - Check every quantization and every runtime, per model.
 - Set the context size for the device.
-- Below ~1B parameters, expect echoing and loops, not answers.
+- Below ~1B parameters, expect empty answers or loops, not answers.
 
 **D2. For all LLMs.**
 - Use them for what they're good at (language judgment); don't force them to be classifiers.
@@ -205,7 +205,7 @@ Speaker-note material, not slides: below ~1B parameters models echo the prompt o
 | Signal | Failure it caught | Effect |
 |---|---|---|
 | Energy per decision | thinking on | 202 → 817 J per call, accuracy unchanged |
-| Completion rate | thinking runaway | 36/36 calls truncated |
+| Completion rate | thinking runaway | 11/18 calls never finished thinking |
 | Memory headroom | default context size | ~50 GB reserved, ~6 GB needed |
 | Thermal state | sustained load | cool: 24-77% faster, 30-60% more energy per call |
 | Correctness, per case | Q4_0 on Gemma-3-4B | errors 0% → 30%, energy −10-41% |

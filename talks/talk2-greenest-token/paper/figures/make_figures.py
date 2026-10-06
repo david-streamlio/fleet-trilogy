@@ -230,7 +230,10 @@ def fig3() -> None:
         pts = []
         for mode, marker, _ in modes:
             r = next((r for r in rows if r["model"] == m and r["mode"] == mode), None)
-            if not r:
+            # Qwen3.5-9B's thinking-on run is a harness artifact, not a measurement: the thinking
+            # grammar (think ::= [^<]*) closed the thought at the first "<" the model wrote, then it
+            # emitted whitespace to the limit, so 32 of 36 calls had no card (test log incident 27).
+            if not r or (m == "qwen3.5-9b" and mode == "chat-on"):
                 continue
             p = r["all_ok"] / r["n"]
             lo, hi = wilson(p * r["n_eff"], r["n_eff"])
@@ -238,7 +241,10 @@ def fig3() -> None:
             ax.errorbar(r["p50"], 100 * p, yerr=[[100 * (p - lo)], [100 * (hi - p)]], fmt=marker, color=color,
                         ms=4.5 * KL, elinewidth=0.6 * KL, capsize=1.5 * KL, zorder=3)
         ax.plot([x for x, _ in pts], [y for _, y in pts], color=color, linewidth=0.7 * KL, alpha=0.6, zorder=2)
-        ax.annotate(label, pts[-1], xytext=(4, 0), textcoords="offset points", fontsize=6.5 * FS, color=color, va="center")
+        # Qwen3.5-9B's last point is now its chat-off one, which sits beside Qwen3-14B's: label it to the left.
+        offset, ha = ((-6, 0), "right") if m == "qwen3.5-9b" else ((4, 0), "left")
+        ax.annotate(label, pts[-1], xytext=offset, textcoords="offset points", fontsize=6.5 * FS, color=color,
+                    va="center", ha=ha)
         rb = next((r for r in budget if r["model"] == m), None)  # thinking capped at 1,024 tokens (budget forcing)
         off = next((r for r in rows if r["model"] == m and r["mode"] == "chat-off"), None)
         if rb and off:

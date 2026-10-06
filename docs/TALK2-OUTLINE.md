@@ -242,7 +242,9 @@ an answer — not the same degenerate-repetition collapse 0.5B showed, and not
 reproduced by Qwen3-0.6B under the identical `-no-cnv` invocation, so it's
 specific to these two families, not a property of skipping the chat template
 in general. Root cause not yet confirmed. Full account:
-`docs/TALK2-350M-PROMPT-ECHO.md`.
+`docs/TALK2-350M-PROMPT-ECHO.md`. *(Corrected 2026-10-06: not an echo. Both
+models ended their turn without writing anything; the printed prompt is
+`llama-completion`'s own echo of its input. See that doc's correction note.)*
 
 This means the extreme-low end of the spectrum has **three differently
 shaped walls** (BitNet's ARM numerical bug, 0.5B's degenerate repetition,
