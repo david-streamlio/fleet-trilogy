@@ -538,6 +538,46 @@ Host runs carry their own trace. The MacBook runs shared `/tmp/m4max-powermetric
 - **In-process vs llama-server on the Pi 4** (run C: event-last, changed events, 18 calls, meter 3,932 mWh / 1,888 s → 7,730 J above idle): **429 J/call, p50 87.2 s**, against llama-server's 416 J, 82.2 s; 4.0 vs 6.7 GB. Same cost within noise; no throttling (0/58). On the M4 Max CPU in-process was ~20% slower (2.59 vs 2.13 s, published prompt).
 - **Scope:** the stream condition is measured on these two devices only. The other Table II rows stay best cases, and the Pi's ratio doesn't transfer: the penalty is prompt reading, cheap on a GPU and dominant on a CPU.
 
+### Whole-card prompt on a 70B model (2026-10-07): could a bigger model do the whole job?
+
+**Why** (user, 2026-10-07): the first attempt's whole-card prompt (2026-09-12, "Flow A": the model classifies severity and writes the whole enrichment card) was wrong on 20-63% of severity calls with the thresholds stated, across 16 models up to Qwen3.8-27B. The 27B was right on every answer it gave, but its raw-completion output was empty on 25-28 of 30 calls (`…20260925T214253Z`, `…20260926T000238Z`). Is the poor accuracy a small-model problem? Outside the 2026-10-04 time box, run at the user's request on non-study hardware.
+
+**Setup:**
+- `tests/model/enrichment_http_check.py`: `test_compare_models.py`'s measurements and sample sizes (30 format trials, 30 grounding trials, 10 severity trials per tier, then 30 per tier when the format rate reaches 80%). The prompt is the same thresholds version (`structured.ENRICHMENT_CARD_PROMPT`), with temperature 0.7, 256 tokens and no grammar.
+- Sent through `HttpLlmBackend` to the user's Mac Studio (M4 Max, 128 GB): LiteLLM in front of vllm-mlx 0.4.1, route `reasoner`, Llama-3.3-70B-Instruct (MLX 4-bit, 37 GB).
+- Differences from the September runs:
+  - the server applies the model's chat template (they sent raw completions);
+  - MLX, not llama.cpp;
+  - 4 concurrent calls, so latencies aren't comparable;
+  - every prompt starts with a unique `Request <uuid4 hex>` line (incident 28).
+
+**Results** (`eval-results/compare-enrichment-http-reasoner-20261007T171911Z.json`):
+
+| Measure | Llama-3.3-70B | Best of the September runs |
+|---|---|---|
+| Format (parsed) | **30 / 30** | 30 / 30 (several models) |
+| Grounding (eta_impact not copied) | **0 / 30** | 3.7% (Qwen2.5-1.5B, 2026-09-12) |
+| Severity, thresholds stated (gate 2) | **0 / 90 wrong** | 20-22% wrong (Qwen3-8B, Phi-3.5-mini) |
+
+- **What it answers:** a large enough model applies the stated thresholds reliably. The small models' severity errors were capacity (plus format, in raw mode), not hardware.
+- **What it doesn't change:** five lines of code get the same answers exactly, on the truck. The 70B took about 7 s a call when asked one call at a time (a handful of diagnostic calls) and needs a 37 GB model on a 128 GB workstation. Energy wasn't measured.
+- **The first run is invalid:** `…20261007T164924Z.json` (30 / 90 wrong; annotated in place). The server's prefix cache corrupted its prompts (incident 28).
+
+### Pi 4: command-line tool vs llama-server, per call (2026-10-07)
+
+**Why** (user, 2026-10-07): the impact track's "~6x" for moving from the command-line tool to llama-server compared two laptop sweeps with 30 vs 9 runs per model, more threads and a working prompt cache, so it couldn't say how much came from not reloading the model. Outside the 2026-10-04 time box, at the user's request.
+
+**Setup and results:** `eval-results/pi4-cli-vs-server-20261007/README.md`. Phi-3.5-mini, the production prompt (506 tokens) and grammar, 4 threads, `-c 4096`, temperature 0.2, one warm-up per arm, no meter.
+
+| Arm | n | Wall p50 | Load | Prompt | Generation |
+|---|---|---|---|---|---|
+| Command-line tool | 10 | 196.0 s | 3.11 s per call (9.1 s cold) | 161.4 s, 506 tokens | 30.8 s, 41 tokens |
+| llama-server, `cache_prompt: false` | 10 | 192.7 s | once, 5.6 s startup | 161.8 s, 506 tokens | 30.9 s, 42 tokens |
+| llama-server, `cache_prompt: true` | 30 | 31.7 s | once | 0.74 s, 1 token | 30.9 s, 42 tokens |
+
+- On the Pi, loading the model is ~1.6% of a call; reading the prompt is ~82%. The server's real win is the prompt cache it keeps across calls (~6.2x), not skipping the reload.
+- Supersedes the slide's "~6x faster" as a per-call claim. The laptop's per-call median gain across 7 models was ~2.8x, mixing reload, 4 → 12 threads and the cache.
+
 ## 6. Incident log
 
 Every problem, its effect on the data, and the fix. "No data impact" means no measurement was affected.
@@ -571,6 +611,7 @@ Every problem, its effect on the data, and the fix. "No data impact" means no me
 | 26 | 10-05 16:39-16:40 | The Pi trial script refused to start twice ("a llama or pytest process is already running"): its `pgrep -f` guard matched the launching SSH command's own command line, which named those processes in a status check | none; nothing ran, and the meter, already zeroed, counted idle time on both sides of the subtraction | relaunched with a command line that doesn't name them (cf. incident 10) |
 | 27 | 10-06 (found) | **The chat-on (thinking) grammar cut Qwen3.5-9B's full-task thinking off.** `round3_eval.wrap_grammar` builds `root ::= think "</think>" [ \t\n]* card` with `think ::= [^<]*`, so the first `<` a model writes is forced to become `</think>`. Qwen3.5-9B, working through the full task's thresholds, wrote "Else (0.22 g " and was about to write `<`: 32 of 36 calls (2,048 budget) closed the thought right there, then filled the rest of the budget with whitespace (~2,100 characters) and never wrote a card. Found by the examples search for the talk; confirmed by an audit of every chat-on file on all three Macs (below). The budget-forcing runs are unaffected: they use no grammar while thinking (the same model writes `0.22 g < decel <= 0.45 g` there in 33 of 36 calls) | **Qwen3.5-9B full task, chat-on, at 2,048 and 4,096 tokens: not a measurement** (the published "36/36 and 35/36 never finished thinking, 0% correct" was mostly this bug; 4 and 1 calls genuinely never closed). Minor elsewhere: Qwen3.5-9B narrow (2-3 forced closes of 18, every one still answered), Qwen3.8-27B full (2 of 18, 1 without a card). **Qwen3-8B and Qwen3-14B: 0 forced closes in every run on every machine**, so thinking on vs off, the 4-11× time and the M1's 202 → 817 J stand | Corrected the paper (text, Table V cell → n/a, Table VI row, Fig. 3 drops the point, new threat "Harness grammar"), the outline, the slide plan and this log. Genuine runaway kept: narrow task, 11 of 18 never closed at 2,048. A fixed grammar (allow `<` not followed by `/think>`) would be needed to measure the full task with uncapped thinking; not re-run |
 | 16 | 22:50 | The default `enabled_proxies` was still the smoke test's `["android-flagship"]`, so a plain `terraform apply` would have destroyed c7g and mac2 mid-run | none (caught) | default = the deployed set; plain plan = no changes |
+| 28 | 10-07 17:00 | **The Mac Studio's vllm-mlx prefix cache corrupted prompts.** After the 70B run's 6.0-minute format trials, prompts that shared that opening reached the model with a stale token spliced in: a 3.0-minute ETA slip arrived as 63.0 and 20.0 as 620.0 (10 of 10 identical answers each, at temperature 0.7; "63" appears nowhere in the prompt). Every 3.0-minute severity call came back wrong (30 / 90 wrong). With a unique first line per call, so the cache can't match, 16 of 16 were right | the first 70B run (`…20261007T164924Z`) is invalid, annotated in place | `enrichment_http_check.py` prefixes every prompt with `Request <uuid4 hex>`; clean rerun `…20261007T171911Z`: 0 / 90. The server-side fix is vllm-mlx's `--disable-prefix-cache` (on by default in 0.4.1): the user's call. Side effect: this session printed the engine's API key once, from the process list; the user should rotate it |
 
 **Incident 27 audit** (2026-10-06): every `compare-round3-*` chat-on artifact. "Forced" = the thought closed without the newline Qwen writes before a natural `</think>` (i.e. the grammar closed it at a `<`); "no card" = forced and then no card, whitespace to the limit; "never closed" = `</think>` never written.
 

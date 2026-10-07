@@ -2,7 +2,7 @@
 
 **The question:** can phones democratize edge intelligence? Measure the same models across the consumer computing spectrum (Pi → phones → laptops), 5 years on from the Pi 4 baseline.
 
-This is the index of every test: done, running, proposed, deferred and rejected. Results live in `eval-results/`. Measured rows go into `TALK2-DATA-ENGINEERING-IMPACT-TRACK.md`. Last updated 2026-10-05 17:45 UTC.
+This is the index of every test: done, running, proposed, deferred and rejected. Results live in `eval-results/`. Measured rows go into `TALK2-DATA-ENGINEERING-IMPACT-TRACK.md`. Last updated 2026-10-07 21:50 UTC.
 
 ## Done
 
@@ -18,6 +18,8 @@ This is the index of every test: done, running, proposed, deferred and rejected.
 | **Real-stream re-measure, Pi 4, published prompt** (2026-10-05): same, with the published prompt order, llama-server `-np 1 --cache-ram 0`, inline meter, 18 calls | Pi 4 | **772 J/call, p50 160 s** (5× the best case); 400 tokens read, 129 s reading vs 31 s writing; 100% / 0%. Same folder |
 | **Pi 4, in-process vs llama-server** (2026-10-05): run A's setup through llama-cpp-python, inline meter, 18 calls | Pi 4 | **429 J/call, p50 87 s** (server: 416 J, 82 s); 4.0 vs 6.7 GB. But benign → "lower" on 3/3 (server: hold). Same folder |
 | **Backend accuracy check, M4 Max CPU** (2026-10-05): llama-server vs in-process × both prompt orders, 45 escalation calls each | the user's M4 Max laptop | in-process leans to "lower" in borderline cases: published prompt 0/45 for both; event-last in-process 15/45 (benign → lower). `eval-results/edge-triage-backend-accuracy-m4max-20261005/` |
+| **Whole-card prompt on a 70B** (2026-10-07, user request, outside the time box): the first attempt's thresholds prompt, `tests/model/enrichment_http_check.py`, through LiteLLM/vllm-mlx | the user's Mac Studio (M4 Max, 128 GB) | **Llama-3.3-70B: 0 / 90 severity wrong**, 30 / 30 format, 0 / 30 grounding (September best: 20-22% wrong). The first run is invalid: prefix-cache corruption, test log incident 28. `eval-results/compare-enrichment-http-reasoner-20261007T171911Z.json` |
+| **Pi 4: command-line tool vs llama-server, per call** (2026-10-07, user request): Phi-3.5, production prompt and grammar, 4 threads, -c 4096; 10 CLI calls, 10 server calls with cache_prompt off, 30 with it on | Pi 4 | **CLI 196.0 s (3.1 s of it loading the model) → server, cache off 192.7 s → cache on 31.7 s**; prompt 161 s of each uncached call. Not reloading saves ~1.7%; the cache, ~6.2×. `eval-results/pi4-cli-vs-server-20261007/` |
 | **Real-stream re-measure, M4 Max** (2026-10-05): same, both prompt orders, 3 reps × 60 calls, `powermetrics`, llama-server with one slot and no RAM prompt cache (`-np 1 --cache-ram 0`) | the user's M4 Max laptop | **published prompt 25.0 J, p50 0.70 s (400 tokens read); event-last 18.5 J, 0.49 s (148)**; best case ~15 J, 0.36 s. A first run with server defaults restored the recurring events from llama-server's RAM cache (1 token read): kept as evidence. `eval-results/edge-triage-event-last-m4max-20261005/` |
 
 **mac2 headline:** on the two calibration models, M1's Metal generation matches published iPhone 17 Pro figures:
