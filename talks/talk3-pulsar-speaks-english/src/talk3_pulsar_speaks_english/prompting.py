@@ -121,8 +121,10 @@ def generate_spoken_warning(
     reroute_recommended: bool,
     reroute_detail: str | None,
     config: LlmGenerationConfig | None = None,
+    template: str | None = None,
 ) -> str:
-    """Run inference and return the spoken warning text.
+    """Run inference and return the spoken warning text. `template` (None means
+    SYNTHESIS_WARNING_PROMPT) is passed to render_synthesis_prompt.
 
     Prefers the requested `{"spoken_warning": "..."}` shape, reusing
     llm_inference.structured.extract_json_object (public precisely so callers like
@@ -140,6 +142,7 @@ def generate_spoken_warning(
         scope=scope,
         reroute_recommended=reroute_recommended,
         reroute_detail=reroute_detail,
+        template=template if template is not None else SYNTHESIS_WARNING_PROMPT,
     )
     completion = backend.generate(prompt, config)
     try:

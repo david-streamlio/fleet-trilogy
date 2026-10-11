@@ -136,6 +136,14 @@ anything). Optional settings pass through `--user-config`:
   in its chat template. On a Mac, add `-dev none -ngl 0` for CPU only: without
   them a Metal build of llama.cpp runs on the GPU.
 - `CORRIDOR_THRESHOLD` (cards per corridor before synthesizing; default 2).
+- `prompt_template`, `max_tokens` (default 256) and `temperature` (default 0.7):
+  user-config keys only — `run_tier2_localrun.sh` and the Talk 3 windows don't set
+  them, so the demo keeps the built-in prompt. Add them to the `--user-config` JSON
+  by hand. `prompt_template` replaces `SYNTHESIS_WARNING_PROMPT`; it's a Python
+  `str.format` template that may use `{corridor}`, `{truck_count}`, `{scope}`,
+  `{reroute_recommended}`, `{reroute_detail}`, `{cards}` and `{reroute_rule}`, with
+  literal braces doubled (`{{ }}`). Any other field fails on the first message,
+  before the model is called.
 
 **Every `*localrun*.sh` script needs the `functions` dependency group** — the
 imports of `pulsar-admin functions localrun`'s Python instance (protobuf 6.x,

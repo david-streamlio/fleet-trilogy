@@ -47,9 +47,38 @@ from llm_inference import (
     SubprocessLlmBackend,
 )
 
+from talk3_pulsar_speaks_english.prompting import SYNTHESIS_WARNING_PROMPT
 from talk3_pulsar_speaks_english.synthesizer import synthesize
 
 DEFAULT_CORRIDOR_THRESHOLD = 2
+
+# Every field render_synthesis_prompt passes to template.format(), with dummy
+# values, so a user-config prompt_template can be checked once at configure time.
+_TEMPLATE_FIELDS = {
+    "corridor": "I-95N",
+    "truck_count": 2,
+    "scope": "corridor_wide",
+    "reroute_recommended": True,
+    "reroute_detail": "none",
+    "cards": "- (truck-47) traffic_incident_suspected",
+    "reroute_rule": "",
+}
+
+
+def _validate_prompt_template(template: str) -> None:
+    """Fail fast on a prompt_template that render_synthesis_prompt can't fill."""
+    try:
+        template.format(**_TEMPLATE_FIELDS)
+    except KeyError as exc:
+        raise ValueError(
+            f"prompt_template uses unknown field {{{exc.args[0]}}}; available "
+            f"fields: {', '.join(sorted(_TEMPLATE_FIELDS))}"
+        ) from exc
+    except (IndexError, ValueError) as exc:
+        raise ValueError(
+            f"prompt_template is not a valid format string: {exc} "
+            "(positional fields aren't supplied; double literal braces as {{ }})"
+        ) from exc
 
 
 class GlobalSynthesisFunction:
@@ -63,6 +92,7 @@ class GlobalSynthesisFunction:
     def __init__(self, *, corridor_threshold: int = DEFAULT_CORRIDOR_THRESHOLD) -> None:
         self._backend: LlmBackend | None = None
         self._config: LlmGenerationConfig | None = None
+        self._prompt_template = SYNTHESIS_WARNING_PROMPT
         self._corridor_threshold = corridor_threshold
         self._accumulator: dict[str, list[EnrichmentCard]] = defaultdict(list)
 
@@ -75,7 +105,9 @@ class GlobalSynthesisFunction:
         if len(cards) < self._corridor_threshold:
             return None
 
-        synthesis = synthesize(cards, backend, config=self._config)
+        synthesis = synthesize(
+            cards, backend, config=self._config, template=self._prompt_template
+        )
         self._accumulator[card.corridor] = []
         return to_json(synthesis) if synthesis is not None else None
 
@@ -89,7 +121,13 @@ class GlobalSynthesisFunction:
         corridor needs before it's synthesized (e.g. 3 for a three-truck demo).
         `threads` (llama.cpp's -t, default 4) and `timeout_seconds` (default 60)
         override the generation settings, e.g. threads=1 to run the model on a
-        single CPU core.
+        single CPU core. `max_tokens` (default 256) and `temperature` (default 0.7)
+        likewise override LlmGenerationConfig. `prompt_template` replaces
+        prompting.SYNTHESIS_WARNING_PROMPT; it's a str.format template over the
+        fields render_synthesis_prompt passes (corridor, truck_count, scope,
+        reroute_recommended, reroute_detail, cards, reroute_rule -- it may leave any
+        out), checked here so a bad field fails on the first message rather than on
+        every synthesis.
 
         `llm_backend` picks how the model runs:
         - `inprocess` (default since 2026-10-05): llama-cpp-python inside this
@@ -127,6 +165,9 @@ class GlobalSynthesisFunction:
             raise ValueError(
                 f"llm_backend must be 'inprocess' or 'subprocess', got {kind!r}"
             )
+        if user_config.get("prompt_template"):
+            _validate_prompt_template(user_config["prompt_template"])
+            self._prompt_template = user_config["prompt_template"]
         if user_config.get("corridor_threshold"):
             self._corridor_threshold = int(user_config["corridor_threshold"])
         overrides = {}
@@ -134,6 +175,10 @@ class GlobalSynthesisFunction:
             overrides["threads"] = int(threads)
         if user_config.get("timeout_seconds"):
             overrides["timeout_seconds"] = float(user_config["timeout_seconds"])
+        if user_config.get("max_tokens"):
+            overrides["max_tokens"] = int(user_config["max_tokens"])
+        if user_config.get("temperature") not in (None, ""):  # 0 is a real setting
+            overrides["temperature"] = float(user_config["temperature"])
         if overrides:
             self._config = LlmGenerationConfig(**overrides)
         self._backend = backend

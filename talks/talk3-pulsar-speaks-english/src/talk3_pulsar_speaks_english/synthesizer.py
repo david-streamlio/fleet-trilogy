@@ -101,6 +101,7 @@ def synthesize(
     incident_id: str | None = None,
     config: LlmGenerationConfig | None = None,
     max_attempts: int = DEFAULT_WARNING_ATTEMPTS,
+    template: str | None = None,
 ) -> IncidentSynthesis | None:
     """Aggregate one corridor's worth of enrichment cards into an IncidentSynthesis.
 
@@ -114,6 +115,8 @@ def synthesize(
     docs/CANON.md's "LLM interprets/narrates, never decides" rule. Each phrasing is
     checked against the facts (fact_check.check_warning); after `max_attempts`
     failed phrasings, fact_check.fallback_warning() words it in plain code.
+    `template` (None means prompting.SYNTHESIS_WARNING_PROMPT) is used for every
+    attempt.
     """
     if not cards:
         return None
@@ -133,6 +136,7 @@ def synthesize(
             reroute_recommended=reroute_recommended,
             reroute_detail=reroute_detail,
             config=config,
+            template=template,
         )
         problems = check_warning(
             candidate,
