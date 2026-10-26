@@ -35,8 +35,9 @@ Q4_K_M, median of 10 calls).
   (in-process, one CPU thread). No title, no setup.
 - *"That was a Pulsar Function talking. A small LLM inside it wrote that
   sentence, on one CPU core, no GPU."*
-- Backing: take 5, `deploy/recordings/talk3-demo-20261004-182716.mp4` and its
-  WAV (take 4 ran on the GPU through the old subprocess path).
+- Backing: take 6, `deploy/recordings/talk3-demo-20261005-090519.mp4` and its
+  WAV (take 4 ran on the GPU through the old subprocess path; take 5 was
+  dropped).
 
 ## Act 1 — Where the words come from (~5 min, 4 slides incl. divider)
 
@@ -137,12 +138,12 @@ call). Backing: `gating_counts.txt`; `docs/TALK1-SLIDE-PLAN.md` 19–21.
 
 ## Not yet decided / needs your input
 
-- **Sign off on take 5** (`deploy/recordings/talk3-demo-20261004-182716.mp4`,
-  recorded on the M4 Max with the current defaults), or re-take it on the
-  external-display machine.
+- **Sign off on take 6** (`deploy/recordings/talk3-demo-20261005-090519.mp4`,
+  recorded 2026-10-05 on the external-display machine with the current
+  defaults).
 - **Real gating ratio** from a live Edge Triage run, to replace the simulator's
   28–33%.
-- **"Before" audio clips** for the I-95N/ETA slide (raw Piper, normalization
-  off).
+- **"Before" audio clips: done** (2026-10-05),
+  `deploy/recordings/.talk3-slide24-clips/`.
 - **"1-bit" language check** (carried over from Talk 2's open items): this
   outline avoids 1-bit framing; keep it that way in the deck.

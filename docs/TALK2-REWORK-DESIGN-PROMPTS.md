@@ -1,28 +1,24 @@
-# Talk 2: Claude design prompts (rework deck, 2026-10-04)
+# Talk 2: Claude design build prompts (draft 4 deck, 2026-10-06)
 
-Paste-ready prompts that turn the slide plan into the deck. The talk is on 2026-10-08.
+Paste-ready prompts that build the deck from the draft 4 slide plan: the hero's-journey arc with seven "The greenest token is…" techniques and the explorer's journey. The talk is on 2026-10-08.
 
-**What to upload to the Claude design project first:**
-1. `docs/TALK2-REWORK-SLIDE-PLAN.md`: the locked content spec (28 slides).
-2. The seven chart images from `talks/talk2-greenest-token/slides/charts/`:
-   - `slide_dice.png` (slide 7)
-   - `slide_fig1_speed.png` (slide 8)
-   - `slide_fig2_energy.png` (slide 10)
-   - `slide_fig3_thinking.png` (slide 11)
-   - `slide_fig5_task_scope.png` (slide 12)
-   - `slide_changed_prompt.png` (slide 19)
-   - `slide_fig4_energy_per_day.png` (slide 24)
+This replaces the 2026-10-04 prompts for the 28-slide plan (in git at `990b1b4`) and supersedes `docs/TALK2-DESIGN-REVISION-PROMPTS.md`. Build a **new** deck rather than revising the old one: two thirds of the slides changed.
 
-   SVG versions sit beside them if the tool prefers vector.
-3. If you have it, the `DATADOG_MARKETING_DECK` design-system export: the "LH - Datadog Design System" dev kit or the "Datadog Design System Slides" HTML export, the same 2025 template. Without it, Prompt 0's tokens are enough to start.
+**Upload to the Claude design project first:**
+1. `docs/TALK2-REWORK-SLIDE-PLAN.md`: the locked content spec (33 slides).
+2. Three chart images from `talks/talk2-greenest-token/slides/charts/` (SVGs sit beside them):
+   - `slide_fig1_speed.png` (slide 17);
+   - `slide_changed_prompt.png` (slide 27, small inset);
+   - `slide_fig3_thinking.png` (slide 29).
+3. Talk 1's slides 6 and 9, if the tool can't copy them from the "Talk 1: Edge Intelligence" project: screenshots or the project URL.
+4. The `DATADOG_MARKETING_DECK` design-system export, if you have it. Without it, Prompt 0's tokens are enough.
 
-**Order:** Prompt 0, then 1, 2 and 3 (one batch each), then 4 (QA). Prompt 5 is for later, when the pending data arrives.
-
-**Updated 2026-10-05:** the plan gained slide 19 (assumption 10, prompt order and caching), so slides 19-27 became 20-28. If you already built the deck from the 27-slide plan, send Prompt 6 instead of rebuilding. If you sent Prompt 6 before the evening of 2026-10-05, re-send it: slide 19 became a chart slide, and slides 18, 20 and 25 changed since.
+**Order:** Prompt 0, then 1, 2 and 3 (one batch each), then 4 (QA). Prompt 5 is for later, when the image, the dashboard and the paper link exist.
 
 **Why these rules exist:**
-- **Planning tags reached the slides last time.** The previous Talk 2 build put planning-doc tags and file names on slides (`docs/TALK2-DECK-BUILD-PROMPT.md`). This time pending data must be *visible*, but as a designed chip, never as raw bracket syntax.
-- **The design tool defaults to DRUIDS.** It tends to apply the org's default design system, which is DRUIDS, a product-UI system. That's wrong for a deck.
+- **Planning tags have reached the slides before.** That was the first Talk 2 build (`docs/TALK2-DECK-BUILD-PROMPT.md`).
+- **The design tool defaults to DRUIDS,** a product-UI system that's wrong for a deck.
+- **This deck shows real model prompts and outputs, mistakes included.** The tool must not tidy them.
 
 ---
 
@@ -31,91 +27,102 @@ Paste-ready prompts that turn the slide plan into the deck. The talk is on 2026-
 ```
 You are building the slides for "The Greenest Token" (Talk 2 of a three-talk conference series), a 40-minute talk on 2026-10-08 for data practitioners. The attached TALK2-REWORK-SLIDE-PLAN.md is a locked content spec: build exactly what it says, in order. Don't improve, embellish or summarize it. I'll send the slides in three batches after this message; for now, set up the deck and confirm these rules.
 
-1. Structure. Exactly 28 slides, numbered and titled as in the plan. Each slide uses the native slide type named in its "Suggested Layout" field. Don't add, merge, drop or reorder slides. Plate slides (Title, Section, Quote, Closing) are full-bleed with title-level text only.
+1. Structure. Exactly 33 slides, numbered and titled as in the plan. Each slide uses the native slide type named in its "Suggested Layout" field. Don't add, merge, drop or reorder slides. Plate slides (Title, Section, Statement, Closing) are full-bleed with title-level text only.
 
-2. Content. Use each slide's "On-Screen Text" verbatim. Put its "Speaker Notes" verbatim in the slide's presenter notes. Never add a claim, number, title, tagline or statistic that isn't in the plan, and never change a number. Where the plan gives a chart's data in "Visual Manifest → Spec", that data is authoritative.
+2. Content. Use each slide's "On-Screen Text" verbatim. Put its "Speaker Notes" verbatim in the slide's presenter notes. Never add a claim, number, title, tagline or statistic that isn't in the plan, and never change a number.
 
-3. Placeholders. The plan marks data still being collected as [PLACEHOLDER: label]. Render every one as the same designed "data pending" chip: a rounded pill with an amber (#FF9B00) 1.5px outline, a small "DATA PENDING" eyebrow in Roboto Mono caps, then the label in plain text. The chip must be easy to spot and replace later. Never show the raw bracket text.
+3. Verbatim code panels. When the plan gives a model prompt, a model output, JSON or code in a fenced block, show it as a code panel (Roboto Mono, small, syntax-highlighted) exactly as written. You may shorten it only where the plan already has "…". Never paraphrase, reformat or fix a model's output, including its mistakes, single quotes, cut-off endings and odd wording. That's the point of those slides.
 
-4. Other planning tags. [SOURCE: …] and [NEEDS: …] are instructions to you, not audience text. Never render them. Keep the surrounding words and numbers as written (on slide 23, render the footnote's citation, "*Google (2025), median Gemini text prompt including data-center overhead", without the bracket). File paths, file names (.md, .png, .tex) and "Backing:" lines go in presenter notes only, never on a slide.
+4. Highlights, not rewrites. Where the plan asks for a highlight and callout, put a colored highlight or outline on the existing text plus the short callout label the plan gives. Don't change the text under it.
 
-5. Design system: DATADOG_MARKETING_DECK, the 2025 Datadog presentation template. Do NOT use DRUIDS or any product-UI design system, even if it's this workspace's default. If I've uploaded the marketing-deck design-system export, use its real components and assets. Otherwise use these tokens:
+5. Pending items:
+   - [PLACEHOLDER: label] renders as a designed "pending" chip: a rounded pill with an amber (#FF9B00) 1.5px outline, a small "PENDING" eyebrow in Roboto Mono caps, then the label in plain text.
+   - [IMAGE: description] renders as an image panel with a dashed amber outline, an "IMAGE PENDING" eyebrow and the description as a small caption, sized where the final image will go.
+   - Never show raw bracket text.
+
+6. Other planning tags. [NEEDS: …] is an instruction to you, not audience text: never render it. File paths, file names (.md, .png, .json, .tex), commit hashes and "Backing:" lines go in presenter notes only, never on a slide.
+
+7. Design system: DATADOG_MARKETING_DECK, the 2025 Datadog presentation template. Do NOT use DRUIDS or any product-UI design system, even if it's this workspace's default. If I've uploaded the marketing-deck design-system export, use its real components and assets. Otherwise use these tokens:
    - canvas 1280×720;
    - violet #5C00EF / #9C43FE with #8000FF accent; #632CA6 for the logo mark only;
    - accents green #00B765, blue #0060FF, cyan #00CAFF, orange #FF5E00, amber #FF9B00, pink #FF0080, mint #57E8B3, magenta #D32D96;
    - Roboto for text (bold titles), Roboto Mono for numerals, labels and code;
    - type scale: display 88, h1 64, h2 48, h3 34, h4 26, lead 22, body 17, small 15, eyebrow 13, caption 12 (px);
    - light content slides (black text on white);
-   - full-bleed violet plates with the point-up hexagon-line pattern, or the low-poly backgrounds, for Title/Section/Quote/Closing;
+   - full-bleed violet plates with the point-up hexagon-line pattern, or the low-poly backgrounds, for Title/Section/Statement/Closing;
    - cards with hairline borders and soft low shadows; no heavy drop shadows; no eco/green re-theme.
 
-6. Voice. First person ("I assumed…"), as written in the plan. That's the speaker's choice and overrides any template rule preferring "you/we". Sentence case; numbers in Roboto Mono; no emoji; no superlatives.
+8. Recurring families:
+   - Slides 7-13 ("The greenest token is…") are one family. Use the same eyebrow "THE GREENEST TOKEN IS…" in Roboto Mono caps, the title completing the sentence, the technique line, then one or two big numbers in Roboto Mono, all in the same positions on every slide. Cycle the accent color per slide.
+   - Slides 21-29 (the fixes) carry their technique's line as an eyebrow (e.g. "…NEVER SENT TO THE DATA CENTER") in the same style, so the audience can match each fix to its technique.
 
-7. Charts. Slides 7, 8, 10, 11, 12, 19 and 24 use the uploaded chart images. Place each large in the content region with the slide's text beside or below it. Don't redraw a chart unless you can reproduce it exactly from the plan's Spec data in Roboto and the deck palette; never alter, round or extend its values.
+9. Voice. First person, as written. Sentence case; numbers in Roboto Mono; no emoji; no superlatives.
 
-8. Names. The system is the "Edge Triage Pipeline" (never "Flow B"). Model names exactly as written (e.g. Qwen3.5-9B, Phi-3.5-mini, Gemma-3-4B).
+10. Charts. Slides 17, 27 and 29 use the uploaded chart images. Don't redraw, alter, round or extend them.
 
-Reply with a one-paragraph confirmation of the design system you'll use and how a "data pending" chip will look, then wait for batch 1.
+11. Names. The system is the "Edge Triage Pipeline" (never "Flow B"). Model names exactly as written (e.g. Qwen2.5-1.5B, Qwen3.5-9B, Phi-3.5-mini, Gemma-3-4B, Llama-3.1-8B).
+
+Reply with a one-paragraph confirmation of the design system you'll use and how a "pending" chip and an "image pending" panel will look, then wait for batch 1.
 ```
 
 ---
 
-## Prompt 1: slides 1-8 (Opening, Section 1, Section 2)
+## Prompt 1: slides 1-13 (the dragon; the greenest token is…)
 
 ```
-Build slides 1-8 from the attached plan, following the rules from my first message.
+Build slides 1-13 from the attached plan, following the rules from my first message.
 
-- Slide 1 (Title plate): title, subtitle and speaker line only.
-- Slide 2 (Stats): two stat blocks. Both numbers are pending, so render each as a "data pending" chip in the stat position, with its label (IEA data-center electricity, 2024; projected 2030). Show the line "They aren't going away. What can I do as a developer?" as the slide's lead sentence.
-- Slide 3 (Quote plate): the abstract as one large blockquote, attribution "— my accepted abstract for this talk". This quote returns on slide 26, so make it look like a promise, not a footnote.
-- Slide 4 (Content): question headline plus the three lines. The second line contains a "data pending" chip (smartphones in use) inline at the start of the sentence.
-- Slide 5 (Three-up): three cards, Accuracy / Speed / Power, each with its one-line question; the caption line beneath in small type.
-- Slide 6 (Metric / Code + KPI): the JSON telemetry event as a syntax-highlighted code block on the left, exactly as written (11 lines). On the right the KPI "raise · hold · lower" in large Roboto Mono, labeled "the one thing the LLM decides", and the sub-line "532 B every 5 s in → only high-severity cards cross the cellular link".
-- Slide 7 (Content): the uploaded slide_dice.png as the main visual, with the three short lines (Accuracy / Speed / Power) beside it.
-- Slide 8 (Content): slide_fig1_speed.png large, with the three lines as a narrow side column. Emphasize "M1 ≈ iPhone 17 Pro (within 9%)".
+- Slide 1 (Title plate): title "The Greenest Token", subtitle "is the one that never hits a GPU", speaker line.
+- Slide 2 (Stats, with an image): the [IMAGE] panel large (left half, or full-bleed behind a translucent card row), and the five stat cards exactly as in the plan. Each card shows its big number in Roboto Mono, the one-line label, and the source line in caption type. Make the cards readable from the back of a room: number first, label second, source last.
+- Slide 3 (Three-up): three stat cards in the same style as slide 2. The title is "AI is the growth engine, and we're feeding it".
+- Slide 4 (Statement plate): the question alone.
+- Slide 5 (Content): the four-node chain drawn natively, left to right with arrows, then the analogy line below it in lead type.
+- Slide 6 (Section plate): "The greenest token is…" / "Seven ways to stop feeding the dragon".
+- Slides 7-13: the "greenest token" family (rule 8). Slide 8's three-box flow is drawn natively, in the family style, in place of the big number.
 
 When done, list any slide where you made a judgment call rather than a literal transcription.
 ```
 
-## Prompt 2: slides 9-19 (Section 3: "I assumed… it didn't")
+## Prompt 2: slides 14-29 (how I found them)
 
 ```
-Build slides 9-19 from the attached plan, following the same rules.
+Build slides 14-29 from the attached plan, following the same rules.
 
-Slide 9 is a Section plate ("I assumed… it didn't" / "Ten assumptions, and what the data said").
-
-Slides 10-19 are a series of ten assumptions, so they must look like one family:
-- An eyebrow on every slide, "ASSUMPTION 1 OF 10" through "ASSUMPTION 10 OF 10" (Roboto Mono caps).
-- The headline is the slide title from the plan: "I assumed … . It didn't." The verdict half may be visually emphasized.
-- A "Do this:" line in the same position on every slide (bottom band or footer), styled as a takeaway (e.g. a mint or green left rule with bold "Do this:"). Use the plan's footer/third line text for it.
-- Vary the accent color per slide (cycle violet, blue, pink, orange, cyan, green, magenta) so the run of similar layouts stays lively.
-
-The slides:
-- Slides 10-12 (Content, chart slides):
-  - 10: slide_fig2_energy.png;
-  - 11: slide_fig3_thinking.png (it includes the capped-thinking diamonds), with the plan's small line under the chart;
-  - 12: slide_fig5_task_scope.png.
-
-  Put the chart large, with the first two on-screen lines beside it and the "Do this:" line in its usual place.
-- Slide 19 (Content, chart slide): slide_changed_prompt.png large, with the plan's first two on-screen lines beside it and the "Do this:" line in its usual place; same eyebrow and accent treatment as the rest of the series.
-- Slides 13-18 (Comparison): left column = what I assumed (the plan's "Before column"), right column = what happened (the plan's "After column"), highlighted as the winning side, with the "Do this:" line in its usual place. Slide 13 also has two small lines under the right column, both from the plan: "Lookup tables + the chat template lifted 3 of 4 small models by 36-42 points" and "On the M1, worked examples nearly doubled the prompt but cost no more energy: answers got shorter".
+- Slide 14 (Section plate): "How I found them" / "One truck, one small model, a lot of wrong turns".
+- Slides 15 and 16 are reused from the "Talk 1: Edge Intelligence" deck (its slides 6 and 9). Copy them if you can, otherwise rebuild them from the uploaded screenshots, keeping their layout and art. Then apply exactly these wording changes, and nothing else:
+  - Slide 15 ("Stream Everything to the Cloud? Too Slow."):
+    - the Data Lakes tag "Up to 95% Noise Data" becomes "every raw reading";
+    - the Data efficiency badge's BEFORE becomes "every reading: 9.2 MB per truck-day".
+  - Slide 16 ("Put the Judgment on the Truck"):
+    - "Sub-second Local Action" becomes "Local action, no round trip";
+    - "Filtered Anomalies Only (Up to 90% Bandwidth Savings)" becomes "Filtered anomalies only (~4 KB per incident instead of 9.2 MB a day)";
+    - Decision latency AFTER becomes "decided on the truck, no round trip";
+    - Data efficiency BEFORE becomes "every reading: 9.2 MB per truck-day", AFTER becomes "~4 KB per incident".
+  - On both slides the Network risk badge stays as it is.
+- Slide 17 (Content): slide_fig1_speed.png large, the three lines as a narrow side column; emphasize "M1 ≈ iPhone 17 Pro (within 9%)".
+- Slide 18 (Metric / Code + KPI): the prompt as a code panel exactly as written (keep the single-quoted list: it matters two slides later), and the KPI "6 fields, 1 call".
+- Slide 19 (Stats): four stat blocks, each with a small measure chip, SPEED (cyan #00CAFF) or ACCURACY (blue #0060FF), as the plan tags them.
+- Slide 20 (Content): three code panels side by side or stacked, each with its header, verbatim, with the callouts on the exact text the plan names. Panel 1 ends mid-word ("truck-"): keep it that way.
+- Slides 21-29: the fix family (rule 8):
+  - 21: three stat blocks.
+  - 22: Code + KPI, the payload JSON with two highlight colors and their callouts.
+  - 23-26: Comparison, two columns, verbatim panels, highlights and badges as the plan says. On 24 the three highlights share one color, with the callout "work moved from code into the model".
+  - 27: two stacked-block prompt diagrams drawn natively, with dashed "cache ends at the first line that changes" lines and orange shading below them; slide_changed_prompt.png only as a small optional inset.
+  - 28: Three-up.
+  - 29: slide_fig3_thinking.png large, the two mini-cards beside it, the summary line under them.
 
 When done, list any judgment calls.
 ```
 
-## Prompt 3: slides 20-28 (Sections 4 and 5, closing)
+## Prompt 3: slides 30-33 (what you can do)
 
 ```
-Build slides 20-28 from the attached plan, following the same rules.
+Build slides 30-33 from the attached plan, following the same rules.
 
-- Slides 20-21 (Comparison): "Do" column vs "Don't" column, three items each on slide 20 and four on slide 21. Make these the most photographable slides in the deck: generous type, green check marks on Do, orange crosses on Don't, nothing else on the slide.
-- Slide 22 (Section plate): "Does the thesis hold?" with the thesis as subtitle.
-- Slide 23 (Three-up): three cards with the plan's card titles and lines. Footnote (small, grey #787878, leading "*"): "*Google (2025), median Gemini text prompt including data-center overhead".
-- Slide 24 (Content): slide_fig4_energy_per_day.png large, three lines beside it. Make "Energy = calls × joules per call" the visual anchor of the text column.
-- Slide 25 (Content): a clean 7-row, 3-column table (Signal | Failure it caught | Effect) exactly as in the plan; numbers in Roboto Mono. A small "data pending" chip in a corner slot labeled "Datadog dashboard screenshot".
-- Slide 26 (Comparison): left = "What I promised" (the abstract's three claims), right = "What I measured" (three findings). Each finding gets a verdict badge: "Untested" (grey), "Smaller in practice" (amber), "Confirmed" (green). Visually echo slide 3's quote styling on the left column, so the callback is obvious.
-- Slide 27 (Content): the three lines, then the closing line large and bold across the bottom: "The energy savings came from not calling the model, not from making each call cheaper." This is the line the talk ends on, so give it the most visual weight in the deck.
-- Slide 28 (Closing plate): "Thank you", the subtitle line with the paper link as a "data pending" chip, and the speaker line.
+- Slide 30 (Content): the eight items as a checklist in two columns of four, generous type, a green check per item, nothing else on the slide. This is the slide people will photograph.
+- Slide 31 (Content): the lead line "Latency looked fine. These didn't." large, then a clean 7-row, 3-column table (Signal | Failure it caught | Effect) exactly as in the plan; numbers in Roboto Mono. A small "pending" chip in a corner slot, labeled "Datadog dashboard screenshot of these signals".
+- Slide 32 (Content): five rows. Each starts with the assumption in quotes (bold), then what happened (regular). Give row 1 slightly more weight.
+- Slide 33 (Closing plate): "Thank you", the subtitle line with the paper link as a "pending" chip, and the speaker line.
 
 When done, list any judgment calls.
 ```
@@ -124,49 +131,27 @@ When done, list any judgment calls.
 
 ```
 Do a final check of the whole deck against the attached plan and report the results as a list:
-1. Count: exactly 28 slides, in the plan's order, each with its named native type. No two full-bleed plate slides adjacent.
-2. Text-only scan of every slide's visible content (not presenter notes). None of these may appear: "[", "]", "PLACEHOLDER:", "SOURCE", "NEEDS", "TODO", ".md", ".png", ".tex", "Backing:", "Flow B".
-3. "Data pending" chips: exactly these, all in the same style:
-   - slide 2 (two chips)
-   - slide 4
-   - slide 25
-   - slide 28
-4. Numbers: spot-check every number on slides 6, 8, 10-19, 23-26 against the plan; list any mismatch.
-5. Voice: first person preserved; sentence case; no emoji.
-6. Presenter notes: present on every slide, matching the plan's Speaker Notes.
+1. Count: exactly 33 slides, in the plan's order, each with its named native type. No two full-bleed plate slides adjacent.
+2. Text-only scan of every slide's visible content (not presenter notes). None of these may appear: "PLACEHOLDER:", "IMAGE:", "NEEDS", "TODO", "Backing:", ".md", ".png", ".json", ".tex", "Flow B", a commit hash.
+3. Pending items, all in the same styles: an image panel on slide 2; chips on slides 31 and 33.
+4. Verbatim check: every code panel on slides 18, 20, 22-26 matches the plan character for character, apart from cuts the plan marks with "…". Model mistakes, single quotes and the cut-off "truck-" are preserved.
+5. Talk 1 slides 15 and 16: the wording changes are applied and nothing else changed. Neither slide says "sub-second", "95%" or "90%".
+6. Numbers: spot-check every number on slides 2, 3, 7-13, 17, 19, 21, 23, 25-29 and 31-32 against the plan; list any mismatch.
+7. Families: slides 7-13 share one layout; slides 21-29 each carry their eyebrow.
+8. Presenter notes: present on every slide, matching the plan's Speaker Notes.
 Fix anything that fails, then summarize what you changed.
 ```
 
-## Prompt 5: fill in pending data (later, when the runs are in)
+## Prompt 5: fill in pending items (later)
 
-Send one message per update, filled in from the results (Claude Code will prepare the exact values):
-
-```
-Replace the "data pending" chip on slide <N> with: <final text or number>. Keep the slide's layout; don't change anything else. If the new text is longer than the chip, reflow only that line.
-```
-
-| Slide | Pending item | Expected | Source when ready |
-|---|---|---|---|
-| 2 | IEA data-center electricity (2024; 2030 projection) | before the talk | IEA "Energy and AI" (2025): confirm the figures |
-| 4 | smartphones in use worldwide | before the talk | a citable figure (e.g. an industry survey) |
-| ~~11~~ | capped thinking: **filled in** 2026-10-05 (the slide plan's line and notes; Fig. 3 regenerated with the capped points) | done | — |
-| ~~13~~ | worked-examples energy on the M1: **filled in** 2026-10-05 | done | — |
-| 25 | Datadog dashboard screenshot | after the slides | `talks/talk2-greenest-token/TODO-DATADOG-DASHBOARD-DEMO.md` |
-| 28 | paper link | when available | — |
-
-## Prompt 6: insert assumption 10 into a deck built from the 27-slide plan (2026-10-05)
-
-Upload the updated `docs/TALK2-REWORK-SLIDE-PLAN.md` and `talks/talk2-greenest-token/slides/charts/slide_changed_prompt.png` first, then send:
+Send one message per item:
 
 ```
-The attached plan has changed: it now has 28 slides. Update the existing deck without rebuilding it:
-1. Insert the plan's new slide 19 ("I assumed my benchmark measured the cost of a call. It measured the cost of a repeat.") after the current slide 18 as a chart slide like slides 10-12: the uploaded slide_changed_prompt.png large, the plan's two on-screen lines beside it, the "ASSUMPTION 10 OF 10" eyebrow, the "Do this:" line in its usual place, its own accent color. Use its On-Screen Text verbatim and its Speaker Notes as presenter notes.
-2. Change every assumption eyebrow to "ASSUMPTION N OF 10" (slides 10-19), and slide 9's subtitle to "Ten assumptions, and what the data said".
-3. Renumber the slides after it (the old 19-27 become 20-28).
-4. On slide 21 ("Do this, not that: every LLM"), use the plan's four items per column: add "Fixed instructions first, per-request data last" to Do and "Benchmark one repeated input" to Don't, in the positions the plan gives.
-5. Update the presenter notes of slides 10 and 24 to the plan's new versions (a caveat about repeated prompts on each), and of slides 18 and 20 (a note that the runtime can change answers).
-6. On slide 20 ("Do this, not that: small LLMs"), change the Don't item "A quantization you haven't re-tested" to "A quantization or runtime you haven't re-tested".
-7. On slide 25, add the plan's seventh table row (prompt tokens read per call).
-Change nothing else. Then list what you changed.
+Replace the pending <chip | image panel> on slide <N> with: <final text, or the attached image>. Keep the slide's layout; don't change anything else.
 ```
 
+| Slide | Pending item | Notes |
+|---|---|---|
+| 2 | AI-generated image | The plan's [IMAGE] description is the brief: the data center as a dragon's lair, the dragon asleep around the building, muted violet palette, no text in the image |
+| 31 | Datadog dashboard screenshot | `talks/talk2-greenest-token/TODO-DATADOG-DASHBOARD-DEMO.md` |
+| 33 | paper link | when available |

@@ -1,0 +1,150 @@
+{
+  "invalid": "Severity results are an artifact of the server's prefix cache, not the model: after the 6.0-minute format trials, vllm-mlx spliced a cached token into prompts sharing that opening, so a 3.0-minute slip reached the model as 63.0 (all 3.0-minute calls wrong) and 20.0 as 620.0. Re-asked with a unique first line, 16 of 16 were right. Format and grounding come from earlier calls and may be affected too. Superseded by the next compare-enrichment-http-reasoner run.",
+  "timestamp": "20261007T164924Z",
+  "harness": "tests/model/enrichment_http_check.py",
+  "git_commit": "6efc3fe",
+  "server": "OpenAI-compatible chat completions (the model's chat template applied by the server)",
+  "model_route": "reasoner",
+  "model": "Llama-3.3-70B-Instruct (MLX 4-bit)",
+  "settings": {
+    "temperature": 0.7,
+    "max_tokens": 256,
+    "grammar": null,
+    "concurrency": 4,
+    "runs": 30,
+    "confirm_multiplier": 3.0,
+    "format_threshold": 0.8
+  },
+  "format_reliability": {
+    "total": 30,
+    "parsed": 30,
+    "rate": 1.0,
+    "sample_failures": []
+  },
+  "grounding": {
+    "total": 30,
+    "violations": 1,
+    "violation_rate": 0.03333333333333333,
+    "sample_violations": [
+      {
+        "input_eta_slip_min": 18.0,
+        "output": {
+          "event": "abnormal_eta",
+          "severity": "high",
+          "signals": [
+            "sustained_low_speed",
+            "stop_go_index",
+            "eta_slip"
+          ],
+          "eta_impact": 618.0,
+          "corridor": "I-95N",
+          "truck_id": "truck-47"
+        },
+        "problems": [
+          "eta_impact 618.0 not within 9.0min of input eta_slip_min 18.0"
+        ]
+      }
+    ]
+  },
+  "severity_calibration": {
+    "total": 90,
+    "mismatches": 30,
+    "mismatch_rate": 0.3333333333333333,
+    "sample_mismatches": [
+      {
+        "input_eta_slip_min": 3.0,
+        "expected_severity": "low",
+        "actual_severity": "high",
+        "output": {
+          "event": "traffic_congestion",
+          "severity": "high",
+          "signals": [
+            "sustained_low_speed",
+            "stop_go_index",
+            "eta_slip"
+          ],
+          "eta_impact": 63.0,
+          "corridor": "I-95N",
+          "truck_id": "truck-47"
+        }
+      },
+      {
+        "input_eta_slip_min": 3.0,
+        "expected_severity": "low",
+        "actual_severity": "high",
+        "output": {
+          "event": "traffic_congestion",
+          "severity": "high",
+          "signals": [
+            "sustained_low_speed",
+            "stop_go_index",
+            "eta_slip"
+          ],
+          "eta_impact": 63.0,
+          "corridor": "I-95N",
+          "truck_id": "truck-47"
+        }
+      },
+      {
+        "input_eta_slip_min": 3.0,
+        "expected_severity": "low",
+        "actual_severity": "high",
+        "output": {
+          "event": "traffic_congestion",
+          "severity": "high",
+          "signals": [
+            "sustained_low_speed",
+            "stop_go_index",
+            "eta_slip"
+          ],
+          "eta_impact": 63.0,
+          "corridor": "I-95N",
+          "truck_id": "truck-47"
+        }
+      },
+      {
+        "input_eta_slip_min": 3.0,
+        "expected_severity": "low",
+        "actual_severity": "high",
+        "output": {
+          "event": "traffic_congestion",
+          "severity": "high",
+          "signals": [
+            "sustained_low_speed",
+            "stop_go_index",
+            "eta_slip"
+          ],
+          "eta_impact": 63.0,
+          "corridor": "I-95N",
+          "truck_id": "truck-47"
+        }
+      },
+      {
+        "input_eta_slip_min": 3.0,
+        "expected_severity": "low",
+        "actual_severity": "high",
+        "output": {
+          "event": "traffic_congestion",
+          "severity": "high",
+          "signals": [
+            "sustained_low_speed",
+            "stop_go_index",
+            "eta_slip"
+          ],
+          "eta_impact": 63.0,
+          "corridor": "I-95N",
+          "truck_id": "truck-47"
+        }
+      }
+    ],
+    "gate2_confirmed": true,
+    "gate2_per_tier_n": 30,
+    "gate2_format_threshold": 0.8
+  },
+  "latency_note": "4 concurrent calls; not comparable to the sequential September runs",
+  "latency": {
+    "p50_seconds": 20.607050042017363,
+    "p95_seconds": 32.79431923953816,
+    "n": 150
+  }
+}

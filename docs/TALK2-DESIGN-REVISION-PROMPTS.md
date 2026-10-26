@@ -1,5 +1,9 @@
 # Talk 2: Claude design prompts for the revision (2026-10-06)
 
+> **Superseded (2026-10-06, later the same day).** The talk was restructured into the draft 4 arc: the dragon, "The greenest token is…" and an explorer's journey. Use `docs/TALK2-REWORK-SLIDE-PLAN.md` (draft 4) and `docs/TALK2-REWORK-DESIGN-PROMPTS.md` instead. Kept as history. Two figures below are wrong:
+> - **Prompt cache:** "392 → 140 of 506 tokens" was a static tokenizer count; the measured figure is ~400 → ~148 of 514 (paper Table IV).
+> - **Classifier example:** R4's slide D pairs "thresholds stated in the prompt" with "across 15 models, 33-73%", but that 15-model run used qualitative rules. With the thresholds stated, severity was wrong on 20-63% of calls.
+
 Paste-ready prompts that revise the deck already built from the 28-slide plan
 (`docs/TALK2-REWORK-SLIDE-PLAN.md` at `ba1a7d0`: slide 19 is a chart slide, slide 25's
 table has 7 rows). If your deck predates that, send Prompt 6 from

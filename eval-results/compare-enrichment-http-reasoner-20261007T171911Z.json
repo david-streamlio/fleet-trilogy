@@ -1,0 +1,45 @@
+{
+  "timestamp": "20261007T171911Z",
+  "harness": "tests/model/enrichment_http_check.py",
+  "git_commit": "6efc3fe",
+  "server": "OpenAI-compatible chat completions (the model's chat template applied by the server)",
+  "model_route": "reasoner",
+  "model": "Llama-3.3-70B-Instruct (MLX 4-bit)",
+  "settings": {
+    "temperature": 0.7,
+    "max_tokens": 256,
+    "grammar": null,
+    "concurrency": 4,
+    "runs": 30,
+    "confirm_multiplier": 3.0,
+    "format_threshold": 0.8,
+    "unique_prefix": "every prompt starts with 'Request <uuid4 hex>' to defeat the server's prefix cache"
+  },
+  "format_reliability": {
+    "total": 30,
+    "parsed": 30,
+    "rate": 1.0,
+    "sample_failures": []
+  },
+  "grounding": {
+    "total": 30,
+    "violations": 0,
+    "violation_rate": 0.0,
+    "sample_violations": []
+  },
+  "severity_calibration": {
+    "total": 90,
+    "mismatches": 0,
+    "mismatch_rate": 0.0,
+    "sample_mismatches": [],
+    "gate2_confirmed": true,
+    "gate2_per_tier_n": 30,
+    "gate2_format_threshold": 0.8
+  },
+  "latency_note": "4 concurrent calls; not comparable to the sequential September runs",
+  "latency": {
+    "p50_seconds": 26.495276833506068,
+    "p95_seconds": 38.89283130831609,
+    "n": 150
+  }
+}

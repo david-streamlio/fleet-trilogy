@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#632ca6"></rect><text x="50" y="62" font-family="sans-serif" font-size="34" font-weight="700" fill="#ffffff" text-anchor="middle">T1</text></svg></template>
+<link rel="stylesheet" href="_ds/org-default-druids-design-system-019df7a5-844f-7867-ac4e-78b090652252/tokens.css">
+<script src="_ds/org-default-druids-design-system-019df7a5-844f-7867-ac4e-78b090652252/_ds_bundle.js"></script>
+<script src="./image-slot.js"></script>
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;background:#000;font-family:var(--font-family-base);}
+a{color:var(--ui-interaction-primary);}
+a:hover{color:var(--ui-interaction-primary-contrast);}
+</style>
+</helmet>
+<x-import component-from-global-scope="deck-stage" from="./deck-stage.js" width="1920" height="1080" hint-size="100%,100%" data-uneditable="">
+
+<section data-label="Waitroom" data-screen-label="Waitroom" data-speaker-notes="Lobby slide. Leave up while attendees join; the countdown and Pulsar facts run on their own." style="background:linear-gradient(135deg, var(--purple-700) 0%, oklch(0.42 0.24 272) 60%, oklch(0.5 0.22 262) 100%);color:#ffffff;font-family:var(--font-family-base);padding:0;box-sizing:border-box;overflow:hidden" data-om-slide-id="1b6a6f6f">
+  <div style="position:relative;width:100%;height:100%;overflow:hidden">
+    <div style="position:absolute;inset:0;background:rgba(255,255,255,0.05);clip-path:polygon(38% 0, 62% 0, 30% 100%, 8% 100%)"></div>
+    <div style="position:absolute;inset:0;background:rgba(255,255,255,0.07);clip-path:polygon(70% 0, 100% 0, 100% 55%)"></div>
+    <div style="position:absolute;inset:0;background:rgba(0,0,40,0.12);clip-path:polygon(0 0, 22% 0, 0 45%)"></div>
+    <div style="position:absolute;inset:0;background:rgba(255,255,255,0.04);clip-path:polygon(58% 100%, 100% 40%, 100% 100%)"></div>
+    <div style="position:absolute;inset:0;padding:120px 120px;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) 860px;gap:96px;align-items:center">
+      <div style="display:flex;flex-direction:column;gap:44px">
+        <div style="display:flex;align-items:center;gap:16px;font-size:28px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase"><span style="width:14px;height:14px;border-radius:50%;background:#41eba4"></span>Edge Intelligence for Connected Fleets</div>
+        <h1 style="margin:0;font-size:136px;font-weight:700;line-height:1.02;letter-spacing:-0.02em">Welcome!<br>We'll begin<br>shortly.</h1>
+        <div style="font-size:38px;line-height:1.45;color:#ececf4;max-width:760px;text-wrap:pretty">Grab a coffee and settle in. While you wait, here are some interesting facts about Apache Pulsar</div>
+        <div style="align-self:flex-start;display:flex;align-items:center;gap:28px;padding:22px 36px;border-radius:8px;background:rgba(255,255,255,0.14);border:2px solid rgba(255,255,255,0.28)">
+          <span style="font-size:30px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase">{{ countLabel }}</span>
+          <span style="font-family:var(--font-family-monospace);font-size:52px;font-weight:600">{{ clock }}</span>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,0.12);border:2px solid rgba(255,255,255,0.28);border-radius:16px;padding:52px 56px;display:flex;flex-direction:column;gap:40px;min-height:560px;box-sizing:border-box">
+        <div style="display:flex;flex-direction:column;gap:18px">
+          <div style="font-size:34px;font-weight:700">Apache Pulsar facts</div>
+          <div style="align-self:flex-start;display:flex;align-items:center;height:64px;padding:0 32px;border-radius:8px;background:var(--purple-600);font-size:30px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">{{ fact.topic }}</div>
+        </div>
+        <div style="flex:1;font-size:40px;line-height:1.45;text-wrap:pretty">{{ fact.text }}</div>
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <div style="display:flex;align-items:center;gap:20px">
+            <button onClick="{{ prev }}" aria-label="Previous fact" style="width:56px;height:56px;border-radius:50%;border:2px solid rgba(255,255,255,0.5);background:transparent;color:#ffffff;font-size:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0" style-hover="background:rgba(255,255,255,0.15)">←</button>
+            <button onClick="{{ next }}" aria-label="Next fact" style="width:56px;height:56px;border-radius:50%;border:2px solid rgba(255,255,255,0.5);background:transparent;color:#ffffff;font-size:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0" style-hover="background:rgba(255,255,255,0.15)">→</button>
+            <div style="flex:1;display:flex;align-items:center;gap:12px;padding-left:12px">
+              <sc-for list="{{ dots }}" as="d" hint-placeholder-count="4">
+                <span style="width:{{ d.size }};height:{{ d.size }};border-radius:50%;background:{{ d.bg }}"></span>
+              </sc-for>
+            </div>
+            <div style="font-family:var(--font-family-monospace);font-size:32px;color:#ececf4">{{ counter }}</div>
+          </div>
+          <div style="height:6px;border-radius:3px;background:rgba(255,255,255,0.2);overflow:hidden">
+            <div style="height:100%;width:{{ progress }};background:#ffffff"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section data-label="Title" data-screen-label="00 Title" data-speaker-notes="Untimed title slide. Introduce yourself, then go straight into the use case." style="background:linear-gradient(135deg, var(--purple-700) 0%, oklch(0.42 0.24 272) 60%, oklch(0.5 0.22 262) 100%);overflow:hidden;color:#ffffff;font-family:var(--font-family-base);padding:120px;display:flex;flex-direction:column;box-sizing:border-box" data-om-slide-id="1e53a74c">
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.05);clip-path:polygon(38% 0, 62% 0, 30% 100%, 8% 100%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.07);clip-path:polygon(70% 0, 100% 0, 100% 55%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(0,0,40,0.12);clip-path:polygon(0 0, 22% 0, 0 45%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.04);clip-path:polygon(58% 100%, 100% 40%, 100% 100%);pointer-events:none"></div>
+  <div style="position:relative;flex:1;display:flex;flex-direction:column;justify-content:center;gap:40px">
+    
+    <h1 style="margin:0;font-size:88px;font-weight:700;line-height:1.08;letter-spacing:-0.015em;max-width:1500px;text-wrap:balance">Edge Intelligence for Connected Fleets: 1-Bit LLMs Inside Apache Pulsar Functions</h1>
+  </div>
+  <div style="position:relative;display:flex;flex-direction:column;gap:8px;border-top:2px solid var(--purple-500);padding-top:32px">
+    <div style="font-size:36px;font-weight:600">David Kjerrumgaard</div>
+    <div style="font-size:28px;color:var(--purple-200)">Apache Pulsar Committer</div>
+  </div>
+</section>
+
+
+
+
+
+
+
+<section data-label="Two Problems, One Thesis" data-screen-label="Two Problems, One Thesis" data-speaker-notes="Today's connected fleet solutions have two problems. First, cost: the industry's answer to edge intelligence is dedicated, expensive compute in the vehicle. Second, the cloud observability bottleneck: without intelligence at the edge, every reading goes to the cloud, and every decision waits for a round trip. The thesis of this talk is that smaller LLMs deployed at the edge can solve both. To democratize edge safety, software must leverage the pre-existing, low-cost commodity processors already on the road." style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:88px 120px 48px;display:flex;flex-direction:column;box-sizing:border-box;gap:16px" data-om-slide-id="972383c7">
+  <h2 style="margin:0;font-size:60px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">Two Problems with Today's Connected Solutions</h2>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:40px;min-height:0">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px">
+      <div style="border:3px solid var(--ui-status-danger);border-radius:8px;padding:40px 44px;display:flex;flex-direction:column;gap:22px">
+      <div style="display:flex;align-items:center;gap:20px">
+        <div style="width:72px;height:72px;border-radius:8px;background:var(--ui-status-danger-soft);display:flex;align-items:center;justify-content:center"><i data-lucide="banknote" width="40" height="40" stroke-width="2" style="color:var(--ui-status-danger);display:inline-flex;flex:none"></i></div>
+        <div style="font-family:var(--font-family-monospace);font-size:40px;font-weight:600;color:var(--ui-status-danger-contrast)">01</div>
+      </div>
+      <div style="font-size:52px;font-weight:700;line-height:1.1">The Cost Barrier</div>
+      <div style="font-size:30px;line-height:1.45;color:var(--ui-text-secondary);text-wrap:pretty">Edge intelligence today means dedicated, expensive in-vehicle compute.</div>
+    </div>
+      <div style="border:3px solid #c15800;border-radius:8px;padding:40px 44px;display:flex;flex-direction:column;gap:22px">
+      <div style="display:flex;align-items:center;gap:20px">
+        <div style="width:72px;height:72px;border-radius:8px;background:var(--ui-status-warning-soft);display:flex;align-items:center;justify-content:center"><i data-lucide="cloud-alert" width="40" height="40" stroke-width="2" style="color:#c15800;display:inline-flex;flex:none"></i></div>
+        <div style="font-family:var(--font-family-monospace);font-size:40px;font-weight:600;color:#c15800">02</div>
+      </div>
+      <div style="font-size:52px;font-weight:700;line-height:1.1">Cloud Observability Bottlenecks</div>
+      <div style="font-size:30px;line-height:1.45;color:var(--ui-text-secondary);text-wrap:pretty">Every reading goes to the cloud, and every decision waits for the round trip.</div>
+    </div>
+    </div>
+    <div style="background:var(--gray-800);color:#ffffff;border-radius:8px;padding:40px 48px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:40px;align-items:start">
+      <div style="display:flex;align-items:center;height:52px;padding:0 20px;border-radius:4px;background:var(--purple-600);font-size:26px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">Thesis</div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="font-size:40px;font-weight:700;line-height:1.3;text-wrap:pretty">Smaller LLMs deployed on the edge can solve both problems.</div>
+        <div style="font-size:30px;line-height:1.45;color:#e0e0e6;text-wrap:pretty">To democratize edge safety, software must leverage pre-existing, low-cost commodity processors already on the road.</div>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;font-size:24px;color:var(--ui-text-tertiary)"><span>Edge Intelligence for Connected Fleets</span><span>03</span></div>
+</section>
+
+<section data-label="04 Before: Cloud-Centric" data-screen-label="04 Before: Cloud-Centric" data-speaker-notes="This is how fleet observability works today without edge intelligence. Every truck is a dumb edge: it streams raw, unfiltered telemetry, RPM, GPS, brake wear, continuously, over a high-latency cellular pipeline into one cloud core. That core has to ingest, queue, process and store all of it, and most of it is normal, repetitive readings. Three costs follow. Decision latency: a critical safety event has to make a full cloud round-trip, tens of seconds to minutes, before anyone acts. Bandwidth bleed: you pay cellular costs to ship noise. And network dependency: when a truck drives into a dead zone, you lose it entirely. Next, the same fleet with the intelligence moved onto the truck." style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:64px 120px 48px;display:flex;flex-direction:column;box-sizing:border-box;gap:16px" data-om-slide-id="f0c4b8fe">
+  <div style="display:flex;gap:8px;align-self:flex-start;padding:6px;border-radius:8px;background:var(--gray-50);border:2px solid var(--gray-100)">
+      <button onClick="{{ goBefore }}" style="height:48px;padding:0 24px;border-radius:4px;border:none;cursor:pointer;font-family:var(--font-family-base);font-size:24px;font-weight:600;display:flex;align-items:center;gap:10px;background:var(--ui-status-danger);color:#ffffff"><i data-lucide="triangle-alert" width="24" height="24" stroke-width="2" style="color:#ffffff;display:inline-flex;flex:none"></i>Before</button>
+      <button onClick="{{ goAfter }}" style="height:48px;padding:0 24px;border-radius:4px;border:none;cursor:pointer;font-family:var(--font-family-base);font-size:24px;font-weight:600;display:flex;align-items:center;gap:10px;background:transparent;color:var(--ui-text-secondary)"><i data-lucide="zap" width="24" height="24" stroke-width="2" style="color:var(--ui-status-success);display:inline-flex;flex:none"></i>After</button>
+    </div>
+  <h2 style="margin:0;font-size:46px;font-weight:700;line-height:1.15;letter-spacing:-0.01em">Current Architecture: Cloud-Centric Observability Bottlenecks</h2>
+  <div style="flex:1;display:grid;grid-template-columns:620px 1000px;gap:60px;align-items:center;min-height:0">
+    <div style="display:flex;flex-direction:column;gap:32px">
+      <div style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;align-items:start">
+        <div style="width:52px;height:52px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--ui-status-danger-soft)"><i data-lucide="timer" width="30" height="30" stroke-width="2" style="color:var(--ui-status-danger);display:inline-flex;flex:none"></i></div>
+        <div style="font-size:27px;line-height:1.42;text-wrap:pretty"><strong style="font-weight:700">High Decision Latency (10s – Minutes):</strong> Critical safety events must make a full cloud round-trip before any action is taken.</div>
+      </div>
+      <div style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;align-items:start">
+        <div style="width:52px;height:52px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--ui-status-danger-soft)"><i data-lucide="banknote" width="30" height="30" stroke-width="2" style="color:var(--ui-status-danger);display:inline-flex;flex:none"></i></div>
+        <div style="font-size:27px;line-height:1.42;text-wrap:pretty"><strong style="font-weight:700">Bandwidth Bleed:</strong> Massive cellular costs incurred by continuously transmitting normal, repetitive readings.</div>
+      </div>
+      <div style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;align-items:start">
+        <div style="width:52px;height:52px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--ui-status-danger-soft)"><i data-lucide="wifi-off" width="30" height="30" stroke-width="2" style="color:var(--ui-status-danger);display:inline-flex;flex:none"></i></div>
+        <div style="font-size:27px;line-height:1.42;text-wrap:pretty"><strong style="font-weight:700">Network Dependencies:</strong> Total loss of visibility and real-time tracking when a vehicle enters a cellular dead zone.</div>
+      </div>
+    </div>
+    <div style="position:relative;width:1000px;height:520px">
+      <div style="position:absolute;left:0;top:0;width:190px;display:flex;justify-content:center"><div style="display:flex;align-items:center;height:40px;padding:0 14px;border-radius:4px;background:var(--gray-100);color:var(--ui-text-secondary);font-size:24px;font-weight:700;white-space:nowrap">Dumb Edge</div></div>
+      <div style="position:absolute;left:0;top:56px;width:190px;height:120px;box-sizing:border-box;border-radius:8px;border:2px solid var(--gray-150);background:var(--gray-25);display:flex;align-items:center;justify-content:center;gap:14px">
+          <i data-lucide="truck" width="60" height="60" stroke-width="1.5" style="color:var(--gray-400);display:inline-flex;flex:none"></i>
+          
+        </div><div style="position:absolute;left:0;top:206px;width:190px;height:120px;box-sizing:border-box;border-radius:8px;border:2px solid var(--gray-150);background:var(--gray-25);display:flex;align-items:center;justify-content:center;gap:14px">
+          <i data-lucide="truck" width="60" height="60" stroke-width="1.5" style="color:var(--gray-400);display:inline-flex;flex:none"></i>
+          
+        </div><div style="position:absolute;left:0;top:356px;width:190px;height:120px;box-sizing:border-box;border-radius:8px;border:2px solid var(--gray-150);background:var(--gray-25);display:flex;align-items:center;justify-content:center;gap:14px">
+          <i data-lucide="truck" width="60" height="60" stroke-width="1.5" style="color:var(--gray-400);display:inline-flex;flex:none"></i>
+          
+        </div>
+      <div style="position:absolute;left:0;top:486px;width:190px;text-align:center;font-size:24px;color:var(--ui-text-tertiary);white-space:nowrap">raw, unfiltered</div>
+      <svg width="1000" height="520" viewBox="0 0 1000 520" style="position:absolute;inset:0;overflow:visible">
+        <defs><marker id="arrR" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="2.4" markerHeight="2.4" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#e0243c"></path></marker></defs>
+        <g fill="none" stroke="#e0243c" stroke-opacity="0.42" stroke-width="24" stroke-linecap="round">
+          <path d="M200 100 C380 100 400 190 552 196" marker-end="url(#arrR)"></path>
+          <path d="M200 132 C380 132 420 250 552 256" marker-end="url(#arrR)"></path>
+          <path d="M200 250 C380 250 400 220 552 226" marker-end="url(#arrR)"></path>
+          <path d="M200 282 C380 282 400 300 552 296" marker-end="url(#arrR)"></path>
+          <path d="M200 400 C380 400 400 330 552 326" marker-end="url(#arrR)"></path>
+          <path d="M200 432 C380 432 420 360 552 356" marker-end="url(#arrR)"></path>
+        </g>
+        <line x1="236" y1="44" x2="236" y2="500" stroke="var(--gray-200)" stroke-width="2" stroke-dasharray="8 8"></line>
+        <line x1="536" y1="44" x2="536" y2="500" stroke="var(--gray-200)" stroke-width="2" stroke-dasharray="8 8"></line>
+      </svg>
+      <div style="position:absolute;left:236px;top:0;width:300px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:24px;font-weight:600;color:#c15800;text-align:center"><i data-lucide="radio-tower" width="26" height="26" stroke-width="2" style="color:#c15800;display:inline-flex;flex:none"></i><span>High-Latency Cellular Pipeline</span></div>
+      <div style="position:absolute;left:250px;top:88px;display:flex;align-items:center;height:42px;padding:0 14px;border-radius:4px;background:#ffffff;border:2px solid var(--ui-status-danger);color:var(--ui-status-danger-contrast);font-family:var(--font-family-monospace);font-size:24px;font-weight:600">RPM</div>
+      <div style="position:absolute;left:250px;top:238px;display:flex;align-items:center;height:42px;padding:0 14px;border-radius:4px;background:#ffffff;border:2px solid var(--ui-status-danger);color:var(--ui-status-danger-contrast);font-family:var(--font-family-monospace);font-size:24px;font-weight:600">GPS</div>
+      <div style="position:absolute;left:250px;top:388px;display:flex;align-items:center;height:42px;padding:0 14px;border-radius:4px;background:#ffffff;border:2px solid var(--ui-status-danger);color:var(--ui-status-danger-contrast);font-family:var(--font-family-monospace);font-size:24px;font-weight:600">Brake wear</div>
+      <div style="position:absolute;left:580px;top:0;width:420px;height:520px;box-sizing:border-box;border-radius:8px;border:3px solid var(--ui-status-danger);background:var(--ui-status-danger-soft);padding:24px;display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;flex-direction:column;align-items:flex-start;gap:10px">
+          <div style="display:flex;align-items:center;gap:12px;font-size:30px;font-weight:700;white-space:nowrap"><i data-lucide="cloud" width="36" height="36" stroke-width="2" style="color:var(--ui-status-danger);display:inline-flex;flex:none"></i>Cloud Core</div>
+          <div style="display:flex;align-items:center;gap:6px;height:40px;padding:0 14px;border-radius:4px;background:var(--ui-status-danger);color:#ffffff;font-size:24px;font-weight:700"><i data-lucide="triangle-alert" width="20" height="20" stroke-width="2.25" style="color:#ffffff;display:inline-flex;flex:none"></i>Overloaded</div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:12px">
+          <div style="flex:1;background:#ffffff;border-radius:8px;border:2px solid var(--gray-100);padding:0 20px;display:flex;align-items:center;gap:16px"><i data-lucide="layers" width="36" height="36" stroke-width="1.75" style="color:var(--ui-status-danger);display:inline-flex;flex:none"></i><div style="flex:1;display:flex;flex-direction:column;gap:6px"><span style="font-size:26px;font-weight:600">Ingestion Queues</span><span style="align-self:flex-start;display:flex;align-items:center;height:38px;padding:0 12px;border-radius:4px;background:var(--ui-status-danger-soft);color:var(--ui-status-danger-contrast);font-size:24px;font-weight:700">Overloaded</span></div></div>
+          <div style="flex:1;background:#ffffff;border-radius:8px;border:2px solid var(--gray-100);padding:0 20px;display:flex;align-items:center;gap:16px"><i data-lucide="activity" width="36" height="36" stroke-width="1.75" style="color:#c15800;display:inline-flex;flex:none"></i><div style="flex:1;display:flex;flex-direction:column;gap:6px"><span style="font-size:26px;font-weight:600">Stream Processing</span><span style="align-self:flex-start;display:flex;align-items:center;height:38px;padding:0 12px;border-radius:4px;background:var(--ui-status-warning-soft);color:#c15800;font-size:24px;font-weight:700">Lagging</span></div></div>
+          <div style="flex:1;background:#ffffff;border-radius:8px;border:2px solid var(--gray-100);padding:0 20px;display:flex;align-items:center;gap:16px"><i data-lucide="database" width="36" height="36" stroke-width="1.75" style="color:#c15800;display:inline-flex;flex:none"></i><div style="flex:1;display:flex;flex-direction:column;gap:6px"><span style="font-size:26px;font-weight:600">Data Lakes</span><span style="align-self:flex-start;display:flex;align-items:center;height:38px;padding:0 12px;border-radius:4px;background:var(--ui-status-warning-soft);color:#c15800;font-size:24px;font-weight:700">Up to 95% Noise Data</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px">
+    <div style="border:2px solid var(--gray-100);border-radius:8px;padding:16px 24px;display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:24px;font-weight:600;letter-spacing:0.03em;text-transform:uppercase;color:var(--ui-text-secondary)">Decision Latency</div>
+      <div style="display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:14px;row-gap:4px;align-items:center;font-size:24px">
+        <span style="font-size:24px;font-weight:700;color:var(--ui-status-danger)">BEFORE</span><span style="font-weight:700;color:var(--ui-text)">10s – minutes</span>
+        <span style="font-size:24px;font-weight:700;color:var(--ui-text-tertiary)">AFTER</span><span style="color:var(--ui-text-tertiary)">Sub-second</span>
+      </div>
+    </div>
+    <div style="border:2px solid var(--gray-100);border-radius:8px;padding:16px 24px;display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:24px;font-weight:600;letter-spacing:0.03em;text-transform:uppercase;color:var(--ui-text-secondary)">Data Efficiency</div>
+      <div style="display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:14px;row-gap:4px;align-items:center;font-size:24px">
+        <span style="font-size:24px;font-weight:700;color:var(--ui-status-danger)">BEFORE</span><span style="font-weight:700;color:var(--ui-text)">Up to 95% noise data</span>
+        <span style="font-size:24px;font-weight:700;color:var(--ui-text-tertiary)">AFTER</span><span style="color:var(--ui-text-tertiary)">Up to 90% bandwidth savings</span>
+      </div>
+    </div>
+    <div style="border:2px solid var(--gray-100);border-radius:8px;padding:16px 24px;display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:24px;font-weight:600;letter-spacing:0.03em;text-transform:uppercase;color:var(--ui-text-secondary)">Network Risk</div>
+      <div style="display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:14px;row-gap:4px;align-items:center;font-size:24px">
+        <span style="font-size:24px;font-weight:700;color:var(--ui-status-danger)">BEFORE</span><span style="font-weight:700;color:var(--ui-text)">Visibility lost in dead zones</span>
+        <span style="font-size:24px;font-weight:700;color:var(--ui-text-tertiary)">AFTER</span><span style="color:var(--ui-text-tertiary)">Offline autonomy</span>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;font-size:24px;color:var(--ui-text-tertiary)"><span>Edge Intelligence for Connected Fleets</span><span>04</span></div>
+</section>
+
+<section data-label="05 After: Edge Intelligence" data-screen-label="05 After: Edge Intelligence" data-speaker-notes="Now the same fleet with edge intelligence, and the point of this talk: it doesn't take a mobile supercomputer. Each truck gets a commodity edge node, Raspberry Pi 4 class hardware with 4 to 8 GB of RAM, running a small LLM as a lightweight diagnostics layer. The node acts as a gatekeeper: it runs inference on the truck's telematics locally, with no cloud connection required, and only filtered anomalies go over cellular. Massive compute is not what buys the bandwidth savings; putting judgment at the edge does. Whether it really performs on a Pi is the next question." style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:64px 120px 48px;display:flex;flex-direction:column;box-sizing:border-box;gap:16px" data-om-slide-id="00787a37">
+  <div style="display:flex;gap:8px;align-self:flex-start;padding:6px;border-radius:8px;background:var(--gray-50);border:2px solid var(--gray-100)">
+      <button onClick="{{ goBefore }}" style="height:48px;padding:0 24px;border-radius:4px;border:none;cursor:pointer;font-family:var(--font-family-base);font-size:24px;font-weight:600;display:flex;align-items:center;gap:10px;background:transparent;color:var(--ui-text-secondary)"><i data-lucide="triangle-alert" width="24" height="24" stroke-width="2" style="color:var(--ui-status-danger);display:inline-flex;flex:none"></i>Before</button>
+      <button onClick="{{ goAfter }}" style="height:48px;padding:0 24px;border-radius:4px;border:none;cursor:pointer;font-family:var(--font-family-base);font-size:24px;font-weight:600;display:flex;align-items:center;gap:10px;background:var(--ui-status-success);color:#ffffff"><i data-lucide="zap" width="24" height="24" stroke-width="2" style="color:#ffffff;display:inline-flex;flex:none"></i>After</button>
+    </div>
+  <h2 style="margin:0;font-size:46px;font-weight:700;line-height:1.15;letter-spacing:-0.01em">Democratizing the Edge with Resource-Constrained Hardware</h2>
+  <div style="flex:1;display:grid;grid-template-columns:620px 1000px;gap:60px;align-items:center;min-height:0">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;align-items:start">
+        <div style="width:52px;height:52px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--ui-status-success-soft)"><i data-lucide="binary" width="30" height="30" stroke-width="2" style="color:var(--ui-status-success);display:inline-flex;flex:none"></i></div>
+        <div style="font-size:25px;line-height:1.4;text-wrap:pretty"><strong style="font-weight:700">Algorithmic Efficiency over Raw Power:</strong> Utilizing highly optimized small LLMs to run complex diagnostic reasoning on sub-$100 commodity hardware. <span style="font-size:24px;font-weight:500;color:var(--ui-text-tertiary)">Source: Raspberry Pi 4 from $35 (raspberrypi.com); 2GB $55 (PiShop.us)</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;align-items:start">
+        <div style="width:52px;height:52px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--ui-status-success-soft)"><i data-lucide="shield-check" width="30" height="30" stroke-width="2" style="color:var(--ui-status-success);display:inline-flex;flex:none"></i></div>
+        <div style="font-size:25px;line-height:1.4;text-wrap:pretty"><strong style="font-weight:700">Localized Diagnostic Autonomy:</strong> The edge device acts as an intelligent gatekeeper, running real-time inference on vehicle telematics without a cloud connection.</div>
+      </div>
+      <div style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;align-items:start">
+        <div style="width:52px;height:52px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--ui-status-success-soft)"><i data-lucide="trending-down" width="30" height="30" stroke-width="2" style="color:var(--ui-status-success);display:inline-flex;flex:none"></i></div>
+        <div style="font-size:25px;line-height:1.4;text-wrap:pretty"><strong style="font-weight: 700;">Frictionless Fleet Scaling:</strong> Shifting to low-footprint hardware drives down hardware deployment costs compared to traditional AV computing platforms.&nbsp;</div>
+      </div>
+    </div>
+    <div style="position:relative;width:1000px;height:576px">
+      <div style="position:absolute;left:0;top:0;width:1000px;height:100px;box-sizing:border-box;border-radius:8px;border:2px solid var(--ui-status-success);background:#ffffff;padding:10px 22px;display:flex;align-items:center;gap:20px">
+        <div style="width:64px;height:64px;border-radius:8px;background:var(--ui-status-success-soft);display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="cpu" width="38" height="38" stroke-width="2" style="color:var(--ui-status-success);display:inline-flex;flex:none"></i></div>
+        <div style="display:flex;flex-direction:column;gap:6px;min-width:0">
+          <div style="font-size:22px;font-weight:700;line-height:1.2;white-space:nowrap">Commodity Edge Node <span style="font-weight:400;color:var(--ui-text-secondary)">(Raspberry Pi 4 Class Hardware / 4GB-8GB RAM)</span></div>
+          <div style="align-self:flex-start;display:flex;align-items:center;gap:8px;height:32px;padding:0 12px;border-radius:4px;background:var(--ui-status-success-soft);color:var(--ui-status-success-contrast);font-size:20px;font-weight:600"><i data-lucide="layers" width="20" height="20" stroke-width="2" style="color:var(--ui-status-success);display:inline-flex;flex:none"></i>Small LLM · Edge Diagnostics Model</div>
+        </div>
+      </div>
+      <div style="position:absolute;left:0;top:120px;width:190px;display:flex;justify-content:center"><div style="display:flex;align-items:center;height:40px;padding:0 14px;border-radius:4px;background:var(--ui-status-success-soft);color:var(--ui-status-success-contrast);font-size:24px;font-weight:700;white-space:nowrap">Smart Edge</div></div>
+      <div style="position:absolute;left:0;top:172px;width:190px;height:100px;box-sizing:border-box;border-radius:8px;border:2px solid var(--ui-status-success);background:var(--ui-status-success-soft);display:flex;align-items:center;justify-content:center;gap:14px">
+          <i data-lucide="truck" width="56" height="56" stroke-width="1.5" style="color:var(--ui-text);display:inline-flex;flex:none"></i>
+          <div style="display:flex;flex-direction:column;gap:6px"><div style="width:38px;height:38px;border-radius:4px;background:#ffffff;border:2px solid var(--ui-status-success);display:flex;align-items:center;justify-content:center"><i data-lucide="cpu" width="22" height="22" stroke-width="2" style="color:var(--ui-status-success);display:inline-flex;flex:none"></i></div><div style="width:38px;height:38px;border-radius:50%;background:var(--ui-status-success);display:flex;align-items:center;justify-content:center"><i data-lucide="refresh-cw" width="20" height="20" stroke-width="2.25" style="color:#ffffff;display:inline-flex;flex:none"></i></div></div>
+        </div><div style="position:absolute;left:0;top:292px;width:190px;height:100px;box-sizing:border-box;border-radius:8px;border:2px solid var(--ui-status-success);background:var(--ui-status-success-soft);display:flex;align-items:center;justify-content:center;gap:14px">
+          <i data-lucide="truck" width="56" height="56" stroke-width="1.5" style="color:var(--ui-text);display:inline-flex;flex:none"></i>
+          <div style="display:flex;flex-direction:column;gap:6px"><div style="width:38px;height:38px;border-radius:4px;background:#ffffff;border:2px solid var(--ui-status-success);display:flex;align-items:center;justify-content:center"><i data-lucide="cpu" width="22" height="22" stroke-width="2" style="color:var(--ui-status-success);display:inline-flex;flex:none"></i></div><div style="width:38px;height:38px;border-radius:50%;background:var(--ui-status-success);display:flex;align-items:center;justify-content:center"><i data-lucide="refresh-cw" width="20" height="20" stroke-width="2.25" style="color:#ffffff;display:inline-flex;flex:none"></i></div></div>
+        </div><div style="position:absolute;left:0;top:412px;width:190px;height:100px;box-sizing:border-box;border-radius:8px;border:2px solid var(--ui-status-success);background:var(--ui-status-success-soft);display:flex;align-items:center;justify-content:center;gap:14px">
+          <i data-lucide="truck" width="56" height="56" stroke-width="1.5" style="color:var(--ui-text);display:inline-flex;flex:none"></i>
+          <div style="display:flex;flex-direction:column;gap:6px"><div style="width:38px;height:38px;border-radius:4px;background:#ffffff;border:2px solid var(--ui-status-success);display:flex;align-items:center;justify-content:center"><i data-lucide="cpu" width="22" height="22" stroke-width="2" style="color:var(--ui-status-success);display:inline-flex;flex:none"></i></div><div style="width:38px;height:38px;border-radius:50%;background:var(--ui-status-success);display:flex;align-items:center;justify-content:center"><i data-lucide="refresh-cw" width="20" height="20" stroke-width="2.25" style="color:#ffffff;display:inline-flex;flex:none"></i></div></div>
+        </div>
+      <div style="position:absolute;left:0;top:522px;width:190px;display:flex;align-items:flex-start;justify-content:center;gap:8px;font-size:24px;line-height:1.2;font-weight:600;color:var(--ui-status-success-contrast);text-align:center"><i data-lucide="refresh-cw" width="22" height="22" stroke-width="2.25" style="color:var(--ui-status-success);display:inline-flex;flex:none"></i><span>Sub-second Local Action</span></div>
+      <svg width="1000" height="576" viewBox="0 0 1000 576" style="position:absolute;inset:0;overflow:visible">
+        <defs><marker id="arrG2" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#1d8a5b"></path></marker></defs>
+        <g fill="none" stroke="#1d8a5b" stroke-width="3" stroke-linecap="round">
+          <path d="M200 222 C400 222 460 306 564 310" marker-end="url(#arrG2)"></path>
+          <path d="M200 342 C400 342 460 342 564 342" marker-end="url(#arrG2)"></path>
+          <path d="M200 462 C400 462 460 378 564 374" marker-end="url(#arrG2)"></path>
+        </g>
+      </svg>
+      <div style="position:absolute;left:224px;top:484px;width:340px;display:flex;align-items:flex-start;gap:10px;font-size:24px;line-height:1.35;font-weight:600;color:oklch(0.55 0.1 190)"><i data-lucide="radio-tower" width="26" height="26" stroke-width="2" style="color:oklch(0.55 0.1 190);display:inline-flex;flex:none"></i><span>Filtered Anomalies Only (Up to 90% Bandwidth Savings)</span></div>
+      <div style="position:absolute;left:580px;top:194px;width:420px;height:296px;box-sizing:border-box;border-radius:8px;border:3px solid var(--ui-status-success);background:#ffffff;padding:26px;display:flex;flex-direction:column;gap:20px">
+        <div style="display:flex;align-items:center;gap:12px;font-size:28px;font-weight:700;white-space:nowrap"><i data-lucide="cloud" width="34" height="34" stroke-width="2" style="color:var(--ui-status-success);display:inline-flex;flex:none"></i>Lean Cloud Core</div>
+        <div style="display:flex;align-items:center;gap:8px;align-self:flex-start;padding:6px 12px;border-radius:4px;background:var(--ui-status-success);color:#ffffff;font-size:24px;font-weight:600;line-height:1.25"><i data-lucide="circle-check" width="20" height="20" stroke-width="2.25" style="color:#ffffff;display:inline-flex;flex:none"></i>Operations Control Center</div>
+        <div style="display:flex;gap:12px;margin-top:auto">
+          <div style="width:52px;height:52px;border-radius:8px;background:var(--ui-status-success-soft);display:flex;align-items:center;justify-content:center"><i data-lucide="layers" width="28" height="28" stroke-width="1.75" style="color:oklch(0.55 0.1 190);display:inline-flex;flex:none"></i></div>
+          <div style="width:52px;height:52px;border-radius:8px;background:var(--ui-status-success-soft);display:flex;align-items:center;justify-content:center"><i data-lucide="activity" width="28" height="28" stroke-width="1.75" style="color:oklch(0.55 0.1 190);display:inline-flex;flex:none"></i></div>
+          <div style="width:52px;height:52px;border-radius:8px;background:var(--ui-status-success-soft);display:flex;align-items:center;justify-content:center"><i data-lucide="database" width="28" height="28" stroke-width="1.75" style="color:oklch(0.55 0.1 190);display:inline-flex;flex:none"></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px">
+    <div style="border:2px solid var(--gray-100);border-radius:8px;padding:16px 24px;display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:24px;font-weight:600;letter-spacing:0.03em;text-transform:uppercase;color:var(--ui-text-secondary)">Decision Latency</div>
+      <div style="display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:14px;row-gap:4px;align-items:center;font-size:24px">
+        <span style="font-size:24px;font-weight:700;color:var(--ui-text-tertiary)">BEFORE</span><span style="color:var(--ui-text-tertiary)">10s – minutes</span>
+        <span style="font-size:24px;font-weight:700;color:var(--ui-status-success)">AFTER</span><span style="font-weight:700;color:var(--ui-text)">Sub-second</span>
+      </div>
+    </div>
+    <div style="border:2px solid var(--gray-100);border-radius:8px;padding:16px 24px;display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:24px;font-weight:600;letter-spacing:0.03em;text-transform:uppercase;color:var(--ui-text-secondary)">Data Efficiency</div>
+      <div style="display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:14px;row-gap:4px;align-items:center;font-size:24px">
+        <span style="font-size:24px;font-weight:700;color:var(--ui-text-tertiary)">BEFORE</span><span style="color:var(--ui-text-tertiary)">Up to 95% noise data</span>
+        <span style="font-size:24px;font-weight:700;color:var(--ui-status-success)">AFTER</span><span style="font-weight:700;color:var(--ui-text)">Up to 90% bandwidth savings</span>
+      </div>
+    </div>
+    <div style="border:2px solid var(--gray-100);border-radius:8px;padding:16px 24px;display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:24px;font-weight:600;letter-spacing:0.03em;text-transform:uppercase;color:var(--ui-text-secondary)">Network Risk</div>
+      <div style="display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:14px;row-gap:4px;align-items:center;font-size:24px">
+        <span style="font-size:24px;font-weight:700;color:var(--ui-text-tertiary)">BEFORE</span><span style="color:var(--ui-text-tertiary)">Visibility lost in dead zones</span>
+        <span style="font-size:24px;font-weight:700;color:var(--ui-status-success)">AFTER</span><span style="font-weight:700;color:var(--ui-text)">Offline autonomy</span>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;font-size:24px;color:var(--ui-text-tertiary)"><span>Edge Intelligence for Connected Fleets</span><span>05</span></div>
+</section>
+
+<section data-label="25 Now: The Cost Barrier" data-screen-label="25 Now: The Cost Barrier" data-speaker-notes="Zoom out from fleets to consumer vehicles. Right now, if a car company wants to give a vehicle true local intelligence, it treats the car like a moving data center: dedicated automotive silicon like NVIDIA DRIVE Thor or Tesla's HW4 computer, thousands of dollars per vehicle, liquid cooling, and a large power budget. That keeps advanced local diagnostics and safety features locked in premium tiers. HW4 specs are from teardown analysis; Tesla does not publish them." style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:64px 120px 48px;display:flex;flex-direction:column;box-sizing:border-box;gap:16px" data-om-slide-id="850ff319">
+  <div style="display:flex;gap:8px;align-self:flex-start;padding:6px;border-radius:8px;background:var(--gray-50);border:2px solid var(--gray-100)"><button onClick="{{ goNow }}" style="height:48px;padding:0 24px;border-radius:4px;border:none;cursor:pointer;font-family:var(--font-family-base);font-size:24px;font-weight:600;display:flex;align-items:center;gap:10px;background:var(--ui-status-danger);color:#ffffff"><i data-lucide="lock" width="24" height="24" stroke-width="2" style="color:#ffffff;display:inline-flex;flex:none"></i>Now</button><button onClick="{{ goDream }}" style="height:48px;padding:0 24px;border-radius:4px;border:none;cursor:pointer;font-family:var(--font-family-base);font-size:24px;font-weight:600;display:flex;align-items:center;gap:10px;background:transparent;color:var(--ui-text-secondary)"><i data-lucide="sparkles" width="24" height="24" stroke-width="2" style="color:var(--ui-status-success);display:inline-flex;flex:none"></i>Dream</button></div>
+  <h2 style="margin:0;font-size:46px;font-weight:700;line-height:1.15;letter-spacing:-0.01em">The 'Now' State: The High-Cost Barrier to Consumer Adoption<span style="color:var(--ui-text-tertiary)">*</span></h2>
+  <div style="flex:1;display:grid;grid-template-columns:600px minmax(0,1fr);gap:64px;align-items:center;min-height:0">
+    <div style="display:flex;flex-direction:column;gap:28px">
+      <div style="font-size:32px;font-weight:700">The Cost Bottleneck of Luxury Hardware</div>
+      <div style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;align-items:start">
+        <div style="width:52px;height:52px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--ui-status-danger-soft)"><i data-lucide="receipt" width="30" height="30" stroke-width="2" style="color:var(--ui-status-danger);display:inline-flex;flex:none"></i></div>
+        <div style="font-size:27px;line-height:1.42;text-wrap:pretty"><strong style="font-weight:700">Prohibitive Unit Economics:</strong> Traditional edge intelligence requires dedicated silicon, adding thousands to bill-of-materials (BOM) costs.</div>
+      </div>
+      <div style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;align-items:start">
+        <div style="width:52px;height:52px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--ui-status-danger-soft)"><i data-lucide="hourglass" width="30" height="30" stroke-width="2" style="color:var(--ui-status-danger);display:inline-flex;flex:none"></i></div>
+        <div style="font-size:27px;line-height:1.42;text-wrap:pretty"><strong style="font-weight:700">Ecosystem Isolation:</strong> Features are tied to the vehicle's manufacturing lifecycle, becoming obsolete within a few years.</div>
+      </div>
+      <div style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;align-items:start">
+        <div style="width:52px;height:52px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--ui-status-danger-soft)"><i data-lucide="lock" width="30" height="30" stroke-width="2" style="color:var(--ui-status-danger);display:inline-flex;flex:none"></i></div>
+        <div style="font-size:27px;line-height:1.42;text-wrap:pretty"><strong style="font-weight:700">Luxury Gatekeeping:</strong> Advanced local diagnostics and safety features remain premium options, locked away from everyday drivers.</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="border:2px solid var(--gray-100);border-radius:8px;display:grid;grid-template-columns:220px minmax(0,1fr) minmax(0,1fr)">
+        <div style="padding:12px 20px;background:var(--gray-50);border-bottom:2px solid var(--gray-100);font-size:24px;font-weight:700">Spec</div>
+        <div style="padding:12px 20px;background:var(--gray-50);border-bottom:2px solid var(--gray-100);font-size:24px;font-weight:700">NVIDIA DRIVE Thor</div>
+        <div style="padding:12px 20px;background:var(--gray-50);border-bottom:2px solid var(--gray-100);font-size:24px;font-weight:700;display:flex;flex-wrap:wrap;gap:8px;align-items:center">Tesla HW4 </div>
+        <div style="display:contents"><div style="padding:10px 20px;font-size:24px;font-weight:600;color:var(--ui-text-secondary);border-bottom:2px solid var(--gray-75)">AI inference</div><div style="padding:10px 20px;font-size:24px;border-bottom:2px solid var(--gray-75)">1,000–2,000 TOPS</div><div style="padding:10px 20px;font-size:24px;border-bottom:2px solid var(--gray-75)">~243 TOPS (2 chips)</div></div>
+        <div style="display:contents"><div style="padding:10px 20px;font-size:24px;font-weight:600;color:var(--ui-text-secondary);border-bottom:2px solid var(--gray-75)">CPU</div><div style="padding:10px 20px;font-size:24px;border-bottom:2px solid var(--gray-75)">14-core Arm Neoverse V3AE</div><div style="padding:10px 20px;font-size:24px;border-bottom:2px solid var(--gray-75)">20× Cortex-A72 per chip</div></div>
+        <div style="display:contents"><div style="padding:10px 20px;font-size:24px;font-weight:600;color:var(--ui-text-secondary);border-bottom:2px solid var(--gray-75)">Accelerator</div><div style="padding:10px 20px;font-size:24px;border-bottom:2px solid var(--gray-75)">Blackwell GPU + Tensor Cores</div><div style="padding:10px 20px;font-size:24px;border-bottom:2px solid var(--gray-75)">3 custom NPUs per chip</div></div>
+        <div style="display:contents"><div style="padding:10px 20px;font-size:24px;font-weight:600;color:var(--ui-text-secondary);border-bottom:2px solid var(--gray-75)">RAM</div><div style="padding:10px 20px;font-size:24px;border-bottom:2px solid var(--gray-75)">64–128GB LPDDR5X</div><div style="padding:10px 20px;font-size:24px;border-bottom:2px solid var(--gray-75)">16GB GDDR6</div></div>
+        <div style="display:contents"><div style="padding:10px 20px;font-size:24px;font-weight:600;color:var(--ui-text-secondary);border-bottom:2px solid var(--gray-75)">Power</div><div style="padding:10px 20px;font-size:24px;border-bottom:2px solid var(--gray-75)">~40–130W</div><div style="padding:10px 20px;font-size:24px;border-bottom:2px solid var(--gray-75)">~80–100W (est.)</div></div>
+        <div style="display:contents"><div style="padding:10px 20px;font-size:24px;font-weight:600;color:var(--ui-text-secondary);">Cost</div><div style="padding:10px 20px;font-size:24px;">$600–1,300 per chip (est.)</div><div style="padding:10px 20px;font-size:24px;">~$3,640 service unit</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px">
+        <div style="border-radius:8px;background:var(--ui-status-danger-soft);padding:14px 20px;display:flex;flex-direction:column;gap:4px"><div style="font-size:34px;font-weight:700;color:var(--ui-status-danger-contrast)">~$3,000+</div><div style="font-size:24px">per vehicle, high-end AV platform</div></div>
+        <div style="border-radius:8px;background:var(--ui-status-warning-soft);padding:14px 20px;display:flex;flex-direction:column;gap:4px"><div style="font-size:34px;font-weight:700;color:#c15800">Up to 130W</div><div style="font-size:24px">power draw, plus liquid cooling and wiring</div></div>
+        <div style="border-radius:8px;background:var(--ui-status-danger-soft);padding:14px 20px;display:flex;flex-direction:column;gap:4px"><div style="font-size:34px;font-weight:700;color:var(--ui-status-danger-contrast)">Thousands</div><div style="font-size:24px">in added cost per vehicle</div></div>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;gap:32px;font-size:24px;line-height:1.35;color:var(--ui-text-tertiary)"><span style="white-space:nowrap">Edge Intelligence for Connected Fleets</span><span style="text-align:center;text-wrap:balance;font-size:22px">*Thor: NVIDIA DRIVE AGX Thor developer docs (Dec 2025); chip price est. MarketResearch.com (2025). HW4: SemiAnalysis teardown (TOPS, memory); Electrek (2025, power est.); OEM service-unit listing (cost).</span><span>25</span></div>
+</section><section data-label="26 Dream: Democratization" data-screen-label="26 Dream: Democratization" data-speaker-notes="The dream of democratization happens when we stop trying to change the car's hardware and instead change the software's footprint. Optimize the model down far enough and the compute requirement shrinks to something already in every driver's pocket, their phone, or to a small plug-in dongle in the Pi class. That's how edge intelligence moves from a luxury option toward a universal safety standard. [NEEDS: source for the 97%+ figure before presenting.]" style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:64px 120px 48px;display:flex;flex-direction:column;box-sizing:border-box;gap:16px" data-om-slide-id="379c0044">
+  <div style="display:flex;gap:8px;align-self:flex-start;padding:6px;border-radius:8px;background:var(--gray-50);border:2px solid var(--gray-100)"><button onClick="{{ goNow }}" style="height:48px;padding:0 24px;border-radius:4px;border:none;cursor:pointer;font-family:var(--font-family-base);font-size:24px;font-weight:600;display:flex;align-items:center;gap:10px;background:transparent;color:var(--ui-text-secondary)"><i data-lucide="lock" width="24" height="24" stroke-width="2" style="color:var(--ui-status-danger);display:inline-flex;flex:none"></i>Now</button><button onClick="{{ goDream }}" style="height:48px;padding:0 24px;border-radius:4px;border:none;cursor:pointer;font-family:var(--font-family-base);font-size:24px;font-weight:600;display:flex;align-items:center;gap:10px;background:var(--ui-status-success);color:#ffffff"><i data-lucide="sparkles" width="24" height="24" stroke-width="2" style="color:#ffffff;display:inline-flex;flex:none"></i>Dream</button></div>
+  <h2 style="margin:0;font-size:46px;font-weight:700;line-height:1.15;letter-spacing:-0.01em">The 'Dream' State: Mass Democratization via Handheld Hardware</h2>
+  <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:32px;align-content:center;min-height:0">
+    <div style="border:2px solid var(--ui-status-success);border-radius:8px;padding:32px 36px;display:flex;flex-direction:column;gap:18px">
+      <div style="display:flex;align-items:center;gap:18px"><div style="width:64px;height:64px;border-radius:8px;background:var(--ui-status-success-soft);display:flex;align-items:center;justify-content:center"><i data-lucide="smartphone" width="38" height="38" stroke-width="2" style="color:var(--ui-status-success);display:inline-flex;flex:none"></i></div><div style="font-size:36px;font-weight:700;line-height:1.15">BYOD (Bring Your Own Device)</div></div>
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px"><span style="font-size:48px;font-weight:700;color:var(--ui-status-success-contrast);letter-spacing:-0.01em">$0 Incremental Cost</span></div>
+      <div style="font-size:26px;line-height:1.45;text-wrap:pretty">Running optimized small LLMs directly on consumer mobile processors (e.g., standard smartphone NPUs). The phone interfaces with the car via Bluetooth or a cheap $15 OBD-II dongle. <span style="font-size:24px;font-weight:500;color:var(--ui-text-tertiary)">Source: ELM327 Bluetooth adapters, ~$5–30 retail</span></div>
+      
+      <div style="font-size:26px;line-height:1.45;text-wrap:pretty;border-top:2px solid var(--gray-75);padding-top:16px"><strong style="font-weight:700">Impact:</strong> Instantly turns 1.4 billion existing consumer cars into "smart edge" vehicles overnight. <span style="font-size:24px;font-weight:500;color:var(--ui-text-tertiary)">Source: ~1.475B passenger cars in use, 2024 (WhichCar)</span></div>
+    </div>
+    <div style="border:2px solid var(--ui-status-success);border-radius:8px;padding:32px 36px;display:flex;flex-direction:column;gap:18px">
+      <div style="display:flex;align-items:center;gap:18px"><div style="width:64px;height:64px;border-radius:8px;background:var(--ui-status-success-soft);display:flex;align-items:center;justify-content:center"><i data-lucide="usb" width="38" height="38" stroke-width="2" style="color:var(--ui-status-success);display:inline-flex;flex:none"></i></div><div style="font-size:36px;font-weight:700;line-height:1.15">The Handheld Plug-and-Play Node</div></div>
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px"><span style="font-size:48px;font-weight:700;color:var(--ui-status-success-contrast);letter-spacing:-0.01em">$100s Retail Cost</span></div>
+      <div style="font-size:26px;line-height:1.45;text-wrap:pretty">A tiny, low-power standalone dongle powered by ultra-affordable chips (like a Raspberry Pi Zero or Pi 4 equivalent footprint) that plugs straight into the dashboard.</div>
+      <div style="display:flex;align-items:center;gap:12px;font-size:24px;color:var(--ui-text-secondary)"><i data-lucide="cpu" width="26" height="26" stroke-width="2" style="color:oklch(0.55 0.1 190);display:inline-flex;flex:none"></i><span>Test bed (stand-in for a consumer device): Raspberry Pi 4 · 4-core Arm Cortex-A72 · 8GB RAM</span></div>
+      <div style="font-size:26px;line-height:1.45;text-wrap:pretty;border-top:2px solid var(--gray-75);padding-top:16px"><strong style="font-weight:700">Impact:</strong> Modest algorithmic efficiencies remove the need for fans, heavy wiring, or high battery drain.</div>
+    </div>
+  </div>
+  <div style="background:var(--gray-800);color:#ffffff;border-radius:8px;padding:24px 32px;display:flex;align-items:center;gap:20px;font-size:28px;line-height:1.4;font-weight:600"><i data-lucide="sparkles" width="36" height="36" stroke-width="2" style="color:#41eba4;display:inline-flex;flex:none"></i><span style="flex:1;text-wrap:pretty">By shifting intelligence from custom automotive silicon to small LLMs on handheld hardware, deployment cost drops by 97%+ while making edge safety accessible to 100% of drivers.</span><span style="display:inline-flex;align-items:center;height:34px;padding:0 10px;border-radius:4px;background:var(--amber-100);border:2px solid var(--amber-400);color:#c15800;font-size:24px;font-weight:700;vertical-align:middle;white-space:nowrap">NEEDS: source</span></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;font-size:24px;color:var(--ui-text-tertiary)"><span>Edge Intelligence for Connected Fleets</span><span>26</span></div>
+</section><section data-label="06 Does It Work on a Pi?" data-screen-label="06 Does It Work on a Pi?" data-speaker-notes="The obvious question after that promise: does any of this actually run on a Pi-class device? That answer, with real accuracy, latency and resource numbers from the Pi 4, is the subject of Talk 2, The Greenest Token. This talk stays on the problem and on how Pulsar Functions fit into the edge architecture." style="background:linear-gradient(135deg, var(--purple-700) 0%, oklch(0.42 0.24 272) 60%, oklch(0.5 0.22 262) 100%);overflow:hidden;color:#ffffff;font-family:var(--font-family-base);padding:120px;display:flex;flex-direction:column;box-sizing:border-box" data-om-slide-id="eb2d98a5">
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.05);clip-path:polygon(38% 0, 62% 0, 30% 100%, 8% 100%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.07);clip-path:polygon(70% 0, 100% 0, 100% 55%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(0,0,40,0.12);clip-path:polygon(0 0, 22% 0, 0 45%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.04);clip-path:polygon(58% 100%, 100% 40%, 100% 100%);pointer-events:none"></div>
+  <div style="position:relative;flex:1;display:flex;flex-direction:column;justify-content:center;gap:40px">
+    <h2 style="margin:0;font-size:104px;font-weight:700;line-height:1.05;letter-spacing:-0.02em;text-wrap:balance">The Paradigm Shift &amp; Compute Spectrum</h2>
+  </div>
+  <div style="position:relative;display:flex;justify-content:space-between;align-items:center;font-size:24px;color:var(--purple-200)"><span>Edge Intelligence for Connected Fleets</span><span>06</span></div>
+</section>
+
+<section data-label="09 Proposed Solution: Small LLMs" data-screen-label="09 Proposed Solution: Small LLMs" data-speaker-notes="The proposed solution flips the usual approach. Instead of adding hardware until a model fits, shrink the model until it fits the hardware that's already there. Small LLMs compress what a traditional model does that needs GPU or NPU acceleration into something small and dense enough to run in a pure CPU execution loop. Removing the accelerator dependency is deliberate: it's what lets the software target ubiquitous silicon." style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:88px 120px 48px;display:flex;flex-direction:column;box-sizing:border-box;gap:16px" data-om-slide-id="f7715f7f">
+  <h2 style="margin:0;font-size:56px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">The Proposed Solution – Small LLMs</h2>
+  <div style="flex:1;display:grid;grid-template-columns:minmax(0,1fr) 820px;gap:72px;align-items:center;min-height:0">
+    <div style="display:flex;flex-direction:column;gap:40px">
+      <div style="font-size:40px;font-weight:700;line-height:1.3;text-wrap:pretty">Smaller LLMs deployed on the edge can solve both problems.</div>
+      <div style="display:grid;grid-template-columns:56px minmax(0,1fr);gap:22px;align-items:start">
+        <div style="width:56px;height:56px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--purple-100)"><i data-lucide="minimize-2" width="32" height="32" stroke-width="2" style="color:var(--purple-600);display:inline-flex;flex:none"></i></div>
+        <div style="font-size:30px;line-height:1.45;text-wrap:pretty"><strong style="font-weight:700">Algorithmic Efficiency:</strong> Shrinking model footprint rather than expanding hardware cost.</div>
+      </div>
+      <div style="display:grid;grid-template-columns:56px minmax(0,1fr);gap:22px;align-items:start">
+        <div style="width:56px;height:56px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--purple-100)"><i data-lucide="cpu" width="32" height="32" stroke-width="2" style="color:var(--purple-600);display:inline-flex;flex:none"></i></div>
+        <div style="font-size:30px;line-height:1.45;text-wrap:pretty"><strong style="font-weight:700">Bypassing Accelerators:</strong> Intentionally removing the GPU/NPU dependency to target ubiquitous silicon.</div>
+      </div>
+    </div>
+    <div style="background:var(--gray-800);border-radius:8px;padding:44px;display:flex;flex-direction:column;align-items:center;gap:0">
+      <div style="width:100%;display:grid;grid-template-columns:minmax(0,1fr) 110px minmax(0,1fr);grid-template-rows:auto auto 1fr auto 1fr;gap:16px 0;align-items:center">
+        <div style="font-size:32px;font-weight:700;color:#ffffff;text-align:center">Traditional LLM</div><div></div><div style="font-size:32px;font-weight:700;color:#41eba4;text-align:center">Small LLM</div>
+        <div style="grid-column:1 / -1;display:flex;align-items:center;gap:12px;font-size:24px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#a78bfa"><i data-lucide="minimize-2" width="28" height="28" stroke-width="1.75" style="color:#a78bfa;display:inline-flex;flex:none"></i>Model footprint</div>
+        <div style="height:100%;box-sizing:border-box;border:3px solid #8f969a;border-radius:8px;padding:24px;background:rgba(255,255,255,0.06);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center"><div style="display:grid;grid-template-columns:repeat(6,26px);gap:6px"><div style="width:26px;height:26px;border-radius:3px;background:#8f969a"></div><div style="width:26px;height:26px;border-radius:3px;background:#8f969a"></div><div style="width:26px;height:26px;border-radius:3px;background:#8f969a"></div><div style="width:26px;height:26px;border-radius:3px;background:#8f969a"></div><div style="width:26px;height:26px;border-radius:3px;background:#8f969a"></div><div style="width:26px;height:26px;border-radius:3px;background:#8f969a"></div><div style="width:26px;height:26px;border-radius:3px;background:#8f969a"></div><div style="width:26px;height:26px;border-radius:3px;background:#8f969a"></div><div style="width:26px;height:26px;border-radius:3px;background:#8f969a"></div><div style="width:26px;height:26px;border-radius:3px;background:#8f969a"></div><div style="width:26px;height:26px;border-radius:3px;background:#8f969a"></div><div style="width:26px;height:26px;border-radius:3px;background:#8f969a"></div><div style="width:26px;height:26px;border-radius:3px;background:#8f969a"></div><div style="width:26px;height:26px;border-radius:3px;background:#8f969a"></div><div style="width:26px;height:26px;border-radius:3px;background:#8f969a"></div><div style="width:26px;height:26px;border-radius:3px;background:#8f969a"></div><div style="width:26px;height:26px;border-radius:3px;background:#8f969a"></div><div style="width:26px;height:26px;border-radius:3px;background:#8f969a"></div><div style="width:26px;height:26px;border-radius:3px;background:#8f969a"></div><div style="width:26px;height:26px;border-radius:3px;background:#8f969a"></div><div style="width:26px;height:26px;border-radius:3px;background:#8f969a"></div><div style="width:26px;height:26px;border-radius:3px;background:#8f969a"></div><div style="width:26px;height:26px;border-radius:3px;background:#8f969a"></div><div style="width:26px;height:26px;border-radius:3px;background:#8f969a"></div></div><span style="font-size:26px;font-weight:600;line-height:1.25;color:#c8c8d0">Large, full-precision weights</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#a78bfa"><i data-lucide="arrow-right" width="48" height="48" stroke-width="1.75" style="color:#a78bfa;display:inline-flex;flex:none"></i><span style="font-size:24px;font-weight:700;letter-spacing:0.04em">quantize</span></div>
+        <div style="height:100%;box-sizing:border-box;border:3px solid #41eba4;border-radius:8px;padding:24px;background:rgba(65,235,164,0.12);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center"><div style="height:122px;display:flex;align-items:center"><div style="display:grid;grid-template-columns:repeat(2,26px);gap:6px"><div style="width:26px;height:26px;border-radius:3px;background:#41eba4"></div><div style="width:26px;height:26px;border-radius:3px;background:#41eba4"></div><div style="width:26px;height:26px;border-radius:3px;background:#41eba4"></div><div style="width:26px;height:26px;border-radius:3px;background:#41eba4"></div></div></div><span style="font-size:26px;font-weight:600;line-height:1.25;color:#d6fbe9">Small, dense weights</span></div>
+        <div style="grid-column:1 / -1;display:flex;align-items:center;gap:12px;font-size:24px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#a78bfa"><i data-lucide="cpu" width="28" height="28" stroke-width="1.75" style="color:#a78bfa;display:inline-flex;flex:none"></i>Required silicon</div>
+        <div style="height:100%;box-sizing:border-box;border:3px solid #8f969a;border-radius:8px;padding:24px;background:rgba(255,255,255,0.06);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center"><div style="display:flex;gap:14px"><i data-lucide="server" width="52" height="52" stroke-width="1.75" style="color:#ffffff;display:inline-flex;flex:none"></i><i data-lucide="circuit-board" width="52" height="52" stroke-width="1.75" style="color:#ffffff;display:inline-flex;flex:none"></i></div><span style="font-size:26px;font-weight:600;line-height:1.25;color:#c8c8d0">GPU / NPU accelerator</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#a78bfa"><i data-lucide="arrow-right" width="48" height="48" stroke-width="1.75" style="color:#a78bfa;display:inline-flex;flex:none"></i></div>
+        <div style="height:100%;box-sizing:border-box;border:3px solid #41eba4;border-radius:8px;padding:24px;background:rgba(65,235,164,0.12);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center"><div style="display:flex;gap:14px"><i data-lucide="cpu" width="52" height="52" stroke-width="1.75" style="color:#41eba4;display:inline-flex;flex:none"></i><i data-lucide="refresh-cw" width="52" height="52" stroke-width="1.75" style="color:#41eba4;display:inline-flex;flex:none"></i></div><span style="font-size:26px;font-weight:600;line-height:1.25;color:#d6fbe9">General-purpose CPU loop</span></div>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;font-size:24px;color:var(--ui-text-tertiary)"><span>Edge Intelligence for Connected Fleets</span><span>09</span></div>
+</section>
+
+<section data-label="10 Pure-CPU Compute Spectrum" data-screen-label="10 Pure-CPU Compute Spectrum" data-speaker-notes="Map compute architecture from left to right. Cloud cores have effectively unlimited GPU clusters. Luxury edge AV platforms bring 500-plus TOPS of dedicated NPU. Smartphones sit around 35 to 80 TOPS of NPU. At the far right is the commodity test-bed: a Raspberry Pi 4, a quad-core ARM CPU with zero AI TOPS. Traditionally, running an LLM was only feasible from the cloud to the luxury edge. The bet of this talk is that small LLM architectures extend feasibility all the way to the Pi, which stands in here for a consumer electronic device. And if a small LLM reasons successfully on an unassisted Pi CPU, it can run effortlessly on consumer smartphones. Sources: Apple A18 Pro 35 TOPS (Apple); Pi 4 2GB $55 (PiShop.us)." style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:48px 120px 40px;display:flex;flex-direction:column;box-sizing:border-box;gap:12px" data-om-slide-id="d72e3698">
+  <h2 style="margin:0;font-size:56px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">Visualizing the Compute Spectrum<span data-om-id="60bc2619:487" style="color: var(--ui-text-tertiary);">*</span></h2>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;min-height:0">
+    <img src="assets/compute-spectrum.jpeg" alt="Compute spectrum: a GPU server rack and a liquid-cooled automotive AI unit inside the traditional feasibility range, then a smartphone at 35 TOPS and a small single-board computer toward zero TOPS" style="display:block;width:100%;height:100%;min-height:0;object-fit:contain;border-radius:8px">
+  </div>
+  <div style="font-size:28px;font-style:italic;line-height:1.3;text-align:center;color:var(--ui-text);text-wrap:pretty">"If a small LLM reasons successfully on an unassisted Pi CPU, it can run effortlessly on consumer smartphones."</div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:12px;gap:32px;font-size:24px;color:var(--ui-text-tertiary)"><span style="white-space:nowrap">Edge Intelligence for Connected Fleets</span><span style="text-align:center;font-size:22px">*Sources: Apple A18 Pro Neural Engine, 35 TOPS (Apple); Pi 4 2GB, $55 (PiShop.us)</span><span>10</span></div>
+</section>
+
+
+
+
+
+<section data-label="Section: Solution Architecture" data-screen-label="Section: Solution Architecture" data-speaker-notes="Section divider. From the idea to the architecture: how Apache Pulsar Functions and small LLMs fit together on the edge." style="background:linear-gradient(135deg, var(--purple-700) 0%, oklch(0.42 0.24 272) 60%, oklch(0.5 0.22 262) 100%);overflow:hidden;color:#ffffff;font-family:var(--font-family-base);padding:120px;display:flex;flex-direction:column;box-sizing:border-box" data-om-slide-id="5b9d7fc3">
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.05);clip-path:polygon(38% 0, 62% 0, 30% 100%, 8% 100%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.07);clip-path:polygon(70% 0, 100% 0, 100% 55%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(0,0,40,0.12);clip-path:polygon(0 0, 22% 0, 0 45%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.04);clip-path:polygon(58% 100%, 100% 40%, 100% 100%);pointer-events:none"></div>
+  <div style="position:relative;flex:1;display:flex;flex-direction:column;justify-content:center;gap:40px">
+    <h2 style="margin:0;font-size:104px;font-weight:700;line-height:1.05;letter-spacing:-0.02em;text-wrap:balance">The Solution Architecture &amp; Apache Pulsar</h2>
+  </div>
+  <div style="position:relative;display:flex;justify-content:space-between;align-items:center;font-size:24px;color:var(--purple-200)"><span>Edge Intelligence for Connected Fleets</span><span>11</span></div>
+</section>
+
+<section data-label="12 What Are Pulsar Functions?" data-screen-label="12 What Are Pulsar Functions?" data-speaker-notes="A quick point of reference for anyone who hasn't used them. Pulsar Functions are lambda-style serverless compute that runs inside the messaging layer, so there's no separate compute infrastructure to stand up. They consume a topic, evaluate local state, and route results to another topic, which covers stream processing without an external streaming engine. And they're lightweight: an isolated execution thread small enough for resource-constrained embedded nodes. That last property is what makes them a fit for the truck. [NEEDS: source for the sub-millisecond figure.]" style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:88px 120px 48px;display:flex;flex-direction:column;box-sizing:border-box;gap:16px" data-om-slide-id="782e968e">
+  <h2 style="margin:0;font-size:56px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">What are Apache Pulsar Functions?</h2>
+  <div style="flex:1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px;align-content:center;min-height:0">
+    <div style="border:2px solid var(--gray-100);border-radius:8px;padding:40px;display:flex;flex-direction:column;gap:24px">
+      <div style="width:80px;height:80px;border-radius:8px;background:var(--purple-100);display:flex;align-items:center;justify-content:center"><i data-lucide="zap" width="46" height="46" stroke-width="2" style="color:var(--purple-600);display:inline-flex;flex:none"></i></div>
+      <div style="font-size:40px;font-weight:700;line-height:1.15">Zero-Infra Compute</div>
+      <div style="flex:1;font-size:28px;line-height:1.5;color:var(--ui-text-secondary);text-wrap:pretty">Lambda-style serverless compute loops running directly inside the messaging broker layer.</div>
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;background:var(--gray-25);border-radius:8px;padding:18px"><span style="display:flex;align-items:center;height:40px;padding:0 12px;border-radius:4px;font-family:var(--font-family-monospace);font-size:24px;background:#ffffff;border:2px solid var(--gray-150);color:var(--ui-text-secondary)">broker</span><span style="display:flex;align-items:center;height:40px;padding:0 12px;border-radius:4px;font-family:var(--font-family-monospace);font-size:24px;background:var(--purple-600);color:#ffffff">ƒ(x)</span></div>
+    </div>
+    <div style="border:2px solid var(--gray-100);border-radius:8px;padding:40px;display:flex;flex-direction:column;gap:24px">
+      <div style="width:80px;height:80px;border-radius:8px;background:var(--purple-100);display:flex;align-items:center;justify-content:center"><i data-lucide="workflow" width="46" height="46" stroke-width="2" style="color:var(--purple-600);display:inline-flex;flex:none"></i></div>
+      <div style="font-size:40px;font-weight:700;line-height:1.15">Native Stream Processing</div>
+      <div style="flex:1;font-size:28px;line-height:1.5;color:var(--ui-text-secondary);text-wrap:pretty">Intercepts incoming telemetry topics, evaluates local state, and routes alerts instantly without external streaming engines.</div>
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;background:var(--gray-25);border-radius:8px;padding:18px"><span style="display:flex;align-items:center;height:40px;padding:0 12px;border-radius:4px;font-family:var(--font-family-monospace);font-size:24px;background:#ffffff;border:2px solid var(--gray-150);color:var(--ui-text-secondary)">topic</span><span style="display:flex"><i data-lucide="arrow-right" width="26" height="26" stroke-width="2" style="color:var(--gray-400);display:inline-flex;flex:none"></i></span><span style="display:flex;align-items:center;height:40px;padding:0 12px;border-radius:4px;font-family:var(--font-family-monospace);font-size:24px;background:var(--purple-600);color:#ffffff">ƒ(x)</span><span style="display:flex"><i data-lucide="arrow-right" width="26" height="26" stroke-width="2" style="color:var(--gray-400);display:inline-flex;flex:none"></i></span><span style="display:flex;align-items:center;height:40px;padding:0 12px;border-radius:4px;font-family:var(--font-family-monospace);font-size:24px;background:#ffffff;border:2px solid var(--gray-150);color:var(--ui-text-secondary)">alert</span></div>
+    </div>
+    <div style="border:2px solid var(--gray-100);border-radius:8px;padding:40px;display:flex;flex-direction:column;gap:24px">
+      <div style="width:80px;height:80px;border-radius:8px;background:var(--purple-100);display:flex;align-items:center;justify-content:center"><i data-lucide="feather" width="46" height="46" stroke-width="2" style="color:var(--purple-600);display:inline-flex;flex:none"></i></div>
+      <div style="font-size:40px;font-weight:700;line-height:1.15">Lightweight Footprint</div>
+      <div style="flex:1;font-size:28px;line-height:1.5;color:var(--ui-text-secondary);text-wrap:pretty">Highly isolated, sub-millisecond execution thread tailored for resource-constrained embedded nodes. </div>
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;background:var(--gray-25);border-radius:8px;padding:18px"><i data-lucide="cpu" width="30" height="30" stroke-width="2" style="color:var(--purple-600);display:inline-flex;flex:none"></i><span style="font-size:24px;color:var(--ui-text-secondary)">one thread on an embedded node</span></div>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;font-size:24px;color:var(--ui-text-tertiary)"><span>Edge Intelligence for Connected Fleets</span><span>12</span></div>
+</section>
+
+<section data-label="13 Embedded Architecture Blueprint" data-screen-label="13 Embedded Architecture Blueprint" data-speaker-notes="Here's the blueprint on the vehicle. CAN bus sensor readings land on a local Pulsar ingestion topic, on a broker running on the edge device itself. Anomalous-event filtering logic runs first, so only filtered events reach the model; that keeps the LLM from building up a backlog. A Pulsar Function, running inside the local broker, hosts the small LLM on a CPU runtime and evaluates each filtered event. Its output goes out through the filtered egress pipeline to the cloud control center. The processing boundary, function plus model, stays entirely inside local CPU memory." style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:88px 120px 48px;display:flex;flex-direction:column;box-sizing:border-box;gap:16px" data-om-slide-id="de4bdb4d">
+  <h2 style="margin:0;font-size:56px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">Embedded System Architecture Blueprint</h2>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:28px;min-height:0">
+    <div style="display:flex;align-items:stretch;gap:0">
+      <div style="flex:4.6;display:flex;flex-direction:column;gap:14px;min-width:0">
+        <div style="display:flex;align-items:center;gap:12px;font-size:24px;font-weight:700;color:var(--ui-text-secondary);letter-spacing:0.04em;text-transform:uppercase"><i data-lucide="truck" width="30" height="30" stroke-width="2" style="color:var(--ui-text-secondary);display:inline-flex;flex:none"></i>On the vehicle</div>
+        <div style="flex:1;display:flex;align-items:center;border:3px dashed var(--gray-200);border-radius:8px;padding:28px 20px">
+          <div style="flex:1;min-width:0;border-radius:8px;padding:28px 22px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;border:2px solid var(--gray-150);background:#ffffff">
+        <i data-lucide="radio" width="44" height="44" stroke-width="2" style="color:var(--ui-text);display:inline-flex;flex:none"></i>
+        <div style="font-size:27px;font-weight:700;line-height:1.25">Vehicle CAN Bus Sensors</div>
+        <div style="font-size:24px;line-height:1.35;color:var(--ui-text-secondary)">raw readings</div>
+      </div>
+          <div style="flex:none;width:48px;display:flex;justify-content:center"><i data-lucide="arrow-right" width="40" height="40" stroke-width="2.25" style="color:var(--gray-400);display:inline-flex;flex:none"></i></div>
+          <div style="flex:1;min-width:0;border-radius:8px;padding:28px 22px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;border:2px solid var(--gray-150);background:#ffffff">
+        <i data-lucide="inbox" width="44" height="44" stroke-width="2" style="color:var(--ui-text);display:inline-flex;flex:none"></i>
+        <div style="font-size:27px;font-weight:700;line-height:1.25">Local Pulsar Broker Ingestion Topic</div>
+        <div style="font-size:24px;line-height:1.35;color:var(--ui-text-secondary)">telemetry in</div>
+      </div>
+          <div style="flex:none;width:48px;display:flex;justify-content:center"><i data-lucide="arrow-right" width="40" height="40" stroke-width="2.25" style="color:var(--gray-400);display:inline-flex;flex:none"></i></div>
+          <div style="flex:1;min-width:0;border-radius:8px;padding:28px 22px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;border:2px solid var(--gray-150);background:#ffffff">
+        <i data-lucide="filter" width="44" height="44" stroke-width="2" style="color:var(--ui-text);display:inline-flex;flex:none"></i>
+        <div style="font-size:27px;font-weight:700;line-height:1.25">Anomalous Event Filtering Logic</div>
+        <div style="font-size:24px;line-height:1.35;color:var(--ui-text-secondary)">anomalies only</div>
+      </div>
+          <div style="flex:none;width:48px;display:flex;justify-content:center"><i data-lucide="arrow-right" width="40" height="40" stroke-width="2.25" style="color:var(--gray-400);display:inline-flex;flex:none"></i></div>
+          <div style="flex:1;min-width:0;border-radius:8px;padding:28px 22px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;border:3px solid #e0a100;background:linear-gradient(160deg,#fff7e0,#e3f6f4);box-shadow:0 0 0 8px rgba(255,184,77,0.25),0 0 48px 8px rgba(40,170,160,0.35)">
+        <i data-lucide="cpu" width="48" height="48" stroke-width="2.25" style="color:#c15800;display:inline-flex;flex:none"></i>
+        <div style="font-size:27px;font-weight:700;line-height:1.25">Pulsar Function: LLM CPU Runtime Engine</div>
+        <div style="font-size:24px;line-height:1.35;color:var(--ui-text-secondary)">stays in local CPU memory</div>
+      </div>
+        </div>
+      </div>
+      <div style="flex:none;width:48px;display:flex;justify-content:center"><i data-lucide="arrow-right" width="40" height="40" stroke-width="2.25" style="color:var(--gray-400);display:inline-flex;flex:none"></i></div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:14px;min-width:0">
+        <div style="display:flex;align-items:center;gap:12px;font-size:24px;font-weight:700;color:var(--ui-text-secondary);letter-spacing:0.04em;text-transform:uppercase"><i data-lucide="cloud" width="30" height="30" stroke-width="2" style="color:var(--ui-text-secondary);display:inline-flex;flex:none"></i>Cloud</div>
+        <div style="flex:1;display:flex;padding:28px 0">
+          <div style="flex:1;min-width:0;border-radius:8px;padding:28px 22px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;border:2px solid oklch(0.55 0.1 190);background:#ffffff">
+        <i data-lucide="radio-tower" width="44" height="44" stroke-width="2" style="color:oklch(0.55 0.1 190);display:inline-flex;flex:none"></i>
+        <div style="font-size:27px;font-weight:700;line-height:1.25">Filtered Egress Pipeline to Cloud Control Center</div>
+        <div style="font-size:24px;line-height:1.35;color:var(--ui-text-secondary)"></div>
+      </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;font-size:24px;color:var(--ui-text-tertiary)"><span>Edge Intelligence for Connected Fleets</span><span>13</span></div>
+</section>
+
+<section data-label="Section: Connected Fleet Use Case" data-screen-label="Section: Connected Fleet Use Case" data-speaker-notes="Section divider. From the architecture to the use case: what the connected fleet actually sends, and how the pipeline turns it into a decision." style="background:linear-gradient(135deg, var(--purple-700) 0%, oklch(0.42 0.24 272) 60%, oklch(0.5 0.22 262) 100%);overflow:hidden;color:#ffffff;font-family:var(--font-family-base);padding:120px;display:flex;flex-direction:column;box-sizing:border-box" data-om-slide-id="075a9c76">
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.05);clip-path:polygon(38% 0, 62% 0, 30% 100%, 8% 100%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.07);clip-path:polygon(70% 0, 100% 0, 100% 55%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(0,0,40,0.12);clip-path:polygon(0 0, 22% 0, 0 45%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.04);clip-path:polygon(58% 100%, 100% 40%, 100% 100%);pointer-events:none"></div>
+  <div style="position:relative;flex:1;display:flex;flex-direction:column;justify-content:center;gap:40px">
+    <h2 style="margin:0;font-size:104px;font-weight:700;line-height:1.05;letter-spacing:-0.02em;text-wrap:balance">The Connected Fleet Use Case</h2>
+  </div>
+  <div style="position:relative;display:flex;justify-content:space-between;align-items:center;font-size:24px;color:var(--purple-200)"><span>Edge Intelligence for Connected Fleets</span><span>14</span></div>
+</section>
+
+<section data-label="01 Watching the Whole Fleet" data-screen-label="01 Watching the Whole Fleet" data-speaker-notes="Start at the highest level: this talk is about observing an entire fleet of class 8 trucks, semi-trucks, not a single vehicle. A control center watches every truck at once, much like flight control or air traffic control. The point of watching is to catch a vehicle that is slowing down and use it as a signal to the rest of the fleet: reroute before they reach the same stretch of road." style="background:var(--gray-800);color:#ffffff;font-family:var(--font-family-base);padding:0;box-sizing:border-box" data-om-slide-id="302f63f5">
+  <div style="position:relative;width:100%;height:100%">
+    <image-slot id="fleet-control-center" shape="rect" placeholder="Fleet of trucks dispatched across a map + control center with operators watching metrics and talking to trucks"></image-slot>
+    <div style="position:absolute;left:0;right:0;bottom:0;pointer-events:none;background:rgba(18,18,22,0.86);padding:48px 120px 44px;display:flex;justify-content:space-between;align-items:flex-end;gap:80px">
+      <div style="display:flex;flex-direction:column;gap:16px;max-width:1400px">
+        <h2 style="margin:0;font-size:64px;font-weight:700;line-height:1.1;letter-spacing:-0.01em">Watching the Whole Fleet</h2>
+        <div style="font-size:32px;line-height:1.4;color:#e0e0e6;text-wrap:pretty">A control center observes every class 8 truck at once. When one truck slows down, that becomes a signal for the rest of the fleet to reroute.</div>
+      </div>
+      <div style="font-size:24px;color:#c8c8d0">01</div>
+    </div>
+  </div>
+</section><section data-label="02 Every Truck Reports In" data-screen-label="02 Every Truck Reports In" data-speaker-notes="Zoom in to one truck. Each rig carries a small onboard computer that collects readings from sensors across the tractor and sends them back to the control center over cellular. That onboard computer is where this talk's code runs." style="background:var(--gray-800);color:#ffffff;font-family:var(--font-family-base);padding:0;box-sizing:border-box" data-om-slide-id="47e3ba07">
+  <div style="position:relative;width:100%;height:100%">
+    <image-slot id="truck-sensors" shape="rect" placeholder="Side view of a semi tractor rig: sensors emitting waves from points on the truck, cellular antenna, small onboard computer"></image-slot>
+    <div style="position:absolute;left:0;right:0;bottom:0;pointer-events:none;background:rgba(18,18,22,0.86);padding:48px 120px 44px;display:flex;justify-content:space-between;align-items:flex-end;gap:80px">
+      <div style="display:flex;flex-direction:column;gap:16px;max-width:1400px">
+        <h2 style="margin:0;font-size:64px;font-weight:700;line-height:1.1;letter-spacing:-0.01em">Every Truck Reports In</h2>
+        <div style="font-size:32px;line-height:1.4;color:#e0e0e6;text-wrap:pretty">A small onboard computer collects sensor readings from across the rig and sends them back to the control center over cellular.</div>
+      </div>
+      <div style="font-size:24px;color:#c8c8d0">02</div>
+    </div>
+  </div>
+</section><section data-label="03 What a Truck Sends" data-screen-label="03 What a Truck Sends" data-speaker-notes="This is what one of those readings looks like on the wire: a single TelemetryEvent, published to the truck-telemetry topic. Speed, GPS, heading, route segment and corridor, planned versus current ETA, cheap-math signals, and raw braking readings. Values shown are illustrative of a truck mid-slowdown. Each truck carries more than 2,500 sensor readings in total. Every schema and pipeline stage that follows exists to turn this stream into a reroute decision." style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:88px 120px 56px;display:flex;flex-direction:column;box-sizing:border-box" data-om-slide-id="11ab8b8c">
+  <h2 style="margin:0;font-size:60px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">What a Truck Senses: One Telemetry Event</h2>
+  <div style="flex:1;display:grid;grid-template-columns:minmax(0,1fr) 520px;gap:72px;align-items:center">
+    <div style="background:var(--gray-800);color:#ffffff;border-radius:8px;padding:36px 44px;font-family:var(--font-family-monospace);font-size:24px;line-height:1.5;white-space:pre;letter-spacing:-0.01em">{
+  <span style="color:#5bceff">"timestamp"</span>: <span style="color:#41eba4">"2026-10-14T14:32:05Z"</span>,
+  <span style="color:#5bceff">"truck_id"</span>: <span style="color:#41eba4">"truck-47"</span>,
+  <span style="color:#5bceff">"speed_mph"</span>: <span style="color:#ffb84d">33.8</span>,
+  <span style="color:#5bceff">"gps"</span>: { <span style="color:#5bceff">"lat"</span>: <span style="color:#ffb84d">33.9612</span>, <span style="color:#5bceff">"lon"</span>: <span style="color:#ffb84d">-84.4000</span> },
+  <span style="color:#5bceff">"heading"</span>: <span style="color:#ffb84d">0.0</span>,
+  <span style="color:#5bceff">"route_segment"</span>: <span style="color:#41eba4">"I-95N-segment-4"</span>,
+  <span style="color:#5bceff">"corridor"</span>: <span style="color:#41eba4">"I-95N"</span>,
+  <span style="color:#5bceff">"planned_eta"</span>: <span style="color:#41eba4">"2026-10-14T15:05:00Z"</span>,
+  <span style="color:#5bceff">"current_eta"</span>: <span style="color:#41eba4">"2026-10-14T15:12:12Z"</span>,
+  <span style="color:#5bceff">"signals"</span>: {
+    <span style="color:#5bceff">"rolling_avg_speed"</span>: <span style="color:#ffb84d">36.1</span>,
+    <span style="color:#5bceff">"eta_slip_min"</span>: <span style="color:#ffb84d">7.2</span>,
+    <span style="color:#5bceff">"stop_go_index"</span>: <span style="color:#ffb84d">0.74</span>
+  },
+  <span style="color:#5bceff">"brake_events"</span>: <span style="color:#ffb84d">1</span>,
+  <span style="color:#5bceff">"downshift_events"</span>: <span style="color:#ffb84d">1</span>,
+  <span style="color:#5bceff">"peak_deceleration_g"</span>: <span style="color:#ffb84d">0.31</span>,
+  <span style="color:#5bceff">"abs_engaged"</span>: <span style="color:#ff63a5">false</span>
+}</div>
+    <div style="display:flex;flex-direction:column;gap:12px;border-left:4px solid var(--ui-brand);padding-left:48px">
+      <div style="font-size:180px;font-weight:700;line-height:1;letter-spacing:-0.03em;color:var(--ui-brand)">&gt; 2k</div>
+      <div style="font-size:44px;font-weight:600">sensor readings per truck</div>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:20px;font-size:24px;color:var(--ui-text-tertiary)"><span>Edge Intelligence for Connected Fleets</span><span>03</span></div>
+</section>
+
+<section data-label="Co-Processor Sequence" data-screen-label="Co-Processor Sequence" data-speaker-notes="Before the payload, watch a sequence of readings from a single truck, truck-47, flow into the co-processor, 45 seconds of driving on I-95N. First, severity here is about delivery impact: how badly a slowdown threatens the ETA, not a crash. At zero seconds the truck is cruising; no signals fire and nothing is sent. At ten seconds average speed drops under 40, but low speed alone is noise. At twenty seconds stop-and-go kicks in and all three signals fire, but the ETA has only slipped 2.4 minutes, under the 3-minute gate, so it isn't worth LLM time. At thirty seconds the ETA slip crosses the gate: a real slowdown, and moderate braking with a stop-go index of 0.74 gives a medium baseline. At forty-five seconds ABS engages, which always forces high. That's the event the next slide shows as a triage payload. Values are illustrative; thresholds are the real ones from detection.py, coprocessor.py and severity_classifier.py." style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:56px 120px 44px;display:flex;flex-direction:column;box-sizing:border-box;gap:18px" data-om-slide-id="fcb411f5">
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:40px">
+    <h2 style="margin:0;font-size:56px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">How a Slowdown Becomes High Severity</h2>
+    <button onClick="{{ replaySeq }}" style="flex:none;height:48px;padding:0 20px;border-radius:4px;border:2px solid var(--gray-150);background:#ffffff;cursor:pointer;font-family:var(--font-family-base);font-size:24px;font-weight:600;color:var(--ui-text-secondary);display:flex;align-items:center;gap:10px" style-hover="background:var(--gray-50)"><i data-lucide="rotate-ccw" width="22" height="22" stroke-width="2" style="display:inline-flex"></i>Replay</button>
+  </div>
+  <div style="display:flex;align-items:center;gap:16px;font-size:28px;line-height:1.3"><i data-lucide="truck" width="34" height="34" stroke-width="2" style="color:var(--ui-text);display:inline-flex;flex:none"></i><span><strong style="font-weight:700">One truck, five readings in a row:</strong> <span style="font-family:var(--font-family-monospace);font-weight:600">truck-47</span> on I-95N</span></div>
+  <div style="display:flex;align-items:center;gap:20px;background:var(--purple-100);border-radius:8px;padding:18px 28px">
+    <i data-lucide="clock" width="36" height="36" stroke-width="2" style="color:var(--purple-600);display:inline-flex;flex:none"></i>
+    <div style="font-size:28px;line-height:1.35"><strong style="font-weight:700">Severity = ETA impact.</strong> How badly a slowdown threatens the delivery window, not a crash.</div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;min-height:0">
+    <div style="display:grid;grid-template-columns:136px 235px 190px 175px 175px 160px minmax(0,1fr);align-items:end;gap:0 12px;padding:0 16px 12px;border-bottom:2px solid var(--gray-100);font-family:var(--font-family-monospace);font-size:22px;color:var(--ui-text-secondary)">
+      <span style="font-family:var(--font-family-base);font-weight:600">truck-47</span>
+      <span>rolling_avg_speed</span>
+      <span>stop_go_index</span>
+      <span>eta_slip_min</span>
+      <span>peak_decel_g</span>
+      <span>abs_engaged</span>
+      <span style="font-family:var(--font-family-base);font-weight:700;color:var(--ui-text);display:flex;align-items:center;gap:10px"><i data-lucide="cpu" width="26" height="26" stroke-width="2" style="color:var(--purple-600);display:inline-flex"></i>Co-processor result</span>
+    </div>
+    <sc-for list="{{ seqRows }}" as="r" hint-placeholder-count="5">
+      <div style="display:grid;grid-template-columns:136px 235px 190px 175px 175px 160px minmax(0,1fr);align-items:center;gap:0 12px;padding:8px 16px;border-bottom:2px solid var(--gray-75);opacity:{{ r.op }};transform:{{ r.tf }};transition:opacity 0.5s ease, transform 0.5s ease, background 0.4s ease;background:{{ r.bg }}">
+        <div style="display:flex;flex-direction:column;gap:2px"><span style="font-family:var(--font-family-monospace);font-size:22px;font-weight:600">{{ r.t }}</span><span style="font-size:22px;color:var(--ui-text-secondary)">{{ r.label }}</span></div>
+        <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="5">
+          <div style="justify-self:start;display:flex;align-items:center;height:40px;padding:0 10px;border-radius:4px;font-family:var(--font-family-monospace);font-size:22px;font-weight:{{ c.weight }};color:{{ c.color }};background:{{ c.bg }};box-shadow:{{ c.shadow }};transition:box-shadow 0.5s ease, background 0.5s ease">{{ c.v }}</div>
+        </sc-for>
+        <div style="display:flex;align-items:center;gap:14px;min-width:0">
+          <span style="flex:none;display:flex;align-items:center;height:38px;padding:0 12px;border-radius:4px;font-size:22px;font-weight:700;background:{{ r.badgeBg }};color:{{ r.badgeFg }}">{{ r.result }}</span>
+          <span style="font-size:22px;line-height:1.3;color:var(--ui-text-secondary)">{{ r.why }}</span>
+        </div>
+      </div>
+    </sc-for>
+    <div style="margin-top:16px;display:flex;align-items:center;gap:20px;background:var(--gray-800);color:#ffffff;border-radius:8px;padding:12px 24px;opacity:{{ seqFinalOp }};transition:opacity 0.6s ease">
+      <span style="flex:none;display:flex;align-items:center;height:44px;padding:0 16px;border-radius:4px;background:var(--ui-status-danger);font-size:24px;font-weight:700">HIGH</span>
+      <span style="font-size:26px;line-height:1.3">truck-47, I-95N: ETA slipping 5.4 min and climbing, ABS engaged. Only events that clear the gate reach the LLM.</span>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;font-size:24px;color:var(--ui-text-tertiary)"><span>Edge Intelligence for Connected Fleets</span><span>18</span></div>
+</section>
+
+<section data-label="What the Co-Processor Sends" data-screen-label="What the Co-Processor Sends" data-speaker-notes="Here's what comes out of the co-processor. The raw reading has passed the cheap-math slowdown check and the ETA-slip magnitude gate, so it's worth the LLM's time. The payload names which signals fired, restates the metrics, turns the stop-go index into a plain-language traffic pattern, and adds context a threshold can't capture: weather, cargo, dispatch status. It also carries a baseline severity, computed deterministically before the LLM runs. The LLM's only job is to raise, hold, or lower that baseline. Payload shape per coprocessor.build_triage_payload; values follow the telemetry example on the previous slide." style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:88px 120px 56px;display:flex;flex-direction:column;box-sizing:border-box" data-om-slide-id="67a8f4c3">
+  <h2 style="margin:0;font-size:60px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">What the Co-Processor Sends: One Triage Payload</h2>
+  <div style="flex:1;display:grid;grid-template-columns:minmax(0,1fr) 460px;gap:56px;align-items:center">
+    <div style="background:var(--gray-800);color:#ffffff;border-radius:8px;padding:36px 32px;font-family:var(--font-family-monospace);font-size:24px;line-height:1.5;white-space:pre;letter-spacing:-0.01em">{
+  <span style="color:#5bceff">"truck_id"</span>: <span style="color:#41eba4">"truck-47"</span>,
+  <span style="color:#5bceff">"corridor"</span>: <span style="color:#41eba4">"I-95N"</span>,
+  <span style="color:#5bceff">"signals"</span>: [<span style="color:#41eba4">"sustained_low_speed"</span>, <span style="color:#41eba4">"stop_go_index"</span>, <span style="color:#41eba4">"eta_slip"</span>],
+  <span style="color:#5bceff">"metrics"</span>: {
+    <span style="color:#5bceff">"rolling_avg_speed"</span>: <span style="color:#ffb84d">36.1</span>,
+    <span style="color:#5bceff">"eta_slip_min"</span>: <span style="color:#ffb84d">7.2</span>,
+    <span style="color:#5bceff">"traffic_pattern"</span>: <span style="color:#41eba4">"elevated velocity variance (frequent speed cycling)"</span>,
+    <span style="color:#5bceff">"peak_deceleration_g"</span>: <span style="color:#ffb84d">0.31</span>,
+    <span style="color:#5bceff">"abs_engaged"</span>: <span style="color:#ff63a5">false</span>
+  },
+  <span style="color:#5bceff">"baseline_severity"</span>: <span style="color:#41eba4">"medium"</span>,
+  <span style="color:#5bceff">"contextual_triggers"</span>: {
+    <span style="color:#5bceff">"local_time"</span>: <span style="color:#41eba4">"2026-10-14T14:32:05+00:00"</span>,
+    <span style="color:#5bceff">"weather_condition"</span>: <span style="color:#41eba4">"Heavy rain, wet asphalt"</span>,
+    <span style="color:#5bceff">"cargo_type"</span>: <span style="color:#41eba4">"Liquids / Chemical Tanker"</span>,
+    <span style="color:#5bceff">"dispatch_status"</span>: <span style="color:#41eba4">"Running 20 minutes behind schedule"</span>
+  }
+}</div>
+    <div style="display:flex;flex-direction:column;gap:12px;border-left:4px solid var(--ui-brand);padding-left:48px">
+      <div style="font-size:104px;font-weight:700;line-height:1;letter-spacing:-0.03em;color:var(--ui-brand)">medium</div>
+      <div style="font-size:44px;font-weight:600">baseline severity</div>
+      <div style="font-size:28px;line-height:1.4;color:var(--ui-text-secondary);margin-top:8px;text-wrap:pretty">set before the LLM runs; the LLM only raises, holds, or lowers it</div>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:20px;font-size:24px;color:var(--ui-text-tertiary)"><span>Edge Intelligence for Connected Fleets</span><span>19</span></div>
+</section>
+
+<section data-label="What the LLM Decides" data-screen-label="What the LLM Decides" data-speaker-notes="This is what comes out of the LLM for the payload on the previous slide. The model only writes two things: a risk_synthesis explaining its reasoning, and an escalation of raise, hold, or lower. Here it reads heavy rain, a liquid chemical tanker, and a driver running behind, and raises. Everything else on the card is deterministic: the final severity is the baseline moved one step, medium to high; the recommended action is a lookup on the escalation; eta_impact is the measured slip in minutes. Because the final severity is high, this card is what goes over the cellular link. Card shape per LlmTriageFunction.process; the risk_synthesis text is illustrative." style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:88px 120px 56px;display:flex;flex-direction:column;box-sizing:border-box" data-om-slide-id="80e99239">
+  <h2 style="margin:0;font-size:60px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">What the LLM Decides: One Enrichment Card</h2>
+  <div style="flex:1;display:grid;grid-template-columns:minmax(0,1fr) 460px;gap:56px;align-items:center">
+    <div style="background:var(--gray-800);color:#ffffff;border-radius:8px;padding:36px 32px;font-family:var(--font-family-monospace);font-size:24px;line-height:1.5;white-space:pre-wrap;letter-spacing:-0.01em">{
+  <span style="color:#5bceff">"risk_synthesis"</span>:
+    <span style="color:#41eba4">"Heavy rain degrades traction, the cargo is a
+     liquid chemical tanker, and the driver is 20
+     minutes behind under schedule pressure. All
+     three are risk multipliers."</span>,
+  <span style="color:#5bceff">"escalation"</span>: <span style="color:#41eba4">"raise"</span>,          <span style="color:#8f969a">// LLM decision</span>
+  <span style="color:#5bceff">"truck_id"</span>: <span style="color:#41eba4">"truck-47"</span>,
+  <span style="color:#5bceff">"baseline_severity"</span>: <span style="color:#41eba4">"medium"</span>,   <span style="color:#8f969a">// from co-processor</span>
+  <span style="color:#5bceff">"severity"</span>: <span style="color:#41eba4">"high"</span>,              <span style="color:#8f969a">// medium + raise</span>
+  <span style="color:#5bceff">"recommended_action"</span>: <span style="color:#41eba4">"Escalate for driver/dispatcher review."</span>,
+  <span style="color:#5bceff">"eta_impact"</span>: <span style="color:#ffb84d">7.2</span>              <span style="color:#8f969a">// minutes</span>
+}</div>
+    <div style="display:flex;flex-direction:column;gap:12px;border-left:4px solid var(--ui-brand);padding-left:48px">
+      <div style="display:flex;align-items:baseline;gap:18px;font-weight:700;line-height:1;letter-spacing:-0.03em"><span style="font-size:56px;color:var(--ui-text-tertiary)">medium →</span></div>
+      <div style="font-size:104px;font-weight:700;line-height:1;letter-spacing:-0.03em;color:var(--ui-brand)">high</div>
+      <div style="font-size:40px;font-weight:600">the LLM raised it</div>
+      <div style="font-size:28px;line-height:1.4;color:var(--ui-text-secondary);margin-top:8px;text-wrap:pretty">final severity high, so this card goes over cellular to the control center</div>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:20px;font-size:24px;color:var(--ui-text-tertiary)"><span>Edge Intelligence for Connected Fleets</span><span>20</span></div>
+</section>
+
+<section data-label="LLM Uplink Sequence" data-screen-label="LLM Uplink Sequence" data-speaker-notes="Now watch several gated payloads reach the LLM on the edge device, across the fleet. The co-processor decided what the LLM sees; the LLM decides what leaves the truck. The rule: a card goes over the cellular link to the control center only if its final severity is high. Truck-47 at 30 seconds: medium baseline, but rain, a chemical tanker and schedule pressure, so the LLM raises it to high and it's sent. Truck-12: medium, but clear, dry, general freight and on schedule, so it's lowered and stays on the truck. Truck-31: low and nothing to move it, so it holds and stays. Truck-08: a physics-high, but the dispatch status says the driver completed an evasive maneuver, so the LLM lowers it and it stays local. Truck-47 again at 45 seconds with ABS: high, raised, clamped at high, sent. Two of five triaged events cross the cellular link, and every raw reading before them never did. That is the cloud observability bottleneck relieved at the source. [NOTE: the high-only uplink rule is the proposed design; the current triage_function emits a card for every payload.] Other trucks' contexts are illustrative." style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:56px 120px 44px;display:flex;flex-direction:column;box-sizing:border-box;gap:18px" data-om-slide-id="43a55051">
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:40px">
+    <h2 style="margin:0;font-size:56px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">The LLM Decides What Crosses the Cellular Link</h2>
+    <button onClick="{{ replayLlm }}" style="flex:none;height:48px;padding:0 20px;border-radius:4px;border:2px solid var(--gray-150);background:#ffffff;cursor:pointer;font-family:var(--font-family-base);font-size:24px;font-weight:600;color:var(--ui-text-secondary);display:flex;align-items:center;gap:10px" style-hover="background:var(--gray-50)"><i data-lucide="rotate-ccw" width="22" height="22" stroke-width="2" style="display:inline-flex"></i>Replay</button>
+  </div>
+  <div style="display:flex;align-items:center;gap:20px;background:var(--purple-100);border-radius:8px;padding:18px 28px">
+    <i data-lucide="radio-tower" width="36" height="36" stroke-width="2" style="color:var(--purple-600);display:inline-flex;flex:none"></i>
+    <div style="font-size:28px;line-height:1.35"><strong style="font-weight:700">Uplink rule:</strong> only cards with a final severity of <strong style="font-weight:700">high</strong> go over cellular to the control center. Everything else is logged on the truck.</div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;min-height:0">
+    <div style="display:grid;grid-template-columns:150px 130px minmax(0,1.1fr) minmax(0,1.15fr) minmax(0,1.25fr) 130px 120px 250px;align-items:end;gap:0 12px;padding:0 16px 12px;border-bottom:2px solid var(--gray-100);font-size:22px;color:var(--ui-text-secondary);font-weight:600">
+      <span>truck · time</span>
+      <span style="font-family:var(--font-family-monospace);font-weight:400">baseline</span>
+      <span style="font-family:var(--font-family-monospace);font-weight:400">weather_condition</span>
+      <span style="font-family:var(--font-family-monospace);font-weight:400">cargo_type</span>
+      <span style="font-family:var(--font-family-monospace);font-weight:400">dispatch_status</span>
+      <span style="color:var(--ui-text);display:flex;align-items:center;gap:8px"><i data-lucide="sparkles" width="22" height="22" stroke-width="2" style="color:var(--purple-600);display:inline-flex"></i>LLM</span>
+      <span style="font-family:var(--font-family-monospace);font-weight:400">severity</span>
+      <span style="color:var(--ui-text)">Uplink</span>
+    </div>
+    <sc-for list="{{ llmRows }}" as="r" hint-placeholder-count="5">
+      <div style="display:grid;grid-template-columns:150px 130px minmax(0,1.1fr) minmax(0,1.15fr) minmax(0,1.25fr) 130px 120px 250px;align-items:center;gap:0 12px;padding:8px 16px;border-bottom:2px solid var(--gray-75);opacity:{{ r.op }};transform:{{ r.tf }};transition:opacity 0.5s ease, transform 0.5s ease, background 0.4s ease;background:{{ r.bg }}">
+        <div style="display:flex;flex-direction:column;gap:2px"><span style="font-family:var(--font-family-monospace);font-size:22px;font-weight:600">{{ r.truck }}</span><span style="font-size:22px;color:var(--ui-text-secondary)">{{ r.t }}</span></div>
+        <span style="justify-self:start;display:flex;align-items:center;height:38px;padding:0 12px;border-radius:4px;font-family:var(--font-family-monospace);font-size:22px;font-weight:600;background:{{ r.baseBg }};color:{{ r.baseFg }}">{{ r.base }}</span>
+        <sc-for list="{{ r.ctx }}" as="c" hint-placeholder-count="3">
+          <div style="justify-self:start;padding:6px 10px;border-radius:4px;font-size:22px;line-height:1.3;font-weight:{{ c.weight }};color:{{ c.color }};background:{{ c.bg }};box-shadow:{{ c.shadow }};transition:box-shadow 0.5s ease, background 0.5s ease">{{ c.v }}</div>
+        </sc-for>
+        <span style="justify-self:start;display:flex;align-items:center;height:38px;padding:0 12px;border-radius:4px;font-family:var(--font-family-monospace);font-size:22px;font-weight:700;background:{{ r.escBg }};color:{{ r.escFg }}">{{ r.esc }}</span>
+        <span style="justify-self:start;display:flex;align-items:center;height:38px;padding:0 12px;border-radius:4px;font-family:var(--font-family-monospace);font-size:22px;font-weight:700;background:{{ r.finBg }};color:{{ r.finFg }}">{{ r.fin }}</span>
+        <span style="justify-self:start;display:flex;align-items:center;gap:8px;height:40px;padding:0 14px;border-radius:4px;border:2px solid {{ r.sendBorder }};font-size:22px;font-weight:700;background:{{ r.sendBg }};color:{{ r.sendFg }};white-space:nowrap"><span>{{ r.sendIcon }}</span><span>{{ r.sendLabel }}</span></span>
+      </div>
+    </sc-for>
+    <div style="margin-top:16px;display:flex;align-items:center;gap:20px;background:var(--gray-800);color:#ffffff;border-radius:8px;padding:12px 24px;opacity:{{ llmFinalOp }};transition:opacity 0.6s ease">
+      <span style="flex:none;display:flex;align-items:center;height:44px;padding:0 16px;border-radius:4px;background:var(--purple-600);font-size:24px;font-weight:700">2 of 5</span>
+      <span style="font-size:26px;line-height:1.3">triaged events cross the cellular link; raw readings never do. The cloud observability bottleneck, relieved at the source.</span>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;font-size:24px;color:var(--ui-text-tertiary)"><span>Edge Intelligence for Connected Fleets</span><span>21</span></div>
+</section>
+
+<section data-label="24 See It Running" data-screen-label="24 See It Running" data-speaker-notes="Everything up to now has been a number on a slide — this is the actual Pi, running the actual function, against actual telemetry, producing actual enrichment cards. [NEEDS: the recording itself. The broker runs on the Pi for this take.] From here, the last slide zooms out past this one truck." style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:88px 120px 56px;display:flex;flex-direction:column;box-sizing:border-box" data-om-slide-id="5cfea2e6">
+  <h2 style="margin:0;font-size:60px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">See It Running, End-to-End</h2>
+  <div style="flex:1;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:48px;padding:40px 0;min-height:0">
+    <div style="border:2px dashed var(--gray-150);border-radius:8px;background:var(--gray-25);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:40px;text-align:center">
+      <div style="font-size:32px;font-weight:600;color:var(--ui-text-secondary)">Demo recording</div>
+      <div style="font-size:26px;color:var(--ui-text-tertiary);max-width:640px;line-height:1.45">Pi console running the function · <span style="font-family:var(--font-family-monospace)">fleet-simulator</span> publishing from the laptop · <span style="font-family:var(--font-family-monospace)">enrichment-cards</span> on the Pi console</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:24px;justify-content:center">
+      <div style="font-size:26px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--ui-text-secondary)">Entry point · broker on the Pi</div>
+      <div style="background:var(--gray-800);color:#ffffff;border-radius:8px;padding:32px 36px;font-family:var(--font-family-monospace);font-size:26px;line-height:1.6;white-space:pre-wrap;word-break:break-all;letter-spacing:-0.01em">./deploy/run_tier1_localrun.sh pulsar://&lt;broker-host&gt;:6650 ...</div>
+      <div style="background:var(--amber-100);border:2px solid var(--amber-400);border-radius:8px;padding:20px 24px;font-size:26px;line-height:1.4"><strong style="color:#c15800;font-weight:700">NEEDS:</strong> the demo recording. No source provides it yet.</div>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:20px;font-size:24px;color:var(--ui-text-tertiary)"><span>Edge Intelligence for Connected Fleets</span><span>24</span></div>
+</section>
+
+<section data-label="Section: Conclusions" data-screen-label="Section: Conclusions" data-speaker-notes="Section divider. Wrap up: what this showed, and what comes next." style="background:linear-gradient(135deg, var(--purple-700) 0%, oklch(0.42 0.24 272) 60%, oklch(0.5 0.22 262) 100%);overflow:hidden;color:#ffffff;font-family:var(--font-family-base);padding:120px;display:flex;flex-direction:column;box-sizing:border-box" data-om-slide-id="e318fe1a">
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.05);clip-path:polygon(38% 0, 62% 0, 30% 100%, 8% 100%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.07);clip-path:polygon(70% 0, 100% 0, 100% 55%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(0,0,40,0.12);clip-path:polygon(0 0, 22% 0, 0 45%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.04);clip-path:polygon(58% 100%, 100% 40%, 100% 100%);pointer-events:none"></div>
+  <div style="position:relative;flex:1;display:flex;flex-direction:column;justify-content:center;gap:40px">
+    <h2 style="margin:0;font-size:104px;font-weight:700;line-height:1.05;letter-spacing:-0.02em;text-wrap:balance">Conclusions &amp; Next Steps</h2>
+  </div>
+  <div style="position:relative;display:flex;justify-content:space-between;align-items:center;font-size:24px;color:var(--purple-200)"><span>Edge Intelligence for Connected Fleets</span><span>23</span></div>
+</section><section data-label="Conclusion: Feasibility Validated" data-screen-label="Conclusion: Feasibility Validated" data-speaker-notes="Three things this project validated, with one caveat up front: the 1-bit LLMs in the original talk abstract did not work, because of software compatibility issues on the Pi, so we substituted small quantized models that run on mainline llama.cpp. The architecture works: small LLMs run their logic loops natively on general-purpose CPUs, inside Pulsar Functions on the edge. Bandwidth drops sharply because normal, steady-state telemetry never leaves the vehicle; only high-severity cards cross the cellular link. And that makes a democratic blueprint: the same approach points to real-time vehicle diagnostics on consumer smartphones and handheld plug-and-play modules. The bandwidth reduction is inferred from the double filtering, co-processor then LLM, not measured; say so if asked for a number." style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:88px 120px 48px;display:flex;flex-direction:column;box-sizing:border-box;gap:16px" data-om-slide-id="6d3cfa96">
+  <h2 style="margin:0;font-size:60px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">Conclusion – Feasibility Validated</h2>
+  <div style="flex:1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px;align-content:center;min-height:0">
+    <div style="border:2px solid var(--gray-100);border-radius:8px;padding:44px 40px;display:flex;flex-direction:column;gap:26px">
+      <div style="display:flex;align-items:center;gap:16px"><div style="width:84px;height:84px;border-radius:8px;background:var(--ui-status-success-soft);display:flex;align-items:center;justify-content:center"><i data-lucide="cpu" width="48" height="48" stroke-width="2" style="color:var(--ui-status-success);display:inline-flex;flex:none"></i></div><i data-lucide="circle-check" width="40" height="40" stroke-width="2" style="color:var(--ui-status-success);display:inline-flex;flex:none"></i></div>
+      <div style="font-size:44px;font-weight:700;line-height:1.15">Architecture Proven</div>
+      <div style="font-size:30px;line-height:1.5;color:var(--ui-text-secondary);text-wrap:pretty">Confirming small LLMs can run logic loops natively on general-purpose CPUs.</div>
+      
+    </div>
+    <div style="border:2px solid var(--gray-100);border-radius:8px;padding:44px 40px;display:flex;flex-direction:column;gap:26px">
+      <div style="display:flex;align-items:center;gap:16px"><div style="width:84px;height:84px;border-radius:8px;background:var(--ui-status-success-soft);display:flex;align-items:center;justify-content:center"><i data-lucide="trending-down" width="48" height="48" stroke-width="2" style="color:var(--ui-status-success);display:inline-flex;flex:none"></i></div><i data-lucide="circle-check" width="40" height="40" stroke-width="2" style="color:var(--ui-status-success);display:inline-flex;flex:none"></i></div>
+      <div style="font-size:44px;font-weight:700;line-height:1.15">Bandwidth Slashed</div>
+      <div style="font-size:30px;line-height:1.5;color:var(--ui-text-secondary);text-wrap:pretty">Two gates, the co-processor then the LLM, drop most ambient sensor readings at the vehicle boundary before anything uses the cellular link.</div>
+      <div style="font-size:24px;color:var(--ui-text-tertiary)">Inferred from the gate design; not yet measured.</div>
+    </div>
+    <div style="border:2px solid var(--gray-100);border-radius:8px;padding:44px 40px;display:flex;flex-direction:column;gap:26px">
+      <div style="display:flex;align-items:center;gap:16px"><div style="width:84px;height:84px;border-radius:8px;background:var(--ui-status-success-soft);display:flex;align-items:center;justify-content:center"><i data-lucide="smartphone" width="48" height="48" stroke-width="2" style="color:var(--ui-status-success);display:inline-flex;flex:none"></i></div><i data-lucide="circle-check" width="40" height="40" stroke-width="2" style="color:var(--ui-status-success);display:inline-flex;flex:none"></i></div>
+      <div style="font-size:44px;font-weight:700;line-height:1.15">Democratic Blueprint</div>
+      <div style="font-size:30px;line-height:1.5;color:var(--ui-text-secondary);text-wrap:pretty">Unlocking real-time vehicle diagnostics on consumer smartphones and handheld plug-and-play modules.</div>
+      
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:20px;background:var(--ui-status-warning-soft);border-radius:8px;padding:20px 28px">
+    <i data-lucide="triangle-alert" width="36" height="36" stroke-width="2" style="color:#c15800;display:inline-flex;flex:none"></i>
+    <div style="font-size:28px;line-height:1.4;text-wrap:pretty"><strong style="font-weight:700">Caveat: 1-bit LLMs specifically didn't work.</strong> Software compatibility issues blocked them on the Pi, so we substituted small quantized models that run on mainline llama.cpp.</div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;font-size:24px;color:var(--ui-text-tertiary)"><span>Edge Intelligence for Connected Fleets</span><span>24</span></div>
+</section>
+
+<section data-label="Cliffhanger: Talk 2" data-screen-label="Cliffhanger: Talk 2" data-speaker-notes="It works. But that raises the obvious question: how well did it actually perform? Three things I haven't shown you. Token latency, and what happens when a commodity CPU handles massive sensor spikes. Quantization loss, and whether extreme compression hurt diagnostic accuracy. And the ARM compile hurdles, the engineering it took to get the stack running on a Cortex-A72. And energy efficiency: what each decision costs in watts on a CPU-only node compared to a GPU. All of that is Part 2." style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:88px 120px 48px;display:flex;flex-direction:column;box-sizing:border-box;gap:16px" data-om-slide-id="8b90365e">
+  <h2 style="margin:0;font-size:60px;font-weight:700;line-height:1.12;letter-spacing:-0.01em;color:var(--ui-text)">But... How Well Did It Actually Perform?</h2>
+  <div style="flex:1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px;align-content:center;min-height:0">
+    <div style="border:2px solid var(--gray-100);border-radius:8px;padding:36px 40px;display:grid;grid-template-columns:84px minmax(0,1fr);grid-template-rows:auto auto;column-gap:28px;row-gap:12px;align-items:start;background:#ffffff">
+      <div style="grid-row:1 / span 2;width:84px;height:84px;border-radius:8px;background:var(--ui-status-warning-soft);display:flex;align-items:center;justify-content:center"><i data-lucide="timer" width="48" height="48" stroke-width="2" style="color:#c15800;display:inline-flex;flex:none"></i></div>
+      <div style="font-size:44px;font-weight:700;line-height:1.15;color:var(--ui-text)">Token Latency?</div>
+      <div style="font-size:30px;line-height:1.5;color:var(--ui-text-secondary);text-wrap:pretty">What happens when a commodity CPU handles massive sensor spikes?</div>
+    </div>
+    <div style="border:2px solid var(--gray-100);border-radius:8px;padding:36px 40px;display:grid;grid-template-columns:84px minmax(0,1fr);grid-template-rows:auto auto;column-gap:28px;row-gap:12px;align-items:start;background:#ffffff">
+      <div style="grid-row:1 / span 2;width:84px;height:84px;border-radius:8px;background:var(--ui-status-warning-soft);display:flex;align-items:center;justify-content:center"><i data-lucide="gauge" width="48" height="48" stroke-width="2" style="color:#c15800;display:inline-flex;flex:none"></i></div>
+      <div style="font-size:44px;font-weight:700;line-height:1.15;color:var(--ui-text)">Quantization Loss?</div>
+      <div style="font-size:30px;line-height:1.5;color:var(--ui-text-secondary);text-wrap:pretty">Did extreme quantization degrade our diagnostic accuracy?</div>
+    </div>
+    <div style="border:2px solid var(--gray-100);border-radius:8px;padding:36px 40px;display:grid;grid-template-columns:84px minmax(0,1fr);grid-template-rows:auto auto;column-gap:28px;row-gap:12px;align-items:start;background:#ffffff">
+      <div style="grid-row:1 / span 2;width:84px;height:84px;border-radius:8px;background:var(--ui-status-warning-soft);display:flex;align-items:center;justify-content:center"><i data-lucide="wrench" width="48" height="48" stroke-width="2" style="color:#c15800;display:inline-flex;flex:none"></i></div>
+      <div style="font-size:44px;font-weight:700;line-height:1.15;color:var(--ui-text)">ARM Compile Hurdles?</div>
+      <div style="font-size:30px;line-height:1.5;color:var(--ui-text-secondary);text-wrap:pretty">What engineering steps were required to run the stack on an ARM Cortex-A72?</div>
+    </div>
+    <div style="border:2px solid var(--gray-100);border-radius:8px;padding:36px 40px;display:grid;grid-template-columns:84px minmax(0,1fr);grid-template-rows:auto auto;column-gap:28px;row-gap:12px;align-items:start;background:#ffffff">
+      <div style="grid-row:1 / span 2;width:84px;height:84px;border-radius:8px;background:var(--ui-status-warning-soft);display:flex;align-items:center;justify-content:center"><i data-lucide="zap" width="48" height="48" stroke-width="2" style="color:#c15800;display:inline-flex;flex:none"></i></div>
+      <div style="font-size:44px;font-weight:700;line-height:1.15;color:var(--ui-text)">Energy Efficiency?</div>
+      <div style="font-size:30px;line-height:1.5;color:var(--ui-text-secondary);text-wrap:pretty">How much power does each edge decision cost on a CPU-only node, compared to a GPU?</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:20px;background:var(--purple-100);border-radius:8px;padding:22px 28px">
+    <span style="flex:none;display:flex;align-items:center;height:48px;padding:0 18px;border-radius:4px;background:var(--purple-600);font-size:26px;font-weight:700">Part 2</span>
+    <span style="font-size:32px;font-weight:600;line-height:1.3;color:var(--ui-text)">Find out in Part 2: The Greenest Token Is the One That Never Hits a GPU.</span>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;font-size:24px;color:var(--ui-text-tertiary)"><span>Edge Intelligence for Connected Fleets</span><span>25</span></div>
+</section>
+
+<section data-label="27 Thank You" data-screen-label="27 Thank You" data-speaker-notes="Transition to Q&amp;A." style="background:linear-gradient(135deg, var(--purple-700) 0%, oklch(0.42 0.24 272) 60%, oklch(0.5 0.22 262) 100%);overflow:hidden;color:#ffffff;font-family:var(--font-family-base);padding:120px;display:flex;flex-direction:column;box-sizing:border-box" data-om-slide-id="a3474a50">
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.05);clip-path:polygon(38% 0, 62% 0, 30% 100%, 8% 100%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.07);clip-path:polygon(70% 0, 100% 0, 100% 55%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(0,0,40,0.12);clip-path:polygon(0 0, 22% 0, 0 45%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.04);clip-path:polygon(58% 100%, 100% 40%, 100% 100%);pointer-events:none"></div>
+  <div style="position:relative;flex:1;display:flex;flex-direction:column;justify-content:center;gap:32px">
+    <h2 style="margin:0;font-size:160px;font-weight:700;line-height:1;letter-spacing:-0.02em">Thank you</h2>
+  </div>
+  <div style="position:relative;display:flex;flex-direction:column;gap:8px;border-top:2px solid var(--purple-500);padding-top:32px">
+    <div style="font-size:36px;font-weight:600">David Kjerrumgaard</div>
+    <div style="font-size:28px;color:var(--purple-200)">Apache Pulsar Committer</div>
+  </div>
+</section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</x-import>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;countdownMinutes&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:5,&quot;min&quot;:1,&quot;max&quot;:30,&quot;unit&quot;:&quot;min&quot;,&quot;section&quot;:&quot;Waitroom&quot;,&quot;tsType&quot;:&quot;number&quot;},&quot;rotateSeconds&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:12,&quot;min&quot;:4,&quot;max&quot;:60,&quot;unit&quot;:&quot;s&quot;,&quot;section&quot;:&quot;Waitroom&quot;,&quot;tsType&quot;:&quot;number&quot;}}">
+class Component extends DCLogic {
+  facts = [
+    { topic: 'Origins', text: 'Apache Pulsar was created at Yahoo in 2012.' },
+    { topic: 'Apache Software Foundation', text: 'Apache Pulsar became a top-level ASF project in 2017' },
+    { topic: 'Community', text: 'Apache Pulsar has over 400 committers' },
+    { topic: 'In production', text: 'Apache Pulsar is used by three automotive manufacturers in production today.' }
+  ];
+  state = { i: 0, t: 0, now: Date.now() };
+  componentDidMount() {
+    this.endAt = Date.now() + (this.props.countdownMinutes ?? 5) * 60000;
+    this.iconTimer = setInterval(() => { if (window.lucide) { this.icons(); clearInterval(this.iconTimer); } }, 150);
+    this.timer = setInterval(() => {
+      const rotateMs = (this.props.rotateSeconds ?? 12) * 1000;
+      this.setState(s => {
+        const t = s.t + 100;
+        return t >= rotateMs ? { i: (s.i + 1) % this.facts.length, t: 0, now: Date.now() } : { t, now: Date.now() };
+      });
+    }, 100);
+  }
+  componentDidUpdate() { this.icons(); }
+  icons() { if (window.lucide && document.querySelector('i[data-lucide]')) window.lucide.createIcons(); }
+  goLabel(label) {
+    const secs = Array.from(document.querySelectorAll('section[data-label]'));
+    const i = secs.findIndex(s => s.dataset.label === label);
+    const st = document.querySelector('deck-stage');
+    if (i >= 0 && st && st.goTo) st.goTo(i);
+  }
+  componentWillUnmount() { clearInterval(this.timer); clearInterval(this.iconTimer); }
+  seqData = [
+    { t: '0s', label: 'Cruising', v: ['68.1', '0.06', '0.0', '0.02', 'false'], key: 0, result: 'dropped', why: '0/3 signals; nothing sent', kind: 'drop' },
+    { t: '10s', label: 'Slowing', v: ['38.7', '0.44', '1.2', '0.12', 'false'], key: 0, result: 'dropped', why: '1/3; low speed alone is noise', kind: 'drop' },
+    { t: '20s', label: 'Stop-and-go', v: ['36.4', '0.62', '2.4', '0.24', 'false'], key: 1, result: 'gated', why: '3/3, but 2.4 min < 3.0 min gate', kind: 'gate' },
+    { t: '30s', label: 'ETA slipping', v: ['35.9', '0.74', '3.6', '0.31', 'false'], key: 2, result: 'MEDIUM', why: '0.31g braking, stop/go 0.74', kind: 'med' },
+    { t: '45s', label: 'ABS engages', v: ['34.2', '0.83', '5.4', '0.38', 'true'], key: 4, result: 'HIGH', why: 'ABS engaged: always high', kind: 'high' }
+  ];
+  seqStep(now) {
+    const sec = typeof document !== 'undefined' && document.querySelector('section[data-label="Co-Processor Sequence"]');
+    const active = !!(sec && sec.hasAttribute('data-deck-active'));
+    if (active && !this._seqActive) this._seqStart = now;
+    this._seqActive = active;
+    if (!active || this._seqStart == null) return this.seqData.length;
+    return Math.max(0, Math.min(this.seqData.length, Math.floor((now - this._seqStart - 600) / 2200) + 1));
+  }
+  llmData = [
+    { truck: 'truck-47', t: '30s', base: 'medium', ctx: ['Heavy rain, wet asphalt', 'Liquids / Chemical Tanker', '20 min behind schedule'], key: 1, esc: 'raise', fin: 'high', send: true },
+    { truck: 'truck-12', t: '31s', base: 'medium', ctx: ['Clear, dry', 'Dry general freight', 'On schedule'], key: 0, esc: 'lower', fin: 'low', send: false },
+    { truck: 'truck-31', t: '38s', base: 'low', ctx: ['Light overcast', 'Empty trailer', 'Ahead of schedule'], key: 1, esc: 'hold', fin: 'low', send: false },
+    { truck: 'truck-08', t: '41s', base: 'high', ctx: ['Clear, dry', 'Palletized dry goods', 'Driver completed evasive maneuver'], key: 2, esc: 'lower', fin: 'medium', send: false },
+    { truck: 'truck-47', t: '45s', base: 'high', ctx: ['Heavy rain, wet asphalt', 'Liquids / Chemical Tanker', '20 min behind schedule'], key: 0, esc: 'raise', fin: 'high', send: true }
+  ];
+  stepFor(label, n, now) {
+    this._st = this._st || {};
+    const st = this._st[label] || (this._st[label] = { active: false, start: null });
+    const sec = typeof document !== 'undefined' && document.querySelector(`section[data-label="${label}"]`);
+    const active = !!(sec && sec.hasAttribute('data-deck-active'));
+    if (active && !st.active) st.start = now;
+    st.active = active;
+    if (!active || st.start == null) return n;
+    return Math.max(0, Math.min(n, Math.floor((now - st.start - 600) / 2200) + 1));
+  }
+  go(d) { this.setState(s => ({ i: (s.i + d + this.facts.length) % this.facts.length, t: 0 })); }
+  renderVals() {
+    const n = this.facts.length, i = this.state.i;
+    const rotateMs = (this.props.rotateSeconds ?? 12) * 1000;
+    const end = this.endAt ?? (Date.now() + (this.props.countdownMinutes ?? 5) * 60000);
+    const rem = Math.max(0, Math.ceil((end - this.state.now) / 1000));
+    const clock = Math.floor(rem / 60) + ':' + String(rem % 60).padStart(2, '0');
+    return {
+      fact: this.facts[i],
+      counter: String(i + 1).padStart(2, '0') + ' / ' + String(n).padStart(2, '0'),
+      dots: this.facts.map((_, k) => ({ size: k === i ? '14px' : '10px', bg: k === i ? '#ffffff' : 'rgba(255,255,255,0.4)' })),
+      progress: Math.min(100, (this.state.t / rotateMs) * 100) + '%',
+      countLabel: rem > 0 ? 'Starting in' : 'Starting now',
+      clock,
+      goBefore: () => this.goLabel('04 Before: Cloud-Centric'),
+      goAfter: () => this.goLabel('05 After: Edge Intelligence'),
+      ...(() => {
+        const step = this.seqStep(this.state.now);
+        const badge = { drop: ['var(--gray-75)', 'var(--ui-text-secondary)'], gate: ['var(--ui-status-warning-soft)', '#c15800'], med: ['#ffe2b3', '#8a4300'], high: ['var(--ui-status-danger)', '#ffffff'] };
+        const seqRows = this.seqData.map((r, i) => {
+          const shown = i < step, current = i === step - 1;
+          return {
+            t: r.t, label: r.label, result: r.result, why: r.why,
+            op: shown ? 1 : 0, tf: shown ? 'none' : 'translateX(-40px)',
+            bg: current ? 'var(--purple-100)' : 'transparent',
+            badgeBg: badge[r.kind][0], badgeFg: badge[r.kind][1],
+            cells: r.v.map((v, j) => {
+              const hot = j === r.key && shown;
+              return { v, weight: hot ? 700 : 400, color: hot ? '#8a4300' : 'var(--ui-text)', bg: hot ? '#fff3d6' : 'transparent', shadow: hot ? '0 0 0 3px #ffb84d, 0 0 28px rgba(255,184,77,0.7)' : 'none' };
+            })
+          };
+        });
+        return { seqRows, seqFinalOp: step >= this.seqData.length ? 1 : 0, replaySeq: () => { this._seqStart = Date.now(); this.forceUpdate(); } };
+      })(),
+      ...(() => {
+        const L = 'LLM Uplink Sequence';
+        const step = this.stepFor(L, this.llmData.length, this.state.now);
+        const sevC = { low: ['var(--gray-75)', 'var(--ui-text-secondary)'], medium: ['#ffe2b3', '#8a4300'], high: ['var(--ui-status-danger)', '#ffffff'] };
+        const escC = { raise: ['var(--ui-status-danger-soft)', 'var(--ui-status-danger-contrast)'], hold: ['var(--gray-75)', 'var(--ui-text-secondary)'], lower: ['var(--ui-status-success-soft)', 'var(--ui-status-success-contrast)'] };
+        const llmRows = this.llmData.map((r, i) => {
+          const shown = i < step, current = i === step - 1;
+          return {
+            truck: r.truck, t: r.t, esc: r.esc, fin: r.fin, base: r.base,
+            op: shown ? 1 : 0, tf: shown ? 'none' : 'translateX(-40px)',
+            bg: current ? 'var(--purple-100)' : 'transparent',
+            baseBg: sevC[r.base][0], baseFg: sevC[r.base][1],
+            escBg: escC[r.esc][0], escFg: escC[r.esc][1],
+            finBg: sevC[r.fin][0], finFg: sevC[r.fin][1],
+            sendLabel: r.send ? 'Sent over cellular' : 'Stays on truck',
+            sendIcon: r.send ? '↑' : '•',
+            sendBg: r.send ? 'var(--gray-800)' : 'transparent', sendFg: r.send ? '#ffffff' : 'var(--ui-text-secondary)',
+            sendBorder: r.send ? 'var(--gray-800)' : 'var(--gray-150)',
+            ctx: r.ctx.map((v, j) => {
+              const hot = j === r.key && shown;
+              return { v, weight: hot ? 700 : 400, color: hot ? '#8a4300' : 'var(--ui-text)', bg: hot ? '#fff3d6' : 'transparent', shadow: hot ? '0 0 0 3px #ffb84d, 0 0 28px rgba(255,184,77,0.7)' : 'none' };
+            })
+          };
+        });
+        return { llmRows, llmFinalOp: step >= this.llmData.length ? 1 : 0, replayLlm: () => { this._st[L].start = Date.now(); this.forceUpdate(); } };
+      })(),
+      goNow: () => this.goLabel('25 Now: The Cost Barrier'),
+      goDream: () => this.goLabel('26 Dream: Democratization'),
+      prev: () => this.go(-1),
+      next: () => this.go(1)
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -75,25 +75,28 @@ minutes of slack for the live demo, plus untimed Waitroom, Title and Thank You.
 - **Title** is the accepted one; the subtitle open item is gone.
 
 ## Open items
-- **New demo take: recorded, needs sign-off.** Take 4
-  (`deploy/recordings/talk3-demo-20261002-174855.mp4`) ran on the GPU through
-  the old subprocess path. Take 5 (`talk3-demo-20261004-182716.mp4`, 54.6 s,
-  recorded on the M4 Max with the current defaults: in-process, one CPU thread)
-  replaces it; transcript in `talk3-demo-20261004-182716.txt` beside it and in
-  `talks/talk3-pulsar-speaks-english/TODO-DEMO-RECORDING.md`. Recordings are
-  gitignored, so the file is only on the M4 Max. [NEEDS: your review of take 5,
-  or a re-take on the external-display machine]
+- **Take 6: recorded, needs sign-off** (2026-10-05, external-display
+  machine): `deploy/recordings/talk3-demo-20261005-090519.mp4`, 52.5 s,
+  1890×1006, current defaults (in-process, one CPU thread, no GPU), fact check
+  passed first time. Replaces take 4 (GPU, old subprocess path) and take 5
+  (dropped). Slides 3 and 25 use it. Recordings are gitignored: the file is
+  only on the external-display machine. Note when reviewing: it names no
+  truck numbers, and "Traffic is being rerouted" overstates a reroute
+  *recommendation*. [NEEDS: your review of take 6]
 - **Pi run: done** (2026-10-05). One Pi 4 core: 6 min 17 s a warning; four
   cores: 1 min 54 s. Slide 22 now reports it. Slide 17's Talk 2 Pi numbers
   (43.7 s) are a best case: the same prompt repeated through `llama-server`'s
   prefix cache, so nearly no prompt reading — see slide 17's notes.
-- **"Before" audio clips** for slide 24 (raw Piper, normalization off).
+- **"Before" audio clips: done** (2026-10-05). Slide 24's raw and normalized
+  clips, Piper `norman`, in `deploy/recordings/.talk3-slide24-clips/`
+  (gitignored; texts in `texts.txt` beside them).
 - **Fact check in the take.** If the new take's log shows a retry or the
   plain-code fallback, slide 25's narration should say so.
 - **Gating ratio on real data.** Slide 5's 28–33% comes from a simulator built
   to be incident-heavy; Talk 1 calls its bandwidth claim "inferred, not
   measured." A real ratio needs a live Edge Triage run's counts.
-- **Repo URL** for slide 27, same open item as Talk 2.
+- **Repo URL: decided.** `github.com/david-streamlio/fleet-trilogy`, private
+  today; to be made public before the talk.
 
 ---
 
@@ -132,12 +135,12 @@ plate, since it follows the Title plate) with an embedded audio player.
 **Visual Manifest:**
 - Type: `Typography_Only`
 - Spec: white slide, a single audio control centered; after playback, one
-  line fades in. Audio: the I-95N warning from take 5 (one CPU core),
-  `deploy/recordings/.talk3-audio-20261004-182716/001-I-95N.wav` (18.6 s):
-  "Drivers approaching I-95 North, be advised that there's a slowdown affecting
-  multiple trucks within the corridor. We're recommending you reroute traffic
-  around I-95 North due to a correlated slowdown, particularly with trucks 47,
-  12, and 31, who are experiencing significant delays."
+  line fades in. Audio: the I-95N warning from take 6 (one CPU core),
+  `deploy/recordings/.talk3-audio-20261005-090519/001-I-95N.wav` (13.3 s):
+  "Approaching I-95 North, we're seeing a slowdown impacting multiple trucks.
+  Traffic is being rerouted to avoid the congestion, with three trucks
+  experiencing significant delays. Please follow the reroute instructions for
+  a smoother journey."
 
 **On-screen text:**
 ```
@@ -785,7 +788,11 @@ the warning."
 - Type: `Bar_Comparison`
 - Spec: two columns, each with an audio control. Left "Raw":
   "I-95N" → "eye ninety-five *en*"; "ETA" → "ee-ta". Right "Normalized":
-  "I-95 North"; "E T A". [NEEDS: the two "before" audio clips]
+  "I-95 North"; "E T A". Clips (Piper `norman`, generated 2026-10-05):
+  `deploy/recordings/.talk3-slide24-clips/raw-I-95N.wav` /
+  `normalized-I-95N.wav` ("Drivers approaching I-95N, be advised.") and
+  `raw-ETA.wav` / `normalized-ETA.wav` ("Truck 47's ETA has slipped twelve
+  minutes.").
 
 **On-screen text:**
 ```
@@ -813,10 +820,12 @@ model on one CPU core, a voice out — live.
 **Visual Manifest:**
 - Type: `[NEEDS: new visual type not yet in the supported list]` — live
   screen share of the three windows (`deploy/talk3-windows/cards.sh`,
-  `decision.sh`, `spoken.sh`), plus a CPU meter showing one core busy
-  [NEEDS: pick the meter — Activity Monitor's CPU history or `htop`].
-  Fallback: take 5, `deploy/recordings/talk3-demo-20261004-182716.mp4`
-  (54.6 s, 1314×876, with audio), embedded video.
+  `decision.sh`, `spoken.sh`), plus a fourth terminal running `htop -p`
+  on the Tier 2 process, showing it at ~100% CPU, i.e. one core. (Not
+  Activity Monitor's per-core graph: macOS migrates the thread between
+  cores, so no single core looks pinned.)
+  Fallback: take 6, `deploy/recordings/talk3-demo-20261005-090519.mp4`
+  (52.5 s, 1890×1006, with audio), embedded video.
 
 **On-screen text:**
 ```
@@ -825,13 +834,15 @@ Replayed cards → live Function → live model (1 CPU core) → live voice
 
 **Speaker notes:** Run it live: start `replay.sh`. Narrate as it goes: the
 three cards arriving three seconds apart; the "Decided by code" panel —
-corridor-wide, three trucks, reroute; the CPU meter — one core pinned for
-about 15 seconds on this first incident, since the model's cache is empty;
+corridor-wide, three trucks, reroute; `htop` — the Function's process at
+about 100% CPU, one core, for about 15 seconds on this first incident, since
+the model's cache is empty;
 then "Worded by the LLM," and the voice. Be upfront: the cards are
 replayed, because in a live Talk 1 run only truck-47 has trip context that
 reaches `high`, so Tier 2 would only ever see one truck. Everything after
 the replay is live. If anything fails, switch to the recorded take and say
-so. Before the session: start the broker and the four windows, and check
+so. Before the session: start the broker, the four windows and
+`htop -p <Tier 2 pid>`, and check
 `tier2.sh`'s log shows `llm_backend=inprocess` and one thread. Backing:
 `deploy/README.md` "Talk 3 demo"; `deploy/talk3-windows/tier2.sh`.
 
@@ -878,7 +889,8 @@ model deserved the job, Talk 3 said it out loud.
 - Type: `Typography_Only`
 - Spec: three cards: "Talk 1 — the edge decides what's worth sending";
   "Talk 2 — prove which model deserves the job"; "Talk 3 — the fleet
-  tells you, out loud." Repo link in the footer. [NEEDS: repo URL]
+  tells you, out loud." Repo link in the footer:
+  `github.com/david-streamlio/fleet-trilogy`.
 
 **On-screen text:**
 ```
