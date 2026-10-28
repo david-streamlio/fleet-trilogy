@@ -1,4 +1,4 @@
-# Talk 3 — Pulsar Speaks English
+# When Your Pulsar Function Speaks English: Inline LLM Inference for Real-Time Stream Enrichment
 
 Tier 2 global synthesis demo. Aggregates enrichment cards across the fleet,
 decides single-truck vs. corridor-wide incident, decides on a reroute, and has
