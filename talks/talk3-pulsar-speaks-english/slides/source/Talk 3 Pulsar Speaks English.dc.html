@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/druids/tokens.css">
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;background:#000;font-family:var(--font-family-base);}
+a{color:var(--ui-interaction-primary);}
+a:hover{color:var(--ui-interaction-primary-contrast);}
+</style>
+</helmet>
+<x-import component-from-global-scope="deck-stage" from="./deck-stage.js" width="1920" height="1080" hint-size="100%,100%" data-uneditable="">
+
+<section data-label="Waitroom" data-screen-label="01 Waitroom" data-speaker-notes="Untimed lobby slide, same convention as Talks 1 and 2. Leave up while attendees join; the countdown and Pulsar facts run on their own." style="background:linear-gradient(135deg, var(--purple-700) 0%, oklch(0.42 0.24 272) 60%, oklch(0.5 0.22 262) 100%);overflow:hidden;color:#ffffff;font-family:var(--font-family-base);padding:120px;display:flex;flex-direction:column;box-sizing:border-box" data-om-slide-id="0adb3880">
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.05);clip-path:polygon(38% 0, 62% 0, 30% 100%, 8% 100%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.07);clip-path:polygon(70% 0, 100% 0, 100% 55%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(0,0,40,0.12);clip-path:polygon(0 0, 22% 0, 0 45%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.04);clip-path:polygon(58% 100%, 100% 40%, 100% 100%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;padding:120px 120px;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) 860px;gap:96px;align-items:center">
+    <div style="display:flex;flex-direction:column;gap:44px">
+      <div style="display:flex;align-items:center;gap:16px;font-size:28px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase"><span style="width:14px;height:14px;border-radius:50%;background:#41eba4;flex:none"></span>When Your Pulsar Function Speaks English</div>
+      <h1 style="margin:0;font-size:136px;font-weight:700;line-height:1.02;letter-spacing:-0.02em">Welcome!<br>We'll begin<br>shortly.</h1>
+      <div style="font-size:38px;line-height:1.45;color:#ececf4;max-width:760px;text-wrap:pretty">Grab a coffee and settle in. While you wait, here are some interesting facts about Apache Pulsar</div>
+      <div style="align-self:flex-start;display:flex;align-items:center;gap:28px;padding:22px 36px;border-radius:8px;background:rgba(255,255,255,0.14);border:2px solid rgba(255,255,255,0.28)">
+        <span style="font-size:30px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase">{{ countLabel }}</span>
+        <span style="font-family:var(--font-family-monospace);font-size:52px;font-weight:600">{{ clock }}</span>
+      </div>
+    </div>
+    <div style="background:rgba(255,255,255,0.12);border:2px solid rgba(255,255,255,0.28);border-radius:16px;padding:52px 56px;display:flex;flex-direction:column;gap:40px;min-height:560px;box-sizing:border-box">
+      <div style="display:flex;flex-direction:column;gap:18px">
+        <div style="font-size:34px;font-weight:700">Apache Pulsar facts</div>
+        <div style="align-self:flex-start;display:flex;align-items:center;height:64px;padding:0 32px;border-radius:8px;background:var(--purple-600);font-size:30px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">{{ fact.topic }}</div>
+      </div>
+      <div style="flex:1;font-size:40px;line-height:1.45;text-wrap:pretty">{{ fact.text }}</div>
+      <div style="display:flex;flex-direction:column;gap:20px">
+        <div style="display:flex;align-items:center;gap:20px">
+          <button onClick="{{ prev }}" aria-label="Previous fact" style="width:56px;height:56px;border-radius:50%;border:2px solid rgba(255,255,255,0.5);background:transparent;color:#ffffff;font-size:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0" style-hover="background:rgba(255,255,255,0.15)">←</button>
+          <button onClick="{{ next }}" aria-label="Next fact" style="width:56px;height:56px;border-radius:50%;border:2px solid rgba(255,255,255,0.5);background:transparent;color:#ffffff;font-size:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0" style-hover="background:rgba(255,255,255,0.15)">→</button>
+          <div style="flex:1;display:flex;align-items:center;gap:12px;padding-left:12px">
+            <sc-for list="{{ dots }}" as="d" hint-placeholder-count="4">
+              <span style="width:{{ d.size }};height:{{ d.size }};border-radius:50%;background:{{ d.bg }}"></span>
+            </sc-for>
+          </div>
+          <div style="font-family:var(--font-family-monospace);font-size:32px;color:#ececf4">{{ counter }}</div>
+        </div>
+        <div style="height:6px;border-radius:3px;background:rgba(255,255,255,0.2);overflow:hidden">
+          <div style="height:100%;width:{{ progress }};background:#ffffff"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section data-label="Title" data-screen-label="02 Title" data-speaker-notes="Overview (keep it short, about 30 seconds): On the surface, this talk is about a Pulsar Function that talks. Underneath, it's about a pattern: putting an LLM inside an event stream, so the model runs where the events already flow instead of in a separate service you call out to. Apache Pulsar is the technology we built it on. Our example takes a stream of truck telemetry events and turns it into a spoken warning a dispatcher can act on. Cheap math on each truck decides which events are worth a second look. A small LLM on the truck writes an enrichment card for the interesting ones. In the data center, a Pulsar Function collects those cards by corridor. Plain code decides what's happening, and an LLM running inside the Function writes a plain-English summary of it. A text-to-speech engine reads it out loud. Along the way: how the Function holds state between messages, the prompt patterns that keep it fast, what small models taught us about building with LLMs, and how code checks what the model says. Then a demo." style="background:linear-gradient(135deg, var(--purple-700) 0%, oklch(0.42 0.24 272) 60%, oklch(0.5 0.22 262) 100%);overflow:hidden;color:#ffffff;font-family:var(--font-family-base);padding:120px;display:flex;flex-direction:column;box-sizing:border-box" data-om-slide-id="25d3eb22">
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.05);clip-path:polygon(38% 0, 62% 0, 30% 100%, 8% 100%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.07);clip-path:polygon(70% 0, 100% 0, 100% 55%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(0,0,40,0.12);clip-path:polygon(0 0, 22% 0, 0 45%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.04);clip-path:polygon(58% 100%, 100% 40%, 100% 100%);pointer-events:none"></div>
+  <div style="position:relative;flex:1;display:flex;flex-direction:column;justify-content:center;gap:40px">
+    <h1 style="margin:0;font-size:104px;font-weight:700;line-height:1.05;letter-spacing:-0.015em;max-width:1500px;text-wrap:balance">When Your Pulsar Function Speaks English</h1>
+    <div style="font-size:44px;line-height:1.3;color:var(--purple-200);max-width:1400px;text-wrap:balance">Inline LLM Inference for Real-Time Stream Enrichment</div>
+  </div>
+  <div style="position:relative;display:flex;flex-direction:column;gap:8px;border-top:2px solid var(--purple-500);padding-top:32px">
+    <div style="font-size:36px;font-weight:600">David Kjerrumgaard</div>
+    <div style="font-size:28px;color:var(--purple-200)">Apache Pulsar Committer</div>
+  </div>
+</section>
+
+<section data-label="Cold Open" data-screen-label="03 Cold Open" data-speaker-notes="Click the purple play button, then say nothing until it finishes (clip: Oct 5 demo take, Piper norman voice). Let it finish. Then: &quot;That was a Pulsar Function talking. An LLM running inside it wrote that sentence. By the end of this talk you'll have seen every piece that made it say that, and it's less than you think. The talking is the fun part. What matters more is where that LLM sits: inside the event stream, as one step of it. That pattern is what this talk is really about.&quot; " style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:88px 120px 48px;display:flex;flex-direction:column;box-sizing:border-box" data-om-slide-id="6585af7a">
+  <h2 style="margin:0;font-size:60px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">That Was a Pulsar Function Talking</h2>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:72px">
+    <div style="width:960px;box-sizing:border-box;border:2px solid var(--gray-100);border-radius:8px;background:var(--gray-25);padding:36px 44px;display:flex;align-items:center;gap:32px">
+      <button onClick="{{ play_cold }}" style="flex:none;width:112px;height:112px;border-radius:50%;border:none;cursor:pointer;background:var(--purple-600);display:flex;align-items:center;justify-content:center" style-hover="background:var(--purple-700)">{{ icon_cold }}</button>
+      <div style="display:flex;flex-direction:column;gap:10px;min-width:0">
+        <div style="display:flex;align-items:center;gap:12px;font-size:32px;font-weight:700"><i data-lucide="audio-lines" width="36" height="36" stroke-width="2" style="color:var(--purple-600);display:inline-flex;flex:none"></i>I-95N warning</div>
+        <div style="font-size:26px;color:var(--ui-text-secondary)">{{ label_cold }}</div>
+      </div>
+    </div>
+    <div style="height:84px;display:flex;align-items:center;justify-content:center;margin-top:-40px;margin-bottom:-40px">
+      <div style="display:flex;align-items:center;min-height:72px;padding:0 28px;border-radius:4px;background:#000000;color:#ffffff;font-size:40px;font-weight:600;line-height:1.3;opacity:{{ capOp }};transition:opacity 0.3s ease">{{ caption }}</div>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;font-size:24px;color:var(--ui-text-tertiary)"><span>When Your Pulsar Function Speaks English</span></div>
+</section>
+
+<section data-label="Section: Where the Words Come From" data-screen-label="04 Section: Where the Words Come From" data-speaker-notes="That was pretty cool, but where did those words we just heard actually come from? Nobody typed that warning. It started as numbers: speed, GPS, braking, ETA, streaming off trucks on the road. In this section I'll walk you back through how those numbers became something worth saying. First, how each truck decides which readings are interesting at all, and why most of them never leave the truck. Then a quick refresher on the three messages the truck produces, for anyone who missed my talk on connected intelligence. Then what arrives in the data center, and the one Pulsar Function that turns it into a sentence. " style="background:linear-gradient(135deg, var(--purple-700) 0%, oklch(0.42 0.24 272) 60%, oklch(0.5 0.22 262) 100%);overflow:hidden;color:#ffffff;font-family:var(--font-family-base);padding:120px;display:flex;flex-direction:column;box-sizing:border-box" data-om-slide-id="7b52de9b">
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.05);clip-path:polygon(38% 0, 62% 0, 30% 100%, 8% 100%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.07);clip-path:polygon(70% 0, 100% 0, 100% 55%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(0,0,40,0.12);clip-path:polygon(0 0, 22% 0, 0 45%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.04);clip-path:polygon(58% 100%, 100% 40%, 100% 100%);pointer-events:none"></div>
+  <div style="position:relative;flex:1;display:flex;flex-direction:column;justify-content:center;gap:40px">
+    <h2 style="margin:0;font-size:104px;font-weight:700;line-height:1.05;letter-spacing:-0.02em;text-wrap:balance">Where the Words Come From</h2>
+  </div>
+  <div style="position:relative;display:flex;justify-content:space-between;align-items:center;font-size:24px;color:var(--purple-200)"><span>When Your Pulsar Function Speaks English</span></div>
+</section>
+
+<section data-label="Gates Before the LLM" data-screen-label="05 Gates Before the LLM" data-speaker-notes="Here's the whole trick: only wake up the LLM when something interesting happens. On every truck, the connected intelligence talk's Edge Triage Pipeline runs cheap math first, a quick check for slowdowns and slipping ETAs. Most readings are boring and stop right there. In our simulation only about one in three make it through, and the simulator is built to be full of trouble, so a real road would be even quieter. The ones that pass go to a small LLM, and only the cards it rates high go out over the cellular link. Those cards land in the control center, and that's where this talk's Pulsar Function runs. It calls its own LLM once per incident, not once per card. We first tried running it out on the edge, on the Pi, but this design rules that out: the Function needs cards from several trucks on the same corridor, and no single truck ever sees those. Calling the model rarely keeps the cost down, whatever hardware it runs on. " style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:72px 120px 44px;display:flex;flex-direction:column;box-sizing:border-box;gap:16px" data-om-slide-id="b44fa6e9">
+  <h2 style="margin:0;font-size:60px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">Only the Interesting Events</h2>
+  <div style="flex:1;display:flex;align-items:center;min-height:0">
+    <div style="position:relative;width:1680px;height:600px">
+      <div style="position:absolute;left:0;top:0;width:1000px;height:260px;box-sizing:border-box;border:3px dashed var(--gray-200);border-radius:8px"></div>
+      <div style="position:absolute;left:24px;top:20px;display:flex;align-items:center;gap:10px;height:40px;padding:0 14px;border-radius:4px;background:var(--gray-100);color:var(--ui-text-secondary);font-size:24px;font-weight:700"><i data-lucide="truck" width="24" height="24" stroke-width="2" style="color:var(--ui-text-secondary);display:inline-flex;flex:none"></i>Truck (Pi-class)</div>
+      <div style="position:absolute;left:1240px;top:0;width:440px;height:440px;box-sizing:border-box;border:3px dashed var(--purple-500);border-radius:8px"></div>
+      <div style="position:absolute;left:1260px;top:20px;display:flex;align-items:center;gap:10px;height:40px;padding:0 14px;border-radius:4px;background:var(--purple-100);color:var(--purple-700);font-size:24px;font-weight:700"><i data-lucide="cloud" width="26" height="26" stroke-width="2" style="color:var(--purple-600);display:inline-flex;flex:none"></i>Cloud · control center</div>
+      <svg width="1680" height="600" viewBox="0 0 1680 600" style="position:absolute;inset:0;overflow:visible">
+        <defs>
+          <marker id="t3a5g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--gray-400)"></path></marker>
+          <marker id="t3a5p" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="3.2" markerHeight="3.2" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--purple-600)"></path></marker>
+        </defs>
+        <g fill="none" stroke-width="3" stroke-linecap="round" style="stroke:var(--gray-400)">
+          <path d="M254 150 L384 150" marker-end="url(#t3a5g)"></path>
+          <path d="M634 150 L754 150" marker-end="url(#t3a5g)"></path>
+        </g>
+        <g fill="none" stroke-width="8" stroke-linecap="round" style="stroke:var(--purple-600)">
+          <path d="M984 150 L1256 150" stroke-dasharray="14 10" marker-end="url(#t3a5p)"></path>
+          <path d="M1460 200 L1460 282" marker-end="url(#t3a5p)"></path>
+        </g>
+      </svg>
+      <div style="position:absolute;left:24px;top:90px;width:232px;height:120px;box-sizing:border-box;padding:0 8px;border-radius:8px;border:2px solid var(--gray-150);background:var(--gray-25);display:flex;align-items:center;justify-content:center;text-align:center;font-family:var(--font-family-monospace);font-size:22px;letter-spacing:-0.02em;font-weight:600">truck-telemetry</div>
+      <div style="position:absolute;left:250px;top:84px;width:140px;display:flex;flex-direction:column;align-items:center;line-height:1.15"><span style="font-family:var(--font-family-monospace);font-size:26px;font-weight:700">100s/sec</span><span style="font-size:24px;color:var(--ui-text-secondary)">events</span></div>
+      <div style="position:absolute;left:390px;top:90px;width:240px;height:120px;box-sizing:border-box;border-radius:8px;border:2px solid var(--gray-150);background:#ffffff;padding:12px 18px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:4px"><div style="font-size:26px;font-weight:700;line-height:1.2">Filtering Function</div><div style="font-size:24px;line-height:1.25;color:var(--ui-text-secondary)">cheap math</div></div>
+      <div style="position:absolute;left:630px;top:84px;width:130px;display:flex;flex-direction:column;align-items:center;line-height:1.15"><span style="font-family:var(--font-family-monospace);font-size:26px;font-weight:700">3–5/sec</span><span style="font-size:24px;color:var(--ui-text-secondary)">pass</span></div>
+      <div style="position:absolute;left:760px;top:90px;width:220px;height:120px;box-sizing:border-box;border-radius:8px;border:2px solid var(--gray-150);background:#ffffff;padding:12px 18px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:4px"><div style="font-size:26px;font-weight:700;line-height:1.2">LLM triage</div><div style="font-size:24px;line-height:1.25;color:var(--ui-text-secondary)">small LLM writes the card</div></div>
+      <div style="position:absolute;left:1000px;top:92px;width:240px;display:flex;justify-content:center"><span style="display:flex;align-items:center;gap:8px;height:40px;padding:0 12px;border-radius:4px;background:var(--ui-status-warning-soft);color:#c15800;font-size:24px;font-weight:700"><i data-lucide="filter" width="22" height="22" stroke-width="2" style="color:#c15800;display:inline-flex;flex:none"></i>severity = high</span></div>
+      <div style="position:absolute;left:1000px;top:168px;width:240px;text-align:center;font-family:var(--font-family-monospace);font-size:26px;font-weight:700;color:var(--purple-700)">0–1/s</div>
+      <div style="position:absolute;left:1000px;top:206px;width:240px;display:flex;align-items:center;justify-content:center;gap:8px;color:var(--purple-600)"><i data-lucide="radio-tower" width="26" height="26" stroke-width="2" style="color:var(--purple-600);display:inline-flex;flex:none"></i><span style="font-size:24px;font-weight:600;line-height:1.3">cellular</span></div>
+      <div style="position:absolute;left:1270px;top:100px;width:380px;height:100px;box-sizing:border-box;border-radius:8px;border:3px solid var(--purple-600);background:var(--purple-100);display:flex;align-items:center;justify-content:center;font-family:var(--font-family-monospace);font-size:26px;font-weight:700;color:var(--purple-700)">enrichment-cards</div>
+      <div style="position:absolute;left:1270px;top:290px;width:380px;height:124px;box-sizing:border-box;border-radius:8px;border:2px solid var(--gray-150);background:#ffffff;padding:14px 20px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:10px">
+        <div style="font-size:26px;font-weight:700">Control center Function</div>
+        <div style="display:flex;align-items:center;height:38px;padding:0 12px;border-radius:4px;background:var(--ui-status-success-soft);color:var(--ui-status-success-contrast);font-size:24px;font-weight:700">1 LLM call per 3 cards</div>
+      </div>
+      <div style="position:absolute;left:0;top:468px;width:1200px;display:flex;flex-direction:column;gap:14px;font-size:30px;line-height:1.35">
+        <div style="font-weight:700">100s/sec readings → a few pass cheap math → only "high" leaves the truck</div>
+        <div style="color:var(--ui-text-secondary)">Control center: 1 LLM call per incident, not per event</div>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;font-size:24px;color:var(--ui-text-tertiary)"><span>When Your Pulsar Function Speaks English</span></div>
+</section>
+
+<section data-label="Refresher: Three Messages" data-screen-label="06 Refresher: Three Messages" data-speaker-notes="Refresher for anyone who missed the edge intelligence  talk: these are the three messages behind the funnel on the last slide, left to right. Left: one TelemetryEvent on truck-telemetry. Every reading looks like this — speed, GPS, route and corridor, planned versus current ETA, cheap-math signals, raw braking. These are the sensor readings. Middle: what the co-processor sends when the cheap math passes — the slowdown check and the ETA-slip gate. It names which signals fired, restates the metrics, adds context a threshold can't capture (weather, cargo, dispatch status), and carries a baseline severity computed before the LLM runs. These are the the interesting events that get pass the filter. Right: what comes out of the LLM. The model only writes two things, the risk_synthesis and an escalation of raise, hold, or lower. Everything else is deterministic: severity is the baseline moved one step, medium to high. Only cards that end up high go on enrichment-cards and leave the truck — that's what the control center receives. " style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:64px 100px 44px;display:flex;flex-direction:column;box-sizing:border-box;gap:24px" data-om-slide-id="ebec02c2">
+  <h2 style="margin:0;font-size:56px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">Refresher: The Three Messages on the Truck</h2>
+  <div style="flex:1;display:grid;grid-template-columns:minmax(0,1fr) 2px minmax(0,1fr) 2px minmax(0,1fr);column-gap:28px;min-height:0">
+    <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+      <div style="display:flex;flex-direction:column;gap:4px;min-height:84px">
+        <div style="display:flex;align-items:center;gap:12px"><span style="width:40px;height:40px;border-radius:50%;background:var(--gray-75);color:var(--ui-text-secondary);display:flex;align-items:center;justify-content:center;font-family:var(--font-family-monospace);font-size:22px;font-weight:700;flex:none">1</span><span style="font-size:32px;font-weight:700">Telemetry event</span></div>
+        <div style="font-size:24px;color:var(--ui-text-secondary);padding-left:52px">every reading · <span style="font-family:var(--font-family-monospace)">truck-telemetry</span></div>
+      </div>
+      <div style="flex:1;background:var(--gray-800);color:#ffffff;border-radius:8px;padding:20px 20px;font-family:var(--font-family-monospace);font-size:20px;line-height:1.42;letter-spacing:-0.01em;overflow:hidden">
+        <div style="padding-left:2ch;text-indent:-2ch">{</div>
+        <div style="padding-left:4ch;text-indent:-2ch"><span style="color:#5bceff">"timestamp"</span>: <span style="color:#41eba4">"2026-10-14T14:32:05Z"</span>,</div>
+        <div style="padding-left:4ch;text-indent:-2ch"><span style="color:#5bceff">"truck_id"</span>: <span style="color:#41eba4">"truck-47"</span>,</div>
+        <div style="padding-left:4ch;text-indent:-2ch"><span style="color:#5bceff">"speed_mph"</span>: <span style="color:#ffb84d">33.8</span>,</div>
+        <div style="padding-left:4ch;text-indent:-2ch"><span style="color:#5bceff">"gps"</span>: { <span style="color:#5bceff">"lat"</span>: <span style="color:#ffb84d">33.9612</span>, <span style="color:#5bceff">"lon"</span>: <span style="color:#ffb84d">-84.4000</span> },</div>
+        <div style="padding-left:4ch;text-indent:-2ch"><span style="color:#5bceff">"heading"</span>: <span style="color:#ffb84d">0.0</span>,</div>
+        <div style="padding-left:4ch;text-indent:-2ch"><span style="color:#5bceff">"route_segment"</span>: <span style="color:#41eba4">"I-95N-segment-4"</span>,</div>
+        <div style="padding-left:4ch;text-indent:-2ch"><span style="color:#5bceff">"corridor"</span>: <span style="color:#41eba4">"I-95N"</span>,</div>
+        <div style="padding-left:4ch;text-indent:-2ch"><span style="color:#5bceff">"planned_eta"</span>: <span style="color:#41eba4">"2026-10-14T15:05:00Z"</span>,</div>
+        <div style="padding-left:4ch;text-indent:-2ch"><span style="color:#5bceff">"current_eta"</span>: <span style="color:#41eba4">"2026-10-14T15:12:12Z"</span>,</div>
+        <div style="padding-left:4ch;text-indent:-2ch"><span style="color:#5bceff">"signals"</span>: {</div>
+        <div style="padding-left:6ch;text-indent:-2ch"><span style="color:#5bceff">"rolling_avg_speed"</span>: <span style="color:#ffb84d">36.1</span>,</div>
+        <div style="padding-left:6ch;text-indent:-2ch;background:rgba(255,184,77,0.16);box-shadow:inset 4px 0 0 #ffb84d"><span style="color:#5bceff">"eta_slip_min"</span>: <span style="color:#ffb84d">7.2</span>,</div>
+        <div style="padding-left:6ch;text-indent:-2ch"><span style="color:#5bceff">"stop_go_index"</span>: <span style="color:#ffb84d">0.74</span></div>
+        <div style="padding-left:4ch;text-indent:-2ch">},</div>
+        <div style="padding-left:4ch;text-indent:-2ch"><span style="color:#5bceff">"brake_events"</span>: <span style="color:#ffb84d">1</span>,</div>
+        <div style="padding-left:4ch;text-indent:-2ch"><span style="color:#5bceff">"downshift_events"</span>: <span style="color:#ffb84d">1</span>,</div>
+        <div style="padding-left:4ch;text-indent:-2ch"><span style="color:#5bceff">"peak_deceleration_g"</span>: <span style="color:#ffb84d">0.31</span>,</div>
+        <div style="padding-left:4ch;text-indent:-2ch"><span style="color:#5bceff">"abs_engaged"</span>: <span style="color:#ff63a5">false</span></div>
+        <div style="padding-left:2ch;text-indent:-2ch">}</div>
+      </div>
+    </div>
+    <div style="position:relative;background:var(--gray-150)"><div style="position:absolute;left:50%;top:22px;transform:translateX(-50%);width:44px;height:44px;border-radius:50%;background:#ffffff;border:2px solid var(--gray-150);display:flex;align-items:center;justify-content:center"><i data-lucide="arrow-right" width="24" height="24" stroke-width="2.25" style="color:var(--gray-400);display:inline-flex;flex:none"></i></div></div>
+    <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+      <div style="display:flex;flex-direction:column;gap:4px;min-height:84px">
+        <div style="display:flex;align-items:center;gap:12px"><span style="width:40px;height:40px;border-radius:50%;background:var(--ui-status-warning-soft);color:#c15800;display:flex;align-items:center;justify-content:center;font-family:var(--font-family-monospace);font-size:22px;font-weight:700;flex:none">2</span><span style="font-size:32px;font-weight:700">Triage payload</span></div>
+        <div style="font-size:24px;color:var(--ui-text-secondary);padding-left:52px">passed cheap math · to the LLM</div>
+      </div>
+      <div style="flex:1;background:var(--gray-800);color:#ffffff;border-radius:8px;padding:20px 20px;font-family:var(--font-family-monospace);font-size:20px;line-height:1.42;letter-spacing:-0.01em;overflow:hidden">
+        <div style="padding-left:2ch;text-indent:-2ch">{</div>
+        <div style="padding-left:4ch;text-indent:-2ch"><span style="color:#5bceff">"truck_id"</span>: <span style="color:#41eba4">"truck-47"</span>,</div>
+        <div style="padding-left:4ch;text-indent:-2ch"><span style="color:#5bceff">"corridor"</span>: <span style="color:#41eba4">"I-95N"</span>,</div>
+        <div style="padding-left:4ch;text-indent:-2ch"><span style="color:#5bceff">"signals"</span>: [<span style="color:#41eba4">"sustained_low_speed"</span>, <span style="color:#41eba4">"stop_go_index"</span>, <span style="color:#41eba4">"eta_slip"</span>],</div>
+        <div style="padding-left:4ch;text-indent:-2ch"><span style="color:#5bceff">"metrics"</span>: {</div>
+        <div style="padding-left:6ch;text-indent:-2ch"><span style="color:#5bceff">"rolling_avg_speed"</span>: <span style="color:#ffb84d">36.1</span>,</div>
+        <div style="padding-left:6ch;text-indent:-2ch"><span style="color:#5bceff">"eta_slip_min"</span>: <span style="color:#ffb84d">7.2</span>,</div>
+        <div style="padding-left:6ch;text-indent:-2ch"><span style="color:#5bceff">"traffic_pattern"</span>: <span style="color:#41eba4">"elevated velocity variance (frequent speed cycling)"</span>,</div>
+        <div style="padding-left:6ch;text-indent:-2ch"><span style="color:#5bceff">"peak_deceleration_g"</span>: <span style="color:#ffb84d">0.31</span>,</div>
+        <div style="padding-left:6ch;text-indent:-2ch"><span style="color:#5bceff">"abs_engaged"</span>: <span style="color:#ff63a5">false</span></div>
+        <div style="padding-left:4ch;text-indent:-2ch">},</div>
+        <div style="padding-left:4ch;text-indent:-2ch;background:rgba(255,184,77,0.16);box-shadow:inset 4px 0 0 #ffb84d"><span style="color:#5bceff">"baseline_severity"</span>: <span style="color:#41eba4">"medium"</span>,</div>
+        <div style="padding-left:4ch;text-indent:-2ch"><span style="color:#5bceff">"contextual_triggers"</span>: {</div>
+        <div style="padding-left:6ch;text-indent:-2ch"><span style="color:#5bceff">"local_time"</span>: <span style="color:#41eba4">"2026-10-14T14:32:05+00:00"</span>,</div>
+        <div style="padding-left:6ch;text-indent:-2ch"><span style="color:#5bceff">"weather_condition"</span>: <span style="color:#41eba4">"Heavy rain, wet asphalt"</span>,</div>
+        <div style="padding-left:6ch;text-indent:-2ch"><span style="color:#5bceff">"cargo_type"</span>: <span style="color:#41eba4">"Liquids / Chemical Tanker"</span>,</div>
+        <div style="padding-left:6ch;text-indent:-2ch"><span style="color:#5bceff">"dispatch_status"</span>: <span style="color:#41eba4">"Running 20 minutes behind schedule"</span></div>
+        <div style="padding-left:4ch;text-indent:-2ch">}</div>
+        <div style="padding-left:2ch;text-indent:-2ch">}</div>
+      </div>
+    </div>
+    <div style="position:relative;background:var(--gray-150)"><div style="position:absolute;left:50%;top:22px;transform:translateX(-50%);width:44px;height:44px;border-radius:50%;background:#ffffff;border:2px solid var(--gray-150);display:flex;align-items:center;justify-content:center"><i data-lucide="arrow-right" width="24" height="24" stroke-width="2.25" style="color:var(--gray-400);display:inline-flex;flex:none"></i></div></div>
+    <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+      <div style="display:flex;flex-direction:column;gap:4px;min-height:84px">
+        <div style="display:flex;align-items:center;gap:12px"><span style="width:40px;height:40px;border-radius:50%;background:var(--purple-600);color:#ffffff;display:flex;align-items:center;justify-content:center;font-family:var(--font-family-monospace);font-size:22px;font-weight:700;flex:none">3</span><span style="font-size:32px;font-weight:700">Enrichment card</span></div>
+        <div style="font-size:24px;color:var(--ui-text-secondary);padding-left:52px">written by the LLM · <span style="font-family:var(--font-family-monospace)">enrichment-cards</span></div>
+      </div>
+      <div style="flex:1;background:var(--gray-800);color:#ffffff;border-radius:8px;padding:20px 20px;font-family:var(--font-family-monospace);font-size:20px;line-height:1.42;letter-spacing:-0.01em;overflow:hidden">
+        <div style="padding-left:2ch;text-indent:-2ch">{</div>
+        <div style="padding-left:4ch;text-indent:-2ch"><span style="color:#5bceff">"risk_synthesis"</span>:</div>
+        <div style="padding-left:6ch;text-indent:-2ch"><span style="color:#41eba4">"Heavy rain degrades traction, the cargo is a liquid chemical tanker, and the driver is 20 minutes behind under schedule pressure. All three are risk multipliers."</span>,</div>
+        <div style="padding-left:4ch;text-indent:-2ch;background:rgba(196,160,255,0.18);box-shadow:inset 4px 0 0 #c4a0ff"><span style="color:#5bceff">"escalation"</span>: <span style="color:#41eba4">"raise"</span>, <span style="color:#8f969a">// LLM decision</span></div>
+        <div style="padding-left:4ch;text-indent:-2ch"><span style="color:#5bceff">"truck_id"</span>: <span style="color:#41eba4">"truck-47"</span>,</div>
+        <div style="padding-left:4ch;text-indent:-2ch"><span style="color:#5bceff">"baseline_severity"</span>: <span style="color:#41eba4">"medium"</span>, <span style="color:#8f969a">// from co-processor</span></div>
+        <div style="padding-left:4ch;text-indent:-2ch;background:rgba(196,160,255,0.18);box-shadow:inset 4px 0 0 #c4a0ff"><span style="color:#5bceff">"severity"</span>: <span style="color:#41eba4">"high"</span>, <span style="color:#8f969a">// medium + raise</span></div>
+        <div style="padding-left:4ch;text-indent:-2ch"><span style="color:#5bceff">"recommended_action"</span>: <span style="color:#41eba4">"Escalate for driver/dispatcher review."</span>,</div>
+        <div style="padding-left:4ch;text-indent:-2ch"><span style="color:#5bceff">"eta_impact"</span>: <span style="color:#ffb84d">7.2</span> <span style="color:#8f969a">// minutes</span></div>
+        <div style="padding-left:2ch;text-indent:-2ch">}</div>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;font-size:24px;color:var(--ui-text-tertiary)"><span>When Your Pulsar Function Speaks English</span></div>
+</section>
+
+<section data-label="Three Cards, One Corridor" data-screen-label="07 Three Cards, One Corridor" data-speaker-notes="Here's what arrives in the cloud: three cards from three trucks, all on interstate 95 North. Two of them are high severity, and one is medium. The control center has to answer the same question a dispatcher would: is this one truck's problem, or is the whole corridor backed up? And if it's the whole corridor, do we tell drivers to go around?  Now let's follow these three cards through the system, end to end." style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:72px 120px 44px;display:flex;flex-direction:column;box-sizing:border-box;gap:20px" data-om-slide-id="87a14398">
+  <h2 style="margin:0;font-size:60px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">One Truck Is Not Enough</h2>
+  <div style="flex:1;display:grid;grid-template-columns:minmax(0,1fr) 380px;align-items:center;min-height:0">
+    <div style="display:flex;flex-direction:column;gap:48px;min-width:0;padding-top:20px">
+    <div style="display:flex;align-items:center;min-width:0">
+      <div style="position:relative;flex:none;display:flex;align-items:center;gap:12px;border:3px dashed var(--gray-200);border-radius:8px;padding:34px 22px 18px">
+        <div style="position:absolute;left:18px;top:-26px;display:flex;align-items:center;gap:12px;height:48px;padding:0 14px;background:#ffffff"><i data-lucide="truck" width="44" height="44" stroke-width="1.75" style="color:var(--ui-text);display:inline-flex;flex:none"></i><span style="font-family:var(--font-family-monospace);font-size:28px;font-weight:600">truck-47</span></div>
+        <div style="flex:none;width:240px;box-sizing:border-box;border-radius:8px;border:2px solid var(--gray-150);background:#ffffff;padding:12px 18px;display:flex;flex-direction:column;justify-content:center;gap:2px"><div style="font-size:30px;font-weight:700;line-height:1.15">Co-processor</div><div style="font-size:26px;color:var(--ui-text-secondary);line-height:1.2">cheap math</div></div>
+        <svg width="40" height="22" viewBox="0 0 40 22" style="flex:none"><path d="M2 11 L30 11" stroke-width="3" fill="none" style="stroke:var(--gray-400)"></path><path d="M28 3 L38 11 L28 19 z" style="fill:var(--gray-400)"></path></svg>
+        <div style="flex:none;width:240px;box-sizing:border-box;border-radius:8px;border:2px solid var(--gray-150);background:#ffffff;padding:12px 18px;display:flex;flex-direction:column;justify-content:center;gap:2px"><div style="font-size:30px;font-weight:700;line-height:1.15">LLM triage</div><div style="font-size:26px;color:var(--ui-text-secondary);line-height:1.2">small LLM</div></div>
+      </div>
+      <div style="flex:none;width:170px;display:flex;flex-direction:column;align-items:center;gap:4px"><span style="display:flex;align-items:center;gap:8px;font-size:26px;font-weight:600;color:oklch(0.55 0.1 190)"><i data-lucide="radio-tower" width="26" height="26" stroke-width="2" style="color:oklch(0.55 0.1 190);display:inline-flex;flex:none"></i>cellular</span><svg width="150" height="22" viewBox="0 0 150 22"><path d="M6 11 L138 11" stroke-width="3" stroke-dasharray="8 6" fill="none" style="stroke:oklch(0.55 0.1 190)"></path><path d="M136 3 L148 11 L136 19 z" style="fill:oklch(0.55 0.1 190)"></path></svg></div>
+      <div style="flex:1;min-width:0;border:3px solid var(--ui-status-danger);border-radius:8px;background:#ffffff;padding:16px 22px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><span style="display:flex;align-items:center;gap:8px;height:44px;padding:0 12px;border-radius:4px;background:var(--ui-status-danger-soft);color:var(--ui-status-danger-contrast);font-size:28px;font-weight:700"><i data-lucide="triangle-alert" width="24" height="24" stroke-width="2" style="color:var(--ui-status-danger);display:inline-flex;flex:none"></i>high</span><span style="font-size:28px;color:var(--ui-text-secondary)">enrichment card</span></div>
+        <div style="font-family:var(--font-family-monospace);font-size:28px;white-space:nowrap"><span style="color:var(--ui-text-secondary)">"eta_impact":</span> <span style="font-weight:700">9.0</span></div>
+      </div>
+      <div style="flex:none;width:52px;display:flex;justify-content:center"><svg width="40" height="22" viewBox="0 0 40 22" style="flex:none"><path d="M2 11 L30 11" stroke-width="3" fill="none" style="stroke:var(--gray-400)"></path><path d="M28 3 L38 11 L28 19 z" style="fill:var(--gray-400)"></path></svg></div>
+    </div>
+    <div style="display:flex;align-items:center;min-width:0">
+      <div style="position:relative;flex:none;display:flex;align-items:center;gap:12px;border:3px dashed var(--gray-200);border-radius:8px;padding:34px 22px 18px">
+        <div style="position:absolute;left:18px;top:-26px;display:flex;align-items:center;gap:12px;height:48px;padding:0 14px;background:#ffffff"><i data-lucide="truck" width="44" height="44" stroke-width="1.75" style="color:var(--ui-text);display:inline-flex;flex:none"></i><span style="font-family:var(--font-family-monospace);font-size:28px;font-weight:600">truck-12</span></div>
+        <div style="flex:none;width:240px;box-sizing:border-box;border-radius:8px;border:2px solid var(--gray-150);background:#ffffff;padding:12px 18px;display:flex;flex-direction:column;justify-content:center;gap:2px"><div style="font-size:30px;font-weight:700;line-height:1.15">Co-processor</div><div style="font-size:26px;color:var(--ui-text-secondary);line-height:1.2">cheap math</div></div>
+        <svg width="40" height="22" viewBox="0 0 40 22" style="flex:none"><path d="M2 11 L30 11" stroke-width="3" fill="none" style="stroke:var(--gray-400)"></path><path d="M28 3 L38 11 L28 19 z" style="fill:var(--gray-400)"></path></svg>
+        <div style="flex:none;width:240px;box-sizing:border-box;border-radius:8px;border:2px solid var(--gray-150);background:#ffffff;padding:12px 18px;display:flex;flex-direction:column;justify-content:center;gap:2px"><div style="font-size:30px;font-weight:700;line-height:1.15">LLM triage</div><div style="font-size:26px;color:var(--ui-text-secondary);line-height:1.2">small LLM</div></div>
+      </div>
+      <div style="flex:none;width:170px;display:flex;flex-direction:column;align-items:center;gap:4px"><span style="display:flex;align-items:center;gap:8px;font-size:26px;font-weight:600;color:oklch(0.55 0.1 190)"><i data-lucide="radio-tower" width="26" height="26" stroke-width="2" style="color:oklch(0.55 0.1 190);display:inline-flex;flex:none"></i>cellular</span><svg width="150" height="22" viewBox="0 0 150 22"><path d="M6 11 L138 11" stroke-width="3" stroke-dasharray="8 6" fill="none" style="stroke:oklch(0.55 0.1 190)"></path><path d="M136 3 L148 11 L136 19 z" style="fill:oklch(0.55 0.1 190)"></path></svg></div>
+      <div style="flex:1;min-width:0;border:3px solid var(--ui-status-danger);border-radius:8px;background:#ffffff;padding:16px 22px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><span style="display:flex;align-items:center;gap:8px;height:44px;padding:0 12px;border-radius:4px;background:var(--ui-status-danger-soft);color:var(--ui-status-danger-contrast);font-size:28px;font-weight:700"><i data-lucide="triangle-alert" width="24" height="24" stroke-width="2" style="color:var(--ui-status-danger);display:inline-flex;flex:none"></i>high</span><span style="font-size:28px;color:var(--ui-text-secondary)">enrichment card</span></div>
+        <div style="font-family:var(--font-family-monospace);font-size:28px;white-space:nowrap"><span style="color:var(--ui-text-secondary)">"eta_impact":</span> <span style="font-weight:700">7.0</span></div>
+      </div>
+      <div style="flex:none;width:52px;display:flex;justify-content:center"><svg width="40" height="22" viewBox="0 0 40 22" style="flex:none"><path d="M2 11 L30 11" stroke-width="3" fill="none" style="stroke:var(--gray-400)"></path><path d="M28 3 L38 11 L28 19 z" style="fill:var(--gray-400)"></path></svg></div>
+    </div>
+    <div style="display:flex;align-items:center;min-width:0">
+      <div style="position:relative;flex:none;display:flex;align-items:center;gap:12px;border:3px dashed var(--gray-200);border-radius:8px;padding:34px 22px 18px">
+        <div style="position:absolute;left:18px;top:-26px;display:flex;align-items:center;gap:12px;height:48px;padding:0 14px;background:#ffffff"><i data-lucide="truck" width="44" height="44" stroke-width="1.75" style="color:var(--ui-text);display:inline-flex;flex:none"></i><span style="font-family:var(--font-family-monospace);font-size:28px;font-weight:600">truck-31</span></div>
+        <div style="flex:none;width:240px;box-sizing:border-box;border-radius:8px;border:2px solid var(--gray-150);background:#ffffff;padding:12px 18px;display:flex;flex-direction:column;justify-content:center;gap:2px"><div style="font-size:30px;font-weight:700;line-height:1.15">Co-processor</div><div style="font-size:26px;color:var(--ui-text-secondary);line-height:1.2">cheap math</div></div>
+        <svg width="40" height="22" viewBox="0 0 40 22" style="flex:none"><path d="M2 11 L30 11" stroke-width="3" fill="none" style="stroke:var(--gray-400)"></path><path d="M28 3 L38 11 L28 19 z" style="fill:var(--gray-400)"></path></svg>
+        <div style="flex:none;width:240px;box-sizing:border-box;border-radius:8px;border:2px solid var(--gray-150);background:#ffffff;padding:12px 18px;display:flex;flex-direction:column;justify-content:center;gap:2px"><div style="font-size:30px;font-weight:700;line-height:1.15">LLM triage</div><div style="font-size:26px;color:var(--ui-text-secondary);line-height:1.2">small LLM</div></div>
+      </div>
+      <div style="flex:none;width:170px;display:flex;flex-direction:column;align-items:center;gap:4px"><span style="display:flex;align-items:center;gap:8px;font-size:26px;font-weight:600;color:oklch(0.55 0.1 190)"><i data-lucide="radio-tower" width="26" height="26" stroke-width="2" style="color:oklch(0.55 0.1 190);display:inline-flex;flex:none"></i>cellular</span><svg width="150" height="22" viewBox="0 0 150 22"><path d="M6 11 L138 11" stroke-width="3" stroke-dasharray="8 6" fill="none" style="stroke:oklch(0.55 0.1 190)"></path><path d="M136 3 L148 11 L136 19 z" style="fill:oklch(0.55 0.1 190)"></path></svg></div>
+      <div style="flex:1;min-width:0;border:3px solid #c15800;border-radius:8px;background:#ffffff;padding:16px 22px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><span style="display:flex;align-items:center;gap:8px;height:44px;padding:0 12px;border-radius:4px;background:var(--ui-status-warning-soft);color:#c15800;font-size:28px;font-weight:700"><i data-lucide="circle-alert" width="24" height="24" stroke-width="2" style="color:#c15800;display:inline-flex;flex:none"></i>medium</span><span style="font-size:28px;color:var(--ui-text-secondary)">enrichment card</span></div>
+        <div style="font-family:var(--font-family-monospace);font-size:28px;white-space:nowrap"><span style="color:var(--ui-text-secondary)">"eta_impact":</span> <span style="font-weight:700">6.0</span></div>
+      </div>
+      <div style="flex:none;width:52px;display:flex;justify-content:center"><svg width="40" height="22" viewBox="0 0 40 22" style="flex:none"><path d="M2 11 L30 11" stroke-width="3" fill="none" style="stroke:var(--gray-400)"></path><path d="M28 3 L38 11 L28 19 z" style="fill:var(--gray-400)"></path></svg></div>
+    </div>
+      <div style="display:flex;align-items:center;gap:14px;font-size:28px;color:var(--ui-text-secondary);margin-top:-12px"><span style="display:flex;align-items:center;height:44px;padding:0 14px;border-radius:4px;background:var(--gray-75);font-weight:700">low</span>stays on the truck; only medium and high cross the cellular link</div>
+    </div>
+    <div style="align-self:stretch;display:flex;flex-direction:column;justify-content:center">
+      <div style="border:3px solid var(--purple-600);border-radius:8px;background:var(--purple-100);padding:34px 32px;display:flex;flex-direction:column;gap:26px">
+        <div style="display:flex;align-items:center;gap:14px;font-size:38px;font-weight:700"><i data-lucide="building-2" width="44" height="44" stroke-width="2" style="color:var(--purple-600);display:inline-flex;flex:none"></i>Data center</div>
+        <div style="background:#ffffff;border-radius:8px;border:2px solid var(--gray-100);padding:18px 20px;display:flex;align-items:center;gap:16px"><div style="width:64px;height:64px;border-radius:50%;background:var(--purple-100);display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="user-round" width="36" height="36" stroke-width="2" style="color:var(--purple-600);display:inline-flex;flex:none"></i></div><div style="font-size:30px;font-weight:600;line-height:1.25">Dispatcher evaluates</div></div>
+        <div style="font-size:60px;font-weight:700;line-height:1.05;letter-spacing:-0.02em;color:var(--ui-brand)">3 trucks · I-95N</div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:30px;font-weight:600">
+          <span style="display:flex;align-items:center;height:50px;padding:0 14px;border-radius:4px;background:var(--ui-status-danger-soft);color:var(--ui-status-danger-contrast)">2 high</span>
+          <span style="color:var(--ui-text-tertiary)">·</span>
+          <span style="display:flex;align-items:center;height:50px;padding:0 14px;border-radius:4px;background:var(--ui-status-warning-soft);color:#c15800">1 medium</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;font-size:24px;color:var(--ui-text-tertiary)"><span>When Your Pulsar Function Speaks English</span></div>
+</section>
+
+<section data-label="Two Topics, One Function, One Speaker" data-screen-label="08 Two Topics, One Function, One Speaker" data-speaker-notes="Here's every piece of the system. The three cards land on a Pulsar topic called enrichment-cards. One Pulsar Function reads them. First, plain code makes the decisions: is this one truck or the whole corridor, and should drivers reroute? Then a small LLM takes those decisions and writes a short summary of what's happening, in plain English, the way a dispatcher would say it. And that model isn't a service off somewhere that the Function calls. It runs inside the Function itself. That's the pattern this talk is about: the LLM is one more step in the stream. Events come in on a topic, the model does its work in the same process, and the result goes out on another topic. There's no extra service to deploy and no network hop to a model server, and Pulsar handles delivery and acknowledgment the same way it does for any other Function. That plain-English summary goes out on a second topic called incidents. A simple consumer picks it up and hands it to a text-to-speech engine called Piper, which reads it out loud. That's what you heard at the start of the talk. Over the next few sections we'll go through it one box at a time, starting with the Function. " style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:72px 120px 44px;display:flex;flex-direction:column;box-sizing:border-box;gap:20px" data-om-slide-id="89f6cace">
+  <h2 style="margin:0;font-size:60px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">The Whole System on One Slide</h2>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:40px;min-height:0">
+    <div style="position:relative;border:3px dashed var(--gray-200);border-radius:8px;padding:48px 24px 28px;display:flex;align-items:center;justify-content:space-between">
+      <div style="position:absolute;left:18px;top:-28px;display:flex;align-items:center;gap:12px;height:52px;padding:0 14px;background:#ffffff"><i data-lucide="building-2" width="40" height="40" stroke-width="2" style="color:var(--purple-600);display:inline-flex;flex:none"></i><span style="font-size:32px;font-weight:700">Control center</span></div>
+      <div style="flex:none;width:300px;display:flex;flex-direction:column;gap:16px">
+        <div style="height:96px;box-sizing:border-box;border:3px solid var(--ui-status-danger);border-radius:8px;background:#ffffff;padding:10px 18px;display:flex;flex-direction:column;justify-content:center;gap:6px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><span style="font-family:var(--font-family-monospace);font-size:24px;font-weight:600">truck-47</span><span style="display:flex;align-items:center;gap:6px;height:36px;padding:0 10px;border-radius:4px;background:var(--ui-status-danger-soft);color:var(--ui-status-danger-contrast);font-size:24px;font-weight:700"><i data-lucide="triangle-alert" width="20" height="20" stroke-width="2" style="color:var(--ui-status-danger);display:inline-flex;flex:none"></i>high</span></div>
+          <div style="font-family:var(--font-family-monospace);font-size:24px;white-space:nowrap"><span style="color:var(--ui-text-secondary)">"eta_impact":</span> <span style="font-weight:700">9.0</span></div>
+        </div>
+        <div style="height:96px;box-sizing:border-box;border:3px solid var(--ui-status-danger);border-radius:8px;background:#ffffff;padding:10px 18px;display:flex;flex-direction:column;justify-content:center;gap:6px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><span style="font-family:var(--font-family-monospace);font-size:24px;font-weight:600">truck-12</span><span style="display:flex;align-items:center;gap:6px;height:36px;padding:0 10px;border-radius:4px;background:var(--ui-status-danger-soft);color:var(--ui-status-danger-contrast);font-size:24px;font-weight:700"><i data-lucide="triangle-alert" width="20" height="20" stroke-width="2" style="color:var(--ui-status-danger);display:inline-flex;flex:none"></i>high</span></div>
+          <div style="font-family:var(--font-family-monospace);font-size:24px;white-space:nowrap"><span style="color:var(--ui-text-secondary)">"eta_impact":</span> <span style="font-weight:700">7.0</span></div>
+        </div>
+        <div style="height:96px;box-sizing:border-box;border:3px solid #c15800;border-radius:8px;background:#ffffff;padding:10px 18px;display:flex;flex-direction:column;justify-content:center;gap:6px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><span style="font-family:var(--font-family-monospace);font-size:24px;font-weight:600">truck-31</span><span style="display:flex;align-items:center;gap:6px;height:36px;padding:0 10px;border-radius:4px;background:var(--ui-status-warning-soft);color:#c15800;font-size:24px;font-weight:700"><i data-lucide="circle-alert" width="20" height="20" stroke-width="2" style="color:#c15800;display:inline-flex;flex:none"></i>medium</span></div>
+          <div style="font-family:var(--font-family-monospace);font-size:24px;white-space:nowrap"><span style="color:var(--ui-text-secondary)">"eta_impact":</span> <span style="font-weight:700">6.0</span></div>
+        </div>
+      </div>
+      <svg width="64" height="320" viewBox="0 0 64 320" style="flex:none"><g fill="none" stroke-width="3" style="stroke:var(--gray-400)"><path d="M2 48 C 34 48 30 160 52 160"></path><path d="M2 160 L52 160"></path><path d="M2 272 C 34 272 30 160 52 160"></path></g><path d="M50 152 L62 160 L50 168 z" style="fill:var(--gray-400)"></path></svg>
+      <div style="flex:none;width:260px;height:110px;box-sizing:border-box;border-radius:8px;border:2px solid var(--gray-150);background:var(--gray-25);display:flex;align-items:center;justify-content:center;text-align:center;font-family:var(--font-family-monospace);font-size:24px;font-weight:600">enrichment-cards</div>
+      <svg width="40" height="22" viewBox="0 0 40 22" style="flex:none"><path d="M2 11 L30 11" stroke-width="3" fill="none" style="stroke:var(--gray-400)"></path><path d="M28 3 L38 11 L28 19 z" style="fill:var(--gray-400)"></path></svg>
+      <div style="flex:none;width:440px;box-sizing:border-box;border-radius:8px;border:3px solid var(--purple-600);background:var(--purple-100);padding:18px 20px 20px;display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <div style="font-family:var(--font-family-monospace);font-size:26px;font-weight:600;color:var(--purple-700)">GlobalSynthesisFunction</div>
+          <div style="font-size:24px;color:var(--ui-text-secondary)">Pulsar Function · <span style="font-family:var(--font-family-monospace)">localrun</span></div>
+        </div>
+        <div style="background:#ffffff;border-radius:8px;border:2px solid var(--gray-100);padding:12px 16px;display:flex;align-items:center;gap:14px"><i data-lucide="git-branch" width="30" height="30" stroke-width="2" style="color:var(--purple-600);display:inline-flex;flex:none"></i><span style="font-size:28px;font-weight:600">plain code decides</span></div>
+        <div style="display:flex;justify-content:center"><svg width="22" height="30" viewBox="0 0 22 30"><path d="M11 2 L11 20" stroke-width="3" fill="none" style="stroke:var(--purple-600)"></path><path d="M3 17 L11 28 L19 17 z" style="fill:var(--purple-600)"></path></svg></div>
+        <div style="background:#ffffff;border-radius:8px;border:2px solid var(--gray-100);padding:12px 16px;display:flex;align-items:flex-start;gap:14px"><i data-lucide="sparkles" width="30" height="30" stroke-width="2" style="color:var(--purple-600);display:inline-flex;flex:none;margin-top:2px"></i><div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:28px;font-weight:600">LLM writes a plain-English summary</span><span style="font-size:24px;line-height:1.35;color:var(--ui-text-secondary)">in llama-cpp-python · loaded once</span></div></div>
+      </div>
+      <svg width="40" height="22" viewBox="0 0 40 22" style="flex:none"><path d="M2 11 L30 11" stroke-width="3" fill="none" style="stroke:var(--gray-400)"></path><path d="M28 3 L38 11 L28 19 z" style="fill:var(--gray-400)"></path></svg>
+      <div style="flex:none;width:160px;height:110px;box-sizing:border-box;border-radius:8px;border:2px solid var(--gray-150);background:var(--gray-25);display:flex;align-items:center;justify-content:center;font-family:var(--font-family-monospace);font-size:24px;font-weight:600">incidents</div>
+      <svg width="40" height="22" viewBox="0 0 40 22" style="flex:none"><path d="M2 11 L30 11" stroke-width="3" fill="none" style="stroke:var(--gray-400)"></path><path d="M28 3 L38 11 L28 19 z" style="fill:var(--gray-400)"></path></svg>
+      <div style="flex:none;width:240px;box-sizing:border-box;border-radius:8px;border:2px solid var(--gray-150);background:#ffffff;padding:16px;display:flex;flex-direction:column;gap:6px">
+        <div style="border-radius:8px;border:2px solid var(--gray-100);padding:12px 14px;text-align:center;font-size:26px;font-weight:600;line-height:1.2">speaker consumer</div>
+        <div style="display:flex;justify-content:center"><svg width="22" height="30" viewBox="0 0 22 30"><path d="M11 2 L11 20" stroke-width="3" fill="none" style="stroke:var(--gray-400)"></path><path d="M3 17 L11 28 L19 17 z" style="fill:var(--gray-400)"></path></svg></div>
+        <div style="border-radius:8px;border:2px solid var(--gray-100);padding:12px 14px;text-align:center;font-size:26px;font-weight:600;line-height:1.2">Piper subprocess</div>
+        <div style="display:flex;justify-content:center"><svg width="22" height="30" viewBox="0 0 22 30"><path d="M11 2 L11 20" stroke-width="3" fill="none" style="stroke:var(--gray-400)"></path><path d="M3 17 L11 28 L19 17 z" style="fill:var(--gray-400)"></path></svg></div>
+        <div style="display:flex;justify-content:center"><div style="width:72px;height:72px;border-radius:8px;background:var(--ui-status-success-soft);display:flex;align-items:center;justify-content:center"><i data-lucide="volume-2" width="40" height="40" stroke-width="2" style="color:var(--ui-status-success);display:inline-flex;flex:none"></i></div></div>
+      </div>
+    </div>
+    <div style="background:var(--gray-800);color:#ffffff;border-radius:8px;padding:26px 40px;font-size:34px;font-weight:600;line-height:1.35;text-align:center">enrichment-cards → Function [code decides · LLM summarizes in plain English] → incidents → voice</div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;font-size:24px;color:var(--ui-text-tertiary)"><span>When Your Pulsar Function Speaks English</span></div>
+</section>
+
+<section data-label="Section: The Pulsar Function" data-screen-label="09 Section: The Pulsar Function" data-speaker-notes="Now lets take a look at the Pulsar Function that makes this possible. This is where the LLM actually lives in the stream, so it's the heart of the pattern." style="background:linear-gradient(135deg, var(--purple-700) 0%, oklch(0.42 0.24 272) 60%, oklch(0.5 0.22 262) 100%);overflow:hidden;color:#ffffff;font-family:var(--font-family-base);padding:120px;display:flex;flex-direction:column;box-sizing:border-box" data-om-slide-id="332d15e6">
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.05);clip-path:polygon(38% 0, 62% 0, 30% 100%, 8% 100%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.07);clip-path:polygon(70% 0, 100% 0, 100% 55%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(0,0,40,0.12);clip-path:polygon(0 0, 22% 0, 0 45%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.04);clip-path:polygon(58% 100%, 100% 40%, 100% 100%);pointer-events:none"></div>
+  <div style="position:relative;flex:1;display:flex;flex-direction:column;justify-content:center;gap:40px">
+    <h2 style="margin:0;font-size:104px;font-weight:700;line-height:1.05;letter-spacing:-0.02em;text-wrap:balance">The Pulsar Function</h2>
+  </div>
+  <div style="position:relative;display:flex;justify-content:space-between;align-items:center;font-size:24px;color:var(--purple-200)"><span>When Your Pulsar Function Speaks English</span></div>
+</section>
+
+<section data-label="Pulsar Functions: Background" data-screen-label="10 Pulsar Functions: Background" data-speaker-notes="A quick bit of background on Pulsar Functions, just the parts that matter for this talk. First, they're event-driven. Every message that lands on the input topic triggers your code. Your code runs once for that message and then either publishes one message to the output topic, or publishes nothing. One in, zero or one out. Second, they're lambda-style. There's no server to stand up and no consumer loop to write. You write a class with a single method, process, and Pulsar handles reading from the topic and publishing the result. Third, they're configurable. When you deploy a Function, you can hand it a set of user-config values, and the code reads them at runtime. That's how we'll swap LLM models, change thread counts, or move work onto a GPU without touching the code. Those three properties are also why Pulsar is a good home for an LLM. The Function already sits between two topics, so adding a model means adding a step, not adding infrastructure. Keep that one-in, zero-or-one-out rule in mind, because the problem we're solving needs more than one message at a time. Backing: Pulsar Functions docs; `function.py`." style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:72px 120px 44px;display:flex;flex-direction:column;box-sizing:border-box;gap:24px" data-om-slide-id="5a515413">
+  <h2 style="margin:0;font-size:60px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">Pulsar Functions, Briefly</h2>
+  <div style="flex:1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px;align-content:center;min-height:0">
+    <div style="border:2px solid var(--gray-100);border-radius:8px;padding:40px 36px;display:flex;flex-direction:column;gap:24px;min-width:0">
+      <div style="display:flex;align-items:center;gap:18px"><div style="width:72px;height:72px;border-radius:8px;background:var(--purple-100);display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="zap" width="40" height="40" stroke-width="2" style="color:var(--purple-600);display:inline-flex;flex:none"></i></div><div style="font-size:44px;font-weight:700;line-height:1.1">Event-driven</div></div>
+      <div style="font-size:30px;line-height:1.4;text-wrap:pretty">Each message on the input topic triggers your code. It emits one message, or none.</div>
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end"><div style="display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="flex:1;display:flex;align-items:center;justify-content:center;height:60px;border-radius:8px;border:2px solid var(--gray-150);background:var(--gray-25);font-size:24px;font-weight:600">input</span><svg width="34" height="20" viewBox="0 0 34 20" style="flex:none"><path d="M2 10 L24 10" stroke-width="3" fill="none" style="stroke:var(--gray-400)"></path><path d="M22 3 L32 10 L22 17 z" style="fill:var(--gray-400)"></path></svg>
+            <span style="flex:1.3;display:flex;align-items:center;justify-content:center;height:60px;border-radius:8px;border:3px solid var(--purple-600);background:var(--purple-100);font-family:var(--font-family-monospace);font-size:24px;font-weight:700;color:var(--purple-700)">process()</span><svg width="34" height="20" viewBox="0 0 34 20" style="flex:none"><path d="M2 10 L24 10" stroke-width="3" fill="none" style="stroke:var(--gray-400)"></path><path d="M22 3 L32 10 L22 17 z" style="fill:var(--gray-400)"></path></svg>
+            <span style="flex:1;display:flex;align-items:center;justify-content:center;height:60px;border-radius:8px;border:2px solid var(--gray-150);background:var(--gray-25);font-size:24px;font-weight:600">output</span>
+          </div>
+          <div style="font-size:36px;font-weight:700;color:var(--ui-brand)">1 in → 0 or 1 out</div>
+        </div></div>
+    </div>
+    <div style="border:2px solid var(--gray-100);border-radius:8px;padding:40px 36px;display:flex;flex-direction:column;gap:24px;min-width:0">
+      <div style="display:flex;align-items:center;gap:18px"><div style="width:72px;height:72px;border-radius:8px;background:var(--purple-100);display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="square-function" width="40" height="40" stroke-width="2" style="color:var(--purple-600);display:inline-flex;flex:none"></i></div><div style="font-size:44px;font-weight:700;line-height:1.1">Lambda-style</div></div>
+      <div style="font-size:30px;line-height:1.4;text-wrap:pretty">One class, one method. Pulsar runs the read–process–publish loop for you.</div>
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end"><div style="background:var(--gray-800);color:#ffffff;border-radius:8px;padding:22px 24px;font-family:var(--font-family-monospace);font-size:24px;line-height:1.6;white-space:pre"><span style="color:#ff63a5">class</span> <span style="color:#5bceff">MyFunction</span>:
+  <span style="color:#ff63a5">def</span> <span style="color:#5bceff">process</span>(self,
+      input, context):
+    ...</div></div>
+    </div>
+    <div style="border:2px solid var(--gray-100);border-radius:8px;padding:40px 36px;display:flex;flex-direction:column;gap:24px;min-width:0">
+      <div style="display:flex;align-items:center;gap:18px"><div style="width:72px;height:72px;border-radius:8px;background:var(--purple-100);display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="sliders-horizontal" width="40" height="40" stroke-width="2" style="color:var(--purple-600);display:inline-flex;flex:none"></i></div><div style="font-size:44px;font-weight:700;line-height:1.1">Configurable</div></div>
+      <div style="font-size:30px;line-height:1.4;text-wrap:pretty">Settings arrive at deploy time through user config, so changes like a new LLM model need no code change.</div>
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end"><div style="display:flex;flex-direction:column;gap:14px">
+          <div style="font-family:var(--font-family-monospace);font-size:26px;font-weight:600">--user-config</div>
+          <div style="display:flex;flex-wrap:wrap;gap:10px"><span style="display:flex;align-items:center;height:44px;padding:0 14px;border-radius:4px;background:var(--gray-75);font-size:24px;font-weight:600;">model</span><span style="display:flex;align-items:center;height:44px;padding:0 14px;border-radius:4px;background:var(--gray-75);font-size:24px;font-weight:600;">threads</span><span style="display:flex;align-items:center;height:44px;padding:0 14px;border-radius:4px;background:var(--gray-75);font-size:24px;font-weight:600;">GPU layers</span><span style="display:flex;align-items:center;height:44px;padding:0 14px;border-radius:4px;background:var(--gray-75);font-size:24px;font-weight:600;">thresholds</span></div>
+        </div></div>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;font-size:24px;color:var(--ui-text-tertiary)"><span>When Your Pulsar Function Speaks English</span></div>
+</section>
+
+<section data-label="One In, Zero or One Out" data-screen-label="11 One In, Zero or One Out" data-speaker-notes="So here's the design problem. We don't want a single event to set off the LLM. One truck slowing down could be anything: a flat tire, a driver on a break, a bad sensor. What we want is consensus. When several trucks on the same corridor are all reporting trouble, that's an incident worth telling people about. So the Function waits for agreement before it writes anything. But a Pulsar Function only ever sees one message at a time. The trick is that a Function instance is a long-lived process, so it can remember things between messages. It keeps a running tally on self, a list of cards for each corridor. Here's the scenario. The first card arrives, from truck-47 on I-95 North. The tally for that corridor goes to one. That's not enough, so the Function returns None and nothing is published. The second card comes in from truck-12, same corridor. The tally goes to two. Still not enough, so again, nothing goes out. Then truck-31 reports in. That's three trucks on I-95 North, which is our threshold. Now we have consensus. The Function hands all three cards to synthesize, clears the tally for that corridor, and publishes one incident. Three messages in, one out. And two of those three messages never touched the LLM at all." style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:72px 120px 44px;display:flex;flex-direction:column;box-sizing:border-box;gap:20px" data-om-slide-id="bdecc3ce">
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:40px">
+    <h2 style="margin:0;font-size:60px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">Per-Message Functions, Corridor-Wide Answers</h2>
+    <button onClick="{{ replayIo }}" style="flex:none;height:48px;padding:0 20px;border-radius:4px;border:2px solid var(--gray-150);background:#ffffff;cursor:pointer;font-family:var(--font-family-base);font-size:24px;font-weight:600;color:var(--ui-text-secondary);display:flex;align-items:center;gap:10px" style-hover="background:var(--gray-50)"><i data-lucide="rotate-ccw" width="22" height="22" stroke-width="2" style="display:inline-flex"></i>Replay</button>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:28px;min-height:0">
+    <div style="position:relative;border:3px dashed var(--gray-200);border-radius:8px;padding:52px 24px 28px;display:grid;grid-template-columns:330px 56px 560px 56px minmax(0,1fr);align-items:center">
+      <div style="position:absolute;left:18px;top:-28px;display:flex;align-items:center;gap:12px;height:52px;padding:0 14px;background:#ffffff"><i data-lucide="building-2" width="40" height="40" stroke-width="2" style="color:var(--purple-600);display:inline-flex;flex:none"></i><span style="font-size:32px;font-weight:700">Data center</span></div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="font-size:26px;font-weight:700;color:var(--ui-text-secondary);font-family:var(--font-family-monospace)">enrichment-cards</div>
+        <sc-for list="{{ ioRows }}" as="r" hint-placeholder-count="3">
+          <div style="height:100px;box-sizing:border-box;border:3px solid {{ r.border }};border-radius:8px;background:#ffffff;padding:10px 18px;display:flex;flex-direction:column;justify-content:center;gap:6px;opacity:{{ r.op }};transform:{{ r.tf }};box-shadow:{{ r.glow }};transition:opacity 0.5s ease, transform 0.5s ease, box-shadow 0.4s ease">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><span style="font-family:var(--font-family-monospace);font-size:26px;font-weight:600">{{ r.truck }}</span><span style="display:flex;align-items:center;height:38px;padding:0 12px;border-radius:4px;font-size:24px;font-weight:700;background:{{ r.badgeBg }};color:{{ r.badgeFg }}">{{ r.sev }}</span></div>
+            <div style="font-family:var(--font-family-monospace);font-size:24px;white-space:nowrap"><span style="color:var(--ui-text-secondary)">"eta_impact":</span> <span style="font-weight:700">{{ r.eta }}</span></div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:flex;justify-content:center"><svg width="44" height="22" viewBox="0 0 44 22"><path d="M2 11 L34 11" stroke-width="3" fill="none" style="stroke:var(--gray-400)"></path><path d="M32 3 L42 11 L32 19 z" style="fill:var(--gray-400)"></path></svg></div>
+      <div style="border-radius:8px;border:3px solid var(--purple-600);background:var(--purple-100);padding:24px 26px;display:flex;flex-direction:column;gap:20px;box-shadow:{{ fnGlow }};transition:box-shadow 0.4s ease">
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div style="font-family:var(--font-family-monospace);font-size:28px;font-weight:600;color:var(--purple-700)">GlobalSynthesisFunction</div>
+          <div style="font-size:24px;color:var(--ui-text-secondary)">Pulsar Function · <span style="font-family:var(--font-family-monospace)">process(input)</span></div>
+        </div>
+        <div style="background:#ffffff;border-radius:8px;border:2px solid var(--gray-100);padding:20px 22px;display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px"><span style="font-family:var(--font-family-monospace);font-size:26px;font-weight:600">self._accumulator["I-95N"]</span><span style="font-family:var(--font-family-monospace);font-size:36px;font-weight:700;color:var(--purple-700)">{{ accCount }}</span></div>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">
+            <sc-for list="{{ ioSlots }}" as="s" hint-placeholder-count="3">
+              <div style="height:60px;box-sizing:border-box;border-radius:8px;border:3px {{ s.style }} {{ s.border }};background:{{ s.bg }};display:flex;align-items:center;justify-content:center;font-family:var(--font-family-monospace);font-size:24px;font-weight:600;color:#ffffff;transition:background 0.4s ease, border-color 0.4s ease">{{ s.label }}</div>
+            </sc-for>
+          </div>
+          <div style="font-size:24px;color:var(--ui-text-tertiary)">{{ accNote }}</div>
+        </div>
+        <div style="min-height:44px;font-family:var(--font-family-monospace);font-size:30px;font-weight:700;color:{{ fnResFg }};opacity:{{ fnResOp }};transition:opacity 0.4s ease">{{ fnRes }}</div>
+      </div>
+      <svg width="56" height="360" viewBox="0 0 56 360" style="justify-self:center"><g fill="none" stroke-width="3" style="stroke:var(--gray-400)"><path d="M2 180 C 28 180 24 90 46 90"></path><path d="M2 180 C 28 180 24 270 46 270"></path></g><path d="M44 82 L54 90 L44 98 z" style="fill:var(--gray-400)"></path><path d="M44 262 L54 270 L44 278 z" style="fill:var(--gray-400)"></path></svg>
+      <div style="display:flex;flex-direction:column;gap:20px;min-width:0">
+        <div style="border:3px solid var(--purple-600);border-radius:8px;padding:18px 22px;display:flex;flex-direction:column;gap:12px;min-height:170px;box-sizing:border-box">
+          <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap"><span style="font-size:36px;font-weight:700;color:var(--purple-700)">1 out</span><span style="font-size:24px;color:var(--ui-text-secondary)">→ <span style="font-family:var(--font-family-monospace)">incidents</span></span></div>
+          <div style="align-self:flex-start;display:flex;align-items:center;gap:10px;height:48px;padding:0 14px;border-radius:4px;background:var(--purple-600);color:#ffffff;font-family:var(--font-family-monospace);font-size:24px;font-weight:600;opacity:{{ outOp }};transform:{{ outTf }};transition:opacity 0.5s ease, transform 0.5s ease"><i data-lucide="sparkles" width="22" height="22" stroke-width="2" style="color:#ffffff;display:inline-flex;flex:none"></i>IncidentSynthesis</div>
+        </div>
+        <div style="border:2px solid var(--gray-150);background:var(--gray-25);border-radius:8px;padding:18px 22px;display:flex;flex-direction:column;gap:12px;min-height:170px;box-sizing:border-box">
+          <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap"><span style="font-size:36px;font-weight:700;color:var(--ui-text-secondary)">0 out</span><span style="font-family:var(--font-family-monospace);font-size:24px;color:var(--ui-text-secondary)">return None</span></div>
+          <sc-for list="{{ ioNone }}" as="o" hint-placeholder-count="2">
+            <div style="font-family:var(--font-family-monospace);font-size:24px;font-weight:600;opacity:{{ o.op }};transform:{{ o.tf }};transition:opacity 0.5s ease, transform 0.5s ease">{{ o.truck }}</div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:28px;background:var(--gray-800);color:#ffffff;border-radius:8px;padding:20px 32px">
+      <span style="font-size:44px;font-weight:700">1 in → 0 or 1 out</span>
+      <span style="flex:1;font-size:24px;color:#c8c8d0">Threshold 3 is the demo's <span style="font-family:var(--font-family-monospace)">CORRIDOR_THRESHOLD</span> (code default 2).</span>
+      <span style="display:flex;align-items:baseline;gap:10px;font-size:28px"><span style="font-family:var(--font-family-monospace);font-size:40px;font-weight:700">{{ ioIn }}</span>in</span>
+      <span style="display:flex;align-items:baseline;gap:10px;font-size:28px"><span style="font-family:var(--font-family-monospace);font-size:40px;font-weight:700;color:#c4a0ff">{{ ioOutN }}</span>out</span>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;font-size:24px;color:var(--ui-text-tertiary)"><span>When Your Pulsar Function Speaks English</span></div>
+</section>
+
+
+<section data-label="The Function Code" data-screen-label="12 The Function Code" data-speaker-notes="This is the Pulsar part of the system, and it's twelve lines. Build the model backend once, parse the card, add it to its corridor, return None until the corridor hits its threshold, then hand off to synthesize and reset. Notice the import at the top: synthesize isn't part of this class. It's a plain Python function in its own file, with no Pulsar code in it at all, so we can test it without a broker. That split is what makes the pattern portable: the Pulsar part is the plumbing that puts the model in the stream, and the LLM logic doesn't need to know it's in one. One more thing to notice: the orange lines use values that came from user config, the corridor threshold and the generation settings. We'll come back to that. But first, let's look inside synthesize, because that's where the real work happens. Backing: `function.py`; `synthesizer.py`; `deploy/run_tier2_localrun.sh`." style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:72px 120px 44px;display:flex;flex-direction:column;box-sizing:border-box;gap:20px" data-om-slide-id="d7e47ce5">
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:40px">
+    <h2 style="margin:0;font-size:60px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">The Pulsar Part Is 12 Lines</h2>
+    <div style="flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:4px"><div style="font-size:56px;font-weight:700;line-height:1;letter-spacing:-0.02em;color:var(--ui-brand)">12 lines</div><div style="font-size:24px;font-weight:600;color:var(--ui-text-secondary)">Pulsar-specific code</div></div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:20px;min-height:0">
+    <div style="display:flex;align-items:center;gap:24px;width:1680px">
+      <div style="width:1220px;box-sizing:border-box;flex:none;background:var(--gray-800);color:#ffffff;border-radius:8px;padding:18px 32px;font-family:var(--font-family-monospace);font-size:29px;line-height:1.4;white-space:pre;letter-spacing:-0.01em;box-shadow:inset 6px 0 0 #41eba4"><span style="color:#ff63a5">from</span> talk3_pulsar_speaks_english.synthesizer <span style="color:#ff63a5">import</span> <span style="color:#41eba4">synthesize</span></div>
+      <div style="flex:1;display:flex;align-items:center;gap:12px;font-size:26px;font-weight:700;color:var(--ui-status-success-contrast)"><i data-lucide="arrow-left" width="26" height="26" stroke-width="2.5" style="color:var(--ui-status-success);display:inline-flex;flex:none"></i><span>plain Python, its own file · next slide</span></div>
+    </div>
+    <div style="position:relative;width:1680px;height:612px">
+      <div style="position:absolute;left:0;top:0;width:1220px;height:612px;box-sizing:border-box;background:var(--gray-800);color:#ffffff;border-radius:8px;padding:36px 0;font-family:var(--font-family-monospace);font-size:29px;line-height:45px;letter-spacing:-0.01em">
+      <div style="height:45px;padding:0 32px;white-space:pre;"><span style="color:#ff63a5">def</span> <span style="color:#5bceff">process</span>(self, input: <span style="color:#5bceff">str</span>, context) -&gt; <span style="color:#5bceff">str</span> | <span style="color:#ff63a5">None</span>:</div>
+      <div style="height:45px;padding:0 32px;white-space:pre;">    backend = self._backend <span style="color:#ff63a5">or</span> self.<span style="color:#5bceff">_build_backend</span>(context)</div>
+      <div style="height:45px;padding:0 32px;white-space:pre;">    card = <span style="color:#5bceff">from_json</span>(EnrichmentCard, input)</div>
+      <div style="height:45px;padding:0 32px;white-space:pre;">    cards = self._accumulator[card.corridor]</div>
+      <div style="height:45px;padding:0 32px;white-space:pre;">    cards.<span style="color:#5bceff">append</span>(card)</div>
+      <div style="height:45px;padding:0 32px;white-space:pre;"></div>
+      <div style="height:45px;padding:0 32px;white-space:pre;background:rgba(255,184,77,0.18);box-shadow:inset 6px 0 0 #ffb84d;">    <span style="color:#ff63a5">if</span> <span style="color:#5bceff">len</span>(cards) &lt; self._corridor_threshold:</div>
+      <div style="height:45px;padding:0 32px;white-space:pre;">        <span style="color:#ff63a5">return</span> <span style="color:#ff63a5">None</span></div>
+      <div style="height:45px;padding:0 32px;white-space:pre;"></div>
+      <div style="height:45px;padding:0 32px;white-space:pre;background:rgba(255,184,77,0.18);box-shadow:inset 6px 0 0 #ffb84d;">    synthesis = <span style="color:#41eba4">synthesize</span>(cards, backend, config=self._config)</div>
+      <div style="height:45px;padding:0 32px;white-space:pre;">    self._accumulator[card.corridor] = []</div>
+      <div style="height:45px;padding:0 32px;white-space:pre;">    <span style="color:#ff63a5">return</span> <span style="color:#5bceff">to_json</span>(synthesis) <span style="color:#ff63a5">if</span> synthesis <span style="color:#ff63a5">is not</span> <span style="color:#ff63a5">None</span> <span style="color:#ff63a5">else</span> <span style="color:#ff63a5">None</span></div>
+      </div>
+      <svg width="1680" height="612" viewBox="0 0 1680 612" style="position:absolute;inset:0;overflow:visible">
+        <defs>
+          <marker id="t3cb" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--purple-600)"></path></marker>
+          <marker id="t3cc" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:#c15800"></path></marker>
+        </defs>
+        <g fill="none" stroke-width="4" style="stroke:#c15800">
+          <path d="M1298 396 L1264 396 L1264 328.5 L1232 328.5" marker-end="url(#t3cc)"></path>
+          <path d="M1264 396 L1264 463.5 L1232 463.5" marker-end="url(#t3cc)"></path>
+        </g>
+      </svg>
+      <div style="position:absolute;left:1300px;top:382px;width:380px;box-sizing:border-box;border:3px solid #c15800;border-radius:8px;background:#ffffff;padding:22px 24px;display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:center;gap:12px"><div style="width:52px;height:52px;border-radius:8px;background:var(--ui-status-warning-soft);display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="sliders-horizontal" width="28" height="28" stroke-width="2" style="color:#c15800;display:inline-flex;flex:none"></i></div><div style="font-size:32px;font-weight:700">User config</div></div>
+        <div style="font-size:26px;line-height:1.35;color:var(--ui-text-secondary)">threshold and settings set at deploy time</div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:24px;font-weight:700;color:#c15800">Coming up: the config<i data-lucide="arrow-right" width="22" height="22" stroke-width="2.5" style="color:#c15800;display:inline-flex;flex:none"></i></div>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;font-size:24px;color:var(--ui-text-tertiary)"><span>When Your Pulsar Function Speaks English</span></div>
+</section>
+
+<section data-label="Config, Not a Rebuild" data-screen-label="13 Config, Not a Rebuild" data-speaker-notes="Model path, the prompt template, the token budget, the temperature, how the model runs, how many threads, how many layers go to a GPU, the corridor threshold and the timeout all come through `--user-config`, read once on the first message by `_build_backend()`. So swapping models — or going from four cores to one — is a config change, not a rebuild. Defaults live in the code: four threads, no GPU layers, a 60-second timeout, a threshold of two; this demo sets one thread and a threshold of three. `llm_extra_args` and `llm_binary_path` only apply to the subprocess backend. The default prompt lives in code, but prompt_template replaces it from config, so the same Function can serve a different use case without a rebuild. (If asked about production: this demo keeps the corridor tally in memory on self, so it's lost if the Function restarts. It only flushes when enough cards arrive, so a corridor stuck below the threshold waits until more cards show up; the repo's pulsar_adapter.py has a time-based flush. And each Function instance loads its own copy of the model, about 5.3 GB here, so adding parallelism multiplies memory. A production version would keep the tally in saved state, flush on time as well as count, and size memory per instance.) Backing: `function.py` `_build_backend()` docstring; `deploy/run_tier2_localrun.sh`; `deploy/talk3-windows/tier2.sh`." style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:64px 120px 40px;display:flex;flex-direction:column;box-sizing:border-box;gap:20px" data-om-slide-id="19c32147">
+  <h2 style="margin:0;font-size:60px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">Config Arrives Through <span style="font-family:var(--font-family-monospace);font-size:54px">--user-config</span>, Not a Rebuild</h2>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:16px;min-height:0">
+    <div style="flex:none;background:var(--gray-800);color:#ffffff;border-radius:8px;padding:18px 28px;font-family:var(--font-family-monospace);font-size:26px;line-height:1.6;white-space:pre;letter-spacing:-0.02em;overflow:hidden">pulsar-admin functions localrun \
+  <span style="color:#5bceff">--classname</span> talk3_pulsar_speaks_english.function.GlobalSynthesisFunction \
+  <span style="color:#5bceff">--inputs</span> persistent://public/default/enrichment-cards \
+  <span style="color:#5bceff">--output</span> persistent://public/default/incidents \
+  <span style="color:#5bceff">--user-config</span> <span style="color:#41eba4">'{"llm_backend": "inprocess", "threads": "1", "corridor_threshold": "3", ...}'</span></div>
+    <div style="flex:none;border:2px solid var(--gray-100);border-radius:8px;overflow:hidden;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.6fr) 200px 200px">
+      <div style="padding:14px 24px;background:var(--gray-50);font-size:26px;font-weight:700">key</div>
+      <div style="padding:14px 24px;background:var(--gray-50);font-size:26px;font-weight:700">sets</div>
+      <div style="padding:14px 24px;background:var(--gray-50);font-size:26px;font-weight:700">default</div>
+      <div style="padding:14px 24px;background:var(--gray-50);font-size:26px;font-weight:700;color:var(--purple-700)">this demo</div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;font-family:var(--font-family-monospace);font-size:26px;font-weight:600">llm_model_path</div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;color:var(--ui-text-secondary)">which model file to load</div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;font-family:var(--font-family-monospace);font-size:26px;color:var(--ui-text-secondary)"></div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;font-family:var(--font-family-monospace);font-size:26px;font-weight:700;color:var(--purple-700)"></div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;font-family:var(--font-family-monospace);font-size:26px;font-weight:600">prompt_template</div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;color:var(--ui-text-secondary)">the prompt, with {corridor}, {cards} … fields</div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;font-family:var(--font-family-monospace);font-size:26px;color:var(--ui-text-secondary)">built-in</div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;font-family:var(--font-family-monospace);font-size:26px;font-weight:700;color:var(--purple-700)"></div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;font-family:var(--font-family-monospace);font-size:26px;font-weight:600">max_tokens</div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;color:var(--ui-text-secondary)">output token budget</div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;font-family:var(--font-family-monospace);font-size:26px;color:var(--ui-text-secondary)">256</div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;font-family:var(--font-family-monospace);font-size:26px;font-weight:700;color:var(--purple-700)"></div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;font-family:var(--font-family-monospace);font-size:26px;font-weight:600">temperature</div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;color:var(--ui-text-secondary)">sampling temperature</div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;font-family:var(--font-family-monospace);font-size:26px;color:var(--ui-text-secondary)">0.7</div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;font-family:var(--font-family-monospace);font-size:26px;font-weight:700;color:var(--purple-700)"></div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;font-family:var(--font-family-monospace);font-size:26px;font-weight:600">llm_backend</div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;color:var(--ui-text-secondary)">how the model runs</div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;font-family:var(--font-family-monospace);font-size:26px;color:var(--ui-text-secondary)">inprocess</div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;font-family:var(--font-family-monospace);font-size:26px;font-weight:700;color:var(--purple-700);background:var(--purple-100)">inprocess</div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;font-family:var(--font-family-monospace);font-size:26px;font-weight:600">threads</div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;color:var(--ui-text-secondary)">CPU threads for llama.cpp</div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;font-family:var(--font-family-monospace);font-size:26px;color:var(--ui-text-secondary)">4</div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;font-family:var(--font-family-monospace);font-size:26px;font-weight:700;color:var(--purple-700);background:var(--purple-100)">1</div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;font-family:var(--font-family-monospace);font-size:26px;font-weight:600">llm_gpu_layers</div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;color:var(--ui-text-secondary)">layers offloaded to a GPU</div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;font-family:var(--font-family-monospace);font-size:26px;color:var(--ui-text-secondary)">0</div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;font-family:var(--font-family-monospace);font-size:26px;font-weight:700;color:var(--purple-700)"></div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;font-family:var(--font-family-monospace);font-size:26px;font-weight:600">corridor_threshold</div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;color:var(--ui-text-secondary)">cards a corridor needs before synthesis</div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;font-family:var(--font-family-monospace);font-size:26px;color:var(--ui-text-secondary)">2</div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;font-family:var(--font-family-monospace);font-size:26px;font-weight:700;color:var(--purple-700);background:var(--purple-100)">3</div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;font-family:var(--font-family-monospace);font-size:26px;font-weight:600">timeout_seconds</div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;color:var(--ui-text-secondary)">limit per model call</div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;font-family:var(--font-family-monospace);font-size:26px;color:var(--ui-text-secondary)">60</div>
+      <div style="padding:7px 24px;border-top:2px solid var(--gray-75);font-size:28px;font-family:var(--font-family-monospace);font-size:26px;font-weight:700;color:var(--purple-700)"></div>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;font-size:24px;color:var(--ui-text-tertiary)"><span>When Your Pulsar Function Speaks English</span></div>
+</section><section data-label="Inside synthesize()" data-screen-label="14 Inside synthesize()" data-speaker-notes="And here's where the magic happens. This is synthesize, trimmed down so it fits, but every line you see is the real code. It does four things, in order. First, plain code decides. Is this one truck or the whole corridor? Should drivers reroute? That's decide_scope and decide_reroute, a little counting and a severity check, no LLM involved. Second, the LLM gets those decisions and writes the plain-English summary. That's generate_spoken_warning, the only line in this whole function that touches the model. Third, plain code checks what the model said. Every number has to match the cards, the corridor has to be named, the reroute has to be mentioned. If the check fails, we ask the model one more time. And fourth, if it fails again, we don't publish something wrong. Plain code writes a stiffer but correct warning instead. So the model never makes a decision, and it never gets the last word on facts. It just writes the sentence. " style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:72px 120px 44px;display:flex;flex-direction:column;box-sizing:border-box;gap:20px" data-om-slide-id="05600662">
+  <h2 style="margin:0;font-size:60px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">Where the Work Happens: <span style="font-family:var(--font-family-monospace);font-size:54px">synthesize()</span></h2>
+  <div style="flex:1;display:grid;grid-template-columns:1230px minmax(0,1fr);gap:36px;align-items:center;min-height:0">
+    <div style="background:var(--gray-800);color:#ffffff;border-radius:8px;padding:24px 0;font-family:var(--font-family-monospace);font-size:24px;line-height:36px;letter-spacing:-0.01em;overflow:hidden">
+      <div style="height:36px;padding:0 28px;white-space:pre;"><span style="color:#ff63a5">def</span> <span style="color:#41eba4">synthesize</span>(cards, backend, *, config=<span style="color:#ff63a5">None</span>, ...) -&gt; IncidentSynthesis | <span style="color:#ff63a5">None</span>:</div>
+      <div style="height:36px;padding:0 28px;white-space:pre;">    corridor = cards[<span style="color:#ffb84d">0</span>].corridor</div>
+      <div style="height:36px;padding:0 28px;white-space:pre;">    corridor_cards = [card <span style="color:#ff63a5">for</span> card <span style="color:#ff63a5">in</span> cards <span style="color:#ff63a5">if</span> card.corridor == corridor]</div>
+      <div style="height:36px;padding:0 28px;white-space:pre;"></div>
+      <div style="height:36px;padding:0 28px;white-space:pre;background:rgba(91,206,255,0.16);box-shadow:inset 6px 0 0 #5bceff;">    scope = <span style="color:#5bceff">decide_scope</span>(corridor_cards)</div>
+      <div style="height:36px;padding:0 28px;white-space:pre;background:rgba(91,206,255,0.16);box-shadow:inset 6px 0 0 #5bceff;">    reroute_recommended, reroute_detail = <span style="color:#5bceff">decide_reroute</span>(corridor_cards, scope)</div>
+      <div style="height:36px;padding:0 28px;white-space:pre;">    spoken_warning = <span style="color:#ff63a5">None</span></div>
+      <div style="height:36px;padding:0 28px;white-space:pre;">    <span style="color:#ff63a5">for</span> attempt <span style="color:#ff63a5">in</span> <span style="color:#5bceff">range</span>(<span style="color:#ffb84d">1</span>, max_attempts + <span style="color:#ffb84d">1</span>):</div>
+      <div style="height:36px;padding:0 28px;white-space:pre;background:rgba(196,160,255,0.2);box-shadow:inset 6px 0 0 #c4a0ff;">        candidate = <span style="color:#5bceff">generate_spoken_warning</span>(backend, corridor=corridor, ...)</div>
+      <div style="height:36px;padding:0 28px;white-space:pre;background:rgba(255,184,77,0.18);box-shadow:inset 6px 0 0 #ffb84d;">        problems = <span style="color:#5bceff">check_warning</span>(candidate, corridor=corridor, ...)</div>
+      <div style="height:36px;padding:0 28px;white-space:pre;background:rgba(255,184,77,0.18);box-shadow:inset 6px 0 0 #ffb84d;">        <span style="color:#ff63a5">if not</span> problems:</div>
+      <div style="height:36px;padding:0 28px;white-space:pre;">            spoken_warning = candidate</div>
+      <div style="height:36px;padding:0 28px;white-space:pre;">            <span style="color:#ff63a5">break</span></div>
+      <div style="height:36px;padding:0 28px;white-space:pre;background:rgba(65,235,164,0.14);box-shadow:inset 6px 0 0 #41eba4;">    <span style="color:#ff63a5">if</span> spoken_warning <span style="color:#ff63a5">is</span> <span style="color:#ff63a5">None</span>:</div>
+      <div style="height:36px;padding:0 28px;white-space:pre;background:rgba(65,235,164,0.14);box-shadow:inset 6px 0 0 #41eba4;">        spoken_warning = <span style="color:#5bceff">fallback_warning</span>(corridor=corridor, ...)</div>
+      <div style="height:36px;padding:0 28px;white-space:pre;"></div>
+      <div style="height:36px;padding:0 28px;white-space:pre;">    <span style="color:#ff63a5">return</span> <span style="color:#5bceff">IncidentSynthesis</span>(..., scope=scope, spoken_warning=spoken_warning, ...)</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:28px">
+      <div style="display:flex;gap:16px;align-items:flex-start;border-left:6px solid #5bceff;padding:6px 0 6px 18px">
+        <div style="width:48px;height:48px;border-radius:8px;background:rgba(91,206,255,0.18);display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="git-branch" width="26" height="26" stroke-width="2" style="color:var(--ui-text);display:inline-flex;flex:none"></i></div>
+        <div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:30px;font-weight:700;line-height:1.15">1. Code decides</div><div style="font-size:24px;line-height:1.35;color:var(--ui-text-secondary)">scope and reroute, no LLM</div></div>
+      </div>
+      <div style="display:flex;gap:16px;align-items:flex-start;border-left:6px solid #c4a0ff;padding:6px 0 6px 18px">
+        <div style="width:48px;height:48px;border-radius:8px;background:var(--purple-100);display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="sparkles" width="26" height="26" stroke-width="2" style="color:var(--ui-text);display:inline-flex;flex:none"></i></div>
+        <div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:30px;font-weight:700;line-height:1.15">2. LLM summarizes</div><div style="font-size:24px;line-height:1.35;color:var(--ui-text-secondary)">plain English, the only model call</div></div>
+      </div>
+      <div style="display:flex;gap:16px;align-items:flex-start;border-left:6px solid #ffb84d;padding:6px 0 6px 18px">
+        <div style="width:48px;height:48px;border-radius:8px;background:var(--ui-status-warning-soft);display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="shield-check" width="26" height="26" stroke-width="2" style="color:var(--ui-text);display:inline-flex;flex:none"></i></div>
+        <div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:30px;font-weight:700;line-height:1.15">3. Code checks it</div><div style="font-size:24px;line-height:1.35;color:var(--ui-text-secondary)">numbers, corridor, reroute; one retry</div></div>
+      </div>
+      <div style="display:flex;gap:16px;align-items:flex-start;border-left:6px solid #41eba4;padding:6px 0 6px 18px">
+        <div style="width:48px;height:48px;border-radius:8px;background:var(--ui-status-success-soft);display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="life-buoy" width="26" height="26" stroke-width="2" style="color:var(--ui-text);display:inline-flex;flex:none"></i></div>
+        <div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:30px;font-weight:700;line-height:1.15">4. Plain-code fallback</div><div style="font-size:24px;line-height:1.35;color:var(--ui-text-secondary)">never publish a wrong warning</div></div>
+      </div>
+    </div>
+  </div>
+  <div style="font-size:24px;color:var(--ui-text-tertiary)">Trimmed for the slide: docstring, logging and some arguments omitted (<span style="font-family:var(--font-family-monospace)">...</span>).</div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;font-size:24px;color:var(--ui-text-tertiary)"><span>When Your Pulsar Function Speaks English</span></div>
+</section>
+
+
+
+<section data-label="The Rule" data-screen-label="15 The Rule" data-speaker-notes="Same rule as Talk 1's edge: cheap code decides, the LLM only puts it into words. One distinct truck means single-truck; two or more means corridor-wide. Reroute only if it's corridor-wide and at least one truck reported high. Explainable, testable, free, and the model can't overrule it because it never sees the question. Our three cards: three trucks, two high, so corridor-wide and reroute. So what do we actually ask the model? Backing: `synthesizer.py`; `docs/CANON.md`." style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:88px 120px 48px;display:flex;flex-direction:column;box-sizing:border-box" data-om-slide-id="222bec61">
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:40px">
+    <h2 style="margin:0;font-size:60px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">The Decision Is Plain Python</h2>
+    <div style="flex:none;display:flex;align-items:baseline;gap:16px"><div style="font-size:72px;font-weight:700;line-height:1;letter-spacing:-0.02em;color:var(--ui-brand)">0</div><div style="font-size:30px;font-weight:600">LLM calls to decide</div></div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0">
+    <div style="background:var(--gray-800);color:#ffffff;border-radius:8px;padding:36px 36px;font-family:var(--font-family-monospace);font-size:31px;line-height:1.55;white-space:pre;letter-spacing:-0.01em;overflow:hidden"><span style="color:#ff63a5">def</span> <span style="color:#5bceff">decide_scope</span>(cards):
+    truck_ids = {card.truck_id <span style="color:#ff63a5">for</span> card <span style="color:#ff63a5">in</span> cards}
+    <span style="color:#ff63a5">return</span> SCOPE_SINGLE_TRUCK <span style="color:#ff63a5">if</span> <span style="color:#5bceff">len</span>(truck_ids) &lt;= <span style="color:#ffb84d">1</span> <span style="color:#ff63a5">else</span> SCOPE_CORRIDOR_WIDE
+
+<span style="color:#ff63a5">def</span> <span style="color:#5bceff">decide_reroute</span>(cards, scope):
+    <span style="color:#ff63a5">if</span> scope != SCOPE_CORRIDOR_WIDE:
+        <span style="color:#ff63a5">return</span> <span style="color:#ff63a5">False</span>, <span style="color:#ff63a5">None</span>
+    <span style="color:#ff63a5">if not</span> <span style="color:#5bceff">any</span>(card.severity.<span style="color:#5bceff">lower</span>() == HIGH_SEVERITY <span style="color:#ff63a5">for</span> card <span style="color:#ff63a5">in</span> cards):
+        <span style="color:#ff63a5">return</span> <span style="color:#ff63a5">False</span>, <span style="color:#ff63a5">None</span>
+    ...  <span style="color:#8f969a"># build reroute_detail, return True</span></div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:20px;font-size:24px;color:var(--ui-text-tertiary)"><span>When Your Pulsar Function Speaks English</span></div>
+</section>
+
+<section data-label="Section: What Small Models Taught Us" data-screen-label="16 Section: What Small Models Taught Us" data-speaker-notes="So far we've talked about the system. Now I want to talk about the models, because a lot of what we learned building this came from running it on small ones." style="background:linear-gradient(135deg, var(--purple-700) 0%, oklch(0.42 0.24 272) 60%, oklch(0.5 0.22 262) 100%);overflow:hidden;color:#ffffff;font-family:var(--font-family-base);padding:120px;display:flex;flex-direction:column;box-sizing:border-box">
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.05);clip-path:polygon(38% 0, 62% 0, 30% 100%, 8% 100%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.07);clip-path:polygon(70% 0, 100% 0, 100% 55%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(0,0,40,0.12);clip-path:polygon(0 0, 22% 0, 0 45%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.04);clip-path:polygon(58% 100%, 100% 40%, 100% 100%);pointer-events:none"></div>
+  <div style="position:relative;flex:1;display:flex;flex-direction:column;justify-content:center;gap:40px">
+    <h2 style="margin:0;font-size:104px;font-weight:700;line-height:1.05;letter-spacing:-0.02em;text-wrap:balance">What Small Models Taught Us</h2>
+  </div>
+  <div style="position:relative;display:flex;justify-content:space-between;align-items:center;font-size:24px;color:var(--purple-200)"><span>When Your Pulsar Function Speaks English</span></div>
+</section>
+
+<section data-label="Why Small Models" data-screen-label="17 Why Small Models" data-speaker-notes="First, what we mean by a small model. Most people think of LLMs as the big hosted ones, hundreds of billions of parameters running on racks of GPUs. The models in this talk are much smaller, from a few hundred million parameters up to about eight billion, and they're compressed so they can run on an ordinary CPU. Why use them at all? Because this series started at the edge. In Talk 1, the LLM ran on the truck itself, on Pi-class hardware, with no GPU and a cellular link that comes and goes. If you want a model there, it has to be small. And small comes with a cost. They're slower, they're worse at following instructions, and they get facts wrong more often. 
+" style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:72px 120px 44px;display:flex;flex-direction:column;box-sizing:border-box;gap:24px">
+  <h2 style="margin:0;font-size:60px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">Why Small Models</h2>
+  <div style="flex:1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px;align-content:center;min-height:0">
+    <div style="border:2px solid var(--gray-100);border-radius:8px;padding:40px 36px;display:flex;flex-direction:column;gap:24px;min-width:0">
+      <div style="display:flex;align-items:center;gap:18px"><div style="width:72px;height:72px;border-radius:8px;background:var(--purple-100);display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="box" width="40" height="40" stroke-width="2" style="color:var(--purple-600);display:inline-flex;flex:none"></i></div><div style="font-size:40px;font-weight:700;line-height:1.1">What they are</div></div>
+      <div style="font-size:30px;line-height:1.4;text-wrap:pretty">Hundreds of millions to a few billion parameters, compressed to run on a CPU.</div>
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:12px"><div style="font-size:24px;font-weight:600;color:var(--ui-text-secondary)">in this talk</div><div style="display:flex;flex-wrap:wrap;gap:10px"><span style="display:flex;align-items:center;height:48px;padding:0 16px;border-radius:4px;background:var(--gray-75);font-family:var(--font-family-monospace);font-size:26px;font-weight:600">350M</span><span style="display:flex;align-items:center;height:48px;padding:0 16px;border-radius:4px;background:var(--gray-75);font-family:var(--font-family-monospace);font-size:26px;font-weight:600">3B</span><span style="display:flex;align-items:center;height:48px;padding:0 16px;border-radius:4px;background:var(--gray-75);font-family:var(--font-family-monospace);font-size:26px;font-weight:600">4B</span><span style="display:flex;align-items:center;height:48px;padding:0 16px;border-radius:4px;background:var(--gray-75);font-family:var(--font-family-monospace);font-size:26px;font-weight:600">8B</span></div></div>
+    </div>
+    <div style="border:2px solid var(--gray-100);border-radius:8px;padding:40px 36px;display:flex;flex-direction:column;gap:24px;min-width:0">
+      <div style="display:flex;align-items:center;gap:18px"><div style="width:72px;height:72px;border-radius:8px;background:var(--purple-100);display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="truck" width="40" height="40" stroke-width="2" style="color:var(--purple-600);display:inline-flex;flex:none"></i></div><div style="font-size:40px;font-weight:700;line-height:1.1">Why we used them</div></div>
+      <div style="font-size:30px;line-height:1.4;text-wrap:pretty">This series started at the edge. In Talk 1 the model ran on the truck.</div>
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:12px"><div style="display:flex;align-items:center;gap:14px;font-size:28px;font-weight:600"><i data-lucide="cpu" width="30" height="30" stroke-width="2" style="color:var(--ui-text-secondary);display:inline-flex;flex:none"></i>Pi-class CPU</div><div style="display:flex;align-items:center;gap:14px;font-size:28px;font-weight:600"><i data-lucide="ban" width="30" height="30" stroke-width="2" style="color:var(--ui-text-secondary);display:inline-flex;flex:none"></i>no GPU</div><div style="display:flex;align-items:center;gap:14px;font-size:28px;font-weight:600"><i data-lucide="radio-tower" width="30" height="30" stroke-width="2" style="color:var(--ui-text-secondary);display:inline-flex;flex:none"></i>patchy cellular link</div></div>
+    </div>
+    <div style="border:2px solid var(--gray-100);border-radius:8px;padding:40px 36px;display:flex;flex-direction:column;gap:24px;min-width:0">
+      <div style="display:flex;align-items:center;gap:18px"><div style="width:72px;height:72px;border-radius:8px;background:var(--ui-status-warning-soft);display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="triangle-alert" width="40" height="40" stroke-width="2" style="color:#c15800;display:inline-flex;flex:none"></i></div><div style="font-size:40px;font-weight:700;line-height:1.1">What they cost</div></div>
+      <div style="font-size:30px;line-height:1.4;text-wrap:pretty">Small enough to fit, but with trade-offs.</div>
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:12px"><div style="display:flex;align-items:center;gap:14px;font-size:28px;font-weight:600"><i data-lucide="timer" width="30" height="30" stroke-width="2" style="color:#c15800;display:inline-flex;flex:none"></i>slower</div><div style="display:flex;align-items:center;gap:14px;font-size:28px;font-weight:600"><i data-lucide="list-x" width="30" height="30" stroke-width="2" style="color:#c15800;display:inline-flex;flex:none"></i>worse at following instructions</div><div style="display:flex;align-items:center;gap:14px;font-size:28px;font-weight:600"><i data-lucide="circle-x" width="30" height="30" stroke-width="2" style="color:#c15800;display:inline-flex;flex:none"></i>more factual slips</div></div>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;font-size:24px;color:var(--ui-text-tertiary)"><span>When Your Pulsar Function Speaks English</span></div>
+</section>
+
+<section data-label="Why We Moved On" data-screen-label="18 Why We Moved On" data-speaker-notes="So why aren't we running a small model in the control center? Because of what this Function needs. It has to see cards from several trucks on the same corridor, and no single truck ever sees those. So it runs where the cards meet, in the control center, and there, GPUs are plentiful. There's no reason to squeeze the job into a small model anymore. But we kept learning from them, and that's the real takeaway. Small models are a stress test for your LLM pipeline. They have the same bad habits as the big ones: making their own judgment calls, copying your examples, rambling, and getting facts wrong. The difference is that a small model does it often enough that you can't miss it. A big model does it rarely enough that you might never notice, until it matters. Fix those habits on a small model, and the pipeline holds at any size. Here's what they showed us." style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:72px 120px 44px;display:flex;flex-direction:column;box-sizing:border-box;gap:24px">
+  <h2 style="margin:0;font-size:60px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">Why We Moved On, and What They Kept Teaching Us</h2>
+  <div style="flex:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;align-content:center;min-height:0">
+    <div style="border:2px solid var(--gray-100);border-radius:8px;padding:40px 36px;display:flex;flex-direction:column;gap:28px">
+      <div style="font-size:40px;font-weight:700">The pivot</div>
+      <div style="display:flex;align-items:stretch;gap:12px">
+        <div style="flex:1;border-radius:8px;border:3px solid var(--gray-200);background:#ffffff;padding:20px 22px;display:flex;flex-direction:column;gap:6px"><div style="font-size:30px;font-weight:700">Truck</div><div style="font-size:24px;line-height:1.3;color:var(--ui-text-secondary)">edge · small model · one truck's view</div></div>
+        <div style="display:flex;align-items:center"><i data-lucide="arrow-right" width="40" height="40" stroke-width="2.25" style="color:var(--gray-400);display:inline-flex;flex:none"></i></div>
+        <div style="flex:1;border-radius:8px;border:3px solid var(--purple-600);background:var(--purple-100);padding:20px 22px;display:flex;flex-direction:column;gap:6px"><div style="font-size:30px;font-weight:700">Control center</div><div style="font-size:24px;line-height:1.3;color:var(--ui-text-secondary)">cloud · GPUs · every truck on the corridor</div></div>
+      </div>
+      <div style="font-size:30px;line-height:1.4;text-wrap:pretty">The Function needs cards from many trucks on one corridor, so it runs where they meet. There, a small model is no longer required.</div>
+    </div>
+    <div style="border:3px solid var(--purple-600);border-radius:8px;padding:40px 36px;display:flex;flex-direction:column;gap:24px">
+      <div style="display:flex;align-items:center;gap:16px"><i data-lucide="flask-conical" width="44" height="44" stroke-width="2" style="color:var(--purple-600);display:inline-flex;flex:none"></i><div style="font-size:40px;font-weight:700;line-height:1.15">Small models are a stress test</div></div>
+      <div style="font-size:30px;line-height:1.4;color:var(--ui-text-secondary)">They magnify habits bigger models hide:</div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;align-items:center;gap:14px"><span style="width:44px;height:44px;border-radius:50%;background:var(--purple-600);color:#ffffff;display:flex;align-items:center;justify-content:center;font-family:var(--font-family-monospace);font-size:24px;font-weight:700;flex:none">1</span><span style="font-size:30px;font-weight:600">making their own judgment calls</span></div>
+        <div style="display:flex;align-items:center;gap:14px"><span style="width:44px;height:44px;border-radius:50%;background:#0b7fb3;color:#ffffff;display:flex;align-items:center;justify-content:center;font-family:var(--font-family-monospace);font-size:24px;font-weight:700;flex:none">2</span><span style="font-size:30px;font-weight:600">copying your examples</span></div>
+        <div style="display:flex;align-items:center;gap:14px"><span style="width:44px;height:44px;border-radius:50%;background:var(--ui-status-success);color:#ffffff;display:flex;align-items:center;justify-content:center;font-family:var(--font-family-monospace);font-size:24px;font-weight:700;flex:none">4</span><span style="font-size:30px;font-weight:600">writing more than you need</span></div>
+        <div style="display:flex;align-items:center;gap:14px"><span style="width:44px;height:44px;border-radius:50%;background:var(--ui-status-danger);display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="shield-check" width="24" height="24" stroke-width="2" style="color:#ffffff;display:inline-flex;flex:none"></i></span><span style="font-size:30px;font-weight:600">getting facts wrong</span></div>
+      </div>
+    </div>
+  </div>
+  <div style="background:var(--gray-800);color:#ffffff;border-radius:8px;padding:22px 32px;font-size:36px;font-weight:700;line-height:1.3">Fix them on a small model, and the pipeline holds at any size.</div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;font-size:24px;color:var(--ui-text-tertiary)"><span>When Your Pulsar Function Speaks English</span></div>
+</section>
+
+<section data-label="Prompt Problems and Fixes" data-screen-label="19 Prompt Problems and Fixes" data-speaker-notes="Before we look at the prompt itself, here's the principle behind it: give the model as little to do as possible. We found these on small models first, because that's where the cost shows up, but they hold at any size. Fewer tokens in and fewer tokens out means less latency and less cost, on a CPU, a GPU, or someone else's API. First, don't ask it to decide. Give it the raw facts and it will happily make its own call on whether this is corridor-wide or whether drivers should reroute. So we hand it a finished verdict, and every decision is labeled as already decided. Its job is to say it, not to judge it. Second, it copies the example. Show a model a realistic sample warning and it will repeat that sentence no matter what the input says. So we show it the shape of the answer with a placeholder instead. Third, it re-reads the same instructions every call. So we put the fixed instructions first, where they're identical every time and can be reused, and the facts that change go after. It's the same idea as prompt caching. And fourth, it writes more than you need. Output comes out one token at a time, so how much the model writes affects speed and cost more than which model you pick. So we ask for two or three sentences, about 60 tokens, and no thinking out loud. Next, here's where each of those shows up in the actual prompt. 
+
+=========
+Backing: `prompting.py` module docstring; `eval-results/talk3-single-core-m4max-20261004/README.md` (round 1 phase times, round 2 prefix reuse)." style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:72px 120px 44px;display:flex;flex-direction:column;box-sizing:border-box;gap:20px">
+  <h2 style="margin:0;font-size:60px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">Give the Model Less to Do</h2>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0">
+    <div style="border:2px solid var(--gray-100);border-radius:8px;overflow:hidden;display:grid;grid-template-columns:96px minmax(0,1fr) 80px minmax(0,1fr)">
+      <div style="padding:18px 0 18px 28px;background:var(--gray-50)"></div>
+      <div style="padding:18px 28px;background:var(--gray-50);display:flex;align-items:center;gap:12px;font-size:30px;font-weight:700"><i data-lucide="circle-x" width="30" height="30" stroke-width="2" style="color:var(--ui-status-danger);display:inline-flex;flex:none"></i>The problem</div>
+      <div style="background:var(--gray-50)"></div>
+      <div style="padding:18px 28px;background:var(--gray-50);display:flex;align-items:center;gap:12px;font-size:30px;font-weight:700"><i data-lucide="circle-check" width="30" height="30" stroke-width="2" style="color:var(--ui-status-success);display:inline-flex;flex:none"></i>The fix in the prompt</div>
+      <div style="padding:22px 0 22px 28px;border-top:2px solid var(--gray-75);display:flex;align-items:center"><div style="width:52px;height:52px;border-radius:50%;background:var(--purple-600);color:#ffffff;display:flex;align-items:center;justify-content:center;font-family:var(--font-family-monospace);font-size:28px;font-weight:700">1</div></div>
+      <div style="padding:22px 28px;border-top:2px solid var(--gray-75);display:flex;flex-direction:column;justify-content:center;gap:6px"><div style="font-size:34px;font-weight:700;line-height:1.2">Don't ask it to decide</div><div style="font-size:26px;line-height:1.35;color:var(--ui-text-secondary)">given the raw facts, it makes its own call on scope and reroute</div></div>
+      <div style="padding:22px 0;border-top:2px solid var(--gray-75);display:flex;align-items:center;justify-content:center"><i data-lucide="arrow-right" width="36" height="36" stroke-width="2.25" style="color:var(--gray-400);display:inline-flex;flex:none"></i></div>
+      <div style="padding:22px 28px;border-top:2px solid var(--gray-75);display:flex;flex-direction:column;justify-content:center;gap:6px;background:var(--ui-status-success-soft)"><div style="font-size:34px;font-weight:700;line-height:1.2">Hand over a finished verdict</div><div style="font-size:26px;line-height:1.35;color:var(--ui-text-secondary)">every decision arrives marked <span style="font-family:var(--font-family-monospace)">(already decided)</span></div></div>
+      <div style="padding:22px 0 22px 28px;border-top:2px solid var(--gray-75);display:flex;align-items:center"><div style="width:52px;height:52px;border-radius:50%;background:#0b7fb3;color:#ffffff;display:flex;align-items:center;justify-content:center;font-family:var(--font-family-monospace);font-size:28px;font-weight:700">2</div></div>
+      <div style="padding:22px 28px;border-top:2px solid var(--gray-75);display:flex;flex-direction:column;justify-content:center;gap:6px"><div style="font-size:34px;font-weight:700;line-height:1.2">It copies the example</div><div style="font-size:26px;line-height:1.35;color:var(--ui-text-secondary)">show a realistic sample sentence and it repeats it, whatever the input</div></div>
+      <div style="padding:22px 0;border-top:2px solid var(--gray-75);display:flex;align-items:center;justify-content:center"><i data-lucide="arrow-right" width="36" height="36" stroke-width="2.25" style="color:var(--gray-400);display:inline-flex;flex:none"></i></div>
+      <div style="padding:22px 28px;border-top:2px solid var(--gray-75);display:flex;flex-direction:column;justify-content:center;gap:6px;background:var(--ui-status-success-soft)"><div style="font-size:34px;font-weight:700;line-height:1.2">Show a placeholder, not an example</div><div style="font-size:26px;line-height:1.35;color:var(--ui-text-secondary)"><span style="font-family:var(--font-family-monospace)">&lt;your warning text here&gt;</span></div></div>
+      <div style="padding:22px 0 22px 28px;border-top:2px solid var(--gray-75);display:flex;align-items:center"><div style="width:52px;height:52px;border-radius:50%;background:#c15800;color:#ffffff;display:flex;align-items:center;justify-content:center;font-family:var(--font-family-monospace);font-size:28px;font-weight:700">3</div></div>
+      <div style="padding:22px 28px;border-top:2px solid var(--gray-75);display:flex;flex-direction:column;justify-content:center;gap:6px"><div style="font-size:34px;font-weight:700;line-height:1.2">It re-reads the same instructions every call</div><div style="font-size:26px;line-height:1.35;color:var(--ui-text-secondary)">reading input is work; the fixed part is identical each time</div></div>
+      <div style="padding:22px 0;border-top:2px solid var(--gray-75);display:flex;align-items:center;justify-content:center"><i data-lucide="arrow-right" width="36" height="36" stroke-width="2.25" style="color:var(--gray-400);display:inline-flex;flex:none"></i></div>
+      <div style="padding:22px 28px;border-top:2px solid var(--gray-75);display:flex;flex-direction:column;justify-content:center;gap:6px;background:var(--ui-status-success-soft)"><div style="font-size:34px;font-weight:700;line-height:1.2">Keep the fixed part first</div><div style="font-size:26px;line-height:1.35;color:var(--ui-text-secondary)">the same instructions every call, so they are reused</div></div>
+      <div style="padding:22px 0 22px 28px;border-top:2px solid var(--gray-75);display:flex;align-items:center"><div style="width:52px;height:52px;border-radius:50%;background:var(--ui-status-success);color:#ffffff;display:flex;align-items:center;justify-content:center;font-family:var(--font-family-monospace);font-size:28px;font-weight:700">4</div></div>
+      <div style="padding:22px 28px;border-top:2px solid var(--gray-75);display:flex;flex-direction:column;justify-content:center;gap:6px"><div style="font-size:34px;font-weight:700;line-height:1.2">It writes more than you need</div><div style="font-size:26px;line-height:1.35;color:var(--ui-text-secondary)">output is written token by token; length drives latency and cost</div></div>
+      <div style="padding:22px 0;border-top:2px solid var(--gray-75);display:flex;align-items:center;justify-content:center"><i data-lucide="arrow-right" width="36" height="36" stroke-width="2.25" style="color:var(--gray-400);display:inline-flex;flex:none"></i></div>
+      <div style="padding:22px 28px;border-top:2px solid var(--gray-75);display:flex;flex-direction:column;justify-content:center;gap:6px;background:var(--ui-status-success-soft)"><div style="font-size:34px;font-weight:700;line-height:1.2">Keep the answer short</div><div style="font-size:26px;line-height:1.35;color:var(--ui-text-secondary)">"2-3 sentences", about 60 tokens out</div></div>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;font-size:24px;color:var(--ui-text-tertiary)"><span>When Your Pulsar Function Speaks English</span></div>
+</section>
+
+<section data-label="The Prompt" data-screen-label="20 The Prompt" data-speaker-notes="Here's the prompt itself, trimmed down, with each fix highlighted. The orange bar on the left is the fixed part: the same instructions every time, sitting at the top so they can be reused from the last call. Inside it, in green, is the length limit, two or three sentences. Below that are the facts for this incident, and you can see the decisions are already made and labeled that way, in purple. And at the bottom, in blue, is the shape we want back, with a placeholder where the warning goes, not a sample sentence the model could copy. The next slide shows what happens when you leave these out. " style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:88px 120px 48px;display:flex;flex-direction:column;box-sizing:border-box" data-om-slide-id="920b2835">
+  <h2 style="margin:0;font-size:60px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">Less to Do, Line by Line</h2>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:28px;min-height:0">
+    <div style="background:var(--gray-800);color:#ffffff;border-radius:8px;padding:32px 28px 32px 24px;font-family:var(--font-family-monospace);font-size:28px;line-height:1.65;letter-spacing:-0.01em;display:flex;flex-direction:column;gap:6px;overflow:hidden">
+      <div style="border-left:6px solid #ffb84d;padding-left:14px;display:flex;flex-direction:column">
+        <div style="white-space:pre">You are generating a short, calm, spoken-style ... warning <span style="background:rgba(65,235,164,0.22);box-shadow:inset 0 -3px 0 #41eba4;color:#41eba4">(2-3 sentences)</span> ...</div>
+        <div style="white-space:pre">Always name the corridor explicitly in your warning ...</div>
+      </div>
+      <div style="padding-left:20px;display:flex;flex-direction:column">
+        <div style="white-space:pre">Scope <span style="background:rgba(196,160,255,0.25);box-shadow:inset 0 -3px 0 #c4a0ff;color:#d9c2ff">(already decided)</span>: <span style="color:#ffb84d">{scope}</span></div>
+        <div style="white-space:pre">Reroute recommended <span style="background:rgba(196,160,255,0.25);box-shadow:inset 0 -3px 0 #c4a0ff;color:#d9c2ff">(already decided)</span>: <span style="color:#ffb84d">{reroute_recommended}</span></div>
+        <div style="white-space:pre">...</div>
+        <div style="white-space:pre">Shape (a placeholder, not a real answer): <span style="background:rgba(91,206,255,0.22);box-shadow:inset 0 -3px 0 #5bceff;color:#5bceff">{"spoken_warning": "&lt;your warning text here&gt;"}</span></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px">
+      <div style="border:2px solid var(--gray-100);border-radius:8px;padding:18px 22px;display:grid;grid-template-columns:48px minmax(0,1fr);gap:16px;align-items:start">
+        <div style="width:48px;height:48px;border-radius:50%;background:var(--purple-600);color:#ffffff;display:flex;align-items:center;justify-content:center;font-family:var(--font-family-monospace);font-size:26px;font-weight:700">1</div>
+        <div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:26px;font-weight:700;line-height:1.25">Hand over a finished verdict</div><div style="font-family:var(--font-family-monospace);font-size:24px;color:var(--ui-text-secondary)">(already decided)</div></div>
+      </div>
+      <div style="border:2px solid var(--gray-100);border-radius:8px;padding:18px 22px;display:grid;grid-template-columns:48px minmax(0,1fr);gap:16px;align-items:start">
+        <div style="width:48px;height:48px;border-radius:50%;background:#0b7fb3;color:#ffffff;display:flex;align-items:center;justify-content:center;font-family:var(--font-family-monospace);font-size:26px;font-weight:700">2</div>
+        <div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:26px;font-weight:700;line-height:1.25">Show a placeholder, not an example</div><div style="font-size:24px;color:var(--ui-text-secondary)">the placeholder shape</div></div>
+      </div>
+      <div style="border:2px solid var(--gray-100);border-radius:8px;padding:18px 22px;display:grid;grid-template-columns:48px minmax(0,1fr);gap:16px;align-items:start">
+        <div style="width:48px;height:48px;border-radius:50%;background:#c15800;color:#ffffff;display:flex;align-items:center;justify-content:center;font-family:var(--font-family-monospace);font-size:26px;font-weight:700">3</div>
+        <div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:26px;font-weight:700;line-height:1.25">Keep the fixed part first</div><div style="font-size:24px;color:var(--ui-text-secondary)">same every call → reused</div></div>
+      </div>
+      <div style="border:2px solid var(--gray-100);border-radius:8px;padding:18px 22px;display:grid;grid-template-columns:48px minmax(0,1fr);gap:16px;align-items:start">
+        <div style="width:48px;height:48px;border-radius:50%;background:var(--ui-status-success);color:#ffffff;display:flex;align-items:center;justify-content:center;font-family:var(--font-family-monospace);font-size:26px;font-weight:700">4</div>
+        <div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:26px;font-weight:700;line-height:1.25">Keep the answer short</div><div style="font-size:24px;color:var(--ui-text-secondary)">"2-3 sentences" · ~60 tokens out</div></div>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:20px;font-size:24px;color:var(--ui-text-tertiary)"><span>When Your Pulsar Function Speaks English</span></div>
+</section>
+
+<section data-label="Talk 2 Callback: The Model Pick" data-screen-label="21 Small Models Magnify Inefficiency" data-speaker-notes="Here's why those fixes matter, measured. This comes from another talks benchmark: two models doing this exact job, with the same prompt, on the same small CPU. Both got the facts right. But we asked for two or three sentences. Gemma wrote about 33 words. Phi-3.5-mini wrote about 115. And because a model writes one token at a time, that's the whole story on speed: 44 seconds versus 186. Same job, same hardware, and the extra words cost more than four times the wait. That's the point of this slide: small models magnify inefficiencies that bigger models hide. On a big GPU, those extra 80 words might cost you a fraction of a second, and you'd never notice. But you're still paying for them, in latency, in compute, and in dollars if it's a hosted API. A small model just makes the bill impossible to ignore. And those accuracy checks were only string matches. The next two slides are what they missed. " style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:88px 120px 48px;display:flex;flex-direction:column;box-sizing:border-box;gap:16px" data-om-slide-id="a2b8db5f">
+  <h2 style="margin:0;font-size:60px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">Small Models Magnify What Big Models Hide</h2>
+  <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;font-size:30px;line-height:1.35;color:var(--ui-text-secondary)"><span>Two small models: same task, same prompt, same hardware. The only big difference is how much each wrote.</span><span style="display:flex;align-items:center;gap:10px;height:44px;padding:0 14px;border-radius:4px;background:var(--ui-status-success-soft);color:var(--ui-status-success-contrast);font-size:24px;font-weight:700"><span style="width:28px;height:28px;border-radius:50%;background:var(--ui-status-success);color:#ffffff;display:flex;align-items:center;justify-content:center;font-family:var(--font-family-monospace);font-size:18px">4</span>Keep the answer short</span></div>
+  <div style="flex:1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:40px;align-content:center;min-height:0">
+    <div style="border:3px solid var(--ui-status-success);border-radius:8px;padding:40px 44px;display:flex;flex-direction:column;gap:36px">
+      <div style="display:flex;align-items:center;gap:20px">
+        <div style="width:72px;height:72px;border-radius:8px;background:var(--ui-status-success-soft);display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="circle-check" width="40" height="40" stroke-width="2" style="color:var(--ui-status-success);display:inline-flex;flex:none"></i></div>
+        <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:44px;font-weight:700;line-height:1.1">Gemma-3-4B-it</div><div style="font-size:26px;color:var(--ui-status-success-contrast);font-weight:600">writes what you asked for</div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:baseline;gap:16px"><span style="font-size:28px;color:var(--ui-text-secondary)">p50</span><span style="font-size:72px;font-weight:700;letter-spacing:-0.02em">43.7 s</span></div>
+        <div style="height:20px;border-radius:4px;background:var(--gray-75)"><div style="height:100%;width:23.5%;border-radius:4px;background:var(--ui-status-success)"></div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:52px;font-weight:700">~33 words</div>
+        <div style="height:20px;border-radius:4px;background:var(--gray-75)"><div style="height:100%;width:28.7%;border-radius:4px;background:var(--ui-status-success)"></div></div>
+      </div>
+    </div>
+    <div style="border:3px solid #c15800;border-radius:8px;padding:40px 44px;display:flex;flex-direction:column;gap:36px">
+      <div style="display:flex;align-items:center;gap:20px">
+        <div style="width:72px;height:72px;border-radius:8px;background:var(--ui-status-warning-soft);display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="timer" width="40" height="40" stroke-width="2" style="color:#c15800;display:inline-flex;flex:none"></i></div>
+        <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:44px;font-weight:700;line-height:1.1">Phi-3.5-mini-instruct</div><div style="font-size:26px;color:#c15800;font-weight:600">writes more than you need</div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:baseline;gap:16px"><span style="font-size:28px;color:var(--ui-text-secondary)">p50</span><span style="font-size:72px;font-weight:700;letter-spacing:-0.02em">186.0 s</span></div>
+        <div style="height:20px;border-radius:4px;background:var(--gray-75)"><div style="height:100%;width:100%;border-radius:4px;background:#c15800"></div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:52px;font-weight:700">~115 words</div>
+        <div style="height:20px;border-radius:4px;background:var(--gray-75)"><div style="height:100%;width:100%;border-radius:4px;background:#c15800"></div></div>
+      </div>
+    </div>
+  </div>
+  <div style="font-size:24px;color:var(--ui-text-tertiary)">Talk 2 benchmark on a small edge CPU, prompt cached, so these times are almost all writing. Faster hardware shrinks the seconds; the extra tokens are still work.</div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;font-size:24px;color:var(--ui-text-tertiary)"><span>When Your Pulsar Function Speaks English</span></div>
+</section>
+
+<section data-label="Blooper Reel: The Models" data-screen-label="22 The Same Failures, Magnified" data-speaker-notes="These are the same habits bigger models have, turned up loud enough to hear. First, the silent corridor. Qwen2.5-3B left I-95 North out of every single-truck warning, but kept it whenever there was a reroute. It decided on its own what wasn't worth naming. A bigger model will drop a detail now and then; this one did it every time. That's fix one: don't let it decide. One blunt line in the prompt, always name the corridor, took care of it. Second, thinking out loud. Qwen3-8B reasons in prose, and it burned through its 110-token budget before it ever got to the answer. Bigger models pad a little; this one never stopped. That's fix four: keep the answer short, and no thinking out loud. And third, the exception. The two 350M models, LFM2.5 and Granite-4.0-H, just handed the prompt back, placeholder and all, every time. Below a certain size, there's no prompt that helps. But the slips that matter most came from the model we picked. 
+
+================================
+Backing: `docs/TALK2-350M-PROMPT-ECHO.md`; `docs/TALK2-DATA-ENGINEERING-IMPACT-TRACK.md` rows 17, 22." style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:88px 120px 48px;display:flex;flex-direction:column;box-sizing:border-box;gap:16px" data-om-slide-id="d141f53d">
+  <h2 style="margin:0;font-size:60px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">The Same Failures, Magnified</h2>
+  <div style="flex:1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px;align-content:center;min-height:0">
+    <div style="border:2px solid var(--gray-100);border-radius:8px;padding:40px 38px;display:flex;flex-direction:column;gap:24px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px"><div style="width:84px;height:84px;border-radius:8px;background:var(--ui-status-warning-soft);display:flex;align-items:center;justify-content:center"><i data-lucide="map-pin-off" width="48" height="48" stroke-width="2" style="color:#c15800;display:inline-flex;flex:none"></i></div><span style="display:flex;align-items:center;height:40px;padding:0 14px;border-radius:4px;background:var(--gray-75);color:var(--ui-text-secondary);font-size:24px;font-weight:600">Qwen2.5-3B</span></div>
+      <div style="font-size:44px;font-weight:700;line-height:1.15">The silent corridor</div>
+      <div style="flex:1;font-size:30px;line-height:1.5;color:var(--ui-text-secondary);text-wrap:pretty">decides on its own what's worth naming, and drops "I-95N"</div>
+      <div style="display:flex;align-items:center;gap:12px;border-top:2px solid var(--gray-75);padding-top:20px"><span style="width:40px;height:40px;border-radius:50%;background:var(--purple-600);color:#ffffff;display:flex;align-items:center;justify-content:center;font-family:var(--font-family-monospace);font-size:22px;font-weight:700;flex:none">1</span><span style="font-size:28px;font-weight:700">Don't ask it to decide</span></div>
+    </div>
+    <div style="border:2px solid var(--gray-100);border-radius:8px;padding:40px 38px;display:flex;flex-direction:column;gap:24px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px"><div style="width:84px;height:84px;border-radius:8px;background:var(--ui-status-warning-soft);display:flex;align-items:center;justify-content:center"><i data-lucide="brain" width="48" height="48" stroke-width="2" style="color:#c15800;display:inline-flex;flex:none"></i></div><span style="display:flex;align-items:center;height:40px;padding:0 14px;border-radius:4px;background:var(--gray-75);color:var(--ui-text-secondary);font-size:24px;font-weight:600">Qwen3-8B</span></div>
+      <div style="font-size:44px;font-weight:700;line-height:1.15">Thinking out loud</div>
+      <div style="flex:1;font-size:30px;line-height:1.5;color:var(--ui-text-secondary);text-wrap:pretty">spends its budget reasoning instead of answering</div>
+      <div style="display:flex;align-items:center;gap:12px;border-top:2px solid var(--gray-75);padding-top:20px"><span style="width:40px;height:40px;border-radius:50%;background:var(--ui-status-success);color:#ffffff;display:flex;align-items:center;justify-content:center;font-family:var(--font-family-monospace);font-size:22px;font-weight:700;flex:none">4</span><span style="font-size:28px;font-weight:700">Keep the answer short</span></div>
+    </div>
+    <div style="border:2px solid var(--gray-100);border-radius:8px;padding:40px 38px;display:flex;flex-direction:column;gap:24px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px"><div style="width:84px;height:84px;border-radius:8px;background:var(--ui-status-warning-soft);display:flex;align-items:center;justify-content:center"><i data-lucide="repeat" width="48" height="48" stroke-width="2" style="color:#c15800;display:inline-flex;flex:none"></i></div><span style="display:flex;align-items:center;height:40px;padding:0 14px;border-radius:4px;background:var(--gray-75);color:var(--ui-text-secondary);font-size:24px;font-weight:600">350M models</span></div>
+      <div style="font-size:44px;font-weight:700;line-height:1.15">The echo</div>
+      <div style="flex:1;font-size:30px;line-height:1.5;color:var(--ui-text-secondary);text-wrap:pretty">hands back the prompt, placeholder and all</div>
+      <div style="display:flex;align-items:center;gap:12px;border-top:2px solid var(--gray-75);padding-top:20px"><i data-lucide="ban" width="32" height="32" stroke-width="2" style="color:var(--ui-text-tertiary);display:inline-flex;flex:none"></i><span style="font-size:28px;font-weight:700;color:var(--ui-text-secondary)">Size floor: no prompt fixes this</span></div>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;font-size:24px;color:var(--ui-text-tertiary)"><span>When Your Pulsar Function Speaks English</span></div>
+</section>
+
+<section data-label="Check What It Says" data-screen-label="23 Check What It Says" data-speaker-notes="There are two ways a warning can come out wrong. The first one was our fault. Our reroute code once described all three trucks as high severity when only one of them was, and the model read that out faithfully. That's a code bug, and we fixed it. The second kind belongs to the model. When we read every warning by hand, about one in four had a factual slip: seven out of thirty in one run, six out of twenty-five in another. My favorite is &quot;nine to twelve minutes.&quot; None of the cards says twelve. But one of the trucks is called truck-12. Twice, it simply left out the reroute that the code had recommended. And the accuracy check from The Greenest Token passed every one of these, because it was only matching strings. So now plain code checks what the model says, the same way plain code made the decision in the first place. Every number of minutes has to match one of the cards. A count of high-severity trucks has to be right. The corridor and the reroute both have to be mentioned. If the warning fails, the Function asks the model one more time. If it fails again, plain code writes the warning itself. It sounds a little stiffer, but it's never wrong. Across sixty-two different warnings from our simulation runs, the check caught fourteen, and every one of them was a real slip. It can't catch what has no number in it, like &quot;impacting all lanes.&quot; And here's the point. The small model made this problem show up often enough that we had to build the fix. A bigger model slips less often, which is exactly why you'd never catch it, until one of those slips gets read out loud to a driver. The check costs almost nothing, and it works at any model size." style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:88px 120px 48px;display:flex;flex-direction:column;box-sizing:border-box;gap:16px" data-om-slide-id="1473c090">
+  <h2 style="margin:0;font-size:60px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">Narrating Isn't the Same as Getting It Right</h2>
+  <div style="flex:1;display:flex;align-items:center;min-height:0">
+    <div style="width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:40px">
+      <div style="border:3px solid var(--ui-status-danger);border-bottom:none;border-radius:8px 8px 0 0;padding:32px 40px 20px;display:flex;align-items:center;gap:20px"><div style="width:72px;height:72px;border-radius:8px;background:var(--ui-status-danger-soft);display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="message-square-warning" width="40" height="40" stroke-width="2" style="color:var(--ui-status-danger);display:inline-flex;flex:none"></i></div><div style="font-size:44px;font-weight:700;line-height:1.15">What the small model said — about 1 in 4</div></div>
+      <div style="border:3px solid var(--ui-status-success);border-bottom:none;border-radius:8px 8px 0 0;padding:32px 40px 20px;display:flex;align-items:center;gap:20px"><div style="width:72px;height:72px;border-radius:8px;background:var(--ui-status-success-soft);display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="shield-check" width="40" height="40" stroke-width="2" style="color:var(--ui-status-success);display:inline-flex;flex:none"></i></div><div style="font-size:44px;font-weight:700;line-height:1.15">What code does now</div></div>
+      <div style="border-left:3px solid var(--ui-status-danger);border-right:3px solid var(--ui-status-danger);border-top:2px solid var(--gray-75);padding:22px 40px;font-size:32px;line-height:1.35;display:flex;align-items:baseline;gap:16px;flex-wrap:wrap"><span style="font-weight:700">"9 to 12 minutes"</span><span style="color:var(--ui-status-danger-contrast)">(truck-12?)</span></div>
+      <div style="border-left:3px solid var(--ui-status-success);border-right:3px solid var(--ui-status-success);border-top:2px solid var(--gray-75);padding:22px 40px;font-size:32px;line-height:1.35">every number checked against the facts</div>
+      <div style="border-left:3px solid var(--ui-status-danger);border-right:3px solid var(--ui-status-danger);border-top:2px solid var(--gray-75);padding:22px 40px;font-size:32px;line-height:1.35;display:flex;align-items:baseline;gap:16px;flex-wrap:wrap"><span style="font-weight:700">"one ... high severity"</span><span style="color:var(--ui-status-danger-contrast)">(two were)</span></div>
+      <div style="border-left:3px solid var(--ui-status-success);border-right:3px solid var(--ui-status-success);border-top:2px solid var(--gray-75);padding:22px 40px;font-size:32px;line-height:1.35">fail → ask again → fail → plain code says it</div>
+      <div style="border:3px solid var(--ui-status-danger);border-top:2px solid var(--gray-75);border-radius:0 0 8px 8px;padding:22px 40px 32px;font-size:32px;line-height:1.35;font-weight:700">reroute left out</div>
+      <div style="border:3px solid var(--ui-status-success);border-top:2px solid var(--gray-75);border-radius:0 0 8px 8px;padding:22px 40px 32px;font-size:32px;line-height:1.35">caught <strong style="font-weight:700">14 of 62</strong>; not "all lanes"</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:16px;background:var(--gray-800);color:#ffffff;border-radius:8px;padding:22px 32px;font-size:34px;font-weight:700;line-height:1.3"><i data-lucide="shield-check" width="36" height="36" stroke-width="2" style="color:#41eba4;display:inline-flex;flex:none"></i>Bigger models slip less often. That makes this check more important, not less.</div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;font-size:24px;color:var(--ui-text-tertiary)"><span>When Your Pulsar Function Speaks English</span></div>
+</section>
+
+<section data-label="Section: Giving It a Voice" data-screen-label="24 Section: Giving It a Voice" data-speaker-notes="So far, everything we've built ends with text: a plain-English summary of what's happening on the corridor, checked against the facts. But nobody reads a screen while they're driving. The last piece is giving that text a voice, and that's a different technology with its own surprises." style="background:linear-gradient(135deg, var(--purple-700) 0%, oklch(0.42 0.24 272) 60%, oklch(0.5 0.22 262) 100%);overflow:hidden;color:#ffffff;font-family:var(--font-family-base);padding:120px;display:flex;flex-direction:column;box-sizing:border-box">
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.05);clip-path:polygon(38% 0, 62% 0, 30% 100%, 8% 100%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.07);clip-path:polygon(70% 0, 100% 0, 100% 55%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(0,0,40,0.12);clip-path:polygon(0 0, 22% 0, 0 45%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.04);clip-path:polygon(58% 100%, 100% 40%, 100% 100%);pointer-events:none"></div>
+  <div style="position:relative;flex:1;display:flex;flex-direction:column;justify-content:center;gap:40px">
+    <h2 style="margin:0;font-size:104px;font-weight:700;line-height:1.05;letter-spacing:-0.02em;text-wrap:balance">Giving It a Voice</h2>
+  </div>
+  <div style="position:relative;display:flex;justify-content:space-between;align-items:center;font-size:24px;color:var(--purple-200)"><span>When Your Pulsar Function Speaks English</span></div>
+</section>
+
+<section data-label="Text-to-Speech as a Separate Process" data-screen-label="25 Text-to-Speech as a Separate Process" data-speaker-notes="Let me be precise about what you heard at the start. The Function wrote that sentence. A separate program called Piper read it out loud. We could have run Piper inside the Function too, the same way we run the LLM. We decided not to. The piece that does the speaking is a plain Pulsar consumer instead, because playing audio is a side effect, and it has to happen on whichever machine has the speakers. Piper itself is open source, but it's licensed under the GPL. So we keep it at arm's length. It's never a dependency of our code. It lives in its own environment, and we call it as a separate process. The voices have their own licenses too. This demo uses a voice called norman, built from public-domain audiobook recordings. Some of the other popular voices are licensed for non-commercial use only, so check before you ship one. And there was one more surprise waiting for us: Piper has no idea what &quot;I-95N&quot; means. 
+
+==================
+Backing: `speaker.py` and `speech.py` docstrings; package README &quot;Speaking the warning.&quot;" style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:88px 120px 48px;display:flex;flex-direction:column;box-sizing:border-box;gap:16px" data-om-slide-id="55fef708">
+  <h2 style="margin:0;font-size:60px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">Piper, at Arm's Length</h2>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:64px;min-height:0">
+    <div style="font-size:48px;font-weight:700;line-height:1.2">The Function wrote it. Piper reads it.</div>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div style="width:200px;height:120px;box-sizing:border-box;border-radius:8px;border:2px solid var(--gray-150);background:var(--gray-25);display:flex;align-items:center;justify-content:center;font-family:var(--font-family-monospace);font-size:24px;font-weight:600">incidents</div>
+      <svg width="56" height="24" viewBox="0 0 56 24"><path d="M2 12 L46 12" stroke-width="3" fill="none" style="stroke:var(--gray-400)"></path><path d="M42 4 L54 12 L42 20 z" style="fill:var(--gray-400)"></path></svg>
+      <div style="position:relative;padding:44px 22px 22px;border:3px dashed var(--purple-500);border-radius:8px">
+        <div style="position:absolute;left:16px;top:-20px;display:flex;align-items:center;height:38px;padding:0 12px;border-radius:4px;background:var(--purple-600);color:#ffffff;font-size:22px;font-weight:700">this repo</div>
+        <div style="width:280px;height:120px;box-sizing:border-box;border-radius:8px;border:2px solid var(--gray-150);background:#ffffff;padding:12px 18px;display:flex;flex-direction:column;justify-content:center;gap:6px"><div style="font-size:26px;font-weight:700">speaker consumer</div><div style="font-size:22px;color:var(--ui-text-secondary)">plain Pulsar consumer</div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><span style="font-size:22px;font-weight:600;color:var(--ui-text-secondary)">subprocess</span><svg width="140" height="24" viewBox="0 0 140 24"><path d="M2 12 L130 12" stroke-width="3" stroke-dasharray="10 8" fill="none" style="stroke:var(--gray-400)"></path><path d="M126 4 L138 12 L126 20 z" style="fill:var(--gray-400)"></path></svg></div>
+      <div style="width:330px;height:150px;box-sizing:border-box;border-radius:8px;border:3px solid #c15800;background:var(--ui-status-warning-soft);padding:14px 20px;display:flex;flex-direction:column;justify-content:center;gap:8px">
+        <div style="display:flex;align-items:center;gap:12px"><i data-lucide="scale" width="28" height="28" stroke-width="2" style="color:#c15800;display:inline-flex;flex:none"></i><span style="font-family:var(--font-family-monospace);font-size:28px;font-weight:700">piper</span></div>
+        <div style="font-size:22px;line-height:1.35;color:var(--ui-text)">own venv, GPL-3.0</div>
+        <div style="font-size:22px;line-height:1.35;color:var(--ui-text-secondary)">+ voice <span style="font-family:var(--font-family-monospace)">.onnx</span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><span style="font-family:var(--font-family-monospace);font-size:22px;font-weight:600;color:var(--ui-text-secondary)">WAV</span><svg width="100" height="24" viewBox="0 0 100 24"><path d="M2 12 L90 12" stroke-width="3" fill="none" style="stroke:var(--gray-400)"></path><path d="M86 4 L98 12 L86 20 z" style="fill:var(--gray-400)"></path></svg></div>
+      <div style="width:250px;height:120px;box-sizing:border-box;border-radius:8px;border:2px solid var(--ui-status-success);background:var(--ui-status-success-soft);display:flex;align-items:center;justify-content:center;gap:12px"><i data-lucide="volume-2" width="32" height="32" stroke-width="2" style="color:var(--ui-status-success);display:inline-flex;flex:none"></i><span style="font-family:var(--font-family-monospace);font-size:24px;font-weight:600">afplay / aplay</span></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:20px;background:var(--gray-50);border-radius:8px;padding:22px 28px;font-size:30px;line-height:1.4"><i data-lucide="file-badge" width="36" height="36" stroke-width="2" style="color:var(--ui-text-secondary);display:inline-flex;flex:none"></i><span>Piper (GPL-3.0) — own venv, subprocess only · Voice: norman (public domain)</span></div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;font-size:24px;color:var(--ui-text-tertiary)"><span>When Your Pulsar Function Speaks English</span></div>
+</section>
+
+<section data-label="Normalize Before You Speak" data-screen-label="26 Normalize Before You Speak" data-speaker-notes="Here's what I mean. Let's listen to the raw version first. [Play raw I-95N.] Piper reads the N at the end as the letter N, so it comes out as &quot;I ninety-five N.&quot; Now the fixed version. [Play normalized I-95N.] Same thing with ETA. [Play raw ETA.] Piper treats it as a word, so you get something like &quot;eta.&quot; [Play normalized ETA.] And that's the fix. We didn't guess at this; we checked it against Piper's own pronunciation rules. The fix is a small function that runs right before every call to Piper. It's two find-and-replace rules and a bit of whitespace cleanup: I-95N becomes I-95 North, and ETA gets spelled out letter by letter. It's more plain code doing exactly one job, the same pattern as the decision code and the fact check. Now let's see all of it together, live. Backing: `normalize_for_speech()` in `speech.py`." style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:88px 120px 48px;display:flex;flex-direction:column;box-sizing:border-box;gap:16px" data-om-slide-id="5b83a91a">
+  <h2 style="margin:0;font-size:60px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">Text-to-Speech Doesn't Know What I-95N Means</h2>
+  <div style="flex:1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:40px;align-content:center;min-height:0">
+    <div style="border:3px solid var(--ui-status-danger);border-radius:8px;padding:36px 40px;display:flex;flex-direction:column;gap:28px">
+      <div style="display:flex;align-items:center;gap:20px"><div style="width:72px;height:72px;border-radius:8px;background:var(--ui-status-danger-soft);display:flex;align-items:center;justify-content:center"><i data-lucide="circle-x" width="40" height="40" stroke-width="2" style="color:var(--ui-status-danger);display:inline-flex;flex:none"></i></div><div style="font-size:48px;font-weight:700">Raw</div></div>
+      <div style="display:flex;align-items:center;gap:20px;border-top:2px solid var(--gray-75);padding-top:20px"><button onClick="{{ play_rawI95 }}" style="flex:none;display:flex;align-items:center;gap:10px;height:60px;padding:0 22px;border-radius:8px;border:none;cursor:pointer;background:var(--ui-status-danger);color:#ffffff;font-family:var(--font-family-base);font-size:24px;font-weight:700" style-hover="opacity:0.88"><svg width="20" height="22" viewBox="0 0 20 22"><path d="M2 2 L18 11 L2 20 z" fill="#ffffff"></path></svg>{{ label_rawI95 }}</button><div style="display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;font-size:36px"><span style="font-family:var(--font-family-monospace);font-weight:600">I-95N</span><span>→ "eye ninety-five en"</span></div></div>
+      <div style="display:flex;align-items:center;gap:20px;border-top:2px solid var(--gray-75);padding-top:20px"><button onClick="{{ play_rawEta }}" style="flex:none;display:flex;align-items:center;gap:10px;height:60px;padding:0 22px;border-radius:8px;border:none;cursor:pointer;background:var(--ui-status-danger);color:#ffffff;font-family:var(--font-family-base);font-size:24px;font-weight:700" style-hover="opacity:0.88"><svg width="20" height="22" viewBox="0 0 20 22"><path d="M2 2 L18 11 L2 20 z" fill="#ffffff"></path></svg>{{ label_rawEta }}</button><div style="display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;font-size:36px"><span style="font-family:var(--font-family-monospace);font-weight:600">ETA</span><span>→ "ee-ta"</span></div></div>
+    </div>
+    <div style="border:3px solid var(--ui-status-success);border-radius:8px;padding:36px 40px;display:flex;flex-direction:column;gap:28px">
+      <div style="display:flex;align-items:center;gap:20px"><div style="width:72px;height:72px;border-radius:8px;background:var(--ui-status-success-soft);display:flex;align-items:center;justify-content:center"><i data-lucide="circle-check" width="40" height="40" stroke-width="2" style="color:var(--ui-status-success);display:inline-flex;flex:none"></i></div><div style="font-size:48px;font-weight:700">Normalized</div></div>
+      <div style="display:flex;align-items:center;gap:20px;border-top:2px solid var(--gray-75);padding-top:20px"><button onClick="{{ play_normI95 }}" style="flex:none;display:flex;align-items:center;gap:10px;height:60px;padding:0 22px;border-radius:8px;border:none;cursor:pointer;background:var(--ui-status-success);color:#ffffff;font-family:var(--font-family-base);font-size:24px;font-weight:700" style-hover="opacity:0.88"><svg width="20" height="22" viewBox="0 0 20 22"><path d="M2 2 L18 11 L2 20 z" fill="#ffffff"></path></svg>{{ label_normI95 }}</button><div style="display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;font-size:36px"><span style="font-weight:600">I-95 North</span></div></div>
+      <div style="display:flex;align-items:center;gap:20px;border-top:2px solid var(--gray-75);padding-top:20px"><button onClick="{{ play_normEta }}" style="flex:none;display:flex;align-items:center;gap:10px;height:60px;padding:0 22px;border-radius:8px;border:none;cursor:pointer;background:var(--ui-status-success);color:#ffffff;font-family:var(--font-family-base);font-size:24px;font-weight:700" style-hover="opacity:0.88"><svg width="20" height="22" viewBox="0 0 20 22"><path d="M2 2 L18 11 L2 20 z" fill="#ffffff"></path></svg>{{ label_normEta }}</button><div style="display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;font-size:36px"><span style="font-weight:600">E T A</span></div></div>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;font-size:24px;color:var(--ui-text-tertiary)"><span>When Your Pulsar Function Speaks English</span></div>
+</section>
+
+<section data-label="Live Demo" data-screen-label="27 Live Demo" data-speaker-notes="[Preamble] Let's watch it run. What you're about to see starts with three enrichment cards for I-95 North, arriving three seconds apart. One thing to be upfront about: these cards are replayed. Everything after the replay is live: the Function, the model inside it, and the voice. Keep an eye on the panel that says Decided by code.
+
+[Let's watch it] Click Play recording. Say nothing while it plays; it runs about 37 seconds. Let the audio finish.
+
+[What we just saw] So here's what we just saw. The three cards landed on enrichment-cards. The panel that said Decided by code was the Function's decision: corridor-wide, three trucks, reroute. No model was involved yet. Then the LLM running inside the Function wrote the plain-English summary, the fact check ran, and the summary went out on incidents to be spoken. That's the whole pipeline, from three cards to a voice.
+
+(Not for reading: the recording is take 8, `deploy/recordings/talk3-demo-20261005-174611.mp4`. It doesn't autoplay; it rewinds to the start each time you open the slide. Take 8 says: &quot;...consider rerouting around I-95N as three trucks are experiencing significant delays, with an estimated impact of up to 9 minutes.&quot; Backing: `deploy/README.md` &quot;Talk 3 demo&quot;; `deploy/talk3-windows/tier2.sh`.)" style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:88px 120px 48px;display:flex;flex-direction:column;box-sizing:border-box;gap:16px" data-om-slide-id="fbc6453d">
+  <h2 style="margin:0;font-size:60px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">See It Live</h2>
+  <div style="font-size:34px;line-height:1.35;color:var(--ui-text-secondary)">Replayed cards → live Function → live model → live voice</div>
+  <div style="flex:1;display:flex;padding:24px 0;min-height:0">
+    <div style="flex:1;position:relative;border-radius:8px;background:#000000;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:0">
+      <video ref="{{ demoRef }}" src="assets/video/talk3-demo-take8.mp4#t=0.1" controls="" preload="auto" playsinline="" onPlay="{{ onDemoPlay }}" onPause="{{ onDemoPause }}" style="width:100%;height:100%;object-fit:contain;display:block"></video>
+      <sc-if value="{{ demoPaused }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ playDemo }}" aria-label="Play demo recording" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:20px;height:104px;padding:0 44px 0 36px;border-radius:52px;border:none;cursor:pointer;background:var(--purple-600);color:#ffffff;font-family:var(--font-family-base);font-size:34px;font-weight:700;box-shadow:0 5.33px 10.67px rgba(0,0,0,0.10)" style-hover="opacity:0.9"><svg width="36" height="40" viewBox="0 0 20 22"><path d="M2 2 L18 11 L2 20 z" fill="#ffffff"></path></svg>Play recording</button>
+      </sc-if>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;font-size:24px;color:var(--ui-text-tertiary)"><span>When Your Pulsar Function Speaks English</span></div>
+</section>
+
+<section data-label="The Pattern" data-screen-label="28 The Pattern" data-speaker-notes="So let's take the trucks out of the picture, because this isn't really about trucks. It's a pattern you can reuse anywhere you have events flowing through Pulsar and want an LLM working on them. The core of it is the top row: run the LLM inside the Pulsar Function itself. The model loads in the same process as your Function code, so there's no external LLM API to call and no model server to run. And everything about the LLM call comes in through user config: which model file to load, which prompt to send, how many tokens it can write, the temperature, how many threads, how many layers go to a GPU, how long a call can take. So this isn't a Function that only writes truck warnings. It's a general-purpose LLM step for a stream. Swapping the model, or the whole use case, is a config change, not a rebuild. Then there are four practices that make it hold up, and they're the lessons the small models taught us. One, give the model less to do. Code makes the decisions, and the model only puts them into words. Two, tell it the shape of the answer you want, with a placeholder, not a sample it can copy. Three, spend tokens efficiently: fixed instructions first so they can be reused, and a short answer with no thinking out loud. And four, trust, but verify. Put guardrails on both sides of the model. What goes in is already decided and labeled, and what comes out gets checked against the facts, with one retry and a plain-code fallback if it's still wrong. You can point this at a lot more than trucks: alarms on a factory floor, on-call pages read out loud, building sensors, or alerts in the cab for drivers. In every one of those, Pulsar carries the events, and the LLM is just another step inside the stream." style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:88px 120px 48px;display:flex;flex-direction:column;box-sizing:border-box;gap:16px" data-om-slide-id="f3d8568d">
+  <h2 style="margin:0;font-size:60px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">The Pattern</h2>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:32px;min-height:0">
+    <div style="background:var(--gray-800);color:#ffffff;border-radius:8px;padding:36px 44px;display:flex;flex-direction:column;gap:24px">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;gap:32px;flex-wrap:wrap"><div style="font-size:48px;font-weight:700;line-height:1.15">Run the LLM inside the Pulsar Function</div><div style="font-size:30px;color:#ececf4">In-process. No external LLM API.</div></div>
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap"><span style="font-size:28px;font-weight:600;color:#ececf4;padding-right:6px">Configured, not coded:</span><span style="display:flex;align-items:center;height:48px;padding:0 18px;border-radius:4px;background:rgba(255,255,255,0.12);font-family:var(--font-family-monospace);font-size:26px;font-weight:600;color:#ffffff">llm_model_path</span><span style="display:flex;align-items:center;height:48px;padding:0 18px;border-radius:4px;background:rgba(255,255,255,0.12);font-family:var(--font-family-monospace);font-size:26px;font-weight:600;color:#ffffff">prompt_template</span><span style="display:flex;align-items:center;height:48px;padding:0 18px;border-radius:4px;background:rgba(255,255,255,0.12);font-family:var(--font-family-monospace);font-size:26px;font-weight:600;color:#ffffff">max_tokens</span><span style="display:flex;align-items:center;height:48px;padding:0 18px;border-radius:4px;background:rgba(255,255,255,0.12);font-family:var(--font-family-monospace);font-size:26px;font-weight:600;color:#ffffff">temperature</span><span style="display:flex;align-items:center;height:48px;padding:0 18px;border-radius:4px;background:rgba(255,255,255,0.12);font-family:var(--font-family-monospace);font-size:26px;font-weight:600;color:#ffffff">llm_backend</span><span style="display:flex;align-items:center;height:48px;padding:0 18px;border-radius:4px;background:rgba(255,255,255,0.12);font-family:var(--font-family-monospace);font-size:26px;font-weight:600;color:#ffffff">threads</span><span style="display:flex;align-items:center;height:48px;padding:0 18px;border-radius:4px;background:rgba(255,255,255,0.12);font-family:var(--font-family-monospace);font-size:26px;font-weight:600;color:#ffffff">llm_gpu_layers</span><span style="display:flex;align-items:center;height:48px;padding:0 18px;border-radius:4px;background:rgba(255,255,255,0.12);font-family:var(--font-family-monospace);font-size:26px;font-weight:600;color:#ffffff">timeout_seconds</span></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px">
+      <div style="border:2px solid var(--gray-100);border-radius:8px;padding:28px 28px 32px;display:flex;flex-direction:column;gap:18px;box-sizing:border-box">
+        <div style="width:72px;height:72px;border-radius:50%;background:var(--purple-600);display:flex;align-items:center;justify-content:center;font-family:var(--font-family-monospace);font-size:32px;font-weight:600;color:#ffffff">1</div>
+        <div style="font-size:38px;font-weight:700;line-height:1.15;text-wrap:pretty">Give the model less to do</div>
+        <div style="font-size:28px;line-height:1.4;color:var(--ui-text-secondary);text-wrap:pretty">Code makes the decisions. The model puts them into words.</div>
+      </div>
+      <div style="border:2px solid var(--gray-100);border-radius:8px;padding:28px 28px 32px;display:flex;flex-direction:column;gap:18px;box-sizing:border-box">
+        <div style="width:72px;height:72px;border-radius:50%;background:var(--purple-600);display:flex;align-items:center;justify-content:center;font-family:var(--font-family-monospace);font-size:32px;font-weight:600;color:#ffffff">2</div>
+        <div style="font-size:38px;font-weight:700;line-height:1.15;text-wrap:pretty">Show the shape of the answer</div>
+        <div style="font-size:28px;line-height:1.4;color:var(--ui-text-secondary);text-wrap:pretty">A placeholder, not a sample sentence it can copy.</div>
+      </div>
+      <div style="border:2px solid var(--gray-100);border-radius:8px;padding:28px 28px 32px;display:flex;flex-direction:column;gap:18px;box-sizing:border-box">
+        <div style="width:72px;height:72px;border-radius:50%;background:var(--purple-600);display:flex;align-items:center;justify-content:center;font-family:var(--font-family-monospace);font-size:32px;font-weight:600;color:#ffffff">3</div>
+        <div style="font-size:38px;font-weight:700;line-height:1.15;text-wrap:pretty">Spend tokens efficiently</div>
+        <div style="font-size:28px;line-height:1.4;color:var(--ui-text-secondary);text-wrap:pretty">Fixed instructions first. Short answer, no thinking out loud.</div>
+      </div>
+      <div style="border:2px solid var(--gray-100);border-radius:8px;padding:28px 28px 32px;display:flex;flex-direction:column;gap:18px;box-sizing:border-box">
+        <div style="width:72px;height:72px;border-radius:50%;background:var(--purple-600);display:flex;align-items:center;justify-content:center;font-family:var(--font-family-monospace);font-size:32px;font-weight:600;color:#ffffff">4</div>
+        <div style="font-size:38px;font-weight:700;line-height:1.15;text-wrap:pretty">Trust, but verify</div>
+        <div style="font-size:28px;line-height:1.4;color:var(--ui-text-secondary);text-wrap:pretty">Guardrails on inputs and outputs: check the facts, retry, fall back to code.</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap"><span style="display:flex;align-items:center;height:48px;padding:0 18px;border-radius:4px;background:var(--gray-75);color:var(--ui-text-secondary);font-size:26px;font-weight:600">factory-floor alarms</span><span style="display:flex;align-items:center;height:48px;padding:0 18px;border-radius:4px;background:var(--gray-75);color:var(--ui-text-secondary);font-size:26px;font-weight:600">on-call pages read aloud</span><span style="display:flex;align-items:center;height:48px;padding:0 18px;border-radius:4px;background:var(--gray-75);color:var(--ui-text-secondary);font-size:26px;font-weight:600">building sensors</span><span style="display:flex;align-items:center;height:48px;padding:0 18px;border-radius:4px;background:var(--gray-75);color:var(--ui-text-secondary);font-size:26px;font-weight:600">in-cab driver alerts</span></div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;font-size:24px;color:var(--ui-text-tertiary)"><span>When Your Pulsar Function Speaks English</span></div>
+</section>
+
+<section data-label="Trilogy Closer" data-screen-label="29 Trilogy Closer" data-speaker-notes="Let's go back to where we started. [Click Replay the warning, and let it play.] That was a Pulsar Function talking, with an LLM running inside it. And now you've seen every line that made it talk. More than that, you've seen a pattern you can reuse: put the LLM inside the event stream, let code make the decisions, and let the model put them into words. We built it on Apache Pulsar, and a Pulsar Function made the stream part twelve lines. This talk is the last part of a series of three. In Edge Intelligence for Connected Fleets, the edge decided what was worth sending. In The Greenest Token, we proved which model deserved the job. And here, the fleet tells you what's happening, out loud. All of the code and the measurements behind this talk are in the repo, so you can try it yourself." style="background:#ffffff;color:var(--ui-text);font-family:var(--font-family-base);padding:88px 120px 48px;display:flex;flex-direction:column;box-sizing:border-box;gap:16px" data-om-slide-id="68568f2d">
+  <h2 style="margin:0;font-size:60px;font-weight:700;line-height:1.12;letter-spacing:-0.01em">The Fleet Tells You, Out Loud</h2>
+  <div style="flex:1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px;align-content:center;min-height:0">
+    <div style="border:2px solid var(--gray-100);border-radius:8px;padding:44px 40px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:26px;min-height:420px;box-sizing:border-box">
+      <div style="width:84px;height:84px;border-radius:8px;background:var(--gray-75);display:flex;align-items:center;justify-content:center"><i data-lucide="filter" width="48" height="48" stroke-width="2" style="color:var(--ui-text-secondary);display:inline-flex;flex:none"></i></div>
+      <div style="font-size:44px;font-weight:700;line-height:1.15">Talk 1</div>
+      <div style="font-size:34px;line-height:1.4;color:var(--ui-text-secondary);text-wrap:pretty">the edge decides what's worth sending</div>
+    </div>
+    <div style="border:2px solid var(--gray-100);border-radius:8px;padding:44px 40px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:26px;min-height:420px;box-sizing:border-box">
+      <div style="width:84px;height:84px;border-radius:8px;background:var(--gray-75);display:flex;align-items:center;justify-content:center"><i data-lucide="scale" width="48" height="48" stroke-width="2" style="color:var(--ui-text-secondary);display:inline-flex;flex:none"></i></div>
+      <div style="font-size:44px;font-weight:700;line-height:1.15">Talk 2</div>
+      <div style="font-size:34px;line-height:1.4;color:var(--ui-text-secondary);text-wrap:pretty">prove which model deserves the job</div>
+    </div>
+    <div style="border:3px solid var(--purple-600);background:var(--purple-100);border-radius:8px;padding:44px 40px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:26px;min-height:420px;box-sizing:border-box">
+      <div style="width:84px;height:84px;border-radius:8px;background:#ffffff;display:flex;align-items:center;justify-content:center"><i data-lucide="volume-2" width="48" height="48" stroke-width="2" style="color:var(--purple-600);display:inline-flex;flex:none"></i></div>
+      <div style="font-size:44px;font-weight:700;line-height:1.15;color:var(--purple-700)">Talk 3</div>
+      <div style="font-size:34px;line-height:1.4;color:var(--ui-text);text-wrap:pretty">the fleet tells you, out loud</div>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:center;padding-bottom:24px">
+    <button onClick="{{ play_cold }}" style="display:flex;align-items:center;gap:14px;height:64px;padding:0 28px;border-radius:8px;border:2px solid var(--purple-600);background:#ffffff;cursor:pointer;font-family:var(--font-family-base);font-size:26px;font-weight:700;color:var(--purple-700)" style-hover="background:var(--purple-100)">{{ iconSm_cold }}{{ replayLabel }}</button>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ui-border);padding-top:16px;font-size:24px;color:var(--ui-text-tertiary)"><span>When Your Pulsar Function Speaks English</span></div>
+</section>
+
+<section data-label="Thank You" data-screen-label="30 Thank You" data-speaker-notes="Transition to Q&amp;A." style="background:linear-gradient(135deg, var(--purple-700) 0%, oklch(0.42 0.24 272) 60%, oklch(0.5 0.22 262) 100%);overflow:hidden;color:#ffffff;font-family:var(--font-family-base);padding:120px;display:flex;flex-direction:column;box-sizing:border-box" data-om-slide-id="150794a3">
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.05);clip-path:polygon(38% 0, 62% 0, 30% 100%, 8% 100%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.07);clip-path:polygon(70% 0, 100% 0, 100% 55%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(0,0,40,0.12);clip-path:polygon(0 0, 22% 0, 0 45%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:rgba(255,255,255,0.04);clip-path:polygon(58% 100%, 100% 40%, 100% 100%);pointer-events:none"></div>
+  <div style="position:relative;flex:1;display:flex;flex-direction:column;justify-content:center;gap:32px">
+    <h2 style="margin:0;font-size:160px;font-weight:700;line-height:1;letter-spacing:-0.02em">Thank you</h2>
+  </div>
+  <div style="position:relative;display:flex;flex-direction:column;gap:8px;border-top:2px solid var(--purple-500);padding-top:32px">
+    <div style="font-size:36px;font-weight:600">David Kjerrumgaard</div>
+    <div style="font-size:28px;color:var(--purple-200)">Apache Pulsar Committer</div>
+  </div>
+</section>
+
+</x-import>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;countdownMinutes&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:5,&quot;min&quot;:1,&quot;max&quot;:30,&quot;unit&quot;:&quot;min&quot;,&quot;section&quot;:&quot;Waitroom&quot;,&quot;tsType&quot;:&quot;number&quot;},&quot;rotateSeconds&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:12,&quot;min&quot;:4,&quot;max&quot;:60,&quot;unit&quot;:&quot;s&quot;,&quot;section&quot;:&quot;Waitroom&quot;,&quot;tsType&quot;:&quot;number&quot;}}">
+class Component extends DCLogic {
+  facts = [
+    { topic: 'Born at Yahoo', text: 'Yahoo built Apache Pulsar around 2013 for Mail and Finance, open-sourced it in 2016, and it became a top-level Apache project in 2018.' },
+    { topic: 'Compute ≠ storage', text: 'Pulsar separates stateless brokers from durable storage (Apache BookKeeper), so each scales independently with no data rebalancing.' },
+    { topic: 'Native multi-tenancy', text: 'One Pulsar cluster serves many teams, with isolated namespaces, auth and quotas per tenant.' },
+    { topic: '1 million+ topics', text: 'A single Pulsar cluster supports up to one million topics, so streams never need to share a congested topic.' },
+    { topic: 'Fast scaling', text: 'With storage split from compute, Pulsar scales up or down almost instantly, without moving files or repartitioning.' },
+    { topic: 'Geo-replication', text: 'Pulsar replicates across data centers and regions natively, with automatic client failover during outages.' },
+    { topic: 'Queuing + streaming', text: 'Pulsar is both a high-throughput streaming log and a traditional work queue, over the same stored data.' },
+    { topic: 'Pulsar Functions', text: 'Built-in serverless functions run Java, Python or Go directly on the broker, no separate cluster needed.' },
+    { topic: 'Zero data loss', text: 'Pulsar replicates each message across multiple storage nodes ("bookies") before acknowledging it.' },
+    { topic: 'Kafka compatible', text: 'With KoP (Kafka on Pulsar), Kafka applications run on a Pulsar cluster without rewriting client code.' },
+    { topic: 'Community', text: 'Apache Pulsar has over 400 committers' },
+    { topic: 'In production', text: 'Apache Pulsar is used by three automotive manufacturers in production today.' }
+  ];
+  state = { coldRevealed: false, i: 0, t: 0, now: Date.now() };
+  go(d) { this.setState(s => ({ i: (s.i + d + this.facts.length) % this.facts.length, t: 0 })); }
+  demoRef = React.createRef();
+  syncDemo() {
+    const v = this.demoRef.current; if (!v) return;
+    const sec = v.closest('section');
+    const active = !!(sec && sec.hasAttribute('data-deck-active'));
+    if (active && !this._demoActive) {
+      v.pause(); v.currentTime = 0;
+    } else if (!active && this._demoActive) v.pause();
+    this._demoActive = active;
+  }
+  componentDidMount() {
+    this.demoPoll = setInterval(() => this.syncDemo(), 150);
+    this.endAt = Date.now() + (this.props.countdownMinutes ?? 5) * 60000;
+    this.timer = setInterval(() => {
+      const isActive = l => { const s = document.querySelector(`section[data-label="${l}"]`); return !!(s && s.hasAttribute('data-deck-active')); };
+      const wait = isActive('Waitroom'), io = isActive('One In, Zero or One Out');
+      const key = (wait ? 'w' : '') + (io ? 'i' : '');
+      const changed = key !== this._tickKey;
+      this._tickKey = key;
+      if (!wait && !io && !changed) return;
+      if (io || changed) {
+        const L = 'One In, Zero or One Out', st = this._an && this._an[L];
+        const done = st && st.active && st.start != null && Date.now() - st.start > 800 + 3 * 3000 + 400;
+        if (!wait && !changed && done) return;
+      }
+      const rotateMs = (this.props.rotateSeconds ?? 12) * 1000;
+      this.setState(s => {
+        if (!wait) return { now: Date.now() };
+        const t = s.t + 100;
+        return t >= rotateMs ? { i: (s.i + 1) % this.facts.length, t: 0, now: Date.now() } : { t, now: Date.now() };
+      });
+    }, 100);
+    this.iconTimer = setInterval(() => { if (window.lucide) { this.icons(); clearInterval(this.iconTimer); } }, 150);
+    this.onKey = (e) => {
+      const keys = ['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter'];
+      return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      this.setState({ coldRevealed: true });
+    };
+    window.addEventListener('keydown', this.onKey, true);
+    this.poll = setInterval(() => {
+      if (this.state.coldRevealed && !this.coldActive()) this.setState({ coldRevealed: false });
+    }, 400);
+  }
+  componentDidUpdate() {
+    if (this._iconPending) return;
+    this._iconPending = true;
+    setTimeout(() => { this._iconPending = false; this.icons(); }, 250);
+  }
+  componentWillUnmount() {
+    clearInterval(this.demoPoll); clearInterval(this.iconTimer); clearInterval(this.poll); clearInterval(this.timer); clearInterval(this._capTimer);
+    if (this._audio) this._audio.pause();
+    window.removeEventListener('keydown', this.onKey, true);
+  }
+  coldActive() {
+    const s = document.querySelector('section[data-label="Cold Open"]');
+    return !!(s && s.hasAttribute('data-deck-active'));
+  }
+  icons() { if (window.lucide && document.querySelector('i[data-lucide]')) window.lucide.createIcons(); }
+  ioData = [
+    { truck: 'truck-47', sev: 'high', eta: '9.0' },
+    { truck: 'truck-12', sev: 'high', eta: '7.0' },
+    { truck: 'truck-31', sev: 'medium', eta: '6.0' }
+  ];
+  anim(label, now, period) {
+    this._an = this._an || {};
+    const st = this._an[label] || (this._an[label] = { active: false, start: null });
+    const sec = document.querySelector(`section[data-label="${label}"]`);
+    const active = !!(sec && sec.hasAttribute('data-deck-active'));
+    if (active && !st.active) st.start = now;
+    st.active = active;
+    if (!active || st.start == null) return { idx: 99, within: 99999 };
+    const el = now - st.start - 800;
+    if (el < 0) return { idx: -1, within: 0 };
+    return { idx: Math.floor(el / period), within: el % period };
+  }
+  ioVals() {
+    const L = 'One In, Zero or One Out';
+    const { idx, within } = this.anim(L, this.state.now, 3000);
+    const n = this.ioData.length;
+    const sevC = { high: ['var(--ui-status-danger)', 'var(--ui-status-danger-soft)', 'var(--ui-status-danger-contrast)'], medium: ['#c15800', 'var(--ui-status-warning-soft)', '#c15800'] };
+    const at = (i, ms) => i < idx || (i === idx && within >= ms);
+    const rows = this.ioData.map((r, i) => {
+      const shown = i <= idx, cur = i === idx && within < 1400;
+      return { truck: r.truck, sev: r.sev, eta: r.eta, border: sevC[r.sev][0], badgeBg: sevC[r.sev][1], badgeFg: sevC[r.sev][2],
+        op: shown ? 1 : 0, tf: shown ? 'none' : 'translateX(-32px)', glow: cur ? '0 0 0 6px rgba(124,58,237,0.22)' : 'none' };
+    });
+    const cleared = at(n - 1, 2600);
+    const slots = this.ioData.map((r, i) => {
+      const filled = !cleared && at(i, 600);
+      return { label: filled ? r.truck : '', bg: filled ? 'var(--purple-600)' : '#ffffff', border: filled ? 'var(--purple-600)' : 'var(--gray-200)', style: filled ? 'solid' : 'dashed' };
+    });
+    const count = cleared ? 0 : this.ioData.filter((r, i) => at(i, 600)).length;
+    const ci = Math.max(0, Math.min(n - 1, idx));
+    let res = '', resFg = 'var(--ui-text-secondary)';
+    if (idx >= 0 && at(ci, 1400)) {
+      if (ci < n - 1) { res = 'return None'; }
+      else { res = cleared ? 'publish · clear I-95N' : '3 = threshold → synthesize()'; resFg = 'var(--purple-700)'; }
+    }
+    const none = this.ioData.slice(0, n - 1).map((r, i) => ({ truck: r.truck, op: at(i, 1400) ? 1 : 0, tf: at(i, 1400) ? 'none' : 'translateX(-24px)' }));
+    const outShown = at(n - 1, 2200);
+    const busy = idx >= 0 && idx < n && within < 2600;
+    return {
+      ioRows: rows, ioSlots: slots, ioNone: none,
+      accCount: String(count), accNote: cleared ? 'cleared after publish' : 'threshold 3',
+      fnRes: res, fnResFg: resFg, fnResOp: res ? 1 : 0,
+      fnGlow: busy ? '0 0 0 8px rgba(124,58,237,0.18)' : 'none',
+      outOp: outShown ? 1 : 0, outTf: outShown ? 'none' : 'translateX(-24px)',
+      ioIn: String(this.ioData.filter((r, i) => i <= idx).length), ioOutN: outShown ? '1' : '0',
+      replayIo: () => { this._an[L].start = Date.now(); this.setState({ now: Date.now() }); }
+    };
+  }
+  clips = { cold: 'assets/audio/cold-open-I-95N.wav', rawI95: 'assets/audio/raw-I-95N.wav', rawEta: 'assets/audio/raw-ETA.wav', normI95: 'assets/audio/normalized-I-95N.wav', normEta: 'assets/audio/normalized-ETA.wav' };
+  capChunks = [
+    'Approaching I-95N, we\'re seeing a slowdown',
+    'impacting multiple trucks.',
+    'Traffic is being rerouted to avoid the congestion,',
+    'with three trucks experiencing significant delays.',
+    'Please follow the reroute instructions',
+    'for a smoother journey.'
+  ];
+  playClip(key) {
+    clearInterval(this._capTimer);
+    if (this._audio) { this._audio.pause(); this._audio = null; }
+    if (this.state.playing === key) { this.setState({ playing: null, capT: 0 }); return; }
+    const a = new Audio(this.clips[key]);
+    a.onended = () => { if (this._audio === a) { clearInterval(this._capTimer); this._audio = null; this.setState({ playing: null, capT: 0 }); } };
+    this._audio = a;
+    a.play();
+    if (key === 'cold') this._capTimer = setInterval(() => this.setState({ capT: a.currentTime, capDur: a.duration || 0 }), 100);
+    this.setState({ playing: key, capT: 0 });
+  }
+  captionVals() {
+    const on = this.state.playing === 'cold' && this.state.capDur > 0;
+    if (!on) return { caption: '', capOp: 0 };
+    const w = this.capChunks.map(c => c.length), total = w.reduce((a, b) => a + b, 0);
+    const p = Math.min(0.999, this.state.capT / this.state.capDur) * total;
+    let acc = 0, idx = 0;
+    for (let i = 0; i < w.length; i++) { acc += w[i]; if (p < acc) { idx = i; break; } }
+    return { caption: this.capChunks[idx], capOp: 1 };
+  }
+  clipVals() {
+    const o = {};
+    Object.keys(this.clips).forEach(k => {
+      o['play_' + k] = (e) => { if (e && e.stopPropagation) e.stopPropagation(); this.playClip(k); };
+      o['label_' + k] = this.state.playing === k ? 'Stop' : 'Play';
+    });
+    const on = this.state.playing === 'cold';
+    const h = React.createElement;
+    const tri = (sz, fill) => h('svg', { width: sz, height: sz, viewBox: '0 0 24 24' }, h('path', { d: 'M6 3 L21 12 L6 21 z', fill }));
+    const sq = (sz, fill) => h('svg', { width: sz, height: sz, viewBox: '0 0 24 24' }, h('rect', { x: 5, y: 5, width: 14, height: 14, rx: 2, fill }));
+    o.icon_cold = on ? sq(44, '#ffffff') : tri(44, '#ffffff');
+    o.iconSm_cold = on ? sq(22, 'var(--purple-600)') : tri(22, 'var(--purple-600)');
+    o.label_cold = on ? 'Playing… click to stop' : 'Click to play';
+    o.replayLabel = on ? 'Stop' : 'Replay the warning';
+    return o;
+  }
+  renderVals() {
+    const n = this.facts.length, i = this.state.i;
+    const rotateMs = (this.props.rotateSeconds ?? 12) * 1000;
+    const end = this.endAt ?? (Date.now() + (this.props.countdownMinutes ?? 5) * 60000);
+    const rem = Math.max(0, Math.ceil((end - this.state.now) / 1000));
+    return {
+      demoRef: this.demoRef,
+      demoPaused: this.state.demoPlaying !== true,
+      onDemoPlay: () => this.setState({ demoPlaying: true }),
+      onDemoPause: () => this.setState({ demoPlaying: false }),
+      playDemo: (e) => { if (e && e.stopPropagation) e.stopPropagation(); const v = this.demoRef.current; if (v) { v.muted = false; v.play().catch(() => {}); } },
+      fact: this.facts[i],
+      counter: String(i + 1).padStart(2, '0') + ' / ' + String(n).padStart(2, '0'),
+      dots: this.facts.map((_, k) => ({ size: k === i ? '14px' : '10px', bg: k === i ? '#ffffff' : 'rgba(255,255,255,0.4)' })),
+      progress: Math.min(100, (this.state.t / rotateMs) * 100) + '%',
+      countLabel: rem > 0 ? 'Starting in' : 'Starting now',
+      clock: Math.floor(rem / 60) + ':' + String(rem % 60).padStart(2, '0'),
+      prev: () => this.go(-1),
+      next: () => this.go(1),
+      coldOp: this.state.coldRevealed ? 1 : 0,
+      coldTf: this.state.coldRevealed ? 'none' : 'translateY(16px)',
+      revealCold: () => this.setState({ coldRevealed: true }),
+      ...this.ioVals(),
+      ...this.clipVals(),
+      ...this.captionVals()
+    };
+  }
+}
+</script>
+</body>
+</html>

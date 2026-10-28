@@ -1,4 +1,4 @@
-# Talk 2 — The Greenest Token
+# The Greenest Token Is the One That Never Hits a GPU
 
 The efficiency story of small-model inference at fleet scale. Contrasts the
 CPU-only small-model approach this project actually ships — a quantized

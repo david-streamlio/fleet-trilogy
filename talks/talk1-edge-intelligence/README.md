@@ -1,4 +1,4 @@
-# Talk 1 — Edge Intelligence
+# Edge Intelligence for Connected Fleets: 1-Bit LLMs Inside Apache Pulsar Functions
 
 Tier 1 edge demo: cheap-math detection (in `fleet-telemetry-model`) plus the 1-bit
 LLM's local interpretation step, producing an `EnrichmentCard` for a probable
