@@ -33,9 +33,15 @@ Three talks, one underlying system, told from three angles:
 **All three talk packages are built**, along with `shared/` and a runnable end-to-end
 local demo (`deploy/README.md` — Pulsar via docker-compose, a localrun script per
 tier, and a mock-LLM mode for dry runs without real models). What's still open: a
-slide deck (not started yet), and a handful of open questions tracked in
-`docs/TALK2-OUTLINE.md`'s "Not yet decided" section — talk1 and talk3 don't have
-their own outline docs yet.
+handful of open questions tracked in `docs/TALK2-OUTLINE.md`'s "Not yet decided"
+section. Talk 3's outline is `docs/TALK3-OUTLINE.md`; talk1 doesn't have its own
+outline doc yet.
+
+**Slides.** Each talk's deck is in `talks/<talk>/slides/`: a standalone HTML copy, a
+PPTX and the editable Claude Design source. The decks are published at
+`streaming-expert.com/talks/slides/<slug>/` (`edge-intelligence-coc-2026`,
+`greenest-token-coc-2026`, `pulsar-speaks-english-coc-2026`) as framework ports in the
+`david-decks` repo. Change a deck's source here first, then its port.
 
 ## One shared codebase
 
